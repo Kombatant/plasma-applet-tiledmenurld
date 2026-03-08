@@ -1,0 +1,693 @@
+# Translation of Tiled Menu Reloaded in id
+# Copyright (C) 2019
+# This file is distributed under the same license as the Tiled Menu Reloaded package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Tiled Menu Reloaded\n"
+"Report-Msgid-Bugs-To: https://github.com/Kombatant/plasma-applet-tiled_rld/issues\n"
+"POT-Creation-Date: 2025-02-25 20:49+1100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: Dika Muhamad A. <ardumpl@gmail.com>\n"
+"Language-Team: Indonesia <LL@li.org>\n"
+"Language: id\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Show border under Group Tile name"
+msgstr ""
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Yes"
+msgstr ""
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "No"
+msgstr ""
+
+#: ../metadata.json
+msgid "Tiled Menu"
+msgstr ""
+
+#: ../metadata.json
+msgid "A menu based on Windows 10's Start Menu."
+msgstr ""
+
+#: ../contents/config/config.qml
+msgid "General"
+msgstr "Setelan Umum"
+
+#: ../contents/config/config.qml
+msgid "Import/Export Layout"
+msgstr "Impor/Ekspor Layout"
+
+#: ../contents/config/config.qml
+msgid "Advanced"
+msgstr "Setelan Lanjutan"
+
+#: ../contents/ui/AppContextMenu.qml
+msgid "Unpin from Menu"
+msgstr "Lepaskan Pin dari Menu"
+
+#: ../contents/ui/AppContextMenu.qml
+msgid "Pin to Menu"
+msgstr "Pin Aplikasi ke Menu"
+
+#: ../contents/ui/AppContextMenu.qml
+msgid "Pin to Taskbar"
+msgstr "Pin Aplikasi ke Taskbar"
+
+#: ../contents/ui/AppsModel.qml
+msgid "Recent Apps"
+msgstr "Aplikasi Terkini"
+
+#: ../contents/ui/AppsModel.qml
+msgid "Most Used"
+msgstr "Paling Banyak Dipakai"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Popup"
+msgstr "Popup"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Fullscreen"
+msgstr "Tampilkan Layar Penuh"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Grid Columns"
+msgstr "Kolom Grid"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "px"
+msgstr " piksel"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Panel Icon"
+msgstr "Ikon Panel"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Fixed Size"
+msgstr "Kunci Ukuran Ikon Panel"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Tiles"
+msgstr "Ubin"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Tile Size"
+msgstr "Ukuran Ubin"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Tile Margin"
+msgstr "Margin Ubin"
+
+#: ../contents/ui/config/ConfigGeneral.qml ../contents/ui/TileEditorView.qml
+msgid "Background Color"
+msgstr "Warna Latar Belakang"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Custom Color"
+msgstr "Warna Kustom"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Gradient"
+msgstr ""
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Transparent"
+msgstr "Transparan"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Text Alignment"
+msgstr "Perataan Teks"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Left"
+msgstr "Kiri"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Center"
+msgstr "Tengah"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Right"
+msgstr "Kanan"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Group Text Alignment"
+msgstr ""
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Sidebar"
+msgstr "Bilah Sisi"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Width"
+msgstr ""
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Icon Size"
+msgstr "Ukuran Ikon"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Popup Button Height"
+msgstr ""
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Theme"
+msgstr ""
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Sidebar Shortcuts"
+msgstr "Pintasan Bilah Sisi"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Add Default"
+msgstr "Tambahkan Default"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Search Box"
+msgstr "Kotak Pencarian"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Hide Search Field"
+msgstr ""
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Search Field Height"
+msgstr "Tinggi Kotak Pencarian"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Search Box Theme"
+msgstr ""
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Windows (White)"
+msgstr "Warna Putih"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "App List"
+msgstr "Daftar Aplikasi"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "App List Area Width"
+msgstr "Lebar Daftar Aplikasi"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Default View"
+msgstr "Tampilan Awal"
+
+#: ../contents/ui/config/ConfigGeneral.qml ../contents/ui/SidebarView.qml
+msgid "Alphabetical"
+msgstr "Urut Alfabet"
+
+#: ../contents/ui/config/ConfigGeneral.qml ../contents/ui/SidebarView.qml
+msgid "Categories"
+msgstr "Kategori"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Jump To Letter"
+msgstr "Lompat ke Huruf"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Jump To Category"
+msgstr "Lompat ke Kategori"
+
+#: ../contents/ui/config/ConfigGeneral.qml ../contents/ui/SidebarView.qml
+msgid "Tiles Only"
+msgstr "Tampilkan Ubin Saja"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "App Description"
+msgstr "Deskripsi Aplikasi"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Hidden"
+msgstr "Sembunyikan Deskripsi"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "After"
+msgstr "Setelah Nama Aplikasi"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Below"
+msgstr "Di bawah Nama Aplikasi"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "App History"
+msgstr ""
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Show:"
+msgstr "Tampilkan:"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Recent applications"
+msgstr "Aplikasi Baru-baru ini"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Often used applications"
+msgstr "Aplikasi yang sering digunakan"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Search Results"
+msgstr "Hasil Pencarian"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Merged (Application Launcher)"
+msgstr "Digabung (Peluncur Aplikasi)"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Split into Categories (Application Menu / Dashboard)"
+msgstr "Pisahkan dalam Kategori (Menu Aplikasi / Dasbor)"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Right Click Menu"
+msgstr ""
+
+#: ../contents/ui/config/ConfigGeneral.qml ../contents/ui/main.qml
+msgid "Terminal"
+msgstr "Terminal"
+
+#: ../contents/ui/config/ConfigGeneral.qml ../contents/ui/main.qml
+msgid "Task Manager"
+msgstr "Pemantau Tugas"
+
+#: ../contents/ui/config/ConfigGeneral.qml ../contents/ui/main.qml
+msgid "File Manager"
+msgstr "Manajer Berkas"
+
+#: ../contents/ui/config/ConfigurationShortcuts.qml
+msgid ""
+"When this widget has a global shortcut set, like 'Alt+F1', Plasma will open "
+"this menu with just the ⊞ Windows / Meta key."
+msgstr ""
+"Jika gawit ini memiliki tombol pintasan global (seperti Alt+F1), Plasma akan "
+"membuka gawit ini dengan tombol Super/Windows"
+
+#: ../contents/ui/main.qml
+msgid "System Info"
+msgstr "Info Sistem"
+
+#: ../contents/ui/main.qml ../contents/ui/SearchFiltersView.qml
+msgid "System Settings"
+msgstr "Setelan Sistem"
+
+#: ../contents/ui/main.qml
+msgid "Edit Applications..."
+msgstr "Sunting Aplikasi..."
+
+#: ../contents/ui/Popup.qml
+msgid "Resize?"
+msgstr "Ingin Ubah Ukuran?"
+
+#: ../contents/ui/Popup.qml ../contents/ui/TileGridSplash.qml
+msgid "Meta + Right Click to resize the menu."
+msgstr "Cukup dengan tombol Meta+Klik Kanan"
+
+#: ../contents/ui/SearchField.qml
+msgid "Search"
+msgstr "Cari"
+
+#: ../contents/ui/SearchField.qml
+msgid "Search Apps"
+msgstr "Cari Aplikasi"
+
+#: ../contents/ui/SearchField.qml
+msgid "Search Files"
+msgstr "Cari Berkas"
+
+#: ../contents/ui/SearchField.qml
+msgid "Search Bookmarks"
+msgstr "Cari Penanda"
+
+#: ../contents/ui/SearchField.qml
+msgctxt "Search [krunnerName, krunnerName, ...], "
+msgid "Search %1"
+msgstr "Cari %1"
+
+#: ../contents/ui/SearchFiltersViewItem.qml
+#: ../contents/ui/SearchFiltersView.qml
+msgid "Default"
+msgstr "Default"
+
+#: ../contents/ui/SearchFiltersView.qml
+msgid "All"
+msgstr "Semua"
+
+#: ../contents/ui/SearchFiltersView.qml
+msgid "Search with all KRunner plugins"
+msgstr "Cari dengan plugin Krunner"
+
+#: ../contents/ui/SearchFiltersView.qml
+msgid "Search with user selected defaults"
+msgstr "Cari dengan pilihan default pengguna"
+
+#: ../contents/ui/SearchFiltersView.qml
+msgid "Applications"
+msgstr "Aplikasi"
+
+#: ../contents/ui/SearchFiltersView.qml
+msgid "Files"
+msgstr "Berkas"
+
+#: ../contents/ui/SearchFiltersView.qml
+msgid "Music"
+msgstr "Musik"
+
+#: ../contents/ui/SearchFiltersView.qml
+msgid "Videos"
+msgstr "Video"
+
+#: ../contents/ui/SearchFiltersView.qml
+msgid "Bookmarks"
+msgstr "Penanda"
+
+#: ../contents/ui/SearchFiltersView.qml
+msgid "Locations"
+msgstr "Lokasi"
+
+#: ../contents/ui/SearchFiltersView.qml
+msgid "Dictionary"
+msgstr "Kamus"
+
+#: ../contents/ui/SearchFiltersView.qml
+msgid "Shell"
+msgstr "Shell"
+
+#: ../contents/ui/SearchFiltersView.qml
+msgid "Calculator"
+msgstr "Kalkulator"
+
+#: ../contents/ui/SearchFiltersView.qml
+msgid "Windowed Widgets"
+msgstr "Gawit Terjendelakan"
+
+#: ../contents/ui/SearchFiltersView.qml
+msgid "Date/Time"
+msgstr "Jam/Tanggal"
+
+#: ../contents/ui/SearchFiltersView.qml
+msgid "Unit Converter"
+msgstr "Pengkornversi Unit"
+
+#: ../contents/ui/SearchResultsView.qml
+msgid "Filters"
+msgstr "Saring"
+
+#: ../contents/ui/SidebarView.qml
+msgid "User Manager"
+msgstr "Manajer Pengguna"
+
+#: ../contents/ui/SidebarView.qml
+msgid "Power"
+msgstr "Daya"
+
+#: ../contents/ui/TileEditorView.qml ../contents/ui/TileItem.qml
+msgid "Edit Tile"
+msgstr "Sunting Judul"
+
+#: ../contents/ui/TileEditorView.qml
+msgid "Reset Tile"
+msgstr "Atur Ulang Judul"
+
+#: ../contents/ui/TileEditorView.qml
+msgid "Close"
+msgstr "Tutup"
+
+#: ../contents/ui/TileEditorView.qml
+msgid "Url"
+msgstr "Alamat URL"
+
+#: ../contents/ui/TileEditorView.qml
+msgid "Label"
+msgstr "Nama Label Ubin"
+
+#: ../contents/ui/TileEditorView.qml
+msgid "Icon"
+msgstr "Ikon"
+
+#: ../contents/ui/TileEditorView.qml
+msgid "Background Image"
+msgstr "Gambar Latar Belakang"
+
+#: ../contents/ui/TileEditorView.qml
+msgid "Choose an image"
+msgstr "Pilih Gambar"
+
+#: ../contents/ui/TileEditorView.qml
+msgid "Image Files (*.png *.apng *.gif *.webp *.jpg *.jpeg *.bmp *.svg *.svgz)"
+msgstr "Berkas Gambar (*.png *.apng *.gif *.webp *.jpg *.jpeg *.bmp *.svg *.svgz)"
+
+#: ../contents/ui/TileEditorView.qml
+msgid "Preset Tiles"
+msgstr "Preset Ubin"
+
+#: ../contents/ui/TileEditorView.qml
+msgid "Position / Size"
+msgstr "Posisi / Ukuran"
+
+#: ../contents/ui/TileEditorRectField.qml
+msgid "x:"
+msgstr "x:"
+
+#: ../contents/ui/TileEditorRectField.qml
+msgid "y:"
+msgstr "y:"
+
+#: ../contents/ui/TileEditorRectField.qml
+msgid "w:"
+msgstr "w:"
+
+#: ../contents/ui/TileEditorRectField.qml
+msgid "h:"
+msgstr "h:"
+
+#: ../contents/ui/TileGridPresets.qml
+msgid "Add Preset"
+msgstr ""
+
+#: ../contents/ui/TileGridPresets.qml
+msgid "Productivity"
+msgstr ""
+
+#: ../contents/ui/TileGridPresets.qml
+msgid "Explore"
+msgstr ""
+
+#: ../contents/ui/TileGridPresets.qml
+msgid "Gmail"
+msgstr ""
+
+#: ../contents/ui/TileGridPresets.qml
+msgid "Software Center"
+msgstr "Pusat Perangkat Lunak"
+
+#: ../contents/ui/TileGrid.qml
+msgid "New Group"
+msgstr "Kelompok Baru"
+
+#: ../contents/ui/TileGrid.qml
+msgid "Unlock Tiles"
+msgstr "Buka Kunci Ubin"
+
+#: ../contents/ui/TileGrid.qml
+msgid "Lock Tiles"
+msgstr "Kunci Ubin"
+
+#: ../contents/ui/TileGrid.qml
+msgctxt "default group label"
+msgid "Group"
+msgstr "Kelompok"
+
+#: ../contents/ui/TileGridSplash.qml
+msgid "Getting Started"
+msgstr ""
+
+#: ../contents/ui/TileGridSplash.qml
+msgid "Drag apps onto the grid."
+msgstr ""
+
+#: ../contents/ui/TileGridSplash.qml
+msgid "Drag folders from the file manager here."
+msgstr ""
+
+#: ../contents/ui/TileGridSplash.qml
+msgid "Use Default Tile Layout"
+msgstr ""
+
+#: ../contents/ui/TileItem.qml
+msgid "Sort Tiles"
+msgstr "Urutkan Ubin"
+
+#~ msgid "<b>Version:</b> %1"
+#~ msgstr "<b>Versi:</b> %1"
+
+#~ msgid "Desktop Theme (%1)"
+#~ msgstr "Sesuaikan Warna dengan Tema Desktop (%1)"
+
+#~ msgid "Menu"
+#~ msgstr "Menu"
+
+#~ msgid "Apps"
+#~ msgstr "Aplikasi"
+
+#: ../contents/ui/SidebarView.qml
+msgid "Tiled Menu Reloaded Settings"
+msgstr ""
+
+#: ../contents/ui/config/ConfigMain.qml
+msgid "AI Chat"
+msgstr "Obrolan AI"
+
+#: ../contents/ui/AiChatView.qml
+msgid "+ Start New Chat"
+msgstr "+ Mulai Obrolan Baru"
+
+#: ../contents/ui/AiChatView.qml
+msgid "Delete This Conversation"
+msgstr "Hapus Percakapan Ini"
+
+#: ../contents/ui/AiChatView.qml
+msgid "You"
+msgstr "kamu"
+
+#: ../contents/ui/AiChatView.qml
+msgid "Assistant"
+msgstr "Asisten"
+
+#: ../contents/ui/AiChatView.qml
+msgid "Start a new conversation"
+msgstr "Mulailah percakapan baru"
+
+#: ../contents/ui/AiChatView.qml
+msgid "Configure provider, API key and model in settings before sending."
+msgstr "Konfigurasikan penyedia, kunci API, dan model dalam pengaturan sebelum mengirim."
+
+#: ../contents/ui/AiChatView.qml
+msgid "Ask anything... (Enter to send, Shift+Enter for newline)"
+msgstr "Tanyakan apa saja... (Enter untuk mengirim, Shift+Enter untuk baris baru)"
+
+#: ../contents/ui/AiChatModel.qml
+msgid "New Chat"
+msgstr "Obrolan Baru"
+
+#: ../contents/ui/AiChatModel.qml
+msgid "Please choose a model in settings."
+msgstr "Silakan pilih model di pengaturan."
+
+#: ../contents/ui/AiChatModel.qml
+msgid "Please enter an API key in settings."
+msgstr "Silakan masukkan kunci API di pengaturan."
+
+#: ../contents/ui/AiChatModel.qml
+msgid "Waiting for response..."
+msgstr "Menunggu tanggapan..."
+
+#: ../contents/ui/AiChatModel.qml
+msgid "The provider returned an empty response."
+msgstr "Penyedia mengembalikan respons kosong."
+
+#: ../contents/ui/AiChatModel.qml
+msgid "Please enter an API key before detecting models."
+msgstr "Silakan masukkan kunci API sebelum mendeteksi model."
+
+#: ../contents/ui/AiChatModel.qml ../contents/ui/config/ConfigAiChat.qml
+msgid "Detecting models..."
+msgstr "Mendeteksi model..."
+
+#: ../contents/ui/AiChatModel.qml
+msgid "No models were detected for this provider."
+msgstr "Tidak ada model yang terdeteksi untuk penyedia ini."
+
+#: ../contents/ui/AiChatModel.qml
+msgid "Invalid JSON response from provider."
+msgstr "Respons JSON tidak valid dari penyedia."
+
+#: ../contents/ui/AiChatModel.qml
+msgid "Request failed (%1)."
+msgstr "Permintaan gagal (%1)."
+
+#: ../contents/ui/AiChatModel.qml
+msgid "Request failed (%1): %2"
+msgstr "Permintaan gagal (%1): %2"
+
+#: ../contents/ui/config/ConfigAiChat.qml
+msgid "Add an API key to detect models."
+msgstr "Tambahkan kunci API untuk mendeteksi model."
+
+#: ../contents/ui/config/ConfigAiChat.qml
+msgid "Model detection failed (%1)."
+msgstr "Deteksi model gagal (%1)."
+
+#: ../contents/ui/config/ConfigAiChat.qml
+msgid "No models were detected."
+msgstr "Tidak ada model yang terdeteksi."
+
+#: ../contents/ui/config/ConfigAiChat.qml
+msgid "Detected %1 model(s)."
+msgstr "%1 model terdeteksi."
+
+#: ../contents/ui/config/ConfigAiChat.qml
+msgid "Paste your API key to auto-detect models."
+msgstr "Tempelkan kunci API Anda untuk mendeteksi model secara otomatis."
+
+#: ../contents/ui/config/ConfigAiChat.qml
+msgid "Provider"
+msgstr "Penyedia"
+
+#: ../contents/ui/config/ConfigAiChat.qml
+msgid "AI Provider"
+msgstr "Penyedia AI"
+
+#: ../contents/ui/config/ConfigAiChat.qml
+msgid "API Key"
+msgstr "Kunci API"
+
+#: ../contents/ui/config/ConfigAiChat.qml
+msgid "Required for this provider"
+msgstr "Diperlukan untuk penyedia ini"
+
+#: ../contents/ui/config/ConfigAiChat.qml
+msgid "Hide API Key"
+msgstr "Sembunyikan Kunci API"
+
+#: ../contents/ui/config/ConfigAiChat.qml
+msgid "Show API Key"
+msgstr "Tampilkan Kunci API"
+
+#: ../contents/ui/config/ConfigAiChat.qml
+msgid "Ollama Server"
+msgstr "Server Ollama"
+
+#: ../contents/ui/config/ConfigAiChat.qml
+msgid "Detected Models"
+msgstr "Model yang Terdeteksi"
+
+#: ../contents/ui/config/ConfigAiChat.qml
+msgid "Reload models"
+msgstr "Muat ulang model"
+
+#: ../contents/ui/config/ConfigAiChat.qml
+msgid "No models detected yet. Paste your API key to auto-detect."
+msgstr "Belum ada model yang terdeteksi. Tempelkan kunci API Anda untuk mendeteksi secara otomatis."
+
+#: ../contents/ui/config/ConfigAiChat.qml
+msgid "Chat Options"
+msgstr "Opsi Obrolan"
+
+#: ../contents/ui/config/ConfigAiChat.qml
+msgid "Enable streaming responses"
+msgstr "Aktifkan respons streaming"
+
+#: ../contents/ui/config/ConfigAiChat.qml
+msgid "Notes"
+msgstr "Catatan"
+
+#: ../contents/ui/config/ConfigAiChat.qml
+msgid "OpenAI, OpenRouter, Google, Perplexity and Anthropic require network access and an API key. Ollama connects to a local server (default: http://127.0.0.1:11434)."
+msgstr "OpenAI, OpenRouter, Google, Perplexity, dan Anthropic memerlukan akses jaringan dan kunci API. Ollama terhubung ke server lokal (default: http://127.0.0.1:11434)."
+

@@ -1,0 +1,696 @@
+# Translation of Tiled Menu Reloaded in ru
+# Copyright (C) 2018 Senkin Nikita <niksnbfmail@gmail.com>
+# This file is distributed under the same license as the Tiled Menu Reloaded package.
+# Senkin Nikita <niksnbfmail@gmail.com>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Tiled Menu Reloaded\n"
+"Report-Msgid-Bugs-To: https://github.com/Kombatant/plasma-applet-tiled_rld/issues\n"
+"POT-Creation-Date: 2025-02-25 20:49+1100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: Senkin Nikita <niksnbfmail@gmail.com>\n"
+"Language-Team: Niksn <LL@li.org>\n"
+"Language: ru\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Show border under Group Tile name"
+msgstr ""
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Yes"
+msgstr ""
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "No"
+msgstr ""
+
+#: ../metadata.json
+msgid "Tiled Menu"
+msgstr "Плиточное Меню"
+
+#: ../metadata.json
+msgid "A menu based on Windows 10's Start Menu."
+msgstr "Меню, основанное на меню Пуск Windows 10."
+
+#: ../contents/config/config.qml
+msgid "General"
+msgstr "Основные"
+
+#: ../contents/config/config.qml
+msgid "Import/Export Layout"
+msgstr "Импортировать/Экспортировать разметку"
+
+#: ../contents/config/config.qml
+msgid "Advanced"
+msgstr "Дополнительные"
+
+#: ../contents/ui/AppContextMenu.qml
+msgid "Unpin from Menu"
+msgstr "Открепить от Меню"
+
+#: ../contents/ui/AppContextMenu.qml
+msgid "Pin to Menu"
+msgstr "Прикрепить к Меню"
+
+#: ../contents/ui/AppContextMenu.qml
+msgid "Pin to Taskbar"
+msgstr "Прикрепить к Панели Задач"
+
+#: ../contents/ui/AppsModel.qml
+msgid "Recent Apps"
+msgstr "Недавние Программы"
+
+#: ../contents/ui/AppsModel.qml
+msgid "Most Used"
+msgstr "Часто Используемые"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Popup"
+msgstr "Появление"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Fullscreen"
+msgstr "На весь экран"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Grid Columns"
+msgstr "Столбцы Сетки"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "px"
+msgstr "px"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Panel Icon"
+msgstr "Значок на Панели"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Fixed Size"
+msgstr "Постоянный Размер"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Tiles"
+msgstr "Плитки"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Tile Size"
+msgstr "Размер Плитки"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Tile Margin"
+msgstr "Край плитки"
+
+#: ../contents/ui/config/ConfigGeneral.qml ../contents/ui/TileEditorView.qml
+msgid "Background Color"
+msgstr "Цвет Фона"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Custom Color"
+msgstr "Пользовательский Цвет"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Gradient"
+msgstr "Градиент"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Transparent"
+msgstr "Прозрачный"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Text Alignment"
+msgstr "Выравнивание Текста"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Left"
+msgstr "Слева"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Center"
+msgstr "По Центру"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Right"
+msgstr "Справа"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Group Text Alignment"
+msgstr ""
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Sidebar"
+msgstr "Боковая панель"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Width"
+msgstr "Ширина"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Icon Size"
+msgstr "Размер Иконки"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Popup Button Height"
+msgstr "Высота Всплывающей Кнопки"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Theme"
+msgstr ""
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Sidebar Shortcuts"
+msgstr "Ярлыки на Боковой панели"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Add Default"
+msgstr "Добавить Значение по умолчанию"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Search Box"
+msgstr "Поле Поиска"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Hide Search Field"
+msgstr "Скрыть Поле Поиска"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Search Field Height"
+msgstr "Высота Поля Поиска"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Search Box Theme"
+msgstr ""
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Windows (White)"
+msgstr "Windows (Белый)"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "App List"
+msgstr "Список Приложений"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "App List Area Width"
+msgstr "Ширина Списка Приложений"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Default View"
+msgstr "Вид по умолчанию"
+
+#: ../contents/ui/config/ConfigGeneral.qml ../contents/ui/SidebarView.qml
+msgid "Alphabetical"
+msgstr "По Алфавиту"
+
+#: ../contents/ui/config/ConfigGeneral.qml ../contents/ui/SidebarView.qml
+msgid "Categories"
+msgstr "Категории"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Jump To Letter"
+msgstr "Перейти к Букве"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Jump To Category"
+msgstr "Перейти к Категории"
+
+#: ../contents/ui/config/ConfigGeneral.qml ../contents/ui/SidebarView.qml
+msgid "Tiles Only"
+msgstr "Только Плитки"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "App Description"
+msgstr "Описание Приложения"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Hidden"
+msgstr "Скрыто"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "After"
+msgstr "После"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Below"
+msgstr "Ниже"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "App History"
+msgstr ""
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Show:"
+msgstr "Показывать:"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Recent applications"
+msgstr "Последние приложения"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Often used applications"
+msgstr "Часто используемые приложения"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Search Results"
+msgstr "Результаты Поиска"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Merged (Application Launcher)"
+msgstr "Объединённые (Меню запуска приложений)"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Split into Categories (Application Menu / Dashboard)"
+msgstr "Разделённые по Категориям (Меню приложений / Доска приложений)"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Right Click Menu"
+msgstr ""
+
+#: ../contents/ui/config/ConfigGeneral.qml ../contents/ui/main.qml
+msgid "Terminal"
+msgstr "Терминал"
+
+#: ../contents/ui/config/ConfigGeneral.qml ../contents/ui/main.qml
+msgid "Task Manager"
+msgstr "Диспетчер Задач"
+
+#: ../contents/ui/config/ConfigGeneral.qml ../contents/ui/main.qml
+msgid "File Manager"
+msgstr "Файловый Менеджер"
+
+#: ../contents/ui/config/ConfigurationShortcuts.qml
+msgid ""
+"When this widget has a global shortcut set, like 'Alt+F1', Plasma will open "
+"this menu with just the ⊞ Windows / Meta key."
+msgstr ""
+"Когда этому виджету назначена глобальная комбинация клавиш, например 'Alt + "
+"F1', Plasma будет открывать это меню только с помощью клавиши Win/Meta"
+
+#: ../contents/ui/main.qml
+msgid "System Info"
+msgstr "Информация о Системе"
+
+#: ../contents/ui/main.qml ../contents/ui/SearchFiltersView.qml
+msgid "System Settings"
+msgstr "Параметры системы"
+
+#: ../contents/ui/main.qml
+msgid "Edit Applications..."
+msgstr "Редактировать Приложения..."
+
+#: ../contents/ui/Popup.qml
+msgid "Resize?"
+msgstr "Изменить Размер?"
+
+#: ../contents/ui/Popup.qml ../contents/ui/TileGridSplash.qml
+msgid "Meta + Right Click to resize the menu."
+msgstr "Meta + ПКМ для изменения размера меню"
+
+#: ../contents/ui/SearchField.qml
+msgid "Search"
+msgstr "Поиск"
+
+#: ../contents/ui/SearchField.qml
+msgid "Search Apps"
+msgstr "Поиск по Приложениям"
+
+#: ../contents/ui/SearchField.qml
+msgid "Search Files"
+msgstr "Поиск по Файлам"
+
+#: ../contents/ui/SearchField.qml
+msgid "Search Bookmarks"
+msgstr "Поиск по Закладкам"
+
+#: ../contents/ui/SearchField.qml
+msgctxt "Search [krunnerName, krunnerName, ...], "
+msgid "Search %1"
+msgstr "Поиск по %1"
+
+#: ../contents/ui/SearchFiltersViewItem.qml
+#: ../contents/ui/SearchFiltersView.qml
+msgid "Default"
+msgstr "По умолчанию"
+
+#: ../contents/ui/SearchFiltersView.qml
+msgid "All"
+msgstr "Всё"
+
+#: ../contents/ui/SearchFiltersView.qml
+msgid "Search with all KRunner plugins"
+msgstr "Поиск со всеми модулями KRunner"
+
+#: ../contents/ui/SearchFiltersView.qml
+msgid "Search with user selected defaults"
+msgstr "Поиск с пользовательскими настройками"
+
+#: ../contents/ui/SearchFiltersView.qml
+msgid "Applications"
+msgstr "Приложения"
+
+#: ../contents/ui/SearchFiltersView.qml
+msgid "Files"
+msgstr "Файлы"
+
+#: ../contents/ui/SearchFiltersView.qml
+msgid "Music"
+msgstr "Музыка"
+
+#: ../contents/ui/SearchFiltersView.qml
+msgid "Videos"
+msgstr "Видео"
+
+#: ../contents/ui/SearchFiltersView.qml
+msgid "Bookmarks"
+msgstr "Закладки"
+
+#: ../contents/ui/SearchFiltersView.qml
+msgid "Locations"
+msgstr "Расположения"
+
+#: ../contents/ui/SearchFiltersView.qml
+msgid "Dictionary"
+msgstr "Словарь"
+
+#: ../contents/ui/SearchFiltersView.qml
+msgid "Shell"
+msgstr "Терминал"
+
+#: ../contents/ui/SearchFiltersView.qml
+msgid "Calculator"
+msgstr "Калькулятор"
+
+#: ../contents/ui/SearchFiltersView.qml
+msgid "Windowed Widgets"
+msgstr "Виджеты"
+
+#: ../contents/ui/SearchFiltersView.qml
+msgid "Date/Time"
+msgstr "Дата / Время"
+
+#: ../contents/ui/SearchFiltersView.qml
+msgid "Unit Converter"
+msgstr "Преобразование Величин"
+
+#: ../contents/ui/SearchResultsView.qml
+msgid "Filters"
+msgstr "Фильтры"
+
+#: ../contents/ui/SidebarView.qml
+msgid "User Manager"
+msgstr "Управление Пользователями"
+
+#: ../contents/ui/SidebarView.qml
+msgid "Power"
+msgstr "Выход"
+
+#: ../contents/ui/TileEditorView.qml ../contents/ui/TileItem.qml
+msgid "Edit Tile"
+msgstr "Изменить Плитку"
+
+#: ../contents/ui/TileEditorView.qml
+msgid "Reset Tile"
+msgstr "Сбросить плитку"
+
+#: ../contents/ui/TileEditorView.qml
+msgid "Close"
+msgstr "Закрыть"
+
+#: ../contents/ui/TileEditorView.qml
+msgid "Url"
+msgstr "Url"
+
+#: ../contents/ui/TileEditorView.qml
+msgid "Label"
+msgstr "Имя"
+
+#: ../contents/ui/TileEditorView.qml
+msgid "Icon"
+msgstr "Значок"
+
+#: ../contents/ui/TileEditorView.qml
+msgid "Background Image"
+msgstr "Фоновое Изображение"
+
+#: ../contents/ui/TileEditorView.qml
+msgid "Choose an image"
+msgstr "Выберите изображение"
+
+#: ../contents/ui/TileEditorView.qml
+msgid "Image Files (*.png *.apng *.gif *.webp *.jpg *.jpeg *.bmp *.svg *.svgz)"
+msgstr "Файлы Изображений (*.png *.apng *.gif *.webp *.jpg *.jpeg *.bmp *.svg *.svgz)"
+
+#: ../contents/ui/TileEditorView.qml
+msgid "Preset Tiles"
+msgstr "Пресет Плиток"
+
+#: ../contents/ui/TileEditorView.qml
+msgid "Position / Size"
+msgstr "Расположение / Размер"
+
+#: ../contents/ui/TileEditorRectField.qml
+msgid "x:"
+msgstr "x:"
+
+#: ../contents/ui/TileEditorRectField.qml
+msgid "y:"
+msgstr "y:"
+
+#: ../contents/ui/TileEditorRectField.qml
+msgid "w:"
+msgstr "w:"
+
+#: ../contents/ui/TileEditorRectField.qml
+msgid "h:"
+msgstr "h:"
+
+#: ../contents/ui/TileGridPresets.qml
+msgid "Add Preset"
+msgstr "Добавить Пресет"
+
+#: ../contents/ui/TileGridPresets.qml
+msgid "Productivity"
+msgstr "Продуктивность"
+
+#: ../contents/ui/TileGridPresets.qml
+msgid "Explore"
+msgstr "Исследование"
+
+#: ../contents/ui/TileGridPresets.qml
+msgid "Gmail"
+msgstr "Gmail"
+
+#: ../contents/ui/TileGridPresets.qml
+msgid "Software Center"
+msgstr "Центр программ"
+
+#: ../contents/ui/TileGrid.qml
+msgid "New Group"
+msgstr "Новая Группа"
+
+#: ../contents/ui/TileGrid.qml
+msgid "Unlock Tiles"
+msgstr "Разблокировать Плитки"
+
+#: ../contents/ui/TileGrid.qml
+msgid "Lock Tiles"
+msgstr "Заблокировать Плитки"
+
+#: ../contents/ui/TileGrid.qml
+msgctxt "default group label"
+msgid "Group"
+msgstr "Группа"
+
+#: ../contents/ui/TileGridSplash.qml
+msgid "Getting Started"
+msgstr "Начало"
+
+#: ../contents/ui/TileGridSplash.qml
+msgid "Drag apps onto the grid."
+msgstr "Переносите приложения сюда"
+
+#: ../contents/ui/TileGridSplash.qml
+msgid "Drag folders from the file manager here."
+msgstr "Переносите папки из файлого менеджера сюда"
+
+#: ../contents/ui/TileGridSplash.qml
+msgid "Use Default Tile Layout"
+msgstr "Использовать стандартную разметку плиток"
+
+#: ../contents/ui/TileItem.qml
+msgid "Sort Tiles"
+msgstr "Отсортировать Плитки"
+
+#~ msgid "<b>Version:</b> %1"
+#~ msgstr "<b>Версия:</b> %1"
+
+#~ msgid "Desktop Theme (%1)"
+#~ msgstr "Тема Рабочего Стола (%1)"
+
+#~ msgid "Menu"
+#~ msgstr "Меню"
+
+#~ msgid "Apps"
+#~ msgstr "Программы"
+
+#~ msgid "Show recent applications"
+#~ msgstr "Показать недавние приложения"
+
+#: ../contents/ui/SidebarView.qml
+msgid "Tiled Menu Reloaded Settings"
+msgstr ""
+
+#: ../contents/ui/config/ConfigMain.qml
+msgid "AI Chat"
+msgstr "AI-чат"
+
+#: ../contents/ui/AiChatView.qml
+msgid "+ Start New Chat"
+msgstr "+ Начать новый чат"
+
+#: ../contents/ui/AiChatView.qml
+msgid "Delete This Conversation"
+msgstr "Удалить этот разговор"
+
+#: ../contents/ui/AiChatView.qml
+msgid "You"
+msgstr "ты"
+
+#: ../contents/ui/AiChatView.qml
+msgid "Assistant"
+msgstr "Ассистент"
+
+#: ../contents/ui/AiChatView.qml
+msgid "Start a new conversation"
+msgstr "Начать новый разговор"
+
+#: ../contents/ui/AiChatView.qml
+msgid "Configure provider, API key and model in settings before sending."
+msgstr "Перед отправкой настройте поставщика, ключ API и модель в настройках."
+
+#: ../contents/ui/AiChatView.qml
+msgid "Ask anything... (Enter to send, Shift+Enter for newline)"
+msgstr "Спросите что угодно... (Enter для отправки, Shift+Enter для перехода на новую строку)"
+
+#: ../contents/ui/AiChatModel.qml
+msgid "New Chat"
+msgstr "Новый чат"
+
+#: ../contents/ui/AiChatModel.qml
+msgid "Please choose a model in settings."
+msgstr "Пожалуйста, выберите модель в настройках."
+
+#: ../contents/ui/AiChatModel.qml
+msgid "Please enter an API key in settings."
+msgstr "Пожалуйста, введите ключ API в настройках."
+
+#: ../contents/ui/AiChatModel.qml
+msgid "Waiting for response..."
+msgstr "Жду ответа..."
+
+#: ../contents/ui/AiChatModel.qml
+msgid "The provider returned an empty response."
+msgstr "Поставщик вернул пустой ответ."
+
+#: ../contents/ui/AiChatModel.qml
+msgid "Please enter an API key before detecting models."
+msgstr "Пожалуйста, введите ключ API перед обнаружением моделей."
+
+#: ../contents/ui/AiChatModel.qml ../contents/ui/config/ConfigAiChat.qml
+msgid "Detecting models..."
+msgstr "Обнаружение моделей..."
+
+#: ../contents/ui/AiChatModel.qml
+msgid "No models were detected for this provider."
+msgstr "Для этого поставщика не обнаружено моделей."
+
+#: ../contents/ui/AiChatModel.qml
+msgid "Invalid JSON response from provider."
+msgstr "Неверный ответ JSON от поставщика."
+
+#: ../contents/ui/AiChatModel.qml
+msgid "Request failed (%1)."
+msgstr "Запрос не выполнен (%1)."
+
+#: ../contents/ui/AiChatModel.qml
+msgid "Request failed (%1): %2"
+msgstr "Запрос не выполнен (%1): %2"
+
+#: ../contents/ui/config/ConfigAiChat.qml
+msgid "Add an API key to detect models."
+msgstr "Добавьте ключ API для обнаружения моделей."
+
+#: ../contents/ui/config/ConfigAiChat.qml
+msgid "Model detection failed (%1)."
+msgstr "Не удалось обнаружить модель (%1)."
+
+#: ../contents/ui/config/ConfigAiChat.qml
+msgid "No models were detected."
+msgstr "Модели не обнаружены."
+
+#: ../contents/ui/config/ConfigAiChat.qml
+msgid "Detected %1 model(s)."
+msgstr "Обнаружено %1 моделей."
+
+#: ../contents/ui/config/ConfigAiChat.qml
+msgid "Paste your API key to auto-detect models."
+msgstr "Вставьте свой ключ API для автоматического обнаружения моделей."
+
+#: ../contents/ui/config/ConfigAiChat.qml
+msgid "Provider"
+msgstr "Поставщик"
+
+#: ../contents/ui/config/ConfigAiChat.qml
+msgid "AI Provider"
+msgstr "Поставщик ИИ"
+
+#: ../contents/ui/config/ConfigAiChat.qml
+msgid "API Key"
+msgstr "API-ключ"
+
+#: ../contents/ui/config/ConfigAiChat.qml
+msgid "Required for this provider"
+msgstr "Требуется для этого провайдера"
+
+#: ../contents/ui/config/ConfigAiChat.qml
+msgid "Hide API Key"
+msgstr "Скрыть ключ API"
+
+#: ../contents/ui/config/ConfigAiChat.qml
+msgid "Show API Key"
+msgstr "Показать ключ API"
+
+#: ../contents/ui/config/ConfigAiChat.qml
+msgid "Ollama Server"
+msgstr "Оллама Сервер"
+
+#: ../contents/ui/config/ConfigAiChat.qml
+msgid "Detected Models"
+msgstr "Обнаруженные модели"
+
+#: ../contents/ui/config/ConfigAiChat.qml
+msgid "Reload models"
+msgstr "Перезагрузить модели"
+
+#: ../contents/ui/config/ConfigAiChat.qml
+msgid "No models detected yet. Paste your API key to auto-detect."
+msgstr "Модели пока не обнаружены. Вставьте свой ключ API для автоматического обнаружения."
+
+#: ../contents/ui/config/ConfigAiChat.qml
+msgid "Chat Options"
+msgstr "Параметры чата"
+
+#: ../contents/ui/config/ConfigAiChat.qml
+msgid "Enable streaming responses"
+msgstr "Включить потоковую передачу ответов"
+
+#: ../contents/ui/config/ConfigAiChat.qml
+msgid "Notes"
+msgstr "Примечания"
+
+#: ../contents/ui/config/ConfigAiChat.qml
+msgid "OpenAI, OpenRouter, Google, Perplexity and Anthropic require network access and an API key. Ollama connects to a local server (default: http://127.0.0.1:11434)."
+msgstr "OpenAI, OpenRouter, Google, Perplexity и Anthropic требуют доступа к сети и ключа API. Оллама подключается к локальному серверу (по умолчанию: http://127.0.0.1:11434)."
+
