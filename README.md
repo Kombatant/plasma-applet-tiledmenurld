@@ -1,7 +1,9 @@
 
 # Tiled Menu Reloaded
 
-Tiled Menu Reloaded is a Plasma applet that provides a tiled launcher loosely inspired by Windows 10's start menu. It offers flexible tile layouts, groupable tiles, and configurable shortcuts while targeting Plasma 6 and Qt6 compatibility. **Used various LLMs as a playground for code generation and assistance in forking/structuring/coding the project.**
+Tiled Menu Reloaded is a Plasma applet that provides a tiled launcher loosely inspired by Windows 10's start menu. It offers flexible tile layouts, groupable tiles, and configurable shortcuts while targeting Plasma 6 and Qt6 compatibility. 
+
+**Used various LLMs as a playground for code generation and assistance in forking/structuring/coding the project.**
 
 ## Origins
 - Forked from zren's (kind of abandoned) Tiled Menu: https://github.com/Zren/plasma-applet-tiledmenu
@@ -22,9 +24,6 @@ Tiled Menu Reloaded is a Plasma applet that provides a tiled launcher loosely in
 - Stores tile layout as a Base64-encoded XML fragment. 
 - **New with 0.7 version**: added a AI Chat tab to the sidebar, which can be used to interact with various LLMs. 
 - New default preset images folder: ~/Pictures/TiledMenuReloaded, configurable in settings.
-
-> [!CAUTION]
-> Nothing is free. If you use a LOT of images, animations etc in your menu, a lot of RAM **AND** VRAM is consumed by Plasmashell. That can actually have ramifications if you play games and you have a graphics card that doesn't have much VRAM. So keep an eye on that number!
 
 <details>
 <summary><h2>Click here for screenshots</h2></summary>
