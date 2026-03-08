@@ -149,7 +149,7 @@ PlasmoidItem {
 		id: popup
 		aiChatModel: aiChatService
 
-		Layout.minimumWidth: config.leftSectionWidth
+		Layout.minimumWidth: config.minimumWidth
 		Layout.minimumHeight: config.minimumHeight
 		Layout.preferredWidth: config.popupWidth
 		Layout.preferredHeight: config.popupHeight

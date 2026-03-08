@@ -26,6 +26,7 @@ Item {
 	}
 
 	readonly property int _fixedHorizontalButtons: 8 // auto resize + 4 view buttons + user + settings + power
+	readonly property int _fixedVerticalBottomButtons: 3 // user + settings + power
 	readonly property color _sidebarIconBackdrop: plasmoid.configuration.sidebarFollowsTheme ? Kirigami.Theme.backgroundColor : config.sidebarBackgroundColor
 	readonly property bool _sidebarIsLight: _relativeLuminance(_sidebarIconBackdrop) > 0.6
 	readonly property url settingsIconSource: Qt.resolvedUrl(_sidebarIsLight ? "assets/tiled-settings-light.png" : "assets/tiled-settings-dark.png")
@@ -41,7 +42,7 @@ Item {
 			return Math.max(0, Math.floor(availableWidth / config.flatButtonSize))
 		}
 		var topHeight = sidebarMenuTopVertical ? sidebarMenuTopVertical.height : 0
-		var availableHeight = Math.max(0, sidebarMenu.height - topHeight - (2 * config.flatButtonSize))
+		var availableHeight = Math.max(0, sidebarMenu.height - topHeight - (_fixedVerticalBottomButtons * config.flatButtonSize))
 		return Math.max(0, Math.floor(availableHeight / config.flatButtonSize))
 	}
 	readonly property bool canAddSidebarShortcut: {
@@ -214,6 +215,7 @@ Item {
 		}
 
 		ColumnLayout {
+			id: sidebarMenuBottomVertical
 			anchors.bottom: parent.bottom
 			spacing: 0
 			visible: !config.sidebarHorizontal
@@ -244,7 +246,7 @@ Item {
 
 			SidebarFavouritesView {
 				model: appsModel.sidebarModel
-				maxHeight: sidebarMenu.height - sidebarMenuTopVertical.height - 2 * config.flatButtonSize
+				maxHeight: Math.max(0, sidebarMenu.height - sidebarMenuTopVertical.height - (sidebarView._fixedVerticalBottomButtons * config.flatButtonSize))
 			}
 
 			SidebarItem {

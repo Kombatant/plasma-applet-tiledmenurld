@@ -165,9 +165,15 @@ Item {
 	readonly property bool sidebarOnBottom: sidebarPosition === 'bottom'
 	readonly property bool sidebarHorizontal: sidebarOnTop || sidebarOnBottom
 	readonly property int sidebarHeight: sidebarHorizontal ? flatButtonSize : -1
+	readonly property int sidebarSeparatorThickness: Math.max(1, Math.round(Screen.devicePixelRatio))
+	readonly property int sidebarFixedHorizontalButtons: 8
+	readonly property int sidebarFixedVerticalButtons: 8
+	readonly property int sidebarFixedHorizontalWidth: (sidebarFixedHorizontalButtons * flatButtonSize) + (2 * sidebarSeparatorThickness)
+	readonly property int sidebarFixedVerticalHeight: (sidebarFixedVerticalButtons * flatButtonSize) + (2 * sidebarSeparatorThickness)
 	readonly property int appListWidth: plasmoid.configuration.appListWidth * Screen.devicePixelRatio
 	readonly property int tileEditorMinWidth: Math.max(350, 350 * Screen.devicePixelRatio)
-	readonly property int minimumHeight: flatButtonSize * 5 // Issue #125
+	readonly property int minimumWidth: sidebarHorizontal ? Math.max(leftSectionWidth, sidebarFixedHorizontalWidth) : leftSectionWidth
+	readonly property int minimumHeight: Math.max(flatButtonSize * 5, sidebarHorizontal ? (sidebarHeight + sidebarRightMargin) : sidebarFixedVerticalHeight) // Issue #125
 
 	property bool showSearch: false
 	property bool isEditingTile: false
