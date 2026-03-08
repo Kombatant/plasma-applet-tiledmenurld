@@ -246,6 +246,10 @@ DropArea {
 		var r = 0;
 		var w = 1;
 		var h = 1;
+		var draggedGroupArea = null
+		if (draggedItem && draggedItem.tileType == "group") {
+			draggedGroupArea = getGroupAreaRect(draggedItem)
+		}
 		for (var i = 0; i < tileModel.length; i++) {
 			var tile = tileModel[i]
 			c = Math.max(c, tile.x + tile.w)
@@ -269,6 +273,9 @@ DropArea {
 		for (var i = 0; i < tileModel.length; i++) {
 			var tile = tileModel[i]
 			if (i == draggedIndex) {
+				continue;
+			}
+			if (draggedGroupArea && tileWithin(tile, draggedGroupArea.x1, draggedGroupArea.y1, draggedGroupArea.x2, draggedGroupArea.y2)) {
 				continue;
 			}
 			for (var j = tile.y; j < tile.y + tile.h; j++) {
