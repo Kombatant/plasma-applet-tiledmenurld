@@ -80,7 +80,7 @@ LibConfig.FormKCM {
 		if (provider === "openai" || provider === "openrouter" || provider === "perplexity") {
 			req.setRequestHeader("Authorization", "Bearer " + apiKey)
 			if (provider === "openrouter") {
-				req.setRequestHeader("HTTP-Referer", "https://github.com/kombatant/tiled_rld")
+				req.setRequestHeader("HTTP-Referer", "https://github.com/Kombatant/plasma-applet-tiledmenurld")
 				req.setRequestHeader("X-Title", "Tiled Menu Reloaded")
 			}
 			return

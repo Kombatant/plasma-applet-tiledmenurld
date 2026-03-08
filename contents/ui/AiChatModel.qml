@@ -576,7 +576,7 @@ Item {
 				req.setRequestHeader("Authorization", "Bearer " + apiKey)
 			}
 			if (p === "openrouter") {
-				req.setRequestHeader("HTTP-Referer", "https://github.com/kombatant/tiled_rld")
+				req.setRequestHeader("HTTP-Referer", "https://github.com/Kombatant/plasma-applet-tiledmenurld")
 				req.setRequestHeader("X-Title", "Tiled Menu Reloaded")
 			}
 			return
