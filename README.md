@@ -36,7 +36,7 @@ Tiled Menu Reloaded is a Plasma applet that provides a tiled launcher loosely in
 
 ![AI Chat](contents/docs/aichat.png)
 
-![Animations supported](contents/docs/tiled_rld_animation.gif)
+![Animations supported](contents/docs/tiled_rld_animation.webm)
 </details>
 
 ## Installation
