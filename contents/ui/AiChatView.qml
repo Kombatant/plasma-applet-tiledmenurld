@@ -35,7 +35,7 @@ Item {
 		if (!chatModel.selectedModel) {
 			return false
 		}
-		if (chatModel.provider !== "ollama" && !chatModel.apiKey) {
+		if (chatModel.apiKeyRequired && !chatModel.apiKey) {
 			return false
 		}
 		return true

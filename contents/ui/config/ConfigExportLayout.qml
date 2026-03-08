@@ -33,6 +33,7 @@ ColumnLayout {
 		defaultAppListView: "string",
 		aiProvider: "string",
 		aiOllamaUrl: "string",
+		aiOpenWebUiUrl: "string",
 		aiModel: "string",
 		aiDetectedModels: "stringlist",
 		aiChatHistory: "string",

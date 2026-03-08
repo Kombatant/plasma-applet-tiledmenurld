@@ -38,7 +38,7 @@
 			<default>Alphabetical</default>
 		</entry>
 		<entry name="aiProvider" type="string">
-			<!-- enum: openai, openrouter, anthropic, ollama -->
+			<!-- enum: openai, openrouter, anthropic, google, perplexity, ollama, openwebui -->
 			<default>openai</default>
 		</entry>
 		<entry name="aiApiKey" type="string">
@@ -46,6 +46,9 @@
 		</entry>
 		<entry name="aiOllamaUrl" type="string">
 			<default>http://127.0.0.1:11434</default>
+		</entry>
+		<entry name="aiOpenWebUiUrl" type="string">
+			<default>http://127.0.0.1:3000</default>
 		</entry>
 		<entry name="aiModel" type="string">
 			<default></default>

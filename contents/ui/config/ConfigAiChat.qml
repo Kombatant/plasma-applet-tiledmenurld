@@ -15,10 +15,14 @@ LibConfig.FormKCM {
 		{ value: "google", text: "Google (Gemini API)" },
 		{ value: "perplexity", text: "Perplexity" },
 		{ value: "anthropic", text: "Anthropic" },
+		{ value: "openwebui", text: "Open WebUI" },
 		{ value: "ollama", text: "Ollama (Local)" },
 	]
 
-	readonly property bool keyRequired: (plasmoid.configuration.aiProvider || "openai") !== "ollama"
+	readonly property bool keyVisible: _providerValue() !== "ollama"
+	readonly property bool keyRequired: _providerValue() !== "ollama" && _providerValue() !== "openwebui"
+	readonly property bool usesOllamaUrl: _providerValue() === "ollama"
+	readonly property bool usesOpenWebUiUrl: _providerValue() === "openwebui"
 	readonly property var detectedModels: plasmoid.configuration.aiDetectedModels || []
 	property bool isDetectingModels: false
 	property string detectionStatus: ""
@@ -55,7 +59,15 @@ LibConfig.FormKCM {
 	}
 
 	function _needsKey(provider) {
-		return provider !== "ollama"
+		return provider !== "ollama" && provider !== "openwebui"
+	}
+
+	function _normalizedOpenWebUiApiBase(url) {
+		var base = (url || "http://127.0.0.1:3000").replace(/\/+$/, "")
+		if (/\/api(?:\/v1)?$/i.test(base)) {
+			return base.replace(/\/v1$/i, "")
+		}
+		return base + "/api"
 	}
 
 	function _modelsEndpoint(provider, apiKey) {
@@ -74,13 +86,19 @@ LibConfig.FormKCM {
 		if (provider === "google") {
 			return "https://generativelanguage.googleapis.com/v1beta/models?key=" + encodeURIComponent(apiKey)
 		}
+		if (provider === "openwebui") {
+			var openWebUiBase = _normalizedOpenWebUiApiBase(plasmoid.configuration.aiOpenWebUiUrl || "http://127.0.0.1:3000")
+			return openWebUiBase + "/models"
+		}
 		var ollamaBase = (plasmoid.configuration.aiOllamaUrl || "http://127.0.0.1:11434").replace(/\/+$/, "")
 		return ollamaBase + "/api/tags"
 	}
 
 	function _applyHeaders(req, provider, apiKey) {
-		if (provider === "openai" || provider === "openrouter" || provider === "perplexity") {
-			req.setRequestHeader("Authorization", "Bearer " + apiKey)
+		if (provider === "openai" || provider === "openrouter" || provider === "perplexity" || provider === "openwebui") {
+			if (apiKey) {
+				req.setRequestHeader("Authorization", "Bearer " + apiKey)
+			}
 			if (provider === "openrouter") {
 				req.setRequestHeader("HTTP-Referer", "https://github.com/Kombatant/plasma-applet-tiledmenurld")
 				req.setRequestHeader("X-Title", "Tiled Menu Reloaded")
@@ -140,7 +158,8 @@ LibConfig.FormKCM {
 		var provider = _providerValue()
 		var apiKey = _apiKeyValue()
 		var ollamaUrl = (plasmoid.configuration.aiOllamaUrl || "http://127.0.0.1:11434").replace(/\/+$/, "")
-		var signature = provider + "|" + (provider === "ollama" ? ollamaUrl : apiKey)
+		var openWebUiUrl = _normalizedOpenWebUiApiBase(plasmoid.configuration.aiOpenWebUiUrl || "http://127.0.0.1:3000")
+		var signature = provider + "|" + (provider === "ollama" ? ollamaUrl : (provider === "openwebui" ? openWebUiUrl + "|" + apiKey : apiKey))
 
 		if (!shouldForce && signature === _lastDetectionSignature) {
 			return
@@ -321,11 +340,13 @@ LibConfig.FormKCM {
 
 	LibConfig.TextField {
 		id: apiKeyField
-		visible: form.keyRequired
+		visible: form.keyVisible
 		enabled: secureApiKey.secureStorageAvailable
-		Kirigami.FormData.label: i18n("API Key")
+		Kirigami.FormData.label: form.keyRequired ? i18n("API Key") : i18n("API Key (Optional)")
 		echoMode: _showKey ? TextInput.Normal : TextInput.Password
-		placeholderText: i18n("Required for this provider (stored in KWallet)")
+		placeholderText: form.keyRequired
+			? i18n("Required for this provider (stored in KWallet)")
+			: i18n("Optional bearer token (stored in KWallet)")
 
 		property bool _showKey: false
 
@@ -371,9 +392,23 @@ LibConfig.FormKCM {
 	LibConfig.TextField {
 		id: ollamaUrlField
 		configKey: "aiOllamaUrl"
-		visible: !form.keyRequired
+		visible: form.usesOllamaUrl
 		Kirigami.FormData.label: i18n("Ollama Server")
 		placeholderText: "http://127.0.0.1:11434"
+		Layout.maximumWidth: _keyMetrics.advanceWidth("0") * 40 + leftPadding + rightPadding
+		onTextChanged: {
+			if (activeFocus) {
+				form._scheduleDetection()
+			}
+		}
+	}
+
+	LibConfig.TextField {
+		id: openWebUiUrlField
+		configKey: "aiOpenWebUiUrl"
+		visible: form.usesOpenWebUiUrl
+		Kirigami.FormData.label: i18n("Open WebUI Server")
+		placeholderText: "http://127.0.0.1:3000 or http://127.0.0.1:3000/api"
 		Layout.maximumWidth: _keyMetrics.advanceWidth("0") * 40 + leftPadding + rightPadding
 		onTextChanged: {
 			if (activeFocus) {
@@ -436,6 +471,6 @@ LibConfig.FormKCM {
 		Layout.fillWidth: true
 		wrapMode: Text.Wrap
 		opacity: 0.85
-		text: i18n("OpenAI, OpenRouter, Google, Perplexity and Anthropic require network access and an API key. Ollama connects to a local server (default: http://127.0.0.1:11434).")
+		text: i18n("OpenAI, OpenRouter, Google, Perplexity and Anthropic require network access and an API key. Open WebUI uses its OpenAI-compatible API at your configured server URL and can optionally use a bearer token; both the server root and an /api URL are accepted. Ollama connects to a local server (default: http://127.0.0.1:11434).")
 	}
 }

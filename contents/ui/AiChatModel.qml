@@ -15,9 +15,11 @@ Item {
 	readonly property string provider: (plasmoid.configuration.aiProvider || "openai").toLowerCase()
 	readonly property string apiKey: secureApiKey.secret || (plasmoid.configuration.aiApiKey || "")
 	readonly property string ollamaUrl: (plasmoid.configuration.aiOllamaUrl || "http://127.0.0.1:11434").replace(/\/+$/, "")
+	readonly property string openWebUiUrl: _normalizedOpenWebUiApiBase(plasmoid.configuration.aiOpenWebUiUrl || "http://127.0.0.1:3000")
 	readonly property string selectedModel: plasmoid.configuration.aiModel || ""
 	readonly property var detectedModels: plasmoid.configuration.aiDetectedModels || []
 	readonly property bool streamEnabled: !!plasmoid.configuration.aiStreamChat
+	readonly property bool apiKeyRequired: provider !== "ollama" && provider !== "openwebui"
 
 	property var conversationList: []
 	property string activeConversationId: ""
@@ -79,6 +81,14 @@ Item {
 				plasmoid.configuration.aiApiKey = ""
 			}
 		})
+	}
+
+	function _normalizedOpenWebUiApiBase(url) {
+		var base = (url || "http://127.0.0.1:3000").replace(/\/+$/, "")
+		if (/\/api(?:\/v1)?$/i.test(base)) {
+			return base.replace(/\/v1$/i, "")
+		}
+		return base + "/api"
 	}
 
 	function _applyLoadedHistory(value) {
@@ -257,7 +267,7 @@ Item {
 			lastError = i18n("Please choose a model in settings.")
 			return false
 		}
-		if (provider !== "ollama" && !apiKey) {
+		if (apiKeyRequired && !apiKey) {
 			lastError = i18n("Please enter an API key in settings.")
 			return false
 		}
@@ -528,7 +538,7 @@ Item {
 
 	function fetchModels() {
 		lastError = ""
-		if (provider !== "ollama" && !apiKey) {
+		if (apiKeyRequired && !apiKey) {
 			lastError = i18n("Please enter an API key before detecting models.")
 			modelDetectionFinished(false)
 			return
@@ -593,13 +603,16 @@ Item {
 			var googleAction = isStream ? "streamGenerateContent?alt=sse&key=" : "generateContent?key="
 			return "https://generativelanguage.googleapis.com/v1beta/" + modelName + ":" + googleAction + encodeURIComponent(apiKey)
 		}
+		if (p === "openwebui") {
+			return kind === "models" ? (openWebUiUrl + "/models") : (openWebUiUrl + "/chat/completions")
+		}
 		// ollama
 		return kind === "models" ? (ollamaUrl + "/api/tags") : (ollamaUrl + "/api/chat")
 	}
 
 	function _applyProviderHeaders(req) {
 		var p = provider
-		if (p === "openai" || p === "openrouter" || p === "perplexity") {
+		if (p === "openai" || p === "openrouter" || p === "perplexity" || p === "openwebui") {
 			if (apiKey) {
 				req.setRequestHeader("Authorization", "Bearer " + apiKey)
 			}

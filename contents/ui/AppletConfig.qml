@@ -54,6 +54,7 @@ Item {
 		_ensureSettingInitialized('aiProvider', 'openai')
 		_ensureSettingInitialized('aiApiKey', '')
 		_ensureSettingInitialized('aiOllamaUrl', 'http://127.0.0.1:11434')
+		_ensureSettingInitialized('aiOpenWebUiUrl', 'http://127.0.0.1:3000')
 		_ensureSettingInitialized('aiModel', '')
 		_ensureSettingInitialized('aiDetectedModels', [])
 		_ensureSettingInitialized('aiChatHistory', '')

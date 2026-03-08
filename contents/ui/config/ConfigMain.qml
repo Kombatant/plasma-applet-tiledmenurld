@@ -107,6 +107,8 @@ KCM.AbstractKCM {
     property var cfg_aiApiKeyDefault
     property var cfg_aiOllamaUrl
     property var cfg_aiOllamaUrlDefault
+    property var cfg_aiOpenWebUiUrl
+    property var cfg_aiOpenWebUiUrlDefault
     property var cfg_aiModel
     property var cfg_aiModelDefault
     property var cfg_aiDetectedModels
@@ -115,7 +117,7 @@ KCM.AbstractKCM {
     property var cfg_aiChatHistoryDefault
     property var cfg_aiStreamChat
     property var cfg_aiStreamChatDefault
-    readonly property var _cfgKeys: ["icon", "fixedPanelIcon", "searchResultsGrouped", "searchDefaultFilters", "showRecentApps", "recentOrdering", "numRecentApps", "sidebarShortcuts", "defaultAppListView", "aiProvider", "aiApiKey", "aiOllamaUrl", "aiModel", "aiDetectedModels", "aiChatHistory", "aiStreamChat", "terminalApp", "taskManagerApp", "fileManagerApp", "tileModel", "tileScale", "tileIconSize", "tileMargin", "tilesLocked", "defaultTileColor", "defaultTileGradient", "sidebarBackgroundColor", "hideSearchField", "searchOnTop", "searchFieldFollowsTheme", "sidebarFollowsTheme", "tileLabelAlignment", "groupLabelAlignment", "showGroupTileNameBorder", "presetTilesFolder", "appDescription", "appListIconSize", "searchFieldHeight", "appListWidth", "popupHeight", "favGridCols", "sidebarButtonSize", "sidebarIconSize", "sidebarPosition", "tileRoundedCorners", "tileCornerRadius", "tileAnimatedPlayOnHover"]
+    readonly property var _cfgKeys: ["icon", "fixedPanelIcon", "searchResultsGrouped", "searchDefaultFilters", "showRecentApps", "recentOrdering", "numRecentApps", "sidebarShortcuts", "defaultAppListView", "aiProvider", "aiApiKey", "aiOllamaUrl", "aiOpenWebUiUrl", "aiModel", "aiDetectedModels", "aiChatHistory", "aiStreamChat", "terminalApp", "taskManagerApp", "fileManagerApp", "tileModel", "tileScale", "tileIconSize", "tileMargin", "tilesLocked", "defaultTileColor", "defaultTileGradient", "sidebarBackgroundColor", "hideSearchField", "searchOnTop", "searchFieldFollowsTheme", "sidebarFollowsTheme", "tileLabelAlignment", "groupLabelAlignment", "showGroupTileNameBorder", "presetTilesFolder", "appDescription", "appListIconSize", "searchFieldHeight", "appListWidth", "popupHeight", "favGridCols", "sidebarButtonSize", "sidebarIconSize", "sidebarPosition", "tileRoundedCorners", "tileCornerRadius", "tileAnimatedPlayOnHover"]
     // Make the initial config window a bit wider so pages lay out cleanly.
     // Do not force shrink: respect user resizing after open.
     readonly property int wideModeMinWidth: Kirigami.Units.gridUnit * 40
