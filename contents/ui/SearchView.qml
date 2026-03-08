@@ -94,7 +94,6 @@ Item {
 			appsView.show()
 			
 		}
-		plasmoid.configuration.defaultAppListView = 'TilesOnly'
 		config.showSearch = false
 	}
 
@@ -104,7 +103,6 @@ Item {
 
 	function showAiChat() {
 		config.showSearch = true
-		plasmoid.configuration.defaultAppListView = 'AiChat'
 		if (stackView.currentItem !== aiChatView) {
 			stackView.replace(aiChatView)
 		}
@@ -198,13 +196,11 @@ Item {
 
 			function showAppsAlphabetically() {
 				appsModel.order = "alphabetical"
-				plasmoid.configuration.defaultAppListView = 'Alphabetical'
 				show()
 			}
 
 			function showAppsCategorically() {
 				appsModel.order = "categories"
-				plasmoid.configuration.defaultAppListView = 'Categories'
 				
 				show()
 			}
