@@ -213,8 +213,10 @@ Item {
 
 	HoverOutlineEffect {
 		id: hoverOutlineEffect
-		anchors.fill: parent
-		anchors.margins: cellMargin
+		x: tileItemView.x
+		y: tileItemView.y
+		width: tileItemView.width
+		height: tileItemView.height
 		cornerRadius: tileItemView.cornerRadius
 		hoverRadius: {
 			if (appObj.isGroup) {
