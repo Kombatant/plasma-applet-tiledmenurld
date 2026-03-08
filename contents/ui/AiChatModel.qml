@@ -1,4 +1,5 @@
 import QtQuick
+import "lib"
 
 Item {
 	id: aiChatModel
@@ -12,7 +13,7 @@ Item {
 	readonly property bool canStopResponse: !!activeChatRequest
 
 	readonly property string provider: (plasmoid.configuration.aiProvider || "openai").toLowerCase()
-	readonly property string apiKey: plasmoid.configuration.aiApiKey || ""
+	readonly property string apiKey: secureApiKey.secret || (plasmoid.configuration.aiApiKey || "")
 	readonly property string ollamaUrl: (plasmoid.configuration.aiOllamaUrl || "http://127.0.0.1:11434").replace(/\/+$/, "")
 	readonly property string selectedModel: plasmoid.configuration.aiModel || ""
 	readonly property var detectedModels: plasmoid.configuration.aiDetectedModels || []
@@ -25,6 +26,16 @@ Item {
 	signal modelDetectionFinished(bool success)
 	signal sendFinished(bool success)
 	signal streamingContentUpdated()
+
+	KWalletSecret {
+		id: secureApiKey
+		onLoaded: function(success) {
+			if (!success) {
+				return
+			}
+			aiChatModel._migrateLegacyApiKey()
+		}
+	}
 
 	Base64JsonString {
 		id: chatHistory
@@ -48,9 +59,26 @@ Item {
 	}
 
 	Component.onCompleted: {
+		secureApiKey.readSecret()
 		if (!conversationList || !conversationList.length) {
 			newConversation()
 		}
+	}
+
+	function _migrateLegacyApiKey() {
+		var legacy = (plasmoid.configuration.aiApiKey || "").trim()
+		if (!legacy) {
+			return
+		}
+		if (secureApiKey.secret && secureApiKey.secret !== legacy) {
+			plasmoid.configuration.aiApiKey = ""
+			return
+		}
+		secureApiKey.migrateLegacy(legacy, function(success) {
+			if (success) {
+				plasmoid.configuration.aiApiKey = ""
+			}
+		})
 	}
 
 	function _applyLoadedHistory(value) {

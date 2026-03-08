@@ -4,6 +4,7 @@ import QtQuick.Layouts
 import org.kde.kirigami as Kirigami
 
 import "../libconfig" as LibConfig
+import "../lib"
 
 LibConfig.FormKCM {
 	id: form
@@ -21,6 +22,7 @@ LibConfig.FormKCM {
 	readonly property var detectedModels: plasmoid.configuration.aiDetectedModels || []
 	property bool isDetectingModels: false
 	property string detectionStatus: ""
+	property bool _updatingApiKeyField: false
 	property string _lastDetectionSignature: ""
 	property int _requestToken: 0
 	readonly property var modelOptionsData: {
@@ -202,10 +204,97 @@ LibConfig.FormKCM {
 		onTriggered: form.detectModelsNow()
 	}
 
+	Timer {
+		id: apiKeyAutoSaveDebounce
+		interval: 250
+		repeat: false
+		onTriggered: form._persistApiKeyDraft()
+	}
+
+	KWalletSecret {
+		id: secureApiKey
+		onLoaded: function(success) {
+			if (success) {
+				form._updatingApiKeyField = true
+				apiKeyField.text = secret
+				form._updatingApiKeyField = false
+				form._migrateLegacyApiKeyIfNeeded()
+			}
+		}
+		onSaved: function(success) {
+			if (success) {
+				plasmoid.configuration.aiApiKey = ""
+				form._scheduleDetection()
+				return
+			}
+			if (typeof showPassiveNotification === "function") {
+				showPassiveNotification(i18n("Failed to save API key to KWallet."))
+			}
+		}
+		onCleared: function(success) {
+			if (success) {
+				plasmoid.configuration.aiApiKey = ""
+				apiKeyField.text = ""
+				form._lastDetectionSignature = ""
+				form._scheduleDetection()
+				return
+			}
+			if (typeof showPassiveNotification === "function") {
+				showPassiveNotification(i18n("Failed to remove API key from KWallet."))
+			}
+		}
+	}
+
+	function _persistApiKeyDraft() {
+		if (_updatingApiKeyField || !keyRequired || secureApiKey.saving) {
+			return
+		}
+		var draft = _apiKeyValue()
+		if (draft === (secureApiKey.secret || "")) {
+			return
+		}
+		if (!draft) {
+			secureApiKey.clearSecret()
+			return
+		}
+		secureApiKey.saveSecret(draft)
+	}
+
+	function _migrateLegacyApiKeyIfNeeded() {
+		var legacy = (plasmoid.configuration.aiApiKey || "").trim()
+		if (!legacy) {
+			return
+		}
+		if (secureApiKey.secret && secureApiKey.secret !== legacy) {
+			plasmoid.configuration.aiApiKey = ""
+			return
+		}
+		secureApiKey.migrateLegacy(legacy, function(success) {
+			if (success) {
+				plasmoid.configuration.aiApiKey = ""
+				apiKeyField.text = secureApiKey.secret
+				form._scheduleDetection()
+				return
+			}
+			if (typeof showPassiveNotification === "function") {
+				showPassiveNotification(i18n("Could not migrate API key to KWallet."))
+			}
+		})
+	}
+
 	Component.onCompleted: {
+		secureApiKey.inspectAvailability()
+		secureApiKey.readSecret()
 		detectionStatus = detectedModels.length
 			? i18n("Detected %1 model(s).", detectedModels.length)
 			: i18n("Paste your API key to auto-detect models.")
+	}
+
+	Kirigami.InlineMessage {
+		Layout.fillWidth: true
+		visible: form.keyRequired && secureApiKey.checkedAvailability && !secureApiKey.secureStorageAvailable && !!secureApiKey.availabilityMessage
+		type: Kirigami.MessageType.Warning
+		text: secureApiKey.availabilityMessage
 	}
 
 	LibConfig.Heading {
@@ -232,11 +321,11 @@ LibConfig.FormKCM {
 
 	LibConfig.TextField {
 		id: apiKeyField
-		configKey: "aiApiKey"
 		visible: form.keyRequired
+		enabled: secureApiKey.secureStorageAvailable
 		Kirigami.FormData.label: i18n("API Key")
 		echoMode: _showKey ? TextInput.Normal : TextInput.Password
-		placeholderText: i18n("Required for this provider")
+		placeholderText: i18n("Required for this provider (stored in KWallet)")
 
 		property bool _showKey: false
 
@@ -265,8 +354,16 @@ LibConfig.FormKCM {
 		}
 
 		onTextChanged: {
+			if (form._updatingApiKeyField) {
+				return
+			}
 			if (activeFocus) {
 				form._scheduleDetection()
+			}
+		}
+		onActiveFocusChanged: {
+			if (!activeFocus) {
+				apiKeyAutoSaveDebounce.restart()
 			}
 		}
 	}

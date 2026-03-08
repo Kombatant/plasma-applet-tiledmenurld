@@ -32,7 +32,6 @@ ColumnLayout {
 		sidebarShortcuts: "stringlist",
 		defaultAppListView: "string",
 		aiProvider: "string",
-		aiApiKey: "string",
 		aiOllamaUrl: "string",
 		aiModel: "string",
 		aiDetectedModels: "stringlist",
