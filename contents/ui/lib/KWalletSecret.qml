@@ -80,8 +80,8 @@ Item {
 					}
 					return
 				}
-				var firstWallet = _trimOutput(stdout).split(/\r?\n/)[0].trim()
-				if (!firstWallet) {
+				var allWallets = _trimOutput(stdout).split(/\r?\n/).map(function(s) { return s.trim() }).filter(Boolean)
+				if (!allWallets.length) {
 					walletAvailable = false
 					checkedAvailability = true
 					availabilityMessage = i18n("Secure storage is unavailable because no KWallet wallet was found. Create or enable a wallet in KDE Wallet settings.")
@@ -90,13 +90,21 @@ Item {
 					}
 					return
 				}
-				activeWallet = firstWallet
-				walletAvailable = true
-				checkedAvailability = true
-				availabilityMessage = ""
-				if (typeof callback === "function") {
-					callback(true)
-				}
+				// Prefer the user's configured default local wallet
+				_qdbus("localWallet", [], function(exitCode3, lwOut) {
+					var localWallet = exitCode3 === 0 ? _trimOutput(lwOut) : ""
+					if (localWallet && allWallets.indexOf(localWallet) >= 0) {
+						activeWallet = localWallet
+					} else {
+						activeWallet = allWallets[0]
+					}
+					walletAvailable = true
+					checkedAvailability = true
+					availabilityMessage = ""
+					if (typeof callback === "function") {
+						callback(true)
+					}
+				})
 			})
 		})
 	}
