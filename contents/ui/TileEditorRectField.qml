@@ -14,10 +14,13 @@ TileEditorGroupBox {
 		if (!isGroupTile) {
 			return appObj ? appObj.tileH : 1
 		}
-		if (appObj && appObj.tile && typeof appObj.tile.groupAreaH !== "undefined") {
-			return appObj.tile.groupAreaH
-		}
-		return 1
+		var storedH = (appObj && appObj.tile && typeof appObj.tile.groupAreaH !== "undefined")
+			? appObj.tile.groupAreaH
+			: 1
+		var actualH = (appObj && appObj.groupRect && typeof appObj.groupRect.h !== "undefined")
+			? appObj.groupRect.h
+			: 1
+		return Math.max(storedH, actualH)
 	}
 
 	function normalizeGroupTile() {
@@ -44,9 +47,15 @@ TileEditorGroupBox {
 			changed = true
 		}
 		if (typeof appObj.tile.groupAreaH === "undefined") {
-			var areaNow = tileGrid.getGroupAreaRect(appObj.tile)
-			var h = areaNow && typeof areaNow.h !== "undefined" ? areaNow.h : 1
-			appObj.tile.groupAreaH = Math.max(1, h)
+			appObj.tile.groupAreaH = 1
+			changed = true
+		}
+
+		var areaNow = tileGrid.getGroupAreaRect(appObj.tile)
+		var h = areaNow && typeof areaNow.h !== "undefined" ? areaNow.h : 1
+		var desiredH = Math.max(1, h)
+		if (appObj.tile.groupAreaH < desiredH) {
+			appObj.tile.groupAreaH = desiredH
 			changed = true
 		}
 		if (changed) {
@@ -56,6 +65,24 @@ TileEditorGroupBox {
 	}
 
 	Component.onCompleted: normalizeGroupTile()
+
+	Connections {
+		target: appObj
+
+		function onTileChanged() {
+			tileEditorRectField.normalizeGroupTile()
+		}
+	}
+
+	Connections {
+		target: tileGrid
+
+		function onTileModelChanged() {
+			if (tileEditorRectField.isGroupTile && appObj.tile) {
+				tileEditorRectField.normalizeGroupTile()
+			}
+		}
+	}
 
 	// readonly property int xLeft: tileGrid.columns - (appObj.tileX + appObj.tileW)
 
