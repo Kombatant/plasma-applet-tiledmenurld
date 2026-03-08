@@ -40,17 +40,42 @@ Tiled Menu Reloaded is a Plasma applet that provides a tiled launcher loosely in
 </details>
 
 ## Installation
-1. Copy the package to your local plasmoids directory:
 
-    ```mkdir -p ~/.local/share/plasma/plasmoids/```
-   
-    ```unzip <package>.zip -d ~/.local/share/plasma/plasmoids/```
+### Option A — Using kpackagetool6 (recommended)
 
-3. Restart Plasma Shell to load the new applet:
+1. Download and extract the release zip, then from inside the extracted folder run:
 
-    ```kquitapp6 plasmashell && nohup plasmashell --replace > /tmp/plasmashell.log 2>&1 &```
+    ```bash
+    kpackagetool6 --type Plasma/Applet --install .
+    ```
 
-4. Add the applet: right-click your application launcher, choose "Show Alternatives", and select "Tiled Menu Reloaded".
+    (Use `--upgrade` instead of `--install` to update an existing installation.)
+
+2. Restart Plasma Shell:
+
+    ```bash
+    kquitapp6 plasmashell && nohup plasmashell --replace > /tmp/plasmashell.log 2>&1 &
+    ```
+
+### Option B — Manual copy
+
+1. Extract the zip and rename the folder to match the plugin ID:
+
+    ```bash
+    mkdir -p ~/.local/share/plasma/plasmoids/
+    unzip <package>.zip
+    mv plasma-applet-tiledmenurld-* ~/.local/share/plasma/plasmoids/org.github.kombatant.tiled_rld
+    ```
+
+2. Restart Plasma Shell:
+
+    ```bash
+    kquitapp6 plasmashell && nohup plasmashell --replace > /tmp/plasmashell.log 2>&1 &
+    ```
+
+### Then
+
+Add the applet: right-click your application launcher, choose "Show Alternatives", and select "Tiled Menu Reloaded".
 
 ## Usage
 - Pin items: right‑click an application or file and select "Pin" or drag it to the tile grid.
