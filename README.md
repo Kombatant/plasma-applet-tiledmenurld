@@ -64,5 +64,5 @@ Tiled Menu Reloaded is a Plasma applet that provides a tiled launcher loosely in
 - Settings are available from the applet configuration dialog. Important options include default tile folder, tile scale, grid columns, and search filters.
 
 ## Contact
-- Report issues at: https://github.com/Kombatant/plasma-applet-tiled_rld/issues
+- Report issues at: https://github.com/Kombatant/plasma-applet-tiledmenurld/issues
 
