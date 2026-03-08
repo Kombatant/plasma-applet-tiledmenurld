@@ -1,0 +1,723 @@
+# Translation of Tiled Menu Reloaded in fr
+# Copyright (C) 2016
+# This file is distributed under the same license as the Tiled Menu Reloaded package.
+# Arno Pillods <arno.pillods@tutanota.com>, 2019.
+#
+# Various translations taken from:
+# https://websvn.kde.org/trunk/l10n-kf5/fr/messages/kde-workspace/
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Tiled Menu Reloaded\n"
+"Report-Msgid-Bugs-To: https://github.com/Kombatant/plasma-applet-tiled_rld/issues\n"
+"POT-Creation-Date: 2025-02-25 20:49+1100\n"
+"PO-Revision-Date: 2021-11-10 13:35+0100\n"
+"Last-Translator: Alan Paris <Alan90000@yahoo.com>\n"
+"Language-Team: fr\n"
+"Language: fr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 2.0.6\n"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Show border under Group Tile name"
+msgstr ""
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Yes"
+msgstr ""
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "No"
+msgstr ""
+
+#: ../metadata.json
+msgid "Tiled Menu"
+msgstr "Tiled Menu"
+
+#: ../metadata.json
+msgid "A menu based on Windows 10's Start Menu."
+msgstr "Un menu basé sur le menu de démarrage de Windows 10."
+
+#: ../contents/config/config.qml
+msgid "General"
+msgstr "Général"
+
+#: ../contents/config/config.qml
+msgid "Import/Export Layout"
+msgstr "Importer/Exporter Configuration"
+
+#: ../contents/config/config.qml
+msgid "Advanced"
+msgstr "Avancé"
+
+#: ../contents/ui/AppContextMenu.qml
+msgid "Unpin from Menu"
+msgstr "Retirer du Menu"
+
+#: ../contents/ui/AppContextMenu.qml
+msgid "Pin to Menu"
+msgstr "Épingler au Menu"
+
+#: ../contents/ui/AppContextMenu.qml
+msgid "Pin to Taskbar"
+msgstr "Épingler à la barre des tâches"
+
+#: ../contents/ui/AppsModel.qml
+msgid "Recent Apps"
+msgstr "Application Récentes"
+
+#: ../contents/ui/AppsModel.qml
+msgid "Most Used"
+msgstr "Les plus utilisés"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Popup"
+msgstr "Menu contextuel"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Fullscreen"
+msgstr "Plein écran"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Grid Columns"
+msgstr "Colonnes de la grille"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "px"
+msgstr "px"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Panel Icon"
+msgstr "Icône du panneau"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Fixed Size"
+msgstr "Taille fixe"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Tiles"
+msgstr "Tuiles"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Tile Size"
+msgstr "Taille des tuiles"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Tile Margin"
+msgstr "Marge des tuiles"
+
+#: ../contents/ui/config/ConfigGeneral.qml ../contents/ui/TileEditorView.qml
+msgid "Background Color"
+msgstr "Couleur de fond"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Custom Color"
+msgstr "Couleur personalisée"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Gradient"
+msgstr "Gradient"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Transparent"
+msgstr "Transparent"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Text Alignment"
+msgstr "Alignement du texte"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Left"
+msgstr "Gauche"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Center"
+msgstr "Centre"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Right"
+msgstr "Droite"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Group Text Alignment"
+msgstr ""
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Sidebar"
+msgstr "Barre verticale"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Width"
+msgstr "Largeur"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Icon Size"
+msgstr "Taille d'icône"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Popup Button Height"
+msgstr "Hauteur du bouton contextuel"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Theme"
+msgstr "Thème"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Sidebar Shortcuts"
+msgstr "Raccourcis de la Barre Verticale"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Add Default"
+msgstr "Ajouter par défault"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Search Box"
+msgstr "Barre de recherche"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Hide Search Field"
+msgstr "Masquer le champs de recherche"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Search Field Height"
+msgstr "Hauteur du champs de recherche"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Search Box Theme"
+msgstr "Thème de la barre de recherche"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Windows (White)"
+msgstr "Windows (Blanc)"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "App List"
+msgstr "Liste des applications"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "App List Area Width"
+msgstr "Largeur de la liste des applications"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Default View"
+msgstr "Vue par défault"
+
+#: ../contents/ui/config/ConfigGeneral.qml ../contents/ui/SidebarView.qml
+msgid "Alphabetical"
+msgstr "Alphabetique"
+
+#: ../contents/ui/config/ConfigGeneral.qml ../contents/ui/SidebarView.qml
+msgid "Categories"
+msgstr "Catégories"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Jump To Letter"
+msgstr "Aller à la lettre"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Jump To Category"
+msgstr "Aller à la catégorie"
+
+#: ../contents/ui/config/ConfigGeneral.qml ../contents/ui/SidebarView.qml
+msgid "Tiles Only"
+msgstr "Tuiles uniquement"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "App Description"
+msgstr "Ajouter une description"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Hidden"
+msgstr "Masqué"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "After"
+msgstr "Après"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Below"
+msgstr "En-dessous"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "App History"
+msgstr "Historique des applications"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Show:"
+msgstr "Afficher :"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Recent applications"
+msgstr "Applications récentes"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Often used applications"
+msgstr "Applications fréquemment utilisées"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Search Results"
+msgstr "Résultats de la recherche"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Merged (Application Launcher)"
+msgstr "Fusionné (Lanceur d'applications)"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Split into Categories (Application Menu / Dashboard)"
+msgstr "Diviser en catégories (Menu des applications / Panneau de bord)"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Right Click Menu"
+msgstr ""
+
+#: ../contents/ui/config/ConfigGeneral.qml ../contents/ui/main.qml
+msgid "Terminal"
+msgstr "Terminal"
+
+#: ../contents/ui/config/ConfigGeneral.qml ../contents/ui/main.qml
+msgid "Task Manager"
+msgstr "Surveillance du système"
+
+#: ../contents/ui/config/ConfigGeneral.qml ../contents/ui/main.qml
+msgid "File Manager"
+msgstr "Gestionnaire de fichiers"
+
+#: ../contents/ui/config/ConfigurationShortcuts.qml
+msgid ""
+"When this widget has a global shortcut set, like 'Alt+F1', Plasma will open "
+"this menu with just the ⊞ Windows / Meta key."
+msgstr ""
+"Quand cet add-on a un raccourci clavier établi, comme 'Alt+F1', Plasma "
+"ouvrira le menu avec la touche ⊞ Windows / Meta."
+
+#: ../contents/ui/main.qml
+msgid "System Info"
+msgstr "Centre d'informations"
+
+#: ../contents/ui/main.qml ../contents/ui/SearchFiltersView.qml
+msgid "System Settings"
+msgstr "Paramètres système"
+
+#: ../contents/ui/main.qml
+msgid "Edit Applications..."
+msgstr "Éditer les applications…"
+
+#: ../contents/ui/Popup.qml
+msgid "Resize?"
+msgstr "Changer la taille ?"
+
+#: ../contents/ui/Popup.qml ../contents/ui/TileGridSplash.qml
+msgid "Meta + Right Click to resize the menu."
+msgstr "Meta + Clic Droit pour modifier la taille du menu."
+
+#: ../contents/ui/SearchField.qml
+msgid "Search"
+msgstr "Chercher"
+
+#: ../contents/ui/SearchField.qml
+msgid "Search Apps"
+msgstr "Rechercher des applications"
+
+#: ../contents/ui/SearchField.qml
+msgid "Search Files"
+msgstr "Rechercher des fichiers"
+
+#: ../contents/ui/SearchField.qml
+msgid "Search Bookmarks"
+msgstr "Rechercher des favoris"
+
+#: ../contents/ui/SearchField.qml
+msgctxt "Search [krunnerName, krunnerName, ...], "
+msgid "Search %1"
+msgstr "Rechercher %1"
+
+#: ../contents/ui/SearchFiltersViewItem.qml
+#: ../contents/ui/SearchFiltersView.qml
+msgid "Default"
+msgstr "Défaut"
+
+#: ../contents/ui/SearchFiltersView.qml
+msgid "All"
+msgstr "Tout"
+
+#: ../contents/ui/SearchFiltersView.qml
+msgid "Search with all KRunner plugins"
+msgstr "Rechercher avec tout les plugins KRunner"
+
+#: ../contents/ui/SearchFiltersView.qml
+msgid "Search with user selected defaults"
+msgstr "Rechercher avec les réglages utilisateur par défault"
+
+#: ../contents/ui/SearchFiltersView.qml
+msgid "Applications"
+msgstr "Applications"
+
+#: ../contents/ui/SearchFiltersView.qml
+msgid "Files"
+msgstr "Fichiers"
+
+#: ../contents/ui/SearchFiltersView.qml
+msgid "Music"
+msgstr "Musique"
+
+#: ../contents/ui/SearchFiltersView.qml
+msgid "Videos"
+msgstr "Vidéos"
+
+#: ../contents/ui/SearchFiltersView.qml
+msgid "Bookmarks"
+msgstr "Favoris"
+
+#: ../contents/ui/SearchFiltersView.qml
+msgid "Locations"
+msgstr "Emplacements"
+
+#: ../contents/ui/SearchFiltersView.qml
+msgid "Dictionary"
+msgstr "Dictionaire"
+
+#: ../contents/ui/SearchFiltersView.qml
+msgid "Shell"
+msgstr "Console"
+
+#: ../contents/ui/SearchFiltersView.qml
+msgid "Calculator"
+msgstr "Calculatrice"
+
+#: ../contents/ui/SearchFiltersView.qml
+msgid "Windowed Widgets"
+msgstr "Add-ons fenêtrés"
+
+#: ../contents/ui/SearchFiltersView.qml
+msgid "Date/Time"
+msgstr "Date/Heure"
+
+#: ../contents/ui/SearchFiltersView.qml
+msgid "Unit Converter"
+msgstr "Convertisseur d'unités"
+
+#: ../contents/ui/SearchResultsView.qml
+msgid "Filters"
+msgstr "Filtres"
+
+#: ../contents/ui/SidebarView.qml
+msgid "User Manager"
+msgstr "Gestionnaire d'utilisateurs"
+
+#: ../contents/ui/SidebarView.qml
+msgid "Power"
+msgstr "Énergie"
+
+#: ../contents/ui/TileEditorView.qml ../contents/ui/TileItem.qml
+msgid "Edit Tile"
+msgstr "Editer la Tuile"
+
+#: ../contents/ui/TileEditorView.qml
+msgid "Reset Tile"
+msgstr "Réinitialiser la Tuile"
+
+#: ../contents/ui/TileEditorView.qml
+msgid "Close"
+msgstr "Fermer"
+
+#: ../contents/ui/TileEditorView.qml
+msgid "Url"
+msgstr "Url"
+
+#: ../contents/ui/TileEditorView.qml
+msgid "Label"
+msgstr "Étiquette"
+
+#: ../contents/ui/TileEditorView.qml
+msgid "Icon"
+msgstr "Icône"
+
+#: ../contents/ui/TileEditorView.qml
+msgid "Background Image"
+msgstr "Image de fond"
+
+#: ../contents/ui/TileEditorView.qml
+msgid "Choose an image"
+msgstr "Choisir une image"
+
+#: ../contents/ui/TileEditorView.qml
+msgid "Image Files (*.png *.apng *.gif *.webp *.jpg *.jpeg *.bmp *.svg *.svgz)"
+msgstr "Fichiers d'image (*.png *.apng *.gif *.webp *.jpg *.jpeg *.bmp *.svg *.svgz)"
+
+#: ../contents/ui/TileEditorView.qml
+msgid "Preset Tiles"
+msgstr "Réglage de base des Tuiles"
+
+#: ../contents/ui/TileEditorView.qml
+msgid "Position / Size"
+msgstr "Position / Taille"
+
+#: ../contents/ui/TileEditorRectField.qml
+msgid "x:"
+msgstr "x:"
+
+#: ../contents/ui/TileEditorRectField.qml
+msgid "y:"
+msgstr "y:"
+
+#: ../contents/ui/TileEditorRectField.qml
+msgid "w:"
+msgstr "w:"
+
+#: ../contents/ui/TileEditorRectField.qml
+msgid "h:"
+msgstr "h:"
+
+#: ../contents/ui/TileGridPresets.qml
+msgid "Add Preset"
+msgstr "Ajouter préréglage"
+
+#: ../contents/ui/TileGridPresets.qml
+msgid "Productivity"
+msgstr "Productivité"
+
+#: ../contents/ui/TileGridPresets.qml
+msgid "Explore"
+msgstr "Explorer"
+
+#: ../contents/ui/TileGridPresets.qml
+msgid "Gmail"
+msgstr "Gmail"
+
+#: ../contents/ui/TileGridPresets.qml
+msgid "Software Center"
+msgstr "Logithèque"
+
+#: ../contents/ui/TileGrid.qml
+msgid "New Group"
+msgstr "Nouveau Groupe"
+
+#: ../contents/ui/TileGrid.qml
+msgid "Unlock Tiles"
+msgstr "Dévérouiller les Tuiles"
+
+#: ../contents/ui/TileGrid.qml
+msgid "Lock Tiles"
+msgstr "Verrouiller les Tuiles"
+
+#: ../contents/ui/TileGrid.qml
+msgctxt "default group label"
+msgid "Group"
+msgstr "Groupe"
+
+#: ../contents/ui/TileGridSplash.qml
+msgid "Getting Started"
+msgstr "Pour commencer"
+
+#: ../contents/ui/TileGridSplash.qml
+msgid "Drag apps onto the grid."
+msgstr "Faites glisser des applications sur la grille."
+
+#: ../contents/ui/TileGridSplash.qml
+msgid "Drag folders from the file manager here."
+msgstr "Faites glisser les dossiers du gestionnaire de fichiers ici."
+
+#: ../contents/ui/TileGridSplash.qml
+msgid "Use Default Tile Layout"
+msgstr "Utilisez la disposition de tuiles par défaut"
+
+#: ../contents/ui/TileItem.qml
+msgid "Sort Tiles"
+msgstr "Trier les Tuiles"
+
+#~ msgid "<b>Version:</b> %1"
+#~ msgstr "<b>Version:</b> %1"
+
+#~ msgid "Desktop Theme (%1)"
+#~ msgstr "Thème du Bureau (%1)"
+
+#~ msgid "Menu"
+#~ msgstr "Menu"
+
+#~ msgid "Apps"
+#~ msgstr "Applications"
+
+#~ msgid "Show recent applications"
+#~ msgstr "Afficher les applications récentes"
+
+#~ msgctxt "@item:inmenu Open icon chooser dialog"
+#~ msgid "Choose..."
+#~ msgstr "Sélectionner…"
+
+#~ msgctxt "@item:inmenu Reset icon to default"
+#~ msgid "Clear Icon"
+#~ msgstr "Réinitialiser l'icône"
+
+#~ msgid "More"
+#~ msgstr "Plus"
+
+#~ msgid "Size"
+#~ msgstr "Taille"
+
+#~ msgid "Small"
+#~ msgstr "Petit"
+
+#~ msgid "Medium"
+#~ msgstr "Moyen"
+
+#~ msgid "Settings"
+#~ msgstr "Configuration"
+
+#: ../contents/ui/SidebarView.qml
+msgid "Tiled Menu Reloaded Settings"
+msgstr ""
+
+#: ../contents/ui/config/ConfigMain.qml
+msgid "AI Chat"
+msgstr "Chat IA"
+
+#: ../contents/ui/AiChatView.qml
+msgid "+ Start New Chat"
+msgstr "Démarrer un nouveau chat"
+
+#: ../contents/ui/AiChatView.qml
+msgid "Delete This Conversation"
+msgstr "Supprimer cette conversation"
+
+#: ../contents/ui/AiChatView.qml
+msgid "You"
+msgstr "Vous"
+
+#: ../contents/ui/AiChatView.qml
+msgid "Assistant"
+msgstr "Assistante"
+
+#: ../contents/ui/AiChatView.qml
+msgid "Start a new conversation"
+msgstr "Démarrer une nouvelle conversation"
+
+#: ../contents/ui/AiChatView.qml
+msgid "Configure provider, API key and model in settings before sending."
+msgstr "Configurez le fournisseur, la clé API et le modèle dans les paramètres avant l'envoi."
+
+#: ../contents/ui/AiChatView.qml
+msgid "Ask anything... (Enter to send, Shift+Enter for newline)"
+msgstr "Demandez n'importe quoi... (Entrez pour envoyer, Maj+Entrée pour la nouvelle ligne)"
+
+#: ../contents/ui/AiChatModel.qml
+msgid "New Chat"
+msgstr "Nouvelle discussion"
+
+#: ../contents/ui/AiChatModel.qml
+msgid "Please choose a model in settings."
+msgstr "Veuillez choisir un modèle dans les paramètres."
+
+#: ../contents/ui/AiChatModel.qml
+msgid "Please enter an API key in settings."
+msgstr "Veuillez saisir une clé API dans les paramètres."
+
+#: ../contents/ui/AiChatModel.qml
+msgid "Waiting for response..."
+msgstr "En attente de la réponse..."
+
+#: ../contents/ui/AiChatModel.qml
+msgid "The provider returned an empty response."
+msgstr "Le fournisseur a renvoyé une réponse vide."
+
+#: ../contents/ui/AiChatModel.qml
+msgid "Please enter an API key before detecting models."
+msgstr "Veuillez saisir une clé API avant de détecter les modèles."
+
+#: ../contents/ui/AiChatModel.qml ../contents/ui/config/ConfigAiChat.qml
+msgid "Detecting models..."
+msgstr "Détection des modèles..."
+
+#: ../contents/ui/AiChatModel.qml
+msgid "No models were detected for this provider."
+msgstr "Aucun modèle n'a été détecté pour ce fournisseur."
+
+#: ../contents/ui/AiChatModel.qml
+msgid "Invalid JSON response from provider."
+msgstr "Réponse JSON non valide du fournisseur."
+
+#: ../contents/ui/AiChatModel.qml
+msgid "Request failed (%1)."
+msgstr "Échec de la demande (%1)."
+
+#: ../contents/ui/AiChatModel.qml
+msgid "Request failed (%1): %2"
+msgstr "Échec de la demande (%1) : %2"
+
+#: ../contents/ui/config/ConfigAiChat.qml
+msgid "Add an API key to detect models."
+msgstr "Ajoutez une clé API pour détecter les modèles."
+
+#: ../contents/ui/config/ConfigAiChat.qml
+msgid "Model detection failed (%1)."
+msgstr "La détection du modèle a échoué (%1)."
+
+#: ../contents/ui/config/ConfigAiChat.qml
+msgid "No models were detected."
+msgstr "Aucun modèle n'a été détecté."
+
+#: ../contents/ui/config/ConfigAiChat.qml
+msgid "Detected %1 model(s)."
+msgstr "%1 modeles detectes."
+
+#: ../contents/ui/config/ConfigAiChat.qml
+msgid "Paste your API key to auto-detect models."
+msgstr "Collez votre clé API pour détecter automatiquement les modèles."
+
+#: ../contents/ui/config/ConfigAiChat.qml
+msgid "Provider"
+msgstr "Fournisseur"
+
+#: ../contents/ui/config/ConfigAiChat.qml
+msgid "AI Provider"
+msgstr "Fournisseur d'IA"
+
+#: ../contents/ui/config/ConfigAiChat.qml
+msgid "API Key"
+msgstr "Clé API"
+
+#: ../contents/ui/config/ConfigAiChat.qml
+msgid "Required for this provider"
+msgstr "Requis pour ce fournisseur"
+
+#: ../contents/ui/config/ConfigAiChat.qml
+msgid "Hide API Key"
+msgstr "Masquer la clé API"
+
+#: ../contents/ui/config/ConfigAiChat.qml
+msgid "Show API Key"
+msgstr "Afficher la clé API"
+
+#: ../contents/ui/config/ConfigAiChat.qml
+msgid "Ollama Server"
+msgstr "Serveur Ollama"
+
+#: ../contents/ui/config/ConfigAiChat.qml
+msgid "Detected Models"
+msgstr "Modèles détectés"
+
+#: ../contents/ui/config/ConfigAiChat.qml
+msgid "Reload models"
+msgstr "Recharger les modèles"
+
+#: ../contents/ui/config/ConfigAiChat.qml
+msgid "No models detected yet. Paste your API key to auto-detect."
+msgstr "Aucun modèle détecté pour le moment. Collez votre clé API pour la détection automatique."
+
+#: ../contents/ui/config/ConfigAiChat.qml
+msgid "Chat Options"
+msgstr "Options de discussion"
+
+#: ../contents/ui/config/ConfigAiChat.qml
+msgid "Enable streaming responses"
+msgstr "Activer les réponses en continu"
+
+#: ../contents/ui/config/ConfigAiChat.qml
+msgid "Notes"
+msgstr "Remarques"
+
+#: ../contents/ui/config/ConfigAiChat.qml
+msgid "OpenAI, OpenRouter, Google, Perplexity and Anthropic require network access and an API key. Ollama connects to a local server (default: http://127.0.0.1:11434)."
+msgstr "OpenAI, OpenRouter, Google, Perplexity et Anthropic nécessitent un accès réseau et une clé API. Ollama se connecte à un serveur local (par défaut : http://127.0.0.1 :11434)."
+

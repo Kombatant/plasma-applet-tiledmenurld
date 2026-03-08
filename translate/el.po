@@ -1,0 +1,676 @@
+# Translation of Tiled Menu Reloaded in el
+# Copyright (C) 2026
+# This file is distributed under the same license as the Tiled Menu Reloaded package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Tiled Menu Reloaded\n"
+"Report-Msgid-Bugs-To: https://github.com/Kombatant/plasma-applet-tiled_rld/issues\n"
+"POT-Creation-Date: 2026-01-19 00:00+0000\n"
+"PO-Revision-Date: 2026-01-19 00:00+0000\n"
+"Last-Translator: GitHub Copilot\n"
+"Language-Team: Greek\n"
+"Language: el\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Show border under Group Tile name"
+msgstr "Εμφάνιση περιγράμματος κάτω από το όνομα της ομάδας"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Yes"
+msgstr "Ναι"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "No"
+msgstr "Όχι"
+
+#: ../metadata.json
+msgid "Tiled Menu"
+msgstr "Μενού Πλακιδίων"
+
+#: ../metadata.json
+msgid "A menu based on Windows 10's Start Menu."
+msgstr "Ένα μενού βασισμένο στο Μενού Έναρξης των Windows 10."
+
+#: ../contents/config/config.qml
+msgid "General"
+msgstr "Γενικά"
+
+#: ../contents/config/config.qml
+msgid "Import/Export Layout"
+msgstr "Εισαγωγή/Εξαγωγή διάταξης"
+
+#: ../contents/config/config.qml
+msgid "Advanced"
+msgstr "Για προχωρημένους"
+
+#: ../contents/ui/AppContextMenu.qml
+msgid "Unpin from Menu"
+msgstr "Κατάργηση καρφίτσας από το μενού"
+
+#: ../contents/ui/AppContextMenu.qml
+msgid "Pin to Menu"
+msgstr "Καρφίτσωμα στο μενού"
+
+#: ../contents/ui/AppContextMenu.qml
+msgid "Pin to Taskbar"
+msgstr "Καρφίτσωμα στη γραμμή εργασιών"
+
+#: ../contents/ui/AppsModel.qml
+msgid "Recent Apps"
+msgstr "Πρόσφατες εφαρμογές"
+
+#: ../contents/ui/AppsModel.qml
+msgid "Most Used"
+msgstr "Συχνά χρησιμοποιούμενα"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Popup"
+msgstr "Αναδυόμενο"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Fullscreen"
+msgstr "Πλήρης οθόνη"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Grid Columns"
+msgstr "Στήλες πλέγματος"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "px"
+msgstr "px"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Panel Icon"
+msgstr "Εικονίδιο πίνακα"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Fixed Size"
+msgstr "Σταθερό μέγεθος"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Tiles"
+msgstr "Πλακίδια"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Tile Size"
+msgstr "Μέγεθος πλακιδίου"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Tile Margin"
+msgstr "Περιθώριο πλακιδίου"
+
+#: ../contents/ui/config/ConfigGeneral.qml ../contents/ui/TileEditorView.qml
+msgid "Background Color"
+msgstr "Χρώμα φόντου"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Custom Color"
+msgstr "Προσαρμοσμένο χρώμα"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Gradient"
+msgstr "Διαβάθμιση"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Transparent"
+msgstr "Διαφανές"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Text Alignment"
+msgstr "Στοίχιση κειμένου"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Left"
+msgstr "Αριστερά"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Center"
+msgstr "Κέντρο"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Right"
+msgstr "Δεξιά"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Group Text Alignment"
+msgstr "Στοίχιση κειμένου ομάδας"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Sidebar"
+msgstr "Πλευρική μπάρα"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Width"
+msgstr "Πλάτος"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Icon Size"
+msgstr "Μέγεθος εικονιδίων"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Popup Button Height"
+msgstr "Ύψος κουμπιού αναδυόμενου"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Theme"
+msgstr "Θέμα"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Sidebar Shortcuts"
+msgstr "Συντομεύσεις πλευρικής μπάρας"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Add Default"
+msgstr "Προσθήκη προεπιλογών"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Search Box"
+msgstr "Πλαίσιο αναζήτησης"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Hide Search Field"
+msgstr "Απόκρυψη πεδίου αναζήτησης"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Search Field Height"
+msgstr "Ύψος πεδίου αναζήτησης"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Search Box Theme"
+msgstr "Θέμα πλαισίου αναζήτησης"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Windows (White)"
+msgstr "Windows (Λευκό)"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "App List"
+msgstr "Λίστα εφαρμογών"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "App List Area Width"
+msgstr "Πλάτος περιοχής λίστας εφαρμογών"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Default View"
+msgstr "Προεπιλεγμένη προβολή"
+
+#: ../contents/ui/config/ConfigGeneral.qml ../contents/ui/SidebarView.qml
+msgid "Alphabetical"
+msgstr "Αλφαβητικά"
+
+#: ../contents/ui/config/ConfigGeneral.qml ../contents/ui/SidebarView.qml
+msgid "Categories"
+msgstr "Κατηγορίες"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Jump To Letter"
+msgstr "Μετάβαση σε γράμμα"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Jump To Category"
+msgstr "Μετάβαση σε κατηγορία"
+
+#: ../contents/ui/config/ConfigGeneral.qml ../contents/ui/SidebarView.qml
+msgid "Tiles Only"
+msgstr "Μόνο πλακίδια"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "App Description"
+msgstr "Περιγραφή εφαρμογής"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Hidden"
+msgstr "Κρυφό"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "After"
+msgstr "Μετά"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Below"
+msgstr "Κάτω"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "App History"
+msgstr "Ιστορικό εφαρμογών"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Show:"
+msgstr "Εμφάνιση:"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Recent applications"
+msgstr "Πρόσφατες εφαρμογές"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Often used applications"
+msgstr "Συχνά χρησιμοποιούμενες εφαρμογές"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Search Results"
+msgstr "Αποτελέσματα αναζήτησης"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Merged (Application Launcher)"
+msgstr "Συγχωνευμένα (Εκκινητής εφαρμογών)"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Split into Categories (Application Menu / Dashboard)"
+msgstr "Διαχωρισμός σε κατηγορίες (Μενού εφαρμογών / Πίνακας)"
+
+#: ../contents/ui/config/ConfigGeneral.qml
+msgid "Right Click Menu"
+msgstr "Μενού δεξιού κλικ"
+
+#: ../contents/ui/config/ConfigGeneral.qml ../contents/ui/main.qml
+msgid "Terminal"
+msgstr "Τερματικό"
+
+#: ../contents/ui/config/ConfigGeneral.qml ../contents/ui/main.qml
+msgid "Task Manager"
+msgstr "Διαχειριστής εργασιών"
+
+#: ../contents/ui/config/ConfigGeneral.qml ../contents/ui/main.qml
+msgid "File Manager"
+msgstr "Διαχειριστής αρχείων"
+
+#: ../contents/ui/config/ConfigurationShortcuts.qml
+msgid "When this widget has a global shortcut set, like 'Alt+F1', Plasma will open this menu with just the ⊞ Windows / Meta key."
+msgstr "Όταν αυτό το γραφικό στοιχείο έχει καθολική συντόμευση, όπως 'Alt+F1', το Plasma θα ανοίγει αυτό το μενού μόνο με το πλήκτρο ⊞ Windows / Meta."
+
+#: ../contents/ui/main.qml
+msgid "System Info"
+msgstr "Πληροφορίες συστήματος"
+
+#: ../contents/ui/main.qml ../contents/ui/SearchFiltersView.qml
+msgid "System Settings"
+msgstr "Ρυθμίσεις συστήματος"
+
+#: ../contents/ui/main.qml
+msgid "Edit Applications..."
+msgstr "Επεξεργασία εφαρμογών..."
+
+#: ../contents/ui/Popup.qml
+msgid "Resize?"
+msgstr "Αλλαγή μεγέθους;"
+
+#: ../contents/ui/Popup.qml ../contents/ui/TileGridSplash.qml
+msgid "Meta + Right Click to resize the menu."
+msgstr "Meta + Δεξί κλικ για αλλαγή μεγέθους του μενού."
+
+#: ../contents/ui/SearchField.qml
+msgid "Search"
+msgstr "Αναζήτηση"
+
+#: ../contents/ui/SearchField.qml
+msgid "Search Apps"
+msgstr "Αναζήτηση εφαρμογών"
+
+#: ../contents/ui/SearchField.qml
+msgid "Search Files"
+msgstr "Αναζήτηση αρχείων"
+
+#: ../contents/ui/SearchField.qml
+msgid "Search Bookmarks"
+msgstr "Αναζήτηση σελιδοδεικτών"
+
+#: ../contents/ui/SearchField.qml
+msgctxt "Search [krunnerName, krunnerName, ...], "
+msgid "Search %1"
+msgstr "Αναζήτηση %1"
+
+#: ../contents/ui/SearchFiltersViewItem.qml ../contents/ui/SearchFiltersView.qml
+msgid "Default"
+msgstr "Προεπιλογή"
+
+#: ../contents/ui/SearchFiltersView.qml
+msgid "All"
+msgstr "Όλα"
+
+#: ../contents/ui/SearchFiltersView.qml
+msgid "Search with all KRunner plugins"
+msgstr "Αναζήτηση με όλα τα πρόσθετα KRunner"
+
+#: ../contents/ui/SearchFiltersView.qml
+msgid "Search with user selected defaults"
+msgstr "Αναζήτηση με προεπιλεγμένες επιλογές χρήστη"
+
+#: ../contents/ui/SearchFiltersView.qml
+msgid "Applications"
+msgstr "Εφαρμογές"
+
+#: ../contents/ui/SearchFiltersView.qml
+msgid "Files"
+msgstr "Αρχεία"
+
+#: ../contents/ui/SearchFiltersView.qml
+msgid "Music"
+msgstr "Μουσική"
+
+#: ../contents/ui/SearchFiltersView.qml
+msgid "Videos"
+msgstr "Βίντεο"
+
+#: ../contents/ui/SearchFiltersView.qml
+msgid "Bookmarks"
+msgstr "Σελιδοδείκτες"
+
+#: ../contents/ui/SearchFiltersView.qml
+msgid "Locations"
+msgstr "Τοποθεσίες"
+
+#: ../contents/ui/SearchFiltersView.qml
+msgid "Dictionary"
+msgstr "Λεξικό"
+
+#: ../contents/ui/SearchFiltersView.qml
+msgid "Shell"
+msgstr "Κέλυφος"
+
+#: ../contents/ui/SearchFiltersView.qml
+msgid "Calculator"
+msgstr "Αριθμομηχανή"
+
+#: ../contents/ui/SearchFiltersView.qml
+msgid "Windowed Widgets"
+msgstr "Γραφικά στοιχεία σε παράθυρο"
+
+#: ../contents/ui/SearchFiltersView.qml
+msgid "Date/Time"
+msgstr "Ημερομηνία/Ώρα"
+
+#: ../contents/ui/SearchFiltersView.qml
+msgid "Unit Converter"
+msgstr "Μετατροπέας μονάδων"
+
+#: ../contents/ui/SearchResultsView.qml
+msgid "Filters"
+msgstr "Φίλτρα"
+
+#: ../contents/ui/SidebarView.qml
+msgid "User Manager"
+msgstr "Διαχείριση χρηστών"
+
+#: ../contents/ui/SidebarView.qml
+msgid "Power"
+msgstr "Τροφοδοσία"
+
+#: ../contents/ui/TileEditorView.qml ../contents/ui/TileItem.qml
+msgid "Edit Tile"
+msgstr "Επεξεργασία πλακιδίου"
+
+#: ../contents/ui/TileEditorView.qml
+msgid "Reset Tile"
+msgstr "Επαναφορά πλακιδίου"
+
+#: ../contents/ui/TileEditorView.qml
+msgid "Close"
+msgstr "Κλείσιμο"
+
+#: ../contents/ui/TileEditorView.qml
+msgid "Url"
+msgstr "URL"
+
+#: ../contents/ui/TileEditorView.qml
+msgid "Label"
+msgstr "Ετικέτα"
+
+#: ../contents/ui/TileEditorView.qml
+msgid "Icon"
+msgstr "Εικονίδιο"
+
+#: ../contents/ui/TileEditorView.qml
+msgid "Background Image"
+msgstr "Εικόνα φόντου"
+
+#: ../contents/ui/TileEditorView.qml
+msgid "Choose an image"
+msgstr "Επιλογή εικόνας"
+
+#: ../contents/ui/TileEditorView.qml
+msgid "Image Files (*.png *.apng *.gif *.webp *.jpg *.jpeg *.bmp *.svg *.svgz)"
+msgstr "Αρχεία εικόνων (*.png *.apng *.gif *.webp *.jpg *.jpeg *.bmp *.svg *.svgz)"
+
+#: ../contents/ui/TileEditorView.qml
+msgid "Preset Tiles"
+msgstr "Προκαθορισμένα πλακίδια"
+
+#: ../contents/ui/TileEditorView.qml
+msgid "Position / Size"
+msgstr "Θέση / Μέγεθος"
+
+#: ../contents/ui/TileEditorRectField.qml
+msgid "x:"
+msgstr "x:"
+
+#: ../contents/ui/TileEditorRectField.qml
+msgid "y:"
+msgstr "y:"
+
+#: ../contents/ui/TileEditorRectField.qml
+msgid "w:"
+msgstr "w:"
+
+#: ../contents/ui/TileEditorRectField.qml
+msgid "h:"
+msgstr "h:"
+
+#: ../contents/ui/TileGridPresets.qml
+msgid "Add Preset"
+msgstr "Προσθήκη προεπιλογής"
+
+#: ../contents/ui/TileGridPresets.qml
+msgid "Productivity"
+msgstr "Παραγωγικότητα"
+
+#: ../contents/ui/TileGridPresets.qml
+msgid "Explore"
+msgstr "Εξερεύνηση"
+
+#: ../contents/ui/TileGridPresets.qml
+msgid "Gmail"
+msgstr "Gmail"
+
+#: ../contents/ui/TileGridPresets.qml
+msgid "Software Center"
+msgstr "Κέντρο λογισμικού"
+
+#: ../contents/ui/TileGrid.qml
+msgid "New Group"
+msgstr "Νέα ομάδα"
+
+#: ../contents/ui/TileGrid.qml
+msgid "Unlock Tiles"
+msgstr "Ξεκλείδωμα πλακιδίων"
+
+#: ../contents/ui/TileGrid.qml
+msgid "Lock Tiles"
+msgstr "Κλείδωμα πλακιδίων"
+
+#: ../contents/ui/TileGrid.qml
+msgctxt "default group label"
+msgid "Group"
+msgstr "Ομάδα"
+
+#: ../contents/ui/TileGridSplash.qml
+msgid "Getting Started"
+msgstr "Ξεκινώντας"
+
+#: ../contents/ui/TileGridSplash.qml
+msgid "Drag apps onto the grid."
+msgstr "Σύρετε εφαρμογές στο πλέγμα."
+
+#: ../contents/ui/TileGridSplash.qml
+msgid "Drag folders from the file manager here."
+msgstr "Σύρετε φακέλους από τον διαχειριστή αρχείων εδώ."
+
+#: ../contents/ui/TileGridSplash.qml
+msgid "Use Default Tile Layout"
+msgstr "Χρήση προεπιλεγμένης διάταξης πλακιδίων"
+
+#: ../contents/ui/TileItem.qml
+msgid "Sort Tiles"
+msgstr "Ταξινόμηση πλακιδίων"
+
+#: ../contents/ui/SidebarView.qml
+msgid "Tiled Menu Reloaded Settings"
+msgstr "Ρυθμίσεις Tiled Menu Reloaded"
+
+#: ../contents/ui/config/ConfigMain.qml
+msgid "AI Chat"
+msgstr "Συνομιλία AI"
+
+#: ../contents/ui/AiChatView.qml
+msgid "+ Start New Chat"
+msgstr "+ Έναρξη νέας συνομιλίας"
+
+#: ../contents/ui/AiChatView.qml
+msgid "Delete This Conversation"
+msgstr "Διαγραφή αυτής της συνομιλίας"
+
+#: ../contents/ui/AiChatView.qml
+msgid "You"
+msgstr "Εσείς"
+
+#: ../contents/ui/AiChatView.qml
+msgid "Assistant"
+msgstr "Βοηθός"
+
+#: ../contents/ui/AiChatView.qml
+msgid "Start a new conversation"
+msgstr "Αρχίστε μια συνομιλία"
+
+#: ../contents/ui/AiChatView.qml
+msgid "Configure provider, API key and model in settings before sending."
+msgstr "Διαμορφώστε τον πάροχο, το κλειδί API και το μοντέλο στις ρυθμίσεις πριν από την αποστολή."
+
+#: ../contents/ui/AiChatView.qml
+msgid "Ask anything... (Enter to send, Shift+Enter for newline)"
+msgstr "Ρωτήστε οτιδήποτε... (Enter για αποστολή, Shift+Enter για νέα γραμμή)"
+
+#: ../contents/ui/AiChatModel.qml
+msgid "New Chat"
+msgstr "Νέα συνομιλία"
+
+#: ../contents/ui/AiChatModel.qml
+msgid "Please choose a model in settings."
+msgstr "Επιλέξτε ένα μοντέλο στις ρυθμίσεις."
+
+#: ../contents/ui/AiChatModel.qml
+msgid "Please enter an API key in settings."
+msgstr "Εισαγάγετε ένα κλειδί API στις ρυθμίσεις."
+
+#: ../contents/ui/AiChatModel.qml
+msgid "Waiting for response..."
+msgstr "Αναμονή απάντησης..."
+
+#: ../contents/ui/AiChatModel.qml
+msgid "The provider returned an empty response."
+msgstr "Ο πάροχος επέστρεψε μια κενή απάντηση."
+
+#: ../contents/ui/AiChatModel.qml
+msgid "Please enter an API key before detecting models."
+msgstr "Εισαγάγετε ένα κλειδί API πριν ανιχνεύσετε μοντέλα."
+
+#: ../contents/ui/AiChatModel.qml ../contents/ui/config/ConfigAiChat.qml
+msgid "Detecting models..."
+msgstr "Ανίχνευση μοντέλων..."
+
+#: ../contents/ui/AiChatModel.qml
+msgid "No models were detected for this provider."
+msgstr "Δεν εντοπίστηκαν μοντέλα για αυτόν τον πάροχο."
+
+#: ../contents/ui/AiChatModel.qml
+msgid "Invalid JSON response from provider."
+msgstr "Μη έγκυρη απάντηση JSON από τον πάροχο."
+
+#: ../contents/ui/AiChatModel.qml
+msgid "Request failed (%1)."
+msgstr "Το αίτημα απέτυχε (%1)."
+
+#: ../contents/ui/AiChatModel.qml
+msgid "Request failed (%1): %2"
+msgstr "Το αίτημα απέτυχε (%1): %2"
+
+#: ../contents/ui/config/ConfigAiChat.qml
+msgid "Add an API key to detect models."
+msgstr "Προσθέστε ένα κλειδί API για την ανίχνευση μοντέλων."
+
+#: ../contents/ui/config/ConfigAiChat.qml
+msgid "Model detection failed (%1)."
+msgstr "Η ανίχνευση του μοντέλου απέτυχε (%1)."
+
+#: ../contents/ui/config/ConfigAiChat.qml
+msgid "No models were detected."
+msgstr "Δεν εντοπίστηκαν μοντέλα."
+
+#: ../contents/ui/config/ConfigAiChat.qml
+msgid "Detected %1 model(s)."
+msgstr "Εντοπίστηκε/-αν %1 μοντέλο/-α."
+
+#: ../contents/ui/config/ConfigAiChat.qml
+msgid "Paste your API key to auto-detect models."
+msgstr "Επικολλήστε το κλειδί API στα μοντέλα αυτόματης ανίχνευσης."
+
+#: ../contents/ui/config/ConfigAiChat.qml
+msgid "Provider"
+msgstr "Παροχέας"
+
+#: ../contents/ui/config/ConfigAiChat.qml
+msgid "AI Provider"
+msgstr "Πάροχος τεχνητής νοημοσύνης"
+
+#: ../contents/ui/config/ConfigAiChat.qml
+msgid "API Key"
+msgstr "Κλειδί API"
+
+#: ../contents/ui/config/ConfigAiChat.qml
+msgid "Required for this provider"
+msgstr "Απαιτείται για αυτόν τον πάροχο"
+
+#: ../contents/ui/config/ConfigAiChat.qml
+msgid "Hide API Key"
+msgstr "Απόκρυψη κλειδιού API"
+
+#: ../contents/ui/config/ConfigAiChat.qml
+msgid "Show API Key"
+msgstr "Εμφάνιση κλειδιού API"
+
+#: ../contents/ui/config/ConfigAiChat.qml
+msgid "Ollama Server"
+msgstr "Διακομιστής Ollama"
+
+#: ../contents/ui/config/ConfigAiChat.qml
+msgid "Detected Models"
+msgstr "Ανιχνευμένα μοντέλα"
+
+#: ../contents/ui/config/ConfigAiChat.qml
+msgid "Reload models"
+msgstr "Επαναφόρτωση μοντέλων"
+
+#: ../contents/ui/config/ConfigAiChat.qml
+msgid "No models detected yet. Paste your API key to auto-detect."
+msgstr "Δεν εντοπίστηκαν ακόμη μοντέλα. Επικολλήστε το κλειδί API για αυτόματη ανίχνευση."
+
+#: ../contents/ui/config/ConfigAiChat.qml
+msgid "Chat Options"
+msgstr "Επιλογές συνομιλίας"
+
+#: ../contents/ui/config/ConfigAiChat.qml
+msgid "Enable streaming responses"
+msgstr "Ενεργοποίηση απαντήσεων ροής"
+
+#: ../contents/ui/config/ConfigAiChat.qml
+msgid "Notes"
+msgstr "Παρατηρήσεις"
+
+#: ../contents/ui/config/ConfigAiChat.qml
+msgid "OpenAI, OpenRouter, Google, Perplexity and Anthropic require network access and an API key. Ollama connects to a local server (default: http://127.0.0.1:11434)."
+msgstr "Τα OpenAI, OpenRouter, Google, Perplexity και Anthropic απαιτούν πρόσβαση στο δίκτυο και ένα κλειδί API. Ο Ollama συνδέεται με έναν τοπικό διακομιστή (προεπιλογή: http://127.0.0.1:11434)."
+
