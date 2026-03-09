@@ -11,7 +11,15 @@ DropArea {
 	property real cellPushedMargin: 6 * Screen.devicePixelRatio
 	property int cellBoxSize: cellMargin + cellSize + cellMargin
 	property int hoverOutlineSize: 2 * Screen.devicePixelRatio
-	readonly property int _holoPad: (plasmoid && plasmoid.configuration && plasmoid.configuration.tileHoverEffect === "holographic") ? Math.ceil(cellBoxSize * 0.3) : 0
+	readonly property int _holoPad: {
+		if (plasmoid && plasmoid.configuration) {
+			if (plasmoid.configuration.tileHoverEffect === "holographic")
+				return Math.ceil(cellBoxSize * 0.3)
+			// Classic outline can clip at scroll edges; reserve enough for the border stroke.
+			return Math.ceil(hoverOutlineSize)
+		}
+		return 0
+	}
 
 	property int minColumns: Math.floor((width - 2 * _holoPad) / cellBoxSize)
 	property int minRows: Math.floor((height - 2 * _holoPad) / cellBoxSize)
