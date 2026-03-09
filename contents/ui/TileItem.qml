@@ -227,8 +227,9 @@ Item {
 		}
 		hoverOutlineSize: tileGrid.hoverOutlineSize
 		mouseArea: tileMouseArea
-		// Only show classic hover effect when holographic is not enabled
-		visible: !tileItemView.useHolographicEffect && tileMouseArea.containsMouse
+		// Only show classic hover effect when holographic is not enabled; skip group tiles
+		// (group tiles use groupEffectLoader instead and the small header rect looks disconnected)
+		visible: !appObj.isGroup && !tileItemView.useHolographicEffect && tileMouseArea.containsMouse
 	}
 
 	Kicker.ProcessRunner {

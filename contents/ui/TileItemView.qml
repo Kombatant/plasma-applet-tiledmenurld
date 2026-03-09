@@ -11,8 +11,8 @@ Rectangle {
 	readonly property real cornerRadius: (config && config.tileCornerRadius ? config.tileCornerRadius : 0)
 	property color gradientBottomColor: Qt.darker(appObj.backgroundColor, 2.0)
 
-	// Holographic hover effect properties
-	readonly property bool useHolographicEffect: plasmoid && plasmoid.configuration && plasmoid.configuration.tileHoverEffect === "holographic"
+	// Holographic hover effect properties (disabled for group tiles — the small header rectangle looks wrong with sweep/glow)
+	readonly property bool useHolographicEffect: !appObj.isGroup && plasmoid && plasmoid.configuration && plasmoid.configuration.tileHoverEffect === "holographic"
 	readonly property color holographicColor: "#00ffff" // Cyan
 	readonly property real holographicGlowOpacity: 0.5
 	scale: (useHolographicEffect && hovered) ? 1.05 : 1.0
