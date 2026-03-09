@@ -87,5 +87,5 @@ Add the applet: right-click your application launcher, choose "Show Alternatives
 - Settings are available from the applet configuration dialog. Important options include default tile folder, tile scale, grid columns, and search filters.
 
 ## Contact
-- Report issues at: https://github.com/Kombatant/plasma-applet-tiledmenurld/issues
+- Plasmoid is still under active development, so any reported issues or feature requests are welcome. Report issues at: https://github.com/Kombatant/plasma-applet-tiledmenurld/issues
 
