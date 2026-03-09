@@ -171,12 +171,13 @@ MouseArea {
 		var rows = Math.max(1, Math.ceil(tileGrid.maxRow))
 		// Compute content-based grid count (ignores margins) but include margins in final pixel size
 		var cellContent = config.cellSize
-		var targetGridWidth = cols * (config.cellBoxSize - config.cellMargin/4)
+		var holoPad = tileGrid._holoPad || 0
+		var targetGridWidth = cols * (config.cellBoxSize - config.cellMargin/4) + 2 * holoPad
 		var targetWidth = config.leftSectionWidth + targetGridWidth
 		var sidebarExtraHeight = (config.sidebarOnTop || config.sidebarOnBottom)
 			? (config.sidebarHeight + config.sidebarRightMargin)
 			: 0
-		var contentHeight = Math.max(config.minimumHeight, rows * (config.cellBoxSize - config.cellMargin/4))
+		var contentHeight = Math.max(config.minimumHeight, rows * (config.cellBoxSize - config.cellMargin/4) + 2 * holoPad)
 		var targetHeight = contentHeight + sidebarExtraHeight
 		var dpr = Screen.devicePixelRatio || 1
 		var logicalHeight = Math.ceil(targetHeight / dpr)

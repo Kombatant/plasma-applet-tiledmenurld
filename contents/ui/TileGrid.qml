@@ -11,9 +11,10 @@ DropArea {
 	property real cellPushedMargin: 6 * Screen.devicePixelRatio
 	property int cellBoxSize: cellMargin + cellSize + cellMargin
 	property int hoverOutlineSize: 2 * Screen.devicePixelRatio
+	readonly property int _holoPad: (plasmoid && plasmoid.configuration && plasmoid.configuration.tileHoverEffect === "holographic") ? Math.ceil(cellBoxSize * 0.3) : 0
 
-	property int minColumns: Math.floor(width / cellBoxSize)
-	property int minRows: Math.floor(height / cellBoxSize)
+	property int minColumns: Math.floor((width - 2 * _holoPad) / cellBoxSize)
+	property int minRows: Math.floor((height - 2 * _holoPad) / cellBoxSize)
 
 	property int maxColumn: 0
 	property int maxRow: 0
@@ -194,8 +195,8 @@ DropArea {
 	// https://github.com/qt/qtdeclarative/blob/a4aa8d9ade44d75cb5a1d84bd7c1773fadc73095/src/quick/items/qquickdroparea_p.h#L63
 	function dragTick(event) {
 		
-		var dragX = event.x - dropOffsetX
-		var dragY = event.y - dropOffsetY
+		var dragX = event.x - dropOffsetX - _holoPad
+		var dragY = event.y - dropOffsetY - _holoPad
 		var modelX = Math.floor(dragX / cellBoxSize)
 		var modelY = Math.floor(dragY / cellBoxSize)
 		var globalPoint = popup.mapFromItem(tileGrid, event.x, event.y)
@@ -425,8 +426,8 @@ DropArea {
 		Item {
 			id: scrollItem
 
-			width: columns * cellBoxSize
-			height: rows * cellBoxSize
+			width: columns * cellBoxSize + 2 * _holoPad
+			height: rows * cellBoxSize + 2 * _holoPad
 
 			Repeater {
 				id: cellRepeater
@@ -442,8 +443,8 @@ DropArea {
 					id: cellItem
 					property int modelX: modelData % columns
 					property int modelY: Math.floor(modelData / columns)
-					x: modelX * cellBoxSize
-					y: modelY * cellBoxSize
+					x: modelX * cellBoxSize + _holoPad
+					y: modelY * cellBoxSize + _holoPad
 					width: cellBoxSize
 					height: cellBoxSize
 
@@ -553,11 +554,11 @@ DropArea {
 					// 2 physical pixels for improved visibility.
 					readonly property real separatorHeight: 2 / Screen.devicePixelRatio
 					height: separatorHeight
-					x: (tile ? tile.x : 0) * cellBoxSize
+					x: (tile ? tile.x : 0) * cellBoxSize + _holoPad
 					width: (tile ? tile.w : 0) * cellBoxSize
 					readonly property int headerH: (tile && typeof tile.h !== "undefined") ? tile.h : 1
 					y: {
-						var bottom = ((tile ? tile.y : 0) + headerH) * cellBoxSize
+						var bottom = ((tile ? tile.y : 0) + headerH) * cellBoxSize + _holoPad
 						return Math.round((bottom - separatorHeight) * Screen.devicePixelRatio) / Screen.devicePixelRatio
 					}
 				}

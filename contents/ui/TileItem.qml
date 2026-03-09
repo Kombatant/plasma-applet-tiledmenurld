@@ -7,15 +7,15 @@ import org.kde.kirigami as Kirigami
 
 Item {
 	id: tileItem
-	x: modelData.x * cellBoxSize
-	y: modelData.y * cellBoxSize
+	x: modelData.x * cellBoxSize + _holoPad
+	y: modelData.y * cellBoxSize + _holoPad
 	width: modelData.w * cellBoxSize 
 	height: modelData.h * cellBoxSize
 	z: dragActive ? 20 : ((tileItemView && tileItemView.useHolographicEffect && tileMouseArea.containsMouse) ? 10 : 0)
 
 	function fixCoordinateBindings() {
-		x = Qt.binding(function(){ return modelData.x * cellBoxSize })
-		y = Qt.binding(function(){ return modelData.y * cellBoxSize })
+		x = Qt.binding(function(){ return modelData.x * cellBoxSize + _holoPad })
+		y = Qt.binding(function(){ return modelData.y * cellBoxSize + _holoPad })
 	}
 
 	AppObject {
