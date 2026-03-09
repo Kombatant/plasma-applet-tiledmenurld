@@ -30,6 +30,15 @@ ColumnLayout {
 		tileGrid.tileModelChanged()
 	}
 
+	function normalizeIconFillForTile() {
+		if (!appObj.tile || appObj.isGroup || appObj.tileH !== 1 || typeof appObj.tile.iconFill === "undefined") {
+			return
+		}
+		delete appObj.tile.iconFill
+		appObj.tileChanged()
+		tileGrid.tileModelChanged()
+	}
+
 
 	RowLayout {
 		PlasmaExtras.Heading {
@@ -86,7 +95,7 @@ ColumnLayout {
 				labelExtras: PlasmaComponents3.CheckBox {
 					id: iconFillCheck
 					text: i18n("Fill the whole tile")
-					enabled: iconField.checked
+					enabled: iconField.checked && !appObj.isGroup && appObj.tileH !== 1
 					checked: false
 					property bool updateOnChange: false
 					onCheckedChanged: {
@@ -197,6 +206,14 @@ ColumnLayout {
 			if (stackView.currentItem != tileEditorView) {
 				tileEditorView.resetView()
 			}
+		}
+	}
+
+	Connections {
+		target: appObj
+
+		function onTileChanged() {
+			tileEditorView.normalizeIconFillForTile()
 		}
 	}
 
