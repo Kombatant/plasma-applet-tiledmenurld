@@ -67,7 +67,7 @@ Item {
 		_ensureSettingInitialized('tileModel', '')
 		_ensureSettingInitialized('tileScale', 0.8)
 		_ensureSettingInitialized('tileIconSize', 72)
-		_ensureSettingInitialized('tileMargin', 5)
+		_ensureSettingInitialized('tileMargin', 12)
 		_ensureSettingInitialized('tileRoundedCorners', true)
 		_ensureSettingInitialized('tileCornerRadius', 6)
 		_ensureSettingInitialized('tilesLocked', false)

@@ -88,7 +88,7 @@
 			<default>72</default>
 		</entry>
 		<entry name="tileMargin" type="double">
-			<default>5</default>
+		<default>12</default>
 		</entry>
 		<entry name="tileRoundedCorners" type="bool">
 			<label>Whether tiles and hover highlights use rounded corners.</label>

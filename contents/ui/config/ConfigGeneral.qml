@@ -89,7 +89,7 @@ LibConfig.FormKCM {
 		configKey: 'tileMargin'
 		Kirigami.FormData.label: i18n("Tile Margin")
 		suffix: i18n("px")
-		minimumValue: 0
+		minimumValue: 12
 		maximumValue: config.cellBoxUnits/2
 	}
 	RowLayout {
