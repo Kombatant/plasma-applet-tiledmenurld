@@ -29,6 +29,7 @@ LibConfig.FormKCM {
 	property bool _updatingApiKeyField: false
 	property string _lastDetectionSignature: ""
 	property int _requestToken: 0
+	readonly property int wrappedLabelPreferredWidth: Kirigami.Units.gridUnit * 20
 	readonly property var modelOptionsData: {
 		var options = []
 		for (var i = 0; i < detectedModels.length; i++) {
@@ -441,6 +442,7 @@ LibConfig.FormKCM {
 		id: detectionStatusLabel
 		Layout.fillWidth: true
 		Layout.minimumHeight: Kirigami.Units.gridUnit
+		Layout.preferredWidth: form.wrappedLabelPreferredWidth
 		wrapMode: Text.Wrap
 		opacity: 0.8
 		text: {
@@ -469,6 +471,7 @@ LibConfig.FormKCM {
 
 	QQC2.Label {
 		Layout.fillWidth: true
+		Layout.preferredWidth: form.wrappedLabelPreferredWidth
 		wrapMode: Text.Wrap
 		opacity: 0.85
 		text: i18n("OpenAI, OpenRouter, Google, Perplexity and Anthropic require network access and an API key. Open WebUI uses its OpenAI-compatible API at your configured server URL and can optionally use a bearer token; both the server root and an /api URL are accepted. Ollama connects to a local server (default: http://127.0.0.1:11434).")
