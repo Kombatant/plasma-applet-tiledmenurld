@@ -7,20 +7,38 @@ Kicker.SimpleFavoritesModel {
 	// https://github.com/KDE/plasma-desktop/blob/master/applets/kicker/plugin/appentry.cpp#L151
 	id: kickerAppModel
 
-	signal triggerIndex(int index)
-	onTriggerIndex: {
-		var closeRequested = kickerAppModel.trigger(index, "", null)
+	function triggerIndex(index) {
+		var closeRequested = false
+		try {
+			closeRequested = kickerAppModel.trigger(index, "", null)
+		} catch (e) {
+			console.warn('KickerAppModel.triggerIndex exception', index, e)
+			if (typeof logger !== "undefined" && logger) {
+				logger.warn('KickerAppModel.triggerIndex exception', index, e)
+			}
+			return false
+		}
 		if (closeRequested) {
 			plasmoid.expanded = false
 		}
+		return closeRequested
 	}
 
-	signal triggerIndexAction(int index, string actionId, string actionArgument)
-	onTriggerIndexAction: {
-		var closeRequested = kickerAppModel.trigger(index, actionId, actionArgument)
+	function triggerIndexAction(index, actionId, actionArgument) {
+		var closeRequested = false
+		try {
+			closeRequested = kickerAppModel.trigger(index, actionId, actionArgument)
+		} catch (e) {
+			console.warn('KickerAppModel.triggerIndexAction exception', index, actionId, e)
+			if (typeof logger !== "undefined" && logger) {
+				logger.warn('KickerAppModel.triggerIndexAction exception', index, actionId, e)
+			}
+			return false
+		}
 		if (closeRequested) {
 			plasmoid.expanded = false
 		}
+		return closeRequested
 	}
 
 	// https://invent.kde.org/plasma/plasma-workspace/-/blame/master/applets/kicker/plugin/actionlist.h#L18
