@@ -13,6 +13,53 @@ Item {
 	property string order: "categories"
 	onOrderChanged: allAppsModel.refresh()
 
+	function stringListToArray(value) {
+		if (!value) {
+			return []
+		}
+		if (Array.isArray(value)) {
+			return value.slice()
+		}
+		if (typeof value === "string") {
+			return value ? [value] : []
+		}
+		var list = []
+		var length = typeof value.length === "number" ? value.length : 0
+		for (var i = 0; i < length; i++) {
+			list.push(value[i])
+		}
+		return list
+	}
+
+	function uniqueStringList(value) {
+		var list = stringListToArray(value)
+		var unique = []
+		var seen = {}
+		for (var i = 0; i < list.length; i++) {
+			var entry = list[i]
+			if (!entry || typeof entry !== "string" || seen[entry]) {
+				continue
+			}
+			seen[entry] = true
+			unique.push(entry)
+		}
+		return unique
+	}
+
+	function sameStringList(a, b) {
+		var left = stringListToArray(a)
+		var right = stringListToArray(b)
+		if (left.length !== right.length) {
+			return false
+		}
+		for (var i = 0; i < left.length; i++) {
+			if (left[i] !== right[i]) {
+				return false
+			}
+		}
+		return true
+	}
+
 
 	signal refreshing()
 	signal refreshed()
@@ -110,6 +157,10 @@ Item {
 			powerActionsModel.list = systemList
 			sessionActionsModel.parseSourceModel(powerActionsModel)
 
+			if (sidebarModel.pendingConfigSync) {
+				sidebarModel.applyConfigurationFavorites()
+			}
+
 			debouncedRefresh.restart()
 		}
 
@@ -131,19 +182,68 @@ Item {
 
 		property var sidebarModel: KickerAppModel {
 			id: sidebarModel
+			property bool syncingFromConfiguration: false
+			property bool pendingConfigSync: false
+			property bool hasAppliedConfigurationFavorites: false
+
+			function requestConfigurationSync(force) {
+				var configuredFavorites = appsModel.uniqueStringList(plasmoid.configuration.sidebarShortcuts)
+				if (!force && hasAppliedConfigurationFavorites && appsModel.sameStringList(favorites, configuredFavorites)) {
+					pendingConfigSync = false
+					return
+				}
+				pendingConfigSync = true
+				if (rootModel.count > 0) {
+					sidebarConfigSync.restart()
+				}
+			}
+
+			function applyConfigurationFavorites() {
+				pendingConfigSync = false
+				var configuredFavorites = appsModel.uniqueStringList(plasmoid.configuration.sidebarShortcuts)
+				var existingFavorites = appsModel.stringListToArray(favorites)
+				syncingFromConfiguration = true
+				for (var i = 0; i < existingFavorites.length; i++) {
+					removeFavorite(existingFavorites[i])
+				}
+				for (var j = 0; j < configuredFavorites.length; j++) {
+					addFavorite(configuredFavorites[j], j)
+				}
+				syncingFromConfiguration = false
+				hasAppliedConfigurationFavorites = true
+				var normalizedFavorites = appsModel.uniqueStringList(favorites)
+				if (!appsModel.sameStringList(plasmoid.configuration.sidebarShortcuts, normalizedFavorites)) {
+					plasmoid.configuration.sidebarShortcuts = normalizedFavorites
+				}
+			}
+
+			property var sidebarConfigSync: Timer {
+				id: sidebarConfigSync
+				interval: 0
+				repeat: false
+				onTriggered: {
+					sidebarModel.applyConfigurationFavorites()
+				}
+			}
 
 			Component.onCompleted: {
-				favorites = plasmoid.configuration.sidebarShortcuts
+				requestConfigurationSync(true)
 			}
 
 			onFavoritesChanged: {
-				plasmoid.configuration.sidebarShortcuts = favorites
+				if (syncingFromConfiguration) {
+					return
+				}
+				hasAppliedConfigurationFavorites = true
+				plasmoid.configuration.sidebarShortcuts = appsModel.uniqueStringList(favorites)
 			}
 			
 			property Connections configConnection: Connections {
 				target: plasmoid.configuration
 				function onSidebarShortcutsChanged() {
-					sidebarModel.favorites = plasmoid.configuration.sidebarShortcuts
+					if (!sidebarModel.syncingFromConfiguration) {
+						sidebarModel.requestConfigurationSync(false)
+					}
 				}
 			}
 		}
@@ -434,31 +534,10 @@ Item {
 		if (!favoritesModel || !Array.isArray(urlList)) {
 			return
 		}
-		var unique = []
-		var seen = {}
-		for (var i = 0; i < urlList.length; i++) {
-			var url = urlList[i]
-			if (!url || typeof url !== "string") {
-				continue
-			}
-			if (seen[url]) {
-				continue
-			}
-			seen[url] = true
-			unique.push(url)
-		}
+		var unique = uniqueStringList(urlList)
 		var existing = favoritesModel.favorites
-		if (Array.isArray(existing) && existing.length === unique.length) {
-			var same = true
-			for (var j = 0; j < existing.length; j++) {
-				if (existing[j] !== unique[j]) {
-					same = false
-					break
-				}
-			}
-			if (same) {
-				return
-			}
+		if (sameStringList(existing, unique)) {
+			return
 		}
 		favoritesModel.favorites = unique
 	}
