@@ -122,7 +122,6 @@ KCM.AbstractKCM {
     // Do not force shrink: respect user resizing after open.
     readonly property int wideModeMinWidth: Kirigami.Units.gridUnit * 40
     readonly property int preferredWindowWidth: Kirigami.Units.gridUnit * 48
-    property string filterText: ""
     property string currentSectionKey: ""
     readonly property var _allSections: [{
         "key": "general",
@@ -174,16 +173,11 @@ KCM.AbstractKCM {
         "visible": true
     }]
     readonly property var filteredSections: {
-        var needle = (filterText || "").trim().toLowerCase();
         var out = [];
         for (var i = 0; i < _allSections.length; i++) {
             var s = _allSections[i];
-            if (!s || !s.visible)
-                continue;
-
-            if (!needle || (s.name || "").toLowerCase().indexOf(needle) !== -1)
+            if (s && s.visible)
                 out.push(s);
-
         }
         return out;
     }
@@ -409,7 +403,6 @@ KCM.AbstractKCM {
         });
 
     }
-    onFilterTextChanged: _ensureValidSelection()
     Component.onCompleted: {
         // Defer initialization to avoid creating graphical objects before
         // the page is attached to the host configuration shell. This
@@ -480,19 +473,6 @@ KCM.AbstractKCM {
                 ColumnLayout {
                     anchors.fill: parent
                     spacing: Kirigami.Units.smallSpacing
-
-                    QQC2.TextField {
-                        // QQC2 TextField doesn't reliably expose a clear button across all
-                        // Plasma/Qt6 style versions; avoid using non-portable properties.
-
-                        id: searchField
-
-                        Layout.fillWidth: true
-                        placeholderText: i18n("Search...")
-                        text: page.filterText
-                        onTextChanged: page.filterText = text
-                        selectByMouse: true
-                    }
 
                     // Independent scrolling for the section list.
                     ListView {

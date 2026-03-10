@@ -310,7 +310,7 @@ LibConfig.FormKCM {
 			: i18n("Paste your API key to auto-detect models.")
 	}
 
-	Kirigami.InlineMessage {
+		Kirigami.InlineMessage {
 		Layout.fillWidth: true
 		visible: form.keyRequired && secureApiKey.checkedAvailability && !secureApiKey.secureStorageAvailable && !!secureApiKey.availabilityMessage
 		type: Kirigami.MessageType.Warning
@@ -465,15 +465,18 @@ LibConfig.FormKCM {
 		text: i18n("Enable streaming responses")
 	}
 
-	LibConfig.Heading {
-		text: i18n("Notes")
+	Item {
+		Kirigami.FormData.isSection: false
+		Kirigami.FormData.label: ""
+		implicitHeight: Kirigami.Units.gridUnit
 	}
 
-	QQC2.Label {
+	Kirigami.InlineMessage {
 		Layout.fillWidth: true
-		Layout.preferredWidth: form.wrappedLabelPreferredWidth
-		wrapMode: Text.Wrap
-		opacity: 0.85
-		text: i18n("OpenAI, OpenRouter, Google, Perplexity and Anthropic require network access and an API key. Open WebUI uses its OpenAI-compatible API at your configured server URL and can optionally use a bearer token; both the server root and an /api URL are accepted. Ollama connects to a local server (default: http://127.0.0.1:11434).")
+		visible: true
+		icon.source: "help-info-symbolic"
+		type: Kirigami.MessageType.Information
+		text: i18n("<ul><li>OpenAI, OpenRouter, Google, Perplexity and Anthropic require network access and an API key.</li><li>Open WebUI uses its OpenAI-compatible API at your configured server URL and can optionally use a bearer token; both the server root and an /api URL are accepted.</li><li>Ollama connects to a local server (default: http://127.0.0.1:11434).</li></ul>")
 	}
+
 }
