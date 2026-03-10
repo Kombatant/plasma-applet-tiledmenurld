@@ -6,7 +6,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Tiled Menu Reloaded\n"
-"Report-Msgid-Bugs-To: https://github.com/Kombatant/plasma-applet-tiledmenurld/issues\n"
+"Report-Msgid-Bugs-To: https://github.com/Kombatant/plasma-applet-"
+"tiledmenurld/issues\n"
 "POT-Creation-Date: 2025-02-25 20:49+1100\n"
 "PO-Revision-Date: 2021-06-09 18:00+0300\n"
 "Last-Translator: Kimmo Kujansuu <mrkujansuu@gmail.com>\n"
@@ -165,6 +166,10 @@ msgstr ""
 #: ../contents/ui/config/ConfigGeneral.qml
 msgid "Sidebar Shortcuts"
 msgstr "Sivupalkin pikavalinnat"
+
+#: ../contents/ui/config/ConfigSearch.qml
+msgid "Collapse Search Result Groups"
+msgstr "Tiivistä hakutulosryhmät"
 
 #: ../contents/ui/config/ConfigGeneral.qml
 msgid "Add Default"
@@ -442,7 +447,8 @@ msgstr "Valitse kuva"
 
 #: ../contents/ui/TileEditorView.qml
 msgid "Image Files (*.png *.apng *.gif *.webp *.jpg *.jpeg *.bmp *.svg *.svgz)"
-msgstr "Kuvatiedostot (*.png *.apng *.gif *.webp *.jpg *.jpeg *.bmp *.svg *.svgz)"
+msgstr ""
+"Kuvatiedostot (*.png *.apng *.gif *.webp *.jpg *.jpeg *.bmp *.svg *.svgz)"
 
 #: ../contents/ui/TileEditorView.qml
 msgid "Preset Tiles"
@@ -525,9 +531,6 @@ msgstr "Käytä laatalle oletus asettelua"
 msgid "Sort Tiles"
 msgstr "Järjestä laatat"
 
-#~ msgid "<b>Version:</b> %1"
-#~ msgstr "<b>Versio:</b> %1"
-
 #: ../contents/ui/SidebarView.qml
 msgid "Tiled Menu Reloaded Settings"
 msgstr ""
@@ -562,7 +565,8 @@ msgstr "Määritä tarjoaja, API-avain ja malli asetuksissa ennen lähettämist�
 
 #: ../contents/ui/AiChatView.qml
 msgid "Ask anything... (Enter to send, Shift+Enter for newline)"
-msgstr "Kysy mitä tahansa... (Syötä lähettääksesi, Vaihto+Syötä rivinvaihdolle)"
+msgstr ""
+"Kysy mitä tahansa... (Syötä lähettääksesi, Vaihto+Syötä rivinvaihdolle)"
 
 #: ../contents/ui/AiChatModel.qml
 msgid "New Chat"
@@ -666,7 +670,9 @@ msgstr "Lataa mallit uudelleen"
 
 #: ../contents/ui/config/ConfigAiChat.qml
 msgid "No models detected yet. Paste your API key to auto-detect."
-msgstr "Malleja ei ole vielä havaittu. Liitä API-avain tunnistaaksesi automaattisesti."
+msgstr ""
+"Malleja ei ole vielä havaittu. Liitä API-avain tunnistaaksesi "
+"automaattisesti."
 
 #: ../contents/ui/config/ConfigAiChat.qml
 msgid "Chat Options"
@@ -681,6 +687,14 @@ msgid "Notes"
 msgstr "Muistiinpanot"
 
 #: ../contents/ui/config/ConfigAiChat.qml
-msgid "OpenAI, OpenRouter, Google, Perplexity and Anthropic require network access and an API key. Ollama connects to a local server (default: http://127.0.0.1:11434)."
-msgstr "OpenAI, OpenRouter, Google, Perplexity ja Anthropic vaativat verkkoyhteyden ja API-avaimen. Ollama muodostaa yhteyden paikalliseen palvelimeen (oletus: http://127.0.0.1:11434)."
+msgid ""
+"OpenAI, OpenRouter, Google, Perplexity and Anthropic require network access "
+"and an API key. Ollama connects to a local server (default: http://"
+"127.0.0.1:11434)."
+msgstr ""
+"OpenAI, OpenRouter, Google, Perplexity ja Anthropic vaativat verkkoyhteyden "
+"ja API-avaimen. Ollama muodostaa yhteyden paikalliseen palvelimeen (oletus: "
+"http://127.0.0.1:11434)."
 
+#~ msgid "<b>Version:</b> %1"
+#~ msgstr "<b>Versio:</b> %1"

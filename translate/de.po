@@ -6,7 +6,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Tiled Menu Reloaded\n"
-"Report-Msgid-Bugs-To: https://github.com/Kombatant/plasma-applet-tiledmenurld/issues\n"
+"Report-Msgid-Bugs-To: https://github.com/Kombatant/plasma-applet-"
+"tiledmenurld/issues\n"
 "POT-Creation-Date: 2025-02-25 20:49+1100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Ruman Gerst <rumangerst@gmail.com>\n"
@@ -163,6 +164,10 @@ msgstr ""
 #: ../contents/ui/config/ConfigGeneral.qml
 msgid "Sidebar Shortcuts"
 msgstr "Schnelltasten in Seitenleiste"
+
+#: ../contents/ui/config/ConfigSearch.qml
+msgid "Collapse Search Result Groups"
+msgstr "Suchergebnisgruppen einklappen"
 
 #: ../contents/ui/config/ConfigGeneral.qml
 msgid "Add Default"
@@ -523,44 +528,6 @@ msgstr "Nutze Standardanornung"
 msgid "Sort Tiles"
 msgstr "Sortiere Kacheln"
 
-#~ msgid "<b>Version:</b> %1"
-#~ msgstr "<b>Version:</b> %1"
-
-#~ msgid "Desktop Theme (%1)"
-#~ msgstr "Desktop Thema (%1)"
-
-#~ msgid "Menu"
-#~ msgstr "Menü"
-
-#~ msgid "Apps"
-#~ msgstr "Anwendungen"
-
-#~ msgid "Show recent applications"
-#~ msgstr "Letzte Anwendungen anzeigen"
-
-#~ msgctxt "@item:inmenu Open icon chooser dialog"
-#~ msgid "Choose..."
-#~ msgstr "Auswählen..."
-
-#~ msgctxt "@item:inmenu Reset icon to default"
-#~ msgid "Clear Icon"
-#~ msgstr "Symbol zurücksetzen"
-
-#~ msgid "More"
-#~ msgstr "Mehr"
-
-#~ msgid "Size"
-#~ msgstr "Größe"
-
-#~ msgid "Small"
-#~ msgstr "Klein"
-
-#~ msgid "Medium"
-#~ msgstr "Mittel"
-
-#~ msgid "Settings"
-#~ msgstr "Einstellungen"
-
 #: ../contents/ui/SidebarView.qml
 msgid "Tiled Menu Reloaded Settings"
 msgstr ""
@@ -591,11 +558,14 @@ msgstr "Ein neues Gespräch beginnen"
 
 #: ../contents/ui/AiChatView.qml
 msgid "Configure provider, API key and model in settings before sending."
-msgstr "Konfigurieren Sie Anbieter, API-Schlüssel und Modell in den Einstellungen vor dem Senden."
+msgstr ""
+"Konfigurieren Sie Anbieter, API-Schlüssel und Modell in den Einstellungen "
+"vor dem Senden."
 
 #: ../contents/ui/AiChatView.qml
 msgid "Ask anything... (Enter to send, Shift+Enter for newline)"
-msgstr "Alles fragen... (Eingabe zum Senden, Umschalt+Eingabe für Zeilenumbruch)"
+msgstr ""
+"Alles fragen... (Eingabe zum Senden, Umschalt+Eingabe für Zeilenumbruch)"
 
 #: ../contents/ui/AiChatModel.qml
 msgid "New Chat"
@@ -699,7 +669,9 @@ msgstr "Modelle neu laden"
 
 #: ../contents/ui/config/ConfigAiChat.qml
 msgid "No models detected yet. Paste your API key to auto-detect."
-msgstr "Noch keine Modelle erkannt. Fügen Sie Ihren API-Schlüssel ein, um ihn automatisch zu erkennen."
+msgstr ""
+"Noch keine Modelle erkannt. Fügen Sie Ihren API-Schlüssel ein, um ihn "
+"automatisch zu erkennen."
 
 #: ../contents/ui/config/ConfigAiChat.qml
 msgid "Chat Options"
@@ -714,6 +686,49 @@ msgid "Notes"
 msgstr "Vermerke"
 
 #: ../contents/ui/config/ConfigAiChat.qml
-msgid "OpenAI, OpenRouter, Google, Perplexity and Anthropic require network access and an API key. Ollama connects to a local server (default: http://127.0.0.1:11434)."
-msgstr "OpenAI, OpenRouter, Google, Perplexity und Anthropic erfordern Netzwerkzugriff und einen API-Schlüssel. Ollama stellt eine Verbindung zu einem lokalen Server her (Standard: http://127.0.0.1:11434)."
+msgid ""
+"OpenAI, OpenRouter, Google, Perplexity and Anthropic require network access "
+"and an API key. Ollama connects to a local server (default: http://"
+"127.0.0.1:11434)."
+msgstr ""
+"OpenAI, OpenRouter, Google, Perplexity und Anthropic erfordern "
+"Netzwerkzugriff und einen API-Schlüssel. Ollama stellt eine Verbindung zu "
+"einem lokalen Server her (Standard: http://127.0.0.1:11434)."
 
+#~ msgid "<b>Version:</b> %1"
+#~ msgstr "<b>Version:</b> %1"
+
+#~ msgid "Desktop Theme (%1)"
+#~ msgstr "Desktop Thema (%1)"
+
+#~ msgid "Menu"
+#~ msgstr "Menü"
+
+#~ msgid "Apps"
+#~ msgstr "Anwendungen"
+
+#~ msgid "Show recent applications"
+#~ msgstr "Letzte Anwendungen anzeigen"
+
+#~ msgctxt "@item:inmenu Open icon chooser dialog"
+#~ msgid "Choose..."
+#~ msgstr "Auswählen..."
+
+#~ msgctxt "@item:inmenu Reset icon to default"
+#~ msgid "Clear Icon"
+#~ msgstr "Symbol zurücksetzen"
+
+#~ msgid "More"
+#~ msgstr "Mehr"
+
+#~ msgid "Size"
+#~ msgstr "Größe"
+
+#~ msgid "Small"
+#~ msgstr "Klein"
+
+#~ msgid "Medium"
+#~ msgstr "Mittel"
+
+#~ msgid "Settings"
+#~ msgstr "Einstellungen"

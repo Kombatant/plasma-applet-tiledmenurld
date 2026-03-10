@@ -6,7 +6,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Tiled Menu Reloaded\n"
-"Report-Msgid-Bugs-To: https://github.com/Kombatant/plasma-applet-tiledmenurld/issues\n"
+"Report-Msgid-Bugs-To: https://github.com/Kombatant/plasma-applet-"
+"tiledmenurld/issues\n"
 "POT-Creation-Date: 2025-02-25 20:49+1100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Ugo Ugowsky <ugowsky@gmail.com>\n"
@@ -163,6 +164,10 @@ msgstr ""
 #: ../contents/ui/config/ConfigGeneral.qml
 msgid "Sidebar Shortcuts"
 msgstr "Bližnjice v stranski vrstici"
+
+#: ../contents/ui/config/ConfigSearch.qml
+msgid "Collapse Search Result Groups"
+msgstr "Strni skupine rezultatov iskanja"
 
 #: ../contents/ui/config/ConfigGeneral.qml
 msgid "Add Default"
@@ -523,15 +528,6 @@ msgstr "Uporabi privzeto razporeditev"
 msgid "Sort Tiles"
 msgstr "Uredi ploščice"
 
-#~ msgid "Desktop Theme (%1)"
-#~ msgstr "Tema namizja (%1)"
-
-#~ msgid "<b>Version:</b> %1"
-#~ msgstr "<b>Različica:</b> %1"
-
-#~ msgid "Alt + Right Click to resize the menu."
-#~ msgstr "Alt + desni klik za spreminjanje velikosti menija."
-
 #: ../contents/ui/SidebarView.qml
 msgid "Tiled Menu Reloaded Settings"
 msgstr ""
@@ -562,11 +558,13 @@ msgstr "Začnite nov pogovor"
 
 #: ../contents/ui/AiChatView.qml
 msgid "Configure provider, API key and model in settings before sending."
-msgstr "Konfigurirajte ponudnika, ključ API in model v nastavitvah pred pošiljanjem."
+msgstr ""
+"Konfigurirajte ponudnika, ključ API in model v nastavitvah pred pošiljanjem."
 
 #: ../contents/ui/AiChatView.qml
 msgid "Ask anything... (Enter to send, Shift+Enter for newline)"
-msgstr "Vprašajte karkoli ... (Enter za pošiljanje, Shift+Enter za novo vrstico)"
+msgstr ""
+"Vprašajte karkoli ... (Enter za pošiljanje, Shift+Enter za novo vrstico)"
 
 #: ../contents/ui/AiChatModel.qml
 msgid "New Chat"
@@ -670,7 +668,8 @@ msgstr "Ponovno naloži modele"
 
 #: ../contents/ui/config/ConfigAiChat.qml
 msgid "No models detected yet. Paste your API key to auto-detect."
-msgstr "Zaznan še ni noben model. Prilepite svoj ključ API za samodejno zaznavanje."
+msgstr ""
+"Zaznan še ni noben model. Prilepite svoj ključ API za samodejno zaznavanje."
 
 #: ../contents/ui/config/ConfigAiChat.qml
 msgid "Chat Options"
@@ -685,6 +684,20 @@ msgid "Notes"
 msgstr "Opombe"
 
 #: ../contents/ui/config/ConfigAiChat.qml
-msgid "OpenAI, OpenRouter, Google, Perplexity and Anthropic require network access and an API key. Ollama connects to a local server (default: http://127.0.0.1:11434)."
-msgstr "OpenAI, OpenRouter, Google, Perplexity in Anthropic zahtevajo dostop do omrežja in ključ API. Ollama se poveže z lokalnim strežnikom (privzeto: http://127.0.0.1:11434)."
+msgid ""
+"OpenAI, OpenRouter, Google, Perplexity and Anthropic require network access "
+"and an API key. Ollama connects to a local server (default: http://"
+"127.0.0.1:11434)."
+msgstr ""
+"OpenAI, OpenRouter, Google, Perplexity in Anthropic zahtevajo dostop do "
+"omrežja in ključ API. Ollama se poveže z lokalnim strežnikom (privzeto: "
+"http://127.0.0.1:11434)."
 
+#~ msgid "Desktop Theme (%1)"
+#~ msgstr "Tema namizja (%1)"
+
+#~ msgid "<b>Version:</b> %1"
+#~ msgstr "<b>Različica:</b> %1"
+
+#~ msgid "Alt + Right Click to resize the menu."
+#~ msgstr "Alt + desni klik za spreminjanje velikosti menija."

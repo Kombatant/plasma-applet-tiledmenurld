@@ -6,7 +6,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Tiled Menu Reloaded\n"
-"Report-Msgid-Bugs-To: https://github.com/Kombatant/plasma-applet-tiledmenurld/issues\n"
+"Report-Msgid-Bugs-To: https://github.com/Kombatant/plasma-applet-"
+"tiledmenurld/issues\n"
 "POT-Creation-Date: 2025-02-25 20:49+1100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Lin Mu <linmu789632@gmail.com>\n"
@@ -163,6 +164,10 @@ msgstr ""
 #: ../contents/ui/config/ConfigGeneral.qml
 msgid "Sidebar Shortcuts"
 msgstr "侧栏快捷方式"
+
+#: ../contents/ui/config/ConfigSearch.qml
+msgid "Collapse Search Result Groups"
+msgstr "折叠搜索结果分组"
 
 #: ../contents/ui/config/ConfigGeneral.qml
 msgid "Add Default"
@@ -522,24 +527,6 @@ msgstr ""
 msgid "Sort Tiles"
 msgstr ""
 
-#~ msgid "<b>Version:</b> %1"
-#~ msgstr "<b>版本：</b> %1"
-
-#~ msgid "Desktop Theme (%1)"
-#~ msgstr "桌面主题 (%1)"
-
-#~ msgid "Menu"
-#~ msgstr "菜单"
-
-#~ msgid "Apps"
-#~ msgstr "应用"
-
-#~ msgid "Show recent applications"
-#~ msgstr "显示最近运行应用"
-
-#~ msgid "Default Order"
-#~ msgstr "默认顺序"
-
 #: ../contents/ui/SidebarView.qml
 msgid "Tiled Menu Reloaded Settings"
 msgstr ""
@@ -693,6 +680,28 @@ msgid "Notes"
 msgstr "注释"
 
 #: ../contents/ui/config/ConfigAiChat.qml
-msgid "OpenAI, OpenRouter, Google, Perplexity and Anthropic require network access and an API key. Ollama connects to a local server (default: http://127.0.0.1:11434)."
-msgstr "OpenAI、OpenRouter、Google、Perplexity 和 Anthropic 需要网络访问权限和 API 密钥。 Ollama 连接到本地服务器（默认：http://127.0.0.1:11434）。"
+msgid ""
+"OpenAI, OpenRouter, Google, Perplexity and Anthropic require network access "
+"and an API key. Ollama connects to a local server (default: http://"
+"127.0.0.1:11434)."
+msgstr ""
+"OpenAI、OpenRouter、Google、Perplexity 和 Anthropic 需要网络访问权限和 API 密"
+"钥。 Ollama 连接到本地服务器（默认：http://127.0.0.1:11434）。"
 
+#~ msgid "<b>Version:</b> %1"
+#~ msgstr "<b>版本：</b> %1"
+
+#~ msgid "Desktop Theme (%1)"
+#~ msgstr "桌面主题 (%1)"
+
+#~ msgid "Menu"
+#~ msgstr "菜单"
+
+#~ msgid "Apps"
+#~ msgstr "应用"
+
+#~ msgid "Show recent applications"
+#~ msgstr "显示最近运行应用"
+
+#~ msgid "Default Order"
+#~ msgstr "默认顺序"

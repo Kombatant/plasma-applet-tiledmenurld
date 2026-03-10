@@ -6,7 +6,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Tiled Menu Reloaded\n"
-"Report-Msgid-Bugs-To: https://github.com/Kombatant/plasma-applet-tiledmenurld/issues\n"
+"Report-Msgid-Bugs-To: https://github.com/Kombatant/plasma-applet-"
+"tiledmenurld/issues\n"
 "POT-Creation-Date: 2025-02-25 20:49+1100\n"
 "PO-Revision-Date: 2020-07-07 16:59+0300\n"
 "Last-Translator: Cihan Alkan <cihanalk@gmail.com>\n"
@@ -164,6 +165,10 @@ msgstr ""
 #: ../contents/ui/config/ConfigGeneral.qml
 msgid "Sidebar Shortcuts"
 msgstr "Kenar Çubuğu Kısayolları"
+
+#: ../contents/ui/config/ConfigSearch.qml
+msgid "Collapse Search Result Groups"
+msgstr "Arama sonucu gruplarını daralt"
 
 #: ../contents/ui/config/ConfigGeneral.qml
 msgid "Add Default"
@@ -441,7 +446,8 @@ msgstr "Bir resim seçin"
 
 #: ../contents/ui/TileEditorView.qml
 msgid "Image Files (*.png *.apng *.gif *.webp *.jpg *.jpeg *.bmp *.svg *.svgz)"
-msgstr "Resim Dosyaları (*.png *.apng *.gif *.webp *.jpg *.jpeg *.bmp *.svg *.svgz)"
+msgstr ""
+"Resim Dosyaları (*.png *.apng *.gif *.webp *.jpg *.jpeg *.bmp *.svg *.svgz)"
 
 #: ../contents/ui/TileEditorView.qml
 msgid "Preset Tiles"
@@ -524,12 +530,6 @@ msgstr "Varsayılan Döşeme Düzenini Kullan"
 msgid "Sort Tiles"
 msgstr "Döşemeleri Sıralama"
 
-#~ msgid "<b>Version:</b> %1"
-#~ msgstr "<b>Sürüm:</b> %1"
-
-#~ msgid "Desktop Theme (%1)"
-#~ msgstr "Masaüstü Teması (%1)"
-
 #: ../contents/ui/SidebarView.qml
 msgid "Tiled Menu Reloaded Settings"
 msgstr ""
@@ -560,11 +560,14 @@ msgstr "Yeni bir görüşme başlat"
 
 #: ../contents/ui/AiChatView.qml
 msgid "Configure provider, API key and model in settings before sending."
-msgstr "Göndermeden önce ayarlarda sağlayıcıyı, API anahtarını ve modelini yapılandırın."
+msgstr ""
+"Göndermeden önce ayarlarda sağlayıcıyı, API anahtarını ve modelini "
+"yapılandırın."
 
 #: ../contents/ui/AiChatView.qml
 msgid "Ask anything... (Enter to send, Shift+Enter for newline)"
-msgstr "İstediğinizi sorun... (Göndermek için Enter, yeni satır için Shift+Enter)"
+msgstr ""
+"İstediğinizi sorun... (Göndermek için Enter, yeni satır için Shift+Enter)"
 
 #: ../contents/ui/AiChatModel.qml
 msgid "New Chat"
@@ -668,7 +671,9 @@ msgstr "Modelleri yeniden yükle"
 
 #: ../contents/ui/config/ConfigAiChat.qml
 msgid "No models detected yet. Paste your API key to auto-detect."
-msgstr "Henüz hiçbir model algılanmadı. Otomatik algılama için API anahtarınızı yapıştırın."
+msgstr ""
+"Henüz hiçbir model algılanmadı. Otomatik algılama için API anahtarınızı "
+"yapıştırın."
 
 #: ../contents/ui/config/ConfigAiChat.qml
 msgid "Chat Options"
@@ -683,6 +688,17 @@ msgid "Notes"
 msgstr "Notlar"
 
 #: ../contents/ui/config/ConfigAiChat.qml
-msgid "OpenAI, OpenRouter, Google, Perplexity and Anthropic require network access and an API key. Ollama connects to a local server (default: http://127.0.0.1:11434)."
-msgstr "OpenAI, OpenRouter, Google, Perplexity ve Anthropic ağ erişimi ve bir API anahtarı gerektirir. Ollama yerel bir sunucuya bağlanır (varsayılan: http://127.0.0.1:11434)."
+msgid ""
+"OpenAI, OpenRouter, Google, Perplexity and Anthropic require network access "
+"and an API key. Ollama connects to a local server (default: http://"
+"127.0.0.1:11434)."
+msgstr ""
+"OpenAI, OpenRouter, Google, Perplexity ve Anthropic ağ erişimi ve bir API "
+"anahtarı gerektirir. Ollama yerel bir sunucuya bağlanır (varsayılan: http://"
+"127.0.0.1:11434)."
 
+#~ msgid "<b>Version:</b> %1"
+#~ msgstr "<b>Sürüm:</b> %1"
+
+#~ msgid "Desktop Theme (%1)"
+#~ msgstr "Masaüstü Teması (%1)"

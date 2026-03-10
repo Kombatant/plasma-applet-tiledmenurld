@@ -50,6 +50,7 @@ Item {
 			'org.kde.dolphin.desktop',
 			'systemsettings.desktop',
 		])
+		_ensureSettingInitialized('sidebarCollapsibleSearchResults', false)
 		_ensureSettingInitialized('defaultAppListView', 'Alphabetical')
 		_ensureSettingInitialized('aiProvider', 'openai')
 		_ensureSettingInitialized('aiApiKey', '')
@@ -299,6 +300,7 @@ Item {
 	//--- Settings
 	// Search
 	readonly property bool searchResultsGrouped: plasmoid.configuration.searchResultsGrouped
+	readonly property bool sidebarCollapsibleSearchResults: !!plasmoid.configuration.sidebarCollapsibleSearchResults
 	
 	//--- Tile Data
 	property var tileModel: Base64XmlString {

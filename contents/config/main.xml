@@ -33,6 +33,10 @@
 			<label>Same as favoriteApps except "xdg:DOCUMENTS", etc are constants to ~/Documents.</label>
 			<default>xdg:DOCUMENTS,xdg:PICTURES,org.kde.dolphin.desktop,systemsettings.desktop</default>
 		</entry>
+		<entry name="sidebarCollapsibleSearchResults" type="bool">
+			<label>Whether grouped search results in the sidebar can be collapsed and start with only the first group expanded.</label>
+			<default>false</default>
+		</entry>
 		<entry name="defaultAppListView" type="string">
 			<!-- enum: Alphabetical, Categories, JumpToLetter, JumpToCategory, TilesOnly, AiChat -->
 			<default>Alphabetical</default>

@@ -6,7 +6,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Tiled Menu Reloaded\n"
-"Report-Msgid-Bugs-To: https://github.com/Kombatant/plasma-applet-tiledmenurld/issues\n"
+"Report-Msgid-Bugs-To: https://github.com/Kombatant/plasma-applet-"
+"tiledmenurld/issues\n"
 "POT-Creation-Date: 2025-02-25 20:49+1100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Vladimir Mikulic <vladimir.mikulic2@gmail.com>\n"
@@ -163,6 +164,10 @@ msgstr ""
 #: ../contents/ui/config/ConfigGeneral.qml
 msgid "Sidebar Shortcuts"
 msgstr "Prečaci bočne trake"
+
+#: ../contents/ui/config/ConfigSearch.qml
+msgid "Collapse Search Result Groups"
+msgstr "Sažmi grupe rezultata pretraživanja"
 
 #: ../contents/ui/config/ConfigGeneral.qml
 msgid "Add Default"
@@ -523,12 +528,6 @@ msgstr ""
 msgid "Sort Tiles"
 msgstr "Sortiraj Pločice"
 
-#~ msgid "<b>Version:</b> %1"
-#~ msgstr "<b>Verzija:</b> %1"
-
-#~ msgid "Desktop Theme (%1)"
-#~ msgstr "Desktop Tema"
-
 #: ../contents/ui/SidebarView.qml
 msgid "Tiled Menu Reloaded Settings"
 msgstr ""
@@ -667,7 +666,9 @@ msgstr "Ponovno učitavanje modela"
 
 #: ../contents/ui/config/ConfigAiChat.qml
 msgid "No models detected yet. Paste your API key to auto-detect."
-msgstr "Još nisu otkriveni modeli. Zalijepite svoj API ključ za automatsko otkrivanje."
+msgstr ""
+"Još nisu otkriveni modeli. Zalijepite svoj API ključ za automatsko "
+"otkrivanje."
 
 #: ../contents/ui/config/ConfigAiChat.qml
 msgid "Chat Options"
@@ -682,6 +683,17 @@ msgid "Notes"
 msgstr "Bilješke"
 
 #: ../contents/ui/config/ConfigAiChat.qml
-msgid "OpenAI, OpenRouter, Google, Perplexity and Anthropic require network access and an API key. Ollama connects to a local server (default: http://127.0.0.1:11434)."
-msgstr "OpenAI, OpenRouter, Google, Perplexity i Anthropic zahtijevaju mrežni pristup i API ključ. Ollama se povezuje s lokalnim poslužiteljem (zadano: http://127.0.0.1:11434)."
+msgid ""
+"OpenAI, OpenRouter, Google, Perplexity and Anthropic require network access "
+"and an API key. Ollama connects to a local server (default: http://"
+"127.0.0.1:11434)."
+msgstr ""
+"OpenAI, OpenRouter, Google, Perplexity i Anthropic zahtijevaju mrežni "
+"pristup i API ključ. Ollama se povezuje s lokalnim poslužiteljem (zadano: "
+"http://127.0.0.1:11434)."
 
+#~ msgid "<b>Version:</b> %1"
+#~ msgstr "<b>Verzija:</b> %1"
+
+#~ msgid "Desktop Theme (%1)"
+#~ msgstr "Desktop Tema"

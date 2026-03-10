@@ -12,6 +12,8 @@ LibConfig.FormKCM {
 	id: formLayout
 	readonly property bool searchFieldHidden: !!plasmoid.configuration.hideSearchField
 	readonly property bool searchOptionsEnabled: !searchFieldHidden
+	readonly property bool groupedSearchResultsEnabled: formLayout.searchOptionsEnabled
+		&& !!plasmoid.configuration.searchResultsGrouped
 	readonly property bool searchFieldHeightEnabled: searchOptionsEnabled
 		&& plasmoid.configuration.sidebarPosition !== 'top'
 		&& plasmoid.configuration.sidebarPosition !== 'bottom'
@@ -69,10 +71,43 @@ LibConfig.FormKCM {
 		}
 	}
 
+	Item {
+		Kirigami.FormData.isSection: false
+		Kirigami.FormData.label: ""
+		implicitHeight: Kirigami.Units.gridUnit
+	}
+
 	LibConfig.CheckBox {
 		configKey: 'searchResultsGrouped'
 		text: i18n("Group search results")
 		enabled: formLayout.searchOptionsEnabled
 		opacity: enabled ? 1 : 0.45
+	}
+
+	Item {
+		Kirigami.FormData.isSection: false
+		Kirigami.FormData.label: ""
+		implicitWidth: collapseSearchResultGroupsRow.implicitWidth
+		implicitHeight: collapseSearchResultGroupsRow.implicitHeight
+		visible: true
+		opacity: formLayout.searchOptionsEnabled ? 1 : 0.45
+
+		RowLayout {
+			id: collapseSearchResultGroupsRow
+			anchors.left: parent.left
+			anchors.right: parent.right
+			spacing: 0
+
+			Item {
+				Layout.preferredWidth: Kirigami.Units.largeSpacing * 2
+			}
+
+			LibConfig.CheckBox {
+				configKey: 'sidebarCollapsibleSearchResults'
+				text: i18n("Collapse Search Result Groups")
+				enabled: formLayout.groupedSearchResultsEnabled
+				opacity: enabled ? 1 : 0.45
+			}
+		}
 	}
 }

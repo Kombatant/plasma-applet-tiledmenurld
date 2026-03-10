@@ -6,7 +6,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Tiled Menu Reloaded\n"
-"Report-Msgid-Bugs-To: https://github.com/Kombatant/plasma-applet-tiledmenurld/issues\n"
+"Report-Msgid-Bugs-To: https://github.com/Kombatant/plasma-applet-"
+"tiledmenurld/issues\n"
 "POT-Creation-Date: 2025-02-25 20:49+1100\n"
 "PO-Revision-Date: 2021-03-15 12:27+0200\n"
 "Last-Translator: Omer I.S. <omeritzicschwartz@gmail.com>\n"
@@ -168,6 +169,10 @@ msgstr "ערכת נושא"
 #: ../contents/ui/config/ConfigGeneral.qml
 msgid "Sidebar Shortcuts"
 msgstr "קיצורים בסרגל הצד"
+
+#: ../contents/ui/config/ConfigSearch.qml
+msgid "Collapse Search Result Groups"
+msgstr "כיווץ קבוצות תוצאות החיפוש"
 
 #: ../contents/ui/config/ConfigGeneral.qml
 msgid "Add Default"
@@ -445,7 +450,8 @@ msgstr "נא לבחור תמונה"
 
 #: ../contents/ui/TileEditorView.qml
 msgid "Image Files (*.png *.apng *.gif *.webp *.jpg *.jpeg *.bmp *.svg *.svgz)"
-msgstr "קובצי תמונה (‎*.png‏ ‎*.apng‏ ‎*.gif‏ ‎*.webp‏ ‎*.jpg‏ ‎*.jpeg‏ ‎*.bmp‏ ‎*.svg‏ ‎*.svgz‏)"
+msgstr ""
+"קובצי תמונה (‎*.png‏ ‎*.apng‏ ‎*.gif‏ ‎*.webp‏ ‎*.jpg‏ ‎*.jpeg‏ ‎*.bmp‏ ‎*.svg‏ ‎*.svgz‏)"
 
 #: ../contents/ui/TileEditorView.qml
 msgid "Preset Tiles"
@@ -527,12 +533,6 @@ msgstr "שימוש בפריסת ברירת המחדל"
 #: ../contents/ui/TileItem.qml
 msgid "Sort Tiles"
 msgstr "מיון אריחים"
-
-#~ msgid "<b>Version:</b> %1"
-#~ msgstr "<b>גרסה:</b> %1"
-
-#~ msgid "Desktop Theme (%1)"
-#~ msgstr "ערכת הנושא של שולחן העבודה (%1)"
 
 #: ../contents/ui/SidebarView.qml
 msgid "Tiled Menu Reloaded Settings"
@@ -687,6 +687,16 @@ msgid "Notes"
 msgstr "הערות"
 
 #: ../contents/ui/config/ConfigAiChat.qml
-msgid "OpenAI, OpenRouter, Google, Perplexity and Anthropic require network access and an API key. Ollama connects to a local server (default: http://127.0.0.1:11434)."
-msgstr "OpenAI, OpenRouter, Google, Perplexity ו-Anthropic דורשים גישה לרשת ומפתח API. Ollama מתחבר לשרת מקומי (ברירת מחדל: http://127.0.0.1:11434)."
+msgid ""
+"OpenAI, OpenRouter, Google, Perplexity and Anthropic require network access "
+"and an API key. Ollama connects to a local server (default: http://"
+"127.0.0.1:11434)."
+msgstr ""
+"OpenAI, OpenRouter, Google, Perplexity ו-Anthropic דורשים גישה לרשת ומפתח "
+"API. Ollama מתחבר לשרת מקומי (ברירת מחדל: http://127.0.0.1:11434)."
 
+#~ msgid "<b>Version:</b> %1"
+#~ msgstr "<b>גרסה:</b> %1"
+
+#~ msgid "Desktop Theme (%1)"
+#~ msgstr "ערכת הנושא של שולחן העבודה (%1)"

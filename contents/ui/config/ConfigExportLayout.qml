@@ -30,6 +30,7 @@ ColumnLayout {
 		recentOrdering: "int",
 		numRecentApps: "int",
 		sidebarShortcuts: "stringlist",
+		sidebarCollapsibleSearchResults: "bool",
 		defaultAppListView: "string",
 		aiProvider: "string",
 		aiOllamaUrl: "string",

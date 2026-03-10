@@ -9,7 +9,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Tiled Menu Reloaded\n"
-"Report-Msgid-Bugs-To: https://github.com/Kombatant/plasma-applet-tiledmenurld/issues\n"
+"Report-Msgid-Bugs-To: https://github.com/Kombatant/plasma-applet-"
+"tiledmenurld/issues\n"
 "POT-Creation-Date: 2025-02-25 20:49+1100\n"
 "PO-Revision-Date: 2021-11-10 13:35+0100\n"
 "Last-Translator: Alan Paris <Alan90000@yahoo.com>\n"
@@ -167,6 +168,10 @@ msgstr "Thème"
 #: ../contents/ui/config/ConfigGeneral.qml
 msgid "Sidebar Shortcuts"
 msgstr "Raccourcis de la Barre Verticale"
+
+#: ../contents/ui/config/ConfigSearch.qml
+msgid "Collapse Search Result Groups"
+msgstr "Réduire les groupes de résultats de recherche"
 
 #: ../contents/ui/config/ConfigGeneral.qml
 msgid "Add Default"
@@ -444,7 +449,8 @@ msgstr "Choisir une image"
 
 #: ../contents/ui/TileEditorView.qml
 msgid "Image Files (*.png *.apng *.gif *.webp *.jpg *.jpeg *.bmp *.svg *.svgz)"
-msgstr "Fichiers d'image (*.png *.apng *.gif *.webp *.jpg *.jpeg *.bmp *.svg *.svgz)"
+msgstr ""
+"Fichiers d'image (*.png *.apng *.gif *.webp *.jpg *.jpeg *.bmp *.svg *.svgz)"
 
 #: ../contents/ui/TileEditorView.qml
 msgid "Preset Tiles"
@@ -527,44 +533,6 @@ msgstr "Utilisez la disposition de tuiles par défaut"
 msgid "Sort Tiles"
 msgstr "Trier les Tuiles"
 
-#~ msgid "<b>Version:</b> %1"
-#~ msgstr "<b>Version:</b> %1"
-
-#~ msgid "Desktop Theme (%1)"
-#~ msgstr "Thème du Bureau (%1)"
-
-#~ msgid "Menu"
-#~ msgstr "Menu"
-
-#~ msgid "Apps"
-#~ msgstr "Applications"
-
-#~ msgid "Show recent applications"
-#~ msgstr "Afficher les applications récentes"
-
-#~ msgctxt "@item:inmenu Open icon chooser dialog"
-#~ msgid "Choose..."
-#~ msgstr "Sélectionner…"
-
-#~ msgctxt "@item:inmenu Reset icon to default"
-#~ msgid "Clear Icon"
-#~ msgstr "Réinitialiser l'icône"
-
-#~ msgid "More"
-#~ msgstr "Plus"
-
-#~ msgid "Size"
-#~ msgstr "Taille"
-
-#~ msgid "Small"
-#~ msgstr "Petit"
-
-#~ msgid "Medium"
-#~ msgstr "Moyen"
-
-#~ msgid "Settings"
-#~ msgstr "Configuration"
-
 #: ../contents/ui/SidebarView.qml
 msgid "Tiled Menu Reloaded Settings"
 msgstr ""
@@ -595,11 +563,15 @@ msgstr "Démarrer une nouvelle conversation"
 
 #: ../contents/ui/AiChatView.qml
 msgid "Configure provider, API key and model in settings before sending."
-msgstr "Configurez le fournisseur, la clé API et le modèle dans les paramètres avant l'envoi."
+msgstr ""
+"Configurez le fournisseur, la clé API et le modèle dans les paramètres avant "
+"l'envoi."
 
 #: ../contents/ui/AiChatView.qml
 msgid "Ask anything... (Enter to send, Shift+Enter for newline)"
-msgstr "Demandez n'importe quoi... (Entrez pour envoyer, Maj+Entrée pour la nouvelle ligne)"
+msgstr ""
+"Demandez n'importe quoi... (Entrez pour envoyer, Maj+Entrée pour la nouvelle "
+"ligne)"
 
 #: ../contents/ui/AiChatModel.qml
 msgid "New Chat"
@@ -703,7 +675,9 @@ msgstr "Recharger les modèles"
 
 #: ../contents/ui/config/ConfigAiChat.qml
 msgid "No models detected yet. Paste your API key to auto-detect."
-msgstr "Aucun modèle détecté pour le moment. Collez votre clé API pour la détection automatique."
+msgstr ""
+"Aucun modèle détecté pour le moment. Collez votre clé API pour la détection "
+"automatique."
 
 #: ../contents/ui/config/ConfigAiChat.qml
 msgid "Chat Options"
@@ -718,6 +692,49 @@ msgid "Notes"
 msgstr "Remarques"
 
 #: ../contents/ui/config/ConfigAiChat.qml
-msgid "OpenAI, OpenRouter, Google, Perplexity and Anthropic require network access and an API key. Ollama connects to a local server (default: http://127.0.0.1:11434)."
-msgstr "OpenAI, OpenRouter, Google, Perplexity et Anthropic nécessitent un accès réseau et une clé API. Ollama se connecte à un serveur local (par défaut : http://127.0.0.1 :11434)."
+msgid ""
+"OpenAI, OpenRouter, Google, Perplexity and Anthropic require network access "
+"and an API key. Ollama connects to a local server (default: http://"
+"127.0.0.1:11434)."
+msgstr ""
+"OpenAI, OpenRouter, Google, Perplexity et Anthropic nécessitent un accès "
+"réseau et une clé API. Ollama se connecte à un serveur local (par défaut : "
+"http://127.0.0.1 :11434)."
 
+#~ msgid "<b>Version:</b> %1"
+#~ msgstr "<b>Version:</b> %1"
+
+#~ msgid "Desktop Theme (%1)"
+#~ msgstr "Thème du Bureau (%1)"
+
+#~ msgid "Menu"
+#~ msgstr "Menu"
+
+#~ msgid "Apps"
+#~ msgstr "Applications"
+
+#~ msgid "Show recent applications"
+#~ msgstr "Afficher les applications récentes"
+
+#~ msgctxt "@item:inmenu Open icon chooser dialog"
+#~ msgid "Choose..."
+#~ msgstr "Sélectionner…"
+
+#~ msgctxt "@item:inmenu Reset icon to default"
+#~ msgid "Clear Icon"
+#~ msgstr "Réinitialiser l'icône"
+
+#~ msgid "More"
+#~ msgstr "Plus"
+
+#~ msgid "Size"
+#~ msgstr "Taille"
+
+#~ msgid "Small"
+#~ msgstr "Petit"
+
+#~ msgid "Medium"
+#~ msgstr "Moyen"
+
+#~ msgid "Settings"
+#~ msgstr "Configuration"

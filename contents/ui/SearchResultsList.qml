@@ -5,10 +5,11 @@ KickerListView { // RunnerResultsList
 
 	model: search.results
 	property bool groupedResultsEnabled: plasmoid.configuration.searchResultsGrouped
+	property bool collapsibleGroupsEnabled: groupedResultsEnabled && !!plasmoid.configuration.sidebarCollapsibleSearchResults
 	property var collapsedSections: ({})
 
 	function isSectionCollapsed(sectionName) {
-		if (!groupedResultsEnabled) {
+		if (!collapsibleGroupsEnabled) {
 			return false
 		}
 		var key = (typeof sectionName === "undefined" || sectionName === null) ? "" : ("" + sectionName)
@@ -56,7 +57,7 @@ KickerListView { // RunnerResultsList
 
 	function resetSectionCollapseState() {
 		var nextState = {}
-		if (groupedResultsEnabled && model) {
+		if (collapsibleGroupsEnabled && model) {
 			var seenFirstSection = false
 			for (var itemIndex = 0; itemIndex < count; itemIndex++) {
 				var item = model.get(itemIndex)
@@ -74,7 +75,7 @@ KickerListView { // RunnerResultsList
 	}
 
 	function toggleSectionCollapsed(sectionName) {
-		if (!groupedResultsEnabled) {
+		if (!collapsibleGroupsEnabled) {
 			return
 		}
 		var key = (typeof sectionName === "undefined" || sectionName === null) ? "" : ("" + sectionName)
@@ -115,7 +116,7 @@ KickerListView { // RunnerResultsList
 
 	delegate: MenuListItem {
 		readonly property bool sectionCollapsed: searchResultsList.isSectionCollapsed(model.sectionName)
-		visible: !searchResultsList.groupedResultsEnabled || !sectionCollapsed
+		visible: !searchResultsList.collapsibleGroupsEnabled || !sectionCollapsed
 		height: visible ? implicitHeight : 0
 		enabled: visible
 		// Use the icon already captured in the result model instead of re-fetching
@@ -128,7 +129,7 @@ KickerListView { // RunnerResultsList
 	section.property: plasmoid.configuration.searchResultsGrouped ? 'sectionName' : ''
 	section.criteria: ViewSection.FullString
 	section.delegate: KickerSectionHeader {
-		collapsible: searchResultsList.groupedResultsEnabled
+		collapsible: searchResultsList.collapsibleGroupsEnabled
 		collapsed: searchResultsList.isSectionCollapsed(section)
 		collapseToggler: function() {
 			searchResultsList.toggleSectionCollapsed(section)
@@ -146,6 +147,7 @@ KickerListView { // RunnerResultsList
 	}
 
 	onGroupedResultsEnabledChanged: resetSectionCollapseState()
+	onCollapsibleGroupsEnabledChanged: resetSectionCollapseState()
 
 	function goUp() {
 		stepVisible(-1, 1)

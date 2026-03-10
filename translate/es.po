@@ -6,7 +6,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Tiled Menu Reloaded\n"
-"Report-Msgid-Bugs-To: https://github.com/Kombatant/plasma-applet-tiledmenurld/issues\n"
+"Report-Msgid-Bugs-To: https://github.com/Kombatant/plasma-applet-"
+"tiledmenurld/issues\n"
 "POT-Creation-Date: 2025-02-25 20:49+1100\n"
 "PO-Revision-Date: 2020-09-08 15:41-0300\n"
 "Last-Translator: QUASAR FREAK <quasarfreak@gmail.com>\n"
@@ -163,6 +164,10 @@ msgstr ""
 #: ../contents/ui/config/ConfigGeneral.qml
 msgid "Sidebar Shortcuts"
 msgstr "Atajos de barra lateral"
+
+#: ../contents/ui/config/ConfigSearch.qml
+msgid "Collapse Search Result Groups"
+msgstr "Contraer grupos de resultados de búsqueda"
 
 #: ../contents/ui/config/ConfigGeneral.qml
 msgid "Add Default"
@@ -440,7 +445,9 @@ msgstr "Elegir imagen"
 
 #: ../contents/ui/TileEditorView.qml
 msgid "Image Files (*.png *.apng *.gif *.webp *.jpg *.jpeg *.bmp *.svg *.svgz)"
-msgstr "Archivos de imagen (*.png *.apng *.gif *.webp *.jpg *.jpeg *.bmp *.svg *.svgz)"
+msgstr ""
+"Archivos de imagen (*.png *.apng *.gif *.webp *.jpg *.jpeg *.bmp *.svg "
+"*.svgz)"
 
 #: ../contents/ui/TileEditorView.qml
 msgid "Preset Tiles"
@@ -523,29 +530,6 @@ msgstr "Usar la plantilla de baldosas predeterminada"
 msgid "Sort Tiles"
 msgstr "Ordenar baldosas"
 
-#~ msgid "<b>Version:</b> %1"
-#~ msgstr "<b>Versión:</b> %1"
-
-#~ msgid "Desktop Theme (%1)"
-#~ msgstr "Tema de escritorio (%1)"
-
-#~ msgid "Menu"
-#~ msgstr "Menú"
-
-#~ msgid "Apps"
-#~ msgstr "Aplicaciones"
-
-#~ msgid "Show recent applications"
-#~ msgstr "Mostrar aplicaciones recientes"
-
-#~ msgctxt "@item:inmenu Open icon chooser dialog"
-#~ msgid "Choose..."
-#~ msgstr "Elegir..."
-
-#~ msgctxt "@item:inmenu Reset icon to default"
-#~ msgid "Clear Icon"
-#~ msgstr "Limpiar Icono"
-
 #: ../contents/ui/SidebarView.qml
 msgid "Tiled Menu Reloaded Settings"
 msgstr ""
@@ -576,11 +560,15 @@ msgstr "Iniciar una nueva conversación"
 
 #: ../contents/ui/AiChatView.qml
 msgid "Configure provider, API key and model in settings before sending."
-msgstr "Configure el proveedor, la clave API y el modelo en la configuración antes de enviar."
+msgstr ""
+"Configure el proveedor, la clave API y el modelo en la configuración antes "
+"de enviar."
 
 #: ../contents/ui/AiChatView.qml
 msgid "Ask anything... (Enter to send, Shift+Enter for newline)"
-msgstr "Preguntar cualquier cosa... (Introducir para enviar, Mayús+Intro para nueva línea)"
+msgstr ""
+"Preguntar cualquier cosa... (Introducir para enviar, Mayús+Intro para nueva "
+"línea)"
 
 #: ../contents/ui/AiChatModel.qml
 msgid "New Chat"
@@ -684,7 +672,9 @@ msgstr "Volver a cargar modelos"
 
 #: ../contents/ui/config/ConfigAiChat.qml
 msgid "No models detected yet. Paste your API key to auto-detect."
-msgstr "Todavía no se han detectado modelos. Pegue su clave API para la detección automática."
+msgstr ""
+"Todavía no se han detectado modelos. Pegue su clave API para la detección "
+"automática."
 
 #: ../contents/ui/config/ConfigAiChat.qml
 msgid "Chat Options"
@@ -699,6 +689,34 @@ msgid "Notes"
 msgstr "Notas"
 
 #: ../contents/ui/config/ConfigAiChat.qml
-msgid "OpenAI, OpenRouter, Google, Perplexity and Anthropic require network access and an API key. Ollama connects to a local server (default: http://127.0.0.1:11434)."
-msgstr "OpenAI, OpenRouter, Google, Perplexity y Anthropic requieren acceso a la red y una clave API. Ollama se conecta a un servidor local (por defecto: http://127.0.0.1:11434)."
+msgid ""
+"OpenAI, OpenRouter, Google, Perplexity and Anthropic require network access "
+"and an API key. Ollama connects to a local server (default: http://"
+"127.0.0.1:11434)."
+msgstr ""
+"OpenAI, OpenRouter, Google, Perplexity y Anthropic requieren acceso a la red "
+"y una clave API. Ollama se conecta a un servidor local (por defecto: http://"
+"127.0.0.1:11434)."
 
+#~ msgid "<b>Version:</b> %1"
+#~ msgstr "<b>Versión:</b> %1"
+
+#~ msgid "Desktop Theme (%1)"
+#~ msgstr "Tema de escritorio (%1)"
+
+#~ msgid "Menu"
+#~ msgstr "Menú"
+
+#~ msgid "Apps"
+#~ msgstr "Aplicaciones"
+
+#~ msgid "Show recent applications"
+#~ msgstr "Mostrar aplicaciones recientes"
+
+#~ msgctxt "@item:inmenu Open icon chooser dialog"
+#~ msgid "Choose..."
+#~ msgstr "Elegir..."
+
+#~ msgctxt "@item:inmenu Reset icon to default"
+#~ msgid "Clear Icon"
+#~ msgstr "Limpiar Icono"

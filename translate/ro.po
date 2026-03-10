@@ -6,7 +6,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Tiled Menu Reloaded\n"
-"Report-Msgid-Bugs-To: https://github.com/Kombatant/plasma-applet-tiledmenurld/issues\n"
+"Report-Msgid-Bugs-To: https://github.com/Kombatant/plasma-applet-"
+"tiledmenurld/issues\n"
 "POT-Creation-Date: 2025-02-25 20:49+1100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Istrate Sebastian <istratesebastian@yahoo.com>\n"
@@ -163,6 +164,10 @@ msgstr ""
 #: ../contents/ui/config/ConfigGeneral.qml
 msgid "Sidebar Shortcuts"
 msgstr "Scurtături bara laterală"
+
+#: ../contents/ui/config/ConfigSearch.qml
+msgid "Collapse Search Result Groups"
+msgstr "Restrânge grupurile de rezultate ale căutării"
 
 #: ../contents/ui/config/ConfigGeneral.qml
 msgid "Add Default"
@@ -440,7 +445,8 @@ msgstr "Alege o imagine"
 
 #: ../contents/ui/TileEditorView.qml
 msgid "Image Files (*.png *.apng *.gif *.webp *.jpg *.jpeg *.bmp *.svg *.svgz)"
-msgstr "Fișiere imagine (*.png *.apng *.gif *.webp *.jpg *.jpeg *.bmp *.svg *.svgz)"
+msgstr ""
+"Fișiere imagine (*.png *.apng *.gif *.webp *.jpg *.jpeg *.bmp *.svg *.svgz)"
 
 #: ../contents/ui/TileEditorView.qml
 msgid "Preset Tiles"
@@ -523,12 +529,6 @@ msgstr ""
 msgid "Sort Tiles"
 msgstr "Sortează Dalele"
 
-#~ msgid "<b>Version:</b> %1"
-#~ msgstr "<b>Versiune:</b> %1"
-
-#~ msgid "Desktop Theme (%1)"
-#~ msgstr "Temă Desktop (%1)"
-
 #: ../contents/ui/SidebarView.qml
 msgid "Tiled Menu Reloaded Settings"
 msgstr ""
@@ -559,11 +559,13 @@ msgstr "Începeți o nouă conversație"
 
 #: ../contents/ui/AiChatView.qml
 msgid "Configure provider, API key and model in settings before sending."
-msgstr "Configurați furnizorul, cheia API și modelul în setări înainte de a trimite."
+msgstr ""
+"Configurați furnizorul, cheia API și modelul în setări înainte de a trimite."
 
 #: ../contents/ui/AiChatView.qml
 msgid "Ask anything... (Enter to send, Shift+Enter for newline)"
-msgstr "Întrebați orice... (Enter pentru a trimite, Shift+Enter pentru noua linie)"
+msgstr ""
+"Întrebați orice... (Enter pentru a trimite, Shift+Enter pentru noua linie)"
 
 #: ../contents/ui/AiChatModel.qml
 msgid "New Chat"
@@ -667,7 +669,9 @@ msgstr "Reîncărcați modelele"
 
 #: ../contents/ui/config/ConfigAiChat.qml
 msgid "No models detected yet. Paste your API key to auto-detect."
-msgstr "Încă nu au fost detectate modele. Lipiți cheia dvs. API pentru a detecta automat."
+msgstr ""
+"Încă nu au fost detectate modele. Lipiți cheia dvs. API pentru a detecta "
+"automat."
 
 #: ../contents/ui/config/ConfigAiChat.qml
 msgid "Chat Options"
@@ -682,6 +686,17 @@ msgid "Notes"
 msgstr "Note"
 
 #: ../contents/ui/config/ConfigAiChat.qml
-msgid "OpenAI, OpenRouter, Google, Perplexity and Anthropic require network access and an API key. Ollama connects to a local server (default: http://127.0.0.1:11434)."
-msgstr "OpenAI, OpenRouter, Google, Perplexity și Anthropic necesită acces la rețea și o cheie API. Ollama se conectează la un server local (implicit: http://127.0.0.1:11434)."
+msgid ""
+"OpenAI, OpenRouter, Google, Perplexity and Anthropic require network access "
+"and an API key. Ollama connects to a local server (default: http://"
+"127.0.0.1:11434)."
+msgstr ""
+"OpenAI, OpenRouter, Google, Perplexity și Anthropic necesită acces la rețea "
+"și o cheie API. Ollama se conectează la un server local (implicit: http://"
+"127.0.0.1:11434)."
 
+#~ msgid "<b>Version:</b> %1"
+#~ msgstr "<b>Versiune:</b> %1"
+
+#~ msgid "Desktop Theme (%1)"
+#~ msgstr "Temă Desktop (%1)"

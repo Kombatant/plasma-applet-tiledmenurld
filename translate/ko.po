@@ -6,7 +6,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Tiled Menu Reloaded\n"
-"Report-Msgid-Bugs-To: https://github.com/Kombatant/plasma-applet-tiledmenurld/issues\n"
+"Report-Msgid-Bugs-To: https://github.com/Kombatant/plasma-applet-"
+"tiledmenurld/issues\n"
 "POT-Creation-Date: 2025-02-25 20:49+1100\n"
 "PO-Revision-Date: 2018-12-19 11:26+0900\n"
 "Last-Translator: Hakyong Do <crazyraven@gmail.com>\n"
@@ -163,6 +164,10 @@ msgstr "테마"
 #: ../contents/ui/config/ConfigGeneral.qml
 msgid "Sidebar Shortcuts"
 msgstr "사이드바 바로가기"
+
+#: ../contents/ui/config/ConfigSearch.qml
+msgid "Collapse Search Result Groups"
+msgstr "검색 결과 그룹 접기"
 
 #: ../contents/ui/config/ConfigGeneral.qml
 msgid "Add Default"
@@ -523,18 +528,6 @@ msgstr "기본 타일 레이아웃 사용"
 msgid "Sort Tiles"
 msgstr "타일 정렬"
 
-#~ msgid "<b>Version:</b> %1"
-#~ msgstr "<b>버전:</b> %1"
-
-#~ msgid "Desktop Theme (%1)"
-#~ msgstr "데스크탑 테마 (%1)"
-
-#~ msgid "Menu"
-#~ msgstr "메뉴"
-
-#~ msgid "Apps"
-#~ msgstr "앱"
-
 #: ../contents/ui/SidebarView.qml
 msgid "Tiled Menu Reloaded Settings"
 msgstr ""
@@ -688,6 +681,23 @@ msgid "Notes"
 msgstr "메모"
 
 #: ../contents/ui/config/ConfigAiChat.qml
-msgid "OpenAI, OpenRouter, Google, Perplexity and Anthropic require network access and an API key. Ollama connects to a local server (default: http://127.0.0.1:11434)."
-msgstr "OpenAI, OpenRouter, Google, Perplexity 및 Anthropic에는 네트워크 액세스와 API 키가 필요합니다. Ollama는 로컬 서버에 연결합니다(기본값: http://127.0.0.1:11434)."
+msgid ""
+"OpenAI, OpenRouter, Google, Perplexity and Anthropic require network access "
+"and an API key. Ollama connects to a local server (default: http://"
+"127.0.0.1:11434)."
+msgstr ""
+"OpenAI, OpenRouter, Google, Perplexity 및 Anthropic에는 네트워크 액세스와 "
+"API 키가 필요합니다. Ollama는 로컬 서버에 연결합니다(기본값: http://"
+"127.0.0.1:11434)."
 
+#~ msgid "<b>Version:</b> %1"
+#~ msgstr "<b>버전:</b> %1"
+
+#~ msgid "Desktop Theme (%1)"
+#~ msgstr "데스크탑 테마 (%1)"
+
+#~ msgid "Menu"
+#~ msgstr "메뉴"
+
+#~ msgid "Apps"
+#~ msgstr "앱"

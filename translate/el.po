@@ -5,8 +5,9 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Tiled Menu Reloaded\n"
-"Report-Msgid-Bugs-To: https://github.com/Kombatant/plasma-applet-tiledmenurld/issues\n"
-"POT-Creation-Date: 2026-01-19 00:00+0000\n"
+"Report-Msgid-Bugs-To: https://github.com/Kombatant/plasma-applet-"
+"tiledmenurld/issues\n"
+"POT-Creation-Date: 2025-02-25 20:49+1100\n"
 "PO-Revision-Date: 2026-01-19 00:00+0000\n"
 "Last-Translator: GitHub Copilot\n"
 "Language-Team: Greek\n"
@@ -164,6 +165,10 @@ msgstr "Θέμα"
 msgid "Sidebar Shortcuts"
 msgstr "Συντομεύσεις πλευρικής μπάρας"
 
+#: ../contents/ui/config/ConfigSearch.qml
+msgid "Collapse Search Result Groups"
+msgstr "Σύμπτυξη ομάδων αποτελεσμάτων αναζήτησης"
+
 #: ../contents/ui/config/ConfigGeneral.qml
 msgid "Add Default"
 msgstr "Προσθήκη προεπιλογών"
@@ -281,8 +286,12 @@ msgid "File Manager"
 msgstr "Διαχειριστής αρχείων"
 
 #: ../contents/ui/config/ConfigurationShortcuts.qml
-msgid "When this widget has a global shortcut set, like 'Alt+F1', Plasma will open this menu with just the ⊞ Windows / Meta key."
-msgstr "Όταν αυτό το γραφικό στοιχείο έχει καθολική συντόμευση, όπως 'Alt+F1', το Plasma θα ανοίγει αυτό το μενού μόνο με το πλήκτρο ⊞ Windows / Meta."
+msgid ""
+"When this widget has a global shortcut set, like 'Alt+F1', Plasma will open "
+"this menu with just the ⊞ Windows / Meta key."
+msgstr ""
+"Όταν αυτό το γραφικό στοιχείο έχει καθολική συντόμευση, όπως 'Alt+F1', το "
+"Plasma θα ανοίγει αυτό το μενού μόνο με το πλήκτρο ⊞ Windows / Meta."
 
 #: ../contents/ui/main.qml
 msgid "System Info"
@@ -325,7 +334,8 @@ msgctxt "Search [krunnerName, krunnerName, ...], "
 msgid "Search %1"
 msgstr "Αναζήτηση %1"
 
-#: ../contents/ui/SearchFiltersViewItem.qml ../contents/ui/SearchFiltersView.qml
+#: ../contents/ui/SearchFiltersViewItem.qml
+#: ../contents/ui/SearchFiltersView.qml
 msgid "Default"
 msgstr "Προεπιλογή"
 
@@ -435,7 +445,8 @@ msgstr "Επιλογή εικόνας"
 
 #: ../contents/ui/TileEditorView.qml
 msgid "Image Files (*.png *.apng *.gif *.webp *.jpg *.jpeg *.bmp *.svg *.svgz)"
-msgstr "Αρχεία εικόνων (*.png *.apng *.gif *.webp *.jpg *.jpeg *.bmp *.svg *.svgz)"
+msgstr ""
+"Αρχεία εικόνων (*.png *.apng *.gif *.webp *.jpg *.jpeg *.bmp *.svg *.svgz)"
 
 #: ../contents/ui/TileEditorView.qml
 msgid "Preset Tiles"
@@ -548,7 +559,9 @@ msgstr "Αρχίστε μια συνομιλία"
 
 #: ../contents/ui/AiChatView.qml
 msgid "Configure provider, API key and model in settings before sending."
-msgstr "Διαμορφώστε τον πάροχο, το κλειδί API και το μοντέλο στις ρυθμίσεις πριν από την αποστολή."
+msgstr ""
+"Διαμορφώστε τον πάροχο, το κλειδί API και το μοντέλο στις ρυθμίσεις πριν από "
+"την αποστολή."
 
 #: ../contents/ui/AiChatView.qml
 msgid "Ask anything... (Enter to send, Shift+Enter for newline)"
@@ -656,7 +669,9 @@ msgstr "Επαναφόρτωση μοντέλων"
 
 #: ../contents/ui/config/ConfigAiChat.qml
 msgid "No models detected yet. Paste your API key to auto-detect."
-msgstr "Δεν εντοπίστηκαν ακόμη μοντέλα. Επικολλήστε το κλειδί API για αυτόματη ανίχνευση."
+msgstr ""
+"Δεν εντοπίστηκαν ακόμη μοντέλα. Επικολλήστε το κλειδί API για αυτόματη "
+"ανίχνευση."
 
 #: ../contents/ui/config/ConfigAiChat.qml
 msgid "Chat Options"
@@ -671,6 +686,11 @@ msgid "Notes"
 msgstr "Παρατηρήσεις"
 
 #: ../contents/ui/config/ConfigAiChat.qml
-msgid "OpenAI, OpenRouter, Google, Perplexity and Anthropic require network access and an API key. Ollama connects to a local server (default: http://127.0.0.1:11434)."
-msgstr "Τα OpenAI, OpenRouter, Google, Perplexity και Anthropic απαιτούν πρόσβαση στο δίκτυο και ένα κλειδί API. Ο Ollama συνδέεται με έναν τοπικό διακομιστή (προεπιλογή: http://127.0.0.1:11434)."
-
+msgid ""
+"OpenAI, OpenRouter, Google, Perplexity and Anthropic require network access "
+"and an API key. Ollama connects to a local server (default: http://"
+"127.0.0.1:11434)."
+msgstr ""
+"Τα OpenAI, OpenRouter, Google, Perplexity και Anthropic απαιτούν πρόσβαση "
+"στο δίκτυο και ένα κλειδί API. Ο Ollama συνδέεται με έναν τοπικό διακομιστή "
+"(προεπιλογή: http://127.0.0.1:11434)."
