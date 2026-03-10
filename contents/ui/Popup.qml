@@ -304,7 +304,7 @@ MouseArea {
 		}
 	}
 
-	// Persist user resizing (Meta + Right Click drag) across plasmashell restarts.
+	// Persist user resizing across plasmashell restarts.
 	// Width is represented indirectly via favGridCols; height is stored in popupHeight.
 	property bool _persistSizeEnabled: false
 	property bool _suppressPersist: false
@@ -506,38 +506,6 @@ MouseArea {
 	SidebarView {
 		id: sidebarView
 		popup: popup
-	}
-
-	MouseArea {
-		visible: !plasmoid.configuration.tilesLocked && !(plasmoid.location == PlasmaCore.Types.TopEdge || plasmoid.location == PlasmaCore.Types.RightEdge)
-		anchors.top: parent.top
-		anchors.right: parent.right
-		width: Kirigami.Units.largeSpacing
-		height: Kirigami.Units.largeSpacing
-		cursorShape: Qt.WhatsThisCursor
-
-		PlasmaCore.ToolTipArea {
-			anchors.fill: parent
-			icon: "help-hint"
-			mainText: i18n("Resize?")
-			subText: i18n("Meta + Right Click to resize the menu.")
-		}
-	}
-
-	MouseArea {
-		visible: !plasmoid.configuration.tilesLocked && !(plasmoid.location == PlasmaCore.Types.BottomEdge || plasmoid.location == PlasmaCore.Types.RightEdge)
-		anchors.bottom: parent.bottom
-		anchors.right: parent.right
-		width: Kirigami.Units.largeSpacing
-		height: Kirigami.Units.largeSpacing
-		cursorShape: Qt.WhatsThisCursor
-
-		PlasmaCore.ToolTipArea {
-			anchors.fill: parent
-			icon: "help-hint"
-			mainText: i18n("Resize?")
-			subText: i18n("Meta + Right Click to resize the menu.")
-		}
 	}
 
 	onClicked: searchView.focusPrimaryInput()
