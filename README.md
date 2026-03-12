@@ -1,9 +1,9 @@
-
 # Tiled Menu Reloaded
 
 Tiled Menu Reloaded is a Plasma applet that provides a tiled launcher loosely inspired by Windows 10's start menu. It offers flexible tile layouts, groupable tiles, and configurable shortcuts while targeting Plasma 6 and Qt6 compatibility. 
 
-**Used various LLMs as a playground for code generation and assistance in forking/structuring/coding the project.**
+> [!IMPORTANT]  
+> Used various LLMs as a playground for code generation and assistance in forking/structuring/coding the project.
 
 ## Origins
 - Forked from zren's (kind of abandoned) Tiled Menu: https://github.com/Zren/plasma-applet-tiledmenu
