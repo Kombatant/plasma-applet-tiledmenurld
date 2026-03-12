@@ -158,6 +158,61 @@ Item {
 					menu.addMenuItem(menuItem)
 				}
 			}
+
+			// Fallback "Pin to Task Manager" for task managers that don't register
+			// with Kicker's hardcoded list (e.g. alexankitty.fancytasks).
+			// Kicker only knows about org.kde.plasma.icontasks, org.kde.plasma.taskmanager,
+			// and org.kde.plasma.expandingiconstaskmanager. Any other task manager that
+			// implements addLauncher(url) but omits supportsLaunchers won't get the action.
+			// We scan the containment ourselves and call addLauncher() on matching applets.
+			function addFallbackTaskManagerAction(launcherUrl) {
+				if (!launcherUrl) {
+					return false
+				}
+				var containment = typeof Plasmoid !== "undefined" ? Plasmoid.containment : null
+				if (!containment) {
+					return false
+				}
+				var applets = containment.applets
+				if (!applets || typeof applets.length !== 'number') {
+					return false
+				}
+				var found = false
+				for (var i = 0; i < applets.length; i++) {
+					var applet = applets[i]
+					if (!applet) {
+						continue
+					}
+					if (typeof applet.addLauncher !== 'function' && typeof applet.supportsLaunchers === 'undefined') {
+						continue
+					}
+					if (typeof applet.addLauncher === 'function') {
+						found = true
+					}
+				}
+				if (!found) {
+					return false
+				}
+				var menuItem = menu.newMenuItem()
+				menuItem.text = i18n("Pin to Task Manager")
+				menuItem.icon = "pin"
+				;(function(url) {
+					menuItem.clicked.connect(function() {
+						var c = typeof Plasmoid !== "undefined" ? Plasmoid.containment : null
+						if (!c) return
+						var al = c.applets
+						if (!al) return
+						for (var j = 0; j < al.length; j++) {
+							var a = al[j]
+							if (a && typeof a.addLauncher === 'function') {
+								try { a.addLauncher(url) } catch(e) {}
+							}
+						}
+					})
+				})(launcherUrl)
+				menu.addMenuItem(menuItem)
+				return true
+			}
 		}
 	}
 

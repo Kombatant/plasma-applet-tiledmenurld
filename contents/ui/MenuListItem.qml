@@ -576,6 +576,12 @@ AppToolButton {
 				if (!addedActions && typeof logger !== "undefined" && logger && targetModel && shouldAttemptActions) {
 					logger.warn('MenuListItem: context menu skipped action list; model missing action helpers or empty actions', targetModel)
 				}
+
+				// Fallback: if Kicker didn't supply addToTaskManager (task manager not in
+				// Kicker's hardcoded list, e.g. alexankitty.fancytasks), try ours.
+				if (!existingActionIds['addToTaskManager'] && launcherUrl) {
+					menu.addFallbackTaskManagerAction(launcherUrl)
+				}
 				return
 			}
 
@@ -600,6 +606,12 @@ AppToolButton {
 
 			if (!addedActions && typeof logger !== "undefined" && logger && targetModel && shouldAttemptActions) {
 				logger.warn('MenuListItem: context menu skipped action list; model missing action helpers or empty actions', targetModel)
+			}
+
+			// Fallback: if Kicker didn't supply addToTaskManager (task manager not in
+			// Kicker's hardcoded list, e.g. alexankitty.fancytasks), try ours.
+			if (!existingActionIds['addToTaskManager'] && launcherUrl) {
+				menu.addFallbackTaskManagerAction(launcherUrl)
 			}
 		}
 	}
