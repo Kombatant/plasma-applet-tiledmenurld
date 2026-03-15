@@ -321,12 +321,11 @@ MouseArea {
 			popup.applySavedSize()
 		}
 	}
-	Connections {
-		target: plasmoid
-		function onExpandedChanged() {
-			if (plasmoid.expanded) {
-				popup.applySavedSize()
-			}
+	// Watch plasmoid.expanded via a bound property instead of Connections
+	property bool plasmoidExpanded: (plasmoid && typeof plasmoid.expanded !== "undefined") ? plasmoid.expanded : false
+	onPlasmoidExpandedChanged: {
+		if (plasmoidExpanded) {
+			popup.applySavedSize()
 		}
 	}
 

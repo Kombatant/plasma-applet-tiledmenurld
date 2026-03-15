@@ -55,12 +55,11 @@ Item {
 		return appsModel.sidebarModel.count < sidebarShortcutLimit
 	}
 
-	Connections {
-		target: plasmoid
-		function onExpandedChanged() {
-			if (plasmoid.expanded && config.sidebarHorizontal) {
-				sidebarView._horizontalSearchWidth = config.appListWidth
-			}
+	// Watch plasmoid.expanded via a bound property instead of Connections
+	property bool plasmoidExpanded: (plasmoid && typeof plasmoid.expanded !== "undefined") ? plasmoid.expanded : false
+	onPlasmoidExpandedChanged: {
+		if (plasmoidExpanded && config.sidebarHorizontal) {
+			sidebarView._horizontalSearchWidth = config.appListWidth
 		}
 	}
 
