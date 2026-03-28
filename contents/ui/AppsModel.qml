@@ -12,6 +12,21 @@ Item {
 
 	property string order: "categories"
 	onOrderChanged: allAppsModel.refresh()
+	readonly property bool hasConfiguration: (typeof plasmoid !== "undefined") && plasmoid && plasmoid.configuration
+
+	function logDebug() {
+		if (typeof logger !== "undefined" && logger && typeof logger.debug === "function") {
+			logger.debug.apply(logger, arguments)
+		}
+	}
+
+	function logWarn() {
+		if (typeof logger !== "undefined" && logger && typeof logger.warn === "function") {
+			logger.warn.apply(logger, arguments)
+		} else {
+			console.warn.apply(console, arguments)
+		}
+	}
 
 	function stringListToArray(value) {
 		if (!value) {
@@ -68,9 +83,9 @@ Item {
 		id: rootModelRefresh
 		interval: 400
 		onTriggered: {
-			logger.debug('rootModel.refresh.star', Date.now())
+			appsModel.logDebug('rootModel.refresh.star', Date.now())
 			rootModel.refresh()
-			logger.debug('rootModel.refresh.done', Date.now())
+			appsModel.logDebug('rootModel.refresh.done', Date.now())
 		}
 	}
 
@@ -90,7 +105,7 @@ Item {
 		// sorted: Plasmoid.configuration.alphaSort
 
 		showSeparators: false // !isDash
-		appletInterface: widget
+		appletInterface: (typeof widget !== "undefined" && widget) ? widget : ((typeof plasmoid !== "undefined" && plasmoid) ? plasmoid : null)
 
 		// showAllSubtree: true //isDash (KDE 5.8 and below)
 		showAllApps: true //isDash (KDE 5.9+)
@@ -100,7 +115,7 @@ Item {
 		// showRecentContacts: false //plasmoid.configuration.showRecentContacts
 		// showPowerSession: false
 		// showFavoritesPlaceholder: true
-		recentOrdering: plasmoid.configuration.recentOrdering
+		recentOrdering: appsModel.hasConfiguration ? plasmoid.configuration.recentOrdering : 1
 
 		autoPopulate: false // (KDE 5.9+) defaulted to true
 		// paginate: false // (KDE 5.9+)
@@ -151,7 +166,7 @@ Item {
 				powerActionsModel.parseModel(systemList, systemModel)
 			} else {
 				if (typeof logger !== "undefined" && logger) {
-					logger.warn('AppsModel: systemModel is null')
+					appsModel.logWarn('AppsModel: systemModel is null')
 				}
 			}
 			powerActionsModel.list = systemList
@@ -187,6 +202,10 @@ Item {
 			property bool hasAppliedConfigurationFavorites: false
 
 			function requestConfigurationSync(force) {
+				if (!appsModel.hasConfiguration) {
+					pendingConfigSync = false
+					return
+				}
 				var configuredFavorites = appsModel.uniqueStringList(plasmoid.configuration.sidebarShortcuts)
 				if (!force && hasAppliedConfigurationFavorites && appsModel.sameStringList(favorites, configuredFavorites)) {
 					pendingConfigSync = false
@@ -199,6 +218,10 @@ Item {
 			}
 
 			function applyConfigurationFavorites() {
+				if (!appsModel.hasConfiguration) {
+					pendingConfigSync = false
+					return
+				}
 				pendingConfigSync = false
 				var configuredFavorites = appsModel.uniqueStringList(plasmoid.configuration.sidebarShortcuts)
 				var existingFavorites = appsModel.stringListToArray(favorites)
@@ -231,7 +254,7 @@ Item {
 			}
 
 			onFavoritesChanged: {
-				if (syncingFromConfiguration) {
+				if (syncingFromConfiguration || !appsModel.hasConfiguration) {
 					return
 				}
 				hasAppliedConfigurationFavorites = true
@@ -239,7 +262,7 @@ Item {
 			}
 			
 			property Connections configConnection: Connections {
-				target: plasmoid.configuration
+				target: appsModel.hasConfiguration ? plasmoid.configuration : null
 				function onSidebarShortcutsChanged() {
 					if (!sidebarModel.syncingFromConfiguration) {
 						sidebarModel.requestConfigurationSync(false)
@@ -257,12 +280,12 @@ Item {
 		Repeater {
 			model: rootModel.count >= 0 ? rootModel.modelForRow(rootModel.recentAppsIndex) : []
 			
-			Item {
-				Component.onCompleted: {
-					if (plasmoid.configuration.showRecentApps) {
-						debouncedRefreshRecentApps.restart()
+				Item {
+					Component.onCompleted: {
+						if (appsModel.hasConfiguration && plasmoid.configuration.showRecentApps) {
+							debouncedRefreshRecentApps.restart()
+						}
 					}
-				}
 			}
 		}
 
@@ -298,7 +321,7 @@ Item {
 		}
 		
 		Connections {
-			target: plasmoid.configuration
+			target: appsModel.hasConfiguration ? plasmoid.configuration : null
 			function onShowRecentAppsChanged() { debouncedRefresh.restart() }
 			function onNumRecentAppsChanged() { debouncedRefresh.restart() }
 		}
@@ -362,7 +385,7 @@ Item {
 				parseModel(recentAppList, model)
 			} else {
 				if (typeof logger !== "undefined" && logger) {
-					logger.warn('AppsModel.getRecentApps(): recent apps model is null')
+					appsModel.logWarn('AppsModel.getRecentApps(): recent apps model is null')
 				}
 			}
 
@@ -423,7 +446,7 @@ Item {
 				parseModel(appList, categoryModel)
 			} else {
 				if (typeof logger !== "undefined" && logger) {
-					logger.warn('AppsModel.getCategory(): category model is null', rootIndex)
+					appsModel.logWarn('AppsModel.getCategory(): category model is null', rootIndex)
 				}
 			}
 			
@@ -451,7 +474,7 @@ Item {
 				parseModel(appList, model)
 			} else {
 				if (typeof logger !== "undefined" && logger) {
-					logger.warn('AppsModel.getAllApps(): all apps model is null')
+					appsModel.logWarn('AppsModel.getAllApps(): all apps model is null')
 				}
 			}
 
@@ -491,7 +514,7 @@ Item {
 
 		function refresh() {
 			refreshing()
-			logger.debug("allAppsModel.refresh().star", Date.now())
+			appsModel.logDebug("allAppsModel.refresh().star", Date.now())
 			
 			//--- Apps
 			var appList = []
@@ -502,7 +525,7 @@ Item {
 			}
 
 			//--- Recent Apps
-			if (plasmoid.configuration.showRecentApps) {
+			if (appsModel.hasConfiguration && plasmoid.configuration.showRecentApps) {
 				var recentAppList = getRecentApps();
 				appList = recentAppList.concat(appList); // prepend
 			}
@@ -525,7 +548,7 @@ Item {
 			//--- apply model
 			allAppsModel.list = appList;
 
-			logger.debug("allAppsModel.refresh().done", Date.now())
+			appsModel.logDebug("allAppsModel.refresh().done", Date.now())
 			refreshed()
 		}
 	}

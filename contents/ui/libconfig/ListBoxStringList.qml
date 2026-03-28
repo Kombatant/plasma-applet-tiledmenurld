@@ -14,7 +14,11 @@ Item {
 	property int pendingIndex: -1
 	property bool inputValid: true
 	property string validationMessage: ""
+	property int highlightedSuggestionIndex: -1
+	property int maxVisibleSuggestions: 8
+	property bool suppressSuggestions: false
 	readonly property bool hasPendingItem: pendingIndex >= 0 && pendingIndex < listModel.count
+	readonly property bool suggestionsVisible: suggestionsPopup.visible
 
 	implicitWidth: Kirigami.Units.gridUnit * 20
 	implicitHeight: Kirigami.Units.gridUnit * 14
@@ -53,7 +57,27 @@ Item {
 		}
 	}
 
+	function suggestionItemsForInput(value) {
+		return []
+	}
+
+	function suggestionValue(item) {
+		return item && item.value ? ("" + item.value) : ""
+	}
+
+	function suggestionDisplayText(item) {
+		if (item && item.label) {
+			return "" + item.label
+		}
+		return suggestionValue(item)
+	}
+
+	function suggestionDescription(item) {
+		return item && item.description ? ("" + item.description) : ""
+	}
+
 	function updateValidation() {
+		refreshSuggestions()
 		if (!hasPendingItem && listView.currentIndex < 0) {
 			inputValid = true
 			validationMessage = ""
@@ -76,6 +100,8 @@ Item {
 		pendingIndex = -1
 		inputValid = true
 		validationMessage = ""
+		highlightedSuggestionIndex = -1
+		suggestionsPopup.close()
 		listModel.clear()
 		for (var i = 0; i < values.length; i++) {
 			listModel.append({ value: values[i] })
@@ -149,6 +175,73 @@ Item {
 		listView.currentIndex = -1
 	}
 
+	function refreshSuggestions() {
+		if (suppressSuggestions) {
+			highlightedSuggestionIndex = -1
+			suggestionsPopup.close()
+			return
+		}
+		var items = suggestionItemsForInput(entryField.text)
+			suggestionsModel.clear()
+		for (var i = 0; i < items.length; i++) {
+			var item = items[i]
+			suggestionsModel.append({
+				value: suggestionValue(item),
+				label: suggestionDisplayText(item),
+				description: suggestionDescription(item)
+			})
+		}
+			if (suggestionsModel.count > 0 && entryField.activeFocus) {
+			if (highlightedSuggestionIndex < 0 || highlightedSuggestionIndex >= suggestionsModel.count) {
+				highlightedSuggestionIndex = 0
+			}
+			suggestionsPopup.open()
+				return
+			}
+			highlightedSuggestionIndex = -1
+			suggestionsPopup.close()
+		}
+
+	function highlightNextSuggestion(offset) {
+		if (!suggestionsVisible || suggestionsModel.count <= 0) {
+			return false
+		}
+		var index = highlightedSuggestionIndex
+		if (index < 0 || index >= suggestionsModel.count) {
+			index = 0
+		} else {
+			index = Math.max(0, Math.min(suggestionsModel.count - 1, index + offset))
+		}
+		highlightedSuggestionIndex = index
+		suggestionsList.positionViewAtIndex(index, ListView.Contain)
+		return true
+	}
+
+	function acceptSuggestion(index) {
+		if (index < 0 || index >= suggestionsModel.count) {
+			return false
+		}
+		var item = suggestionsModel.get(index)
+		var value = suggestionValue(item)
+		if (!value.length) {
+			return false
+		}
+		suppressSuggestions = true
+		entryField.text = value
+		highlightedSuggestionIndex = index
+		suggestionsPopup.close()
+		if (hasPendingItem) {
+			commitPendingItem()
+		} else if (listView.currentIndex >= 0) {
+			updateCurrent(value)
+		}
+		return true
+	}
+
+	function acceptHighlightedSuggestion() {
+		return acceptSuggestion(highlightedSuggestionIndex)
+	}
+
 	function beginAddItem() {
 		if (hasPendingItem) {
 			listView.currentIndex = pendingIndex
@@ -163,6 +256,7 @@ Item {
 		entryField.clear()
 		inputValid = false
 		validationMessage = i18n("Shortcut cannot be empty.")
+		refreshSuggestions()
 		entryField.forceActiveFocus()
 	}
 
@@ -270,6 +364,10 @@ Item {
 		id: listModel
 	}
 
+	ListModel {
+		id: suggestionsModel
+	}
+
 	ColumnLayout {
 		anchors.fill: parent
 		spacing: Kirigami.Units.smallSpacing
@@ -332,13 +430,100 @@ Item {
 				Layout.fillWidth: true
 				placeholderText: i18n("Enter a desktop file, URL, or path")
 				onTextChanged: root.updateValidation()
+				onTextEdited: {
+					root.suppressSuggestions = false
+					root.updateValidation()
+				}
+				onActiveFocusChanged: {
+					if (activeFocus) {
+						root.refreshSuggestions()
+					} else {
+						suggestionsPopup.close()
+					}
+				}
+				Keys.onDownPressed: function(event) {
+					if (root.highlightNextSuggestion(1)) {
+						event.accepted = true
+					}
+				}
+				Keys.onUpPressed: function(event) {
+					if (root.highlightNextSuggestion(-1)) {
+						event.accepted = true
+					}
+				}
 				Keys.onReturnPressed: function(event) {
-					root.addItem(text)
+					if (!root.acceptHighlightedSuggestion()) {
+						root.addItem(text)
+					}
 					event.accepted = true
 				}
 				Keys.onEnterPressed: function(event) {
-					root.addItem(text)
+					if (!root.acceptHighlightedSuggestion()) {
+						root.addItem(text)
+					}
 					event.accepted = true
+				}
+				Keys.onEscapePressed: function(event) {
+					if (root.suggestionsVisible) {
+						suggestionsPopup.close()
+						event.accepted = true
+					}
+				}
+			}
+
+			QQC2.Popup {
+				id: suggestionsPopup
+				parent: entryField
+				y: entryField.height + Kirigami.Units.smallSpacing
+				width: entryField.width
+				padding: 0
+				margins: 0
+				closePolicy: QQC2.Popup.CloseOnEscape | QQC2.Popup.CloseOnPressOutsideParent
+
+				background: Rectangle {
+					radius: Kirigami.Units.smallSpacing
+					color: Kirigami.Theme.backgroundColor
+					border.color: Kirigami.Theme.disabledTextColor
+					border.width: 1
+				}
+
+				contentItem: ListView {
+					id: suggestionsList
+					implicitHeight: Math.min(contentHeight, root.maxVisibleSuggestions * Kirigami.Units.gridUnit)
+					clip: true
+					model: suggestionsModel
+					currentIndex: root.highlightedSuggestionIndex
+
+					delegate: QQC2.ItemDelegate {
+						required property int index
+						required property string value
+						required property string label
+						required property string description
+
+						width: ListView.view.width
+						highlighted: index === root.highlightedSuggestionIndex
+						onClicked: root.acceptSuggestion(index)
+
+						contentItem: ColumnLayout {
+							spacing: 0
+
+							QQC2.Label {
+								Layout.fillWidth: true
+								text: label
+								elide: Text.ElideRight
+							}
+
+							QQC2.Label {
+								Layout.fillWidth: true
+								visible: description.length > 0 || value !== label
+								text: description.length > 0 ? description : value
+								elide: Text.ElideRight
+								opacity: 0.7
+							}
+						}
+					}
+
+					QQC2.ScrollBar.vertical: QQC2.ScrollBar {}
 				}
 			}
 		}
