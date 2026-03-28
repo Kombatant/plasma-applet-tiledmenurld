@@ -296,6 +296,32 @@ MouseArea {
 		})
 	}
 
+	function resizeToCurrentViewWidth() {
+		if (!config) {
+			return
+		}
+
+		var targetWidth = config.popupWidth
+		if (!(targetWidth > 0)) {
+			return
+		}
+
+		var previousMinW = popup.Layout.minimumWidth
+		popup.Layout.preferredWidth = targetWidth
+		popup.Layout.minimumWidth = targetWidth
+		popup.Layout.maximumWidth = targetWidth
+		popup.implicitWidth = targetWidth
+		popup.width = targetWidth
+
+		Qt.callLater(function() {
+			popup.width = targetWidth
+			Qt.callLater(function() {
+				popup.Layout.maximumWidth = -1
+				popup.Layout.minimumWidth = previousMinW
+			})
+		})
+	}
+
 	Connections {
 		target: config && config.tileModel ? config.tileModel : null
 		function onLoaded() {
@@ -309,11 +335,21 @@ MouseArea {
 	property bool _persistSizeEnabled: false
 	property bool _suppressPersist: false
 	property bool _sizeRestored: false
+	property bool _pendingEditSidebarResize: false
 	Timer {
 		id: enablePersistSize
 		interval: 0
 		repeat: false
 		onTriggered: popup._persistSizeEnabled = true
+	}
+	Timer {
+		id: editSidebarResizeDebounced
+		interval: 0
+		repeat: false
+		onTriggered: {
+			popup.resizeToCurrentViewWidth()
+			popup._pendingEditSidebarResize = false
+		}
 	}
 	Component.onCompleted: {
 		enablePersistSize.start()
@@ -326,6 +362,19 @@ MouseArea {
 	onPlasmoidExpandedChanged: {
 		if (plasmoidExpanded) {
 			popup.applySavedSize()
+		}
+	}
+
+	Connections {
+		target: config
+		function onIsEditingTileChanged() {
+			popup._pendingEditSidebarResize = true
+			editSidebarResizeDebounced.restart()
+		}
+		function onShowSearchChanged() {
+			if (popup._pendingEditSidebarResize) {
+				editSidebarResizeDebounced.restart()
+			}
 		}
 	}
 
