@@ -347,7 +347,7 @@ MouseArea {
 		interval: 0
 		repeat: false
 		onTriggered: {
-			popup.resizeToCurrentViewWidth()
+			popup.autoResizeToContent()
 			popup._pendingEditSidebarResize = false
 		}
 	}
