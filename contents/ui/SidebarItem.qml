@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Controls as QQC2
 import QtQuick.Layouts
+import org.kde.kirigami as Kirigami
 
 FlatButton {
 	id: sidebarItem
@@ -19,6 +20,8 @@ FlatButton {
 	labelVisible: expanded
 	property bool closeOnClick: true
 	property string tooltipText: ""
+	property bool forceMonochromeIcon: false
+	icon.color: forceMonochromeIcon ? (checked ? Kirigami.Theme.highlightColor : Kirigami.Theme.textColor) : "transparent"
 
 	QQC2.ToolTip {
 		id: control

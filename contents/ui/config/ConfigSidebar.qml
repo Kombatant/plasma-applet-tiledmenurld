@@ -88,12 +88,15 @@ LibConfig.FormKCM {
 		text: i18n("Sidebar Shortcuts")
 	}
 
-	RowLayout {
-		LibConfig.TextAreaStringList {
+	ColumnLayout {
+		Layout.fillWidth: true
+
+		LibConfig.ListBoxStringList {
 			id: sidebarShortcuts
 			configKey: 'sidebarShortcuts'
+			Layout.fillWidth: true
 			Layout.fillHeight: true
-			implicitWidth: 12 * Kirigami.Units.gridUnit
+			implicitWidth: 0
 
 			KCoreAddons.KUser {
 				id: kuser
@@ -103,19 +106,57 @@ LibConfig.FormKCM {
 				return a.substr(0, b.length) === b
 			}
 
-			function textToValue(text) {
-				var urls = text.split("\n")
-				for (var i = 0; i < urls.length; i++) {
-					if (startsWith(urls[i], '~/')) {
-						if (kuser.loginName) {
-							urls[i] = '/home/' + kuser.loginName + urls[i].substr(1)
-						}
-					}
-					if (startsWith(urls[i], '/')) {
-						urls[i] = 'file://' + urls[i]
+			function transformInput(value) {
+				var url = ("" + value).trim()
+				if (startsWith(url, '~/') && kuser.loginName) {
+					url = '/home/' + kuser.loginName + url.substr(1)
+				}
+				if (startsWith(url, '/')) {
+					url = 'file://' + url
+				}
+				return url
+			}
+
+			function endsWith(a, b) {
+				return a.indexOf(b, a.length - b.length) !== -1
+			}
+
+			function validateInput(value) {
+				var shortcut = ("" + value).trim()
+				if (!shortcut.length) {
+					return {
+						valid: false,
+						message: i18n("Shortcut cannot be empty.")
 					}
 				}
-				return urls
+				if (startsWith(shortcut, 'xdg:')) {
+					var xdgName = shortcut.substring('xdg:'.length, shortcut.length)
+					var supported = ['DOCUMENTS', 'DOWNLOAD', 'MUSIC', 'PICTURES', 'VIDEOS']
+					if (supported.indexOf(xdgName) >= 0) {
+						return { valid: true, message: "" }
+					}
+					return {
+						valid: false,
+						message: i18n("Unsupported XDG shortcut. Use DOCUMENTS, DOWNLOAD, MUSIC, PICTURES, or VIDEOS.")
+					}
+				}
+				if (startsWith(shortcut, 'file:///') || startsWith(shortcut, '/') || startsWith(shortcut, '~/')) {
+					return { valid: true, message: "" }
+				}
+				if (endsWith(shortcut, '.desktop')) {
+					var app = appsModel && appsModel.sidebarModel ? appsModel.sidebarModel.getApp(shortcut) : null
+					if (app) {
+						return { valid: true, message: "" }
+					}
+					return {
+						valid: false,
+						message: i18n("Desktop launcher not found.")
+					}
+				}
+				return {
+					valid: false,
+					message: i18n("Use an installed .desktop launcher, an xdg: shortcut, or a filesystem path.")
+				}
 			}
 
 			function addUrl(str) {
@@ -128,47 +169,68 @@ LibConfig.FormKCM {
 
 		ColumnLayout {
 			id: sidebarDefaultsColumn
+			Layout.fillWidth: true
 
-			QQC2.Label {
-				text: i18n("Add Default")
-			}
+			QQC2.Frame {
+				Layout.fillWidth: true
 
-			QQC2.ToolButton {
-				icon.name: "folder-documents-symbolic"
-				text: i18nd("xdg-user-dirs", "Documents")
-				onClicked: sidebarShortcuts.addUrl('xdg:DOCUMENTS')
+				contentItem: ColumnLayout {
+					spacing: Kirigami.Units.smallSpacing
+
+					Kirigami.Heading {
+						text: i18n("Shortcut Presets")
+						level: 4
+					}
+
+					QQC2.Label {
+						Layout.fillWidth: true
+						text: i18n("Add common folders and apps to the sidebar.")
+						wrapMode: Text.WordWrap
+						opacity: 0.8
+					}
+
+					Flow {
+						Layout.fillWidth: true
+						spacing: Kirigami.Units.smallSpacing
+
+						QQC2.ToolButton {
+							icon.name: "folder-documents-symbolic"
+							text: i18nd("xdg-user-dirs", "Documents")
+							onClicked: sidebarShortcuts.addUrl('xdg:DOCUMENTS')
+						}
+						QQC2.ToolButton {
+							icon.name: "folder-download-symbolic"
+							text: i18nd("xdg-user-dirs", "Download")
+							onClicked: sidebarShortcuts.addUrl('xdg:DOWNLOAD')
+						}
+						QQC2.ToolButton {
+							icon.name: "folder-music-symbolic"
+							text: i18nd("xdg-user-dirs", "Music")
+							onClicked: sidebarShortcuts.addUrl('xdg:MUSIC')
+						}
+						QQC2.ToolButton {
+							icon.name: "folder-pictures-symbolic"
+							text: i18nd("xdg-user-dirs", "Pictures")
+							onClicked: sidebarShortcuts.addUrl('xdg:PICTURES')
+						}
+						QQC2.ToolButton {
+							icon.name: "folder-videos-symbolic"
+							text: i18nd("xdg-user-dirs", "Videos")
+							onClicked: sidebarShortcuts.addUrl('xdg:VIDEOS')
+						}
+						QQC2.ToolButton {
+							icon.name: "folder-open-symbolic"
+							text: i18nd("dolphin", "Dolphin")
+							onClicked: sidebarShortcuts.addUrl('org.kde.dolphin.desktop')
+						}
+						QQC2.ToolButton {
+							icon.name: "configure"
+							text: i18nd("systemsettings", "System Settings")
+							onClicked: sidebarShortcuts.addUrl('systemsettings.desktop')
+						}
+					}
+				}
 			}
-			QQC2.ToolButton {
-				icon.name: "folder-download-symbolic"
-				text: i18nd("xdg-user-dirs", "Download")
-				onClicked: sidebarShortcuts.addUrl('xdg:DOWNLOAD')
-			}
-			QQC2.ToolButton {
-				icon.name: "folder-music-symbolic"
-				text: i18nd("xdg-user-dirs", "Music")
-				onClicked: sidebarShortcuts.addUrl('xdg:MUSIC')
-			}
-			QQC2.ToolButton {
-				icon.name: "folder-pictures-symbolic"
-				text: i18nd("xdg-user-dirs", "Pictures")
-				onClicked: sidebarShortcuts.addUrl('xdg:PICTURES')
-			}
-			QQC2.ToolButton {
-				icon.name: "folder-videos-symbolic"
-				text: i18nd("xdg-user-dirs", "Videos")
-				onClicked: sidebarShortcuts.addUrl('xdg:VIDEOS')
-			}
-			QQC2.ToolButton {
-				icon.name: "folder-open-symbolic"
-				text: i18nd("dolphin", "Dolphin")
-				onClicked: sidebarShortcuts.addUrl('org.kde.dolphin.desktop')
-			}
-			QQC2.ToolButton {
-				icon.name: "configure"
-				text: i18nd("systemsettings", "System Settings")
-				onClicked: sidebarShortcuts.addUrl('systemsettings.desktop')
-			}
-			Item { Layout.fillHeight: true }
 		}
 	}
 

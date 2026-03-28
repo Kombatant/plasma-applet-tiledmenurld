@@ -403,7 +403,9 @@ Item {
 				property int minVisibleIndex: count - maxVisible
 
 				SidebarItem {
-					icon.name: symbolicIconName || model.iconName || model.decoration
+					icon.name: resolvedIconName
+					icon.source: resolvedIconSource
+					forceMonochromeIcon: true
 					text: xdgDisplayName || model.name || model.display
 					tooltipText: text
 					visible: index >= sidebarFavouritesHorizontal.minVisibleIndex
@@ -426,6 +428,38 @@ Item {
 
 					function startsWith(s, sub) { return s.indexOf(sub) === 0 }
 					function endsWith(s, sub) { return s.indexOf(sub) === s.length - sub.length }
+					function iconValueCandidate() {
+						if (model.iconName) {
+							return model.iconName
+						}
+						if (typeof model.decoration === "string") {
+							return model.decoration
+						}
+						return model.decoration || ""
+					}
+					function isFileLikeIcon(value) {
+						if (typeof value !== "string") {
+							return false
+						}
+						return startsWith(value, "/") || startsWith(value, "file:/") || startsWith(value, "qrc:/") || startsWith(value, "qrc:///") || startsWith(value, ":/")
+					}
+					function iconNameCandidate() {
+						var candidate = iconValueCandidate()
+						if (typeof candidate === "string" && candidate && !isFileLikeIcon(candidate)) {
+							return candidate
+						}
+						return ""
+					}
+					function iconSourceCandidate() {
+						var candidate = iconValueCandidate()
+						if (isFileLikeIcon(candidate)) {
+							return candidate
+						}
+						if (candidate && typeof candidate !== "string") {
+							return candidate
+						}
+						return ""
+					}
 					function isLocalizedFolder() {
 						var s = model.url ? model.url.toString() : ''
 						if (startsWith(s, 'xdg:')) {
@@ -445,20 +479,40 @@ Item {
 						else if (xdgFolder === 'VIDEOS') return i18nd("xdg-user-dirs", "Videos")
 						return ''
 					}
-					property string symbolicIconName: {
-						if (!model.url) return ""
-						var s = model.url.toString()
-						if (endsWith(s, '/org.kde.dolphin.desktop')) return 'folder-open-symbolic'
-						else if (endsWith(s, '/systemsettings.desktop')) return 'configure'
-						else if (startsWith(s, 'xdg:')) {
-							s = s.substring('xdg:'.length, s.length)
-							if (s === 'DOCUMENTS') return 'folder-documents-symbolic'
-							else if (s === 'DOWNLOAD') return 'folder-download-symbolic'
-							else if (s === 'MUSIC') return 'folder-music-symbolic'
-							else if (s === 'PICTURES') return 'folder-pictures-symbolic'
-							else if (s === 'VIDEOS') return 'folder-videos-symbolic'
+					property string symbolicIconCandidate: {
+						if (model.url) {
+							var s = model.url.toString()
+							if (startsWith(s, 'xdg:')) {
+								s = s.substring('xdg:'.length, s.length)
+								if (s === 'DOCUMENTS') return 'folder-documents-symbolic'
+								else if (s === 'DOWNLOAD') return 'folder-download-symbolic'
+								else if (s === 'MUSIC') return 'folder-music-symbolic'
+								else if (s === 'PICTURES') return 'folder-pictures-symbolic'
+								else if (s === 'VIDEOS') return 'folder-videos-symbolic'
+							} else if (startsWith(s, 'file:///home/')) {
+								s = s.substring('file:///home/'.length, s.length)
+								var trimIndex = s.indexOf('/')
+								if (trimIndex === -1) {
+									s = ''
+								} else {
+									s = s.substring(trimIndex, s.length)
+								}
+								if (s === '') return 'user-home-symbolic'
+							}
+						}
+						var baseIconName = iconNameCandidate()
+						if (baseIconName) {
+							if (endsWith(baseIconName, "-symbolic")) return baseIconName
+							return baseIconName + "-symbolic"
 						}
 						return ""
+					}
+					readonly property string resolvedIconName: symbolicIconProbe.valid ? symbolicIconCandidate : iconNameCandidate()
+					readonly property var resolvedIconSource: resolvedIconName ? "" : iconSourceCandidate()
+					Kirigami.Icon {
+						id: symbolicIconProbe
+						visible: false
+						source: symbolicIconCandidate
 					}
 				}
 			}

@@ -1,4 +1,5 @@
 import QtQuick
+import org.kde.kirigami as Kirigami
 import "./lib/" as Lib
 
 Repeater {
@@ -10,7 +11,9 @@ Repeater {
 	property QtObject xdgUserDir: Lib.XdgUserDir {}
 
 	delegate: SidebarItem {
-		icon.name: symbolicIconName || model.iconName || model.decoration
+		icon.name: resolvedIconName
+		icon.source: resolvedIconSource
+		forceMonochromeIcon: true
 		text: xdgDisplayName || model.name || model.display
 		tooltipText: text
 		sidebarMenu: repeater.parent.parent // SidebarContextMenu { Column { Repeater{} } }
@@ -57,6 +60,38 @@ Repeater {
 		function endsWith(s, sub) {
 			return s.indexOf(sub) === s.length - sub.length
 		}
+		function iconValueCandidate() {
+			if (model.iconName) {
+				return model.iconName
+			}
+			if (typeof model.decoration === "string") {
+				return model.decoration
+			}
+			return model.decoration || ""
+		}
+		function isFileLikeIcon(value) {
+			if (typeof value !== "string") {
+				return false
+			}
+			return startsWith(value, "/") || startsWith(value, "file:/") || startsWith(value, "qrc:/") || startsWith(value, "qrc:///") || startsWith(value, ":/")
+		}
+		function iconNameCandidate() {
+			var candidate = iconValueCandidate()
+			if (typeof candidate === "string" && candidate && !isFileLikeIcon(candidate)) {
+				return candidate
+			}
+			return ""
+		}
+		function iconSourceCandidate() {
+			var candidate = iconValueCandidate()
+			if (isFileLikeIcon(candidate)) {
+				return candidate
+			}
+			if (candidate && typeof candidate !== "string") {
+				return candidate
+			}
+			return ""
+		}
 
 		property string xdgDisplayName: {
 			var xdgFolder = isLocalizedFolder()
@@ -80,16 +115,10 @@ Repeater {
 				return ''
 			}
 		}
-		property string symbolicIconName: {
+		property string symbolicIconCandidate: {
 			if (model.url) {
 				var s = model.url.toString()
-				if (endsWith(s, '.desktop')) {
-					if (endsWith(s, '/org.kde.dolphin.desktop')) {
-						return 'folder-open-symbolic'
-					} else if (endsWith(s, '/systemsettings.desktop')) {
-						return 'configure'
-					}
-				} else if (startsWith(s, 'file:///home/')) {
+				if (startsWith(s, 'file:///home/')) {
 					s = s.substring('file:///home/'.length, s.length)
 
 					var trimIndex = s.indexOf('/')
@@ -117,7 +146,21 @@ Repeater {
 					}
 				}
 			}
+			var baseIconName = iconNameCandidate()
+			if (baseIconName) {
+				if (endsWith(baseIconName, "-symbolic")) {
+					return baseIconName
+				}
+				return baseIconName + "-symbolic"
+			}
 			return ""
+		}
+		readonly property string resolvedIconName: symbolicIconProbe.valid ? symbolicIconCandidate : iconNameCandidate()
+		readonly property var resolvedIconSource: resolvedIconName ? "" : iconSourceCandidate()
+		Kirigami.Icon {
+			id: symbolicIconProbe
+			visible: false
+			source: symbolicIconCandidate
 		}
 	}
 }
