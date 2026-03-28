@@ -49,6 +49,7 @@ ColumnLayout {
 			tilesLocked: "bool",
 			tileHoverEffect: "string",
 			tileAnimatedPlayOnHover: "bool",
+			showTileTooltips: "bool",
 		defaultTileColor: "string",
 		defaultTileGradient: "bool",
 		sidebarBackgroundColor: "string",
@@ -148,7 +149,7 @@ ColumnLayout {
 		if (configKey.indexOf("ai") === 0) {
 			return "AI Chat"
 		}
-		if (configKey.indexOf("tile") === 0 || configKey === "tilesLocked" || configKey === "favGridCols" || configKey.indexOf("defaultTile") === 0) {
+		if (configKey.indexOf("tile") === 0 || configKey === "tilesLocked" || configKey === "favGridCols" || configKey === "showTileTooltips" || configKey.indexOf("defaultTile") === 0) {
 			return "Tiles"
 		}
 		if (configKey.indexOf("sidebar") === 0) {

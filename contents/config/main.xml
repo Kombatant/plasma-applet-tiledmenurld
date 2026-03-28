@@ -114,6 +114,10 @@
 			<label>Play animated tile backgrounds only on mouse hover.</label>
 			<default>true</default>
 		</entry>
+		<entry name="showTileTooltips" type="bool">
+			<label>Whether tiles show a tooltip with their label on mouse hover.</label>
+			<default>false</default>
+		</entry>
 
 		<!-- Colors -->
 		<!-- Use empty string instead of color type so that we can use default colors from the color scheme. -->
@@ -194,4 +198,3 @@
 	</group>
 
 </kcfg>
-

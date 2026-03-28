@@ -33,6 +33,7 @@ Item {
 
 	//--- View Start
 	readonly property bool hasDescription: appObj.descriptionText.length > 0 || appObj.labelText.length > 0
+	readonly property string tileTooltipText: (appObj.labelText || "").trim()
 	readonly property real descriptionSpacing: cellMargin
 	readonly property bool useOverlayLabel: !!appObj.backgroundImage
 	readonly property real labelPaddingX: cellMargin + (6 * Screen.devicePixelRatio)
@@ -241,6 +242,9 @@ Item {
 		id: tileMouseArea
 		anchors.fill: parent
 		hoverEnabled: true
+		QQC2.ToolTip.delay: Kirigami.Units.toolTipDelay
+		QQC2.ToolTip.visible: !!plasmoid.configuration.showTileTooltips && containsMouse && tileTooltipText.length > 0
+		QQC2.ToolTip.text: tileTooltipText
 		acceptedButtons: Qt.LeftButton | Qt.RightButton
 		cursorShape: (dragActive && dragOutside) ? Qt.ForbiddenCursor : (editing ? Qt.ClosedHandCursor : Qt.ArrowCursor)
 		readonly property bool isLeftPressed: pressedButtons & Qt.LeftButton

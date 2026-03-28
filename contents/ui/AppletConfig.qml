@@ -74,6 +74,7 @@ Item {
 		_ensureSettingInitialized('tilesLocked', false)
 		_ensureSettingInitialized('tileHoverEffect', 'classic')
 		_ensureSettingInitialized('tileAnimatedPlayOnHover', true)
+		_ensureSettingInitialized('showTileTooltips', false)
 
 		// Use empty string to indicate "use theme/default".
 		_ensureSettingInitialized('defaultTileColor', '')
@@ -272,6 +273,7 @@ Item {
 
 	//--- Style
 	// Tiles
+	readonly property bool showTileTooltips: !!plasmoid.configuration.showTileTooltips
 	readonly property int tileLabelAlignment: {
 		var val = plasmoid.configuration.tileLabelAlignment
 		if (val === 'center') {
