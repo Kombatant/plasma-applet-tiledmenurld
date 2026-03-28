@@ -200,6 +200,7 @@ LibConfig.FormKCM {
 		model: [
 			{ value: "Alphabetical", text: i18n("Alphabetical") },
 			{ value: "Categories", text: i18n("Categories") },
+			{ value: "LastUsedView", text: i18n("Last Used View") },
 			{ value: "JumpToLetter", text: i18n("Jump To Letter") },
 			{ value: "JumpToCategory", text: i18n("Jump To Category") },
 			{ value: "TilesOnly", text: i18n("Tiles Only") },

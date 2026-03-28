@@ -52,6 +52,7 @@ Item {
 		])
 		_ensureSettingInitialized('sidebarCollapsibleSearchResults', false)
 		_ensureSettingInitialized('defaultAppListView', 'Alphabetical')
+		_ensureSettingInitialized('lastUsedAppListView', 'Alphabetical')
 		_ensureSettingInitialized('aiProvider', 'openai')
 		_ensureSettingInitialized('aiApiKey', '')
 		_ensureSettingInitialized('aiOllamaUrl', 'http://127.0.0.1:11434')

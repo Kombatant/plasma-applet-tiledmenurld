@@ -45,26 +45,52 @@ Item {
 		}
 	}
 
-	function showDefaultView() {
-		var defView = plasmoid.configuration.defaultAppListView
-		if (defView == 'Alphabetical') {
+	function normalizeViewName(viewName) {
+		var validViews = [
+			"Alphabetical",
+			"Categories",
+			"JumpToLetter",
+			"JumpToCategory",
+			"TilesOnly",
+			"AiChat",
+		]
+		return validViews.indexOf(viewName) >= 0 ? viewName : "Alphabetical"
+	}
+
+	function rememberView(viewName) {
+		var normalizedView = normalizeViewName(viewName)
+		if (plasmoid.configuration.lastUsedAppListView !== normalizedView) {
+			plasmoid.configuration.lastUsedAppListView = normalizedView
+		}
+	}
+
+	function resolveConfiguredDefaultView() {
+		var configuredView = plasmoid.configuration.defaultAppListView
+		if (configuredView === "LastUsedView") {
+			return normalizeViewName(plasmoid.configuration.lastUsedAppListView)
+		}
+		return normalizeViewName(configuredView)
+	}
+
+	function openView(viewName) {
+		var resolvedView = normalizeViewName(viewName)
+		if (resolvedView == "Alphabetical") {
 			appsView.showAppsAlphabetically()
-			config.showSearch = true
-		} else if (defView == 'Categories') {
+		} else if (resolvedView == "Categories") {
 			appsView.showAppsCategorically()
-			config.showSearch = true
-		} else if (defView == 'JumpToLetter') {
+		} else if (resolvedView == "JumpToLetter") {
 			jumpToLetterView.showLetters()
-			config.showSearch = true
-		} else if (defView == 'JumpToCategory') {
+		} else if (resolvedView == "JumpToCategory") {
 			jumpToLetterView.showCategories()
-			config.showSearch = true
-		} else if (defView == 'TilesOnly') {
+		} else if (resolvedView == "TilesOnly") {
 			searchView.showTilesOnly()
-		} else if (defView == 'AiChat') {
+		} else if (resolvedView == "AiChat") {
 			searchView.showAiChat()
 		}
-		
+	}
+
+	function showDefaultView() {
+		openView(resolveConfiguredDefaultView())
 	}
 
 	function focusPrimaryInput() {
@@ -88,6 +114,7 @@ Item {
 	}
 
 	function showTilesOnly() {
+		rememberView("TilesOnly")
 		if (!showingAppList) {
 			// appsView.show(stackView.noTransition)
 		
@@ -102,6 +129,7 @@ Item {
 	}
 
 	function showAiChat() {
+		rememberView("AiChat")
 		config.showSearch = true
 		if (stackView.currentItem !== aiChatView) {
 			stackView.replace(aiChatView)
@@ -195,11 +223,13 @@ Item {
 			visible: false
 
 			function showAppsAlphabetically() {
+				searchView.rememberView("Alphabetical")
 				appsModel.order = "alphabetical"
 				show()
 			}
 
 			function showAppsCategorically() {
+				searchView.rememberView("Categories")
 				appsModel.order = "categories"
 				
 				show()
@@ -220,12 +250,14 @@ Item {
 			visible: false
 			
 			function showLetters() {
+				searchView.rememberView("JumpToLetter")
 				appsModel.order = "alphabetical"
 				
 				show()
 			}
 
 			function showCategories() {
+				searchView.rememberView("JumpToCategory")
 				appsModel.order = "categories"
 				show()
 			}

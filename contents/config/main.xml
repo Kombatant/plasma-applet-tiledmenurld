@@ -38,6 +38,10 @@
 			<default>false</default>
 		</entry>
 		<entry name="defaultAppListView" type="string">
+			<!-- enum: Alphabetical, Categories, JumpToLetter, JumpToCategory, TilesOnly, AiChat, LastUsedView -->
+			<default>Alphabetical</default>
+		</entry>
+		<entry name="lastUsedAppListView" type="string">
 			<!-- enum: Alphabetical, Categories, JumpToLetter, JumpToCategory, TilesOnly, AiChat -->
 			<default>Alphabetical</default>
 		</entry>
