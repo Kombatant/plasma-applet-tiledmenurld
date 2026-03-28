@@ -151,6 +151,13 @@ Item {
 		}
 	}
 
+	function switchSidebarView(action) {
+		if (typeof action === "function") {
+			action()
+		}
+		autoResizeDebounce.restart()
+	}
+
 	SidebarMenu {
 		id: sidebarMenu
 		// Don't use anchors.fill - SidebarMenu manages its own size based on orientation
@@ -166,21 +173,21 @@ Item {
 			SidebarViewButton {
 				appletIconName: "view-list-tree"
 				labelText: i18n("Categories")
-				onClicked:  appsView.showAppsCategorically()
+				onClicked: sidebarView.switchSidebarView(function() { appsView.showAppsCategorically() })
 				checked: searchView.showingAppsCategorically
 			}
 
 			SidebarViewButton {
 				appletIconName: "view-list-text"
 				labelText: i18n("Alphabetical")
-				onClicked: appsView.showAppsAlphabetically()
+				onClicked: sidebarView.switchSidebarView(function() { appsView.showAppsAlphabetically() })
 				checked: searchView.showingAppsAlphabetically
 			}
 
 			SidebarViewButton {
 				appletIconName: "view-grid-symbolic"
 				labelText: i18n("Tiles Only")
-				onClicked: searchView.showTilesOnly()
+				onClicked: sidebarView.switchSidebarView(function() { searchView.showTilesOnly() })
 				checked: searchView.showingOnlyTiles
 			}
 
@@ -194,7 +201,7 @@ Item {
 			SidebarViewButton {
 				appletIconName: "dialog-messages"
 				labelText: i18n("AI Chat")
-				onClicked: searchView.showAiChat()
+				onClicked: sidebarView.switchSidebarView(function() { searchView.showAiChat() })
 				checked: searchView.showingAiChat
 			}
 
@@ -287,21 +294,21 @@ Item {
 			SidebarViewButton {
 				appletIconName: "view-list-tree"
 				labelText: i18n("Categories")
-				onClicked: appsView.showAppsCategorically()
+				onClicked: sidebarView.switchSidebarView(function() { appsView.showAppsCategorically() })
 				checked: searchView.showingAppsCategorically
 			}
 
 			SidebarViewButton {
 				appletIconName: "view-list-text"
 				labelText: i18n("Alphabetical")
-				onClicked: appsView.showAppsAlphabetically()
+				onClicked: sidebarView.switchSidebarView(function() { appsView.showAppsAlphabetically() })
 				checked: searchView.showingAppsAlphabetically
 			}
 
 			SidebarViewButton {
 				appletIconName: "view-grid-symbolic"
 				labelText: i18n("Tiles Only")
-				onClicked: searchView.showTilesOnly()
+				onClicked: sidebarView.switchSidebarView(function() { searchView.showTilesOnly() })
 				checked: searchView.showingOnlyTiles
 			}
 
@@ -317,7 +324,7 @@ Item {
 			SidebarViewButton {
 				appletIconName: "dialog-messages"
 				labelText: i18n("AI Chat")
-				onClicked: searchView.showAiChat()
+				onClicked: sidebarView.switchSidebarView(function() { searchView.showAiChat() })
 				checked: searchView.showingAiChat
 			}
 

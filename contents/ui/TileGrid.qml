@@ -216,20 +216,19 @@ DropArea {
 		if (draggedItem) {
 		} else if (addedItem) {
 		} else if (event && event.hasUrls && event.urls) {
+			var url = ""
 			if (event.keys && event.keys.indexOf('favoriteId') >= 0) {
-				var url = event.getDataAsString('favoriteId')
-				url = Utils.parseDropUrl(url)
+				url = event.getDataAsString('favoriteId')
 			} else {
-				var url = event.urls[0]
-				url = Utils.parseDropUrl(url)
+				url = "" + event.urls[0]
 			}
 
-			addedItem = newTile(url)
+			addedItem = newAppTile(url)
 			dropHoverX = modelX
 			dropHoverY = modelY
 
 			// Firefox/Chromium url dropped
-			if (event.keys.indexOf('_NETSCAPE_URL')) {
+			if (event.keys && event.keys.indexOf('_NETSCAPE_URL') >= 0) {
 				var netscapeUrl = event.getDataAsString('_NETSCAPE_URL')
 				var tokens = netscapeUrl.split('\n')
 				if (tokens.length >= 2) {
@@ -668,6 +667,27 @@ DropArea {
 		}
 	}
 
+	function newAppTile(url, props) {
+		var launchUrl = "" + url
+		var favoriteId = Utils.parseDropUrl(launchUrl)
+		var tile = newTile(favoriteId)
+		tile.favoriteId = favoriteId
+		tile.launchUrl = launchUrl
+		if (props && typeof props === "object") {
+			var keys = Object.keys(props)
+			for (var i = 0; i < keys.length; i++) {
+				var key = keys[i]
+				var value = props[key]
+				if (key === "url") {
+					tile.launchUrl = value
+					continue
+				}
+				tile[key] = value
+			}
+		}
+		return tile
+	}
+
 	function removeIndex(i) {
 		var target = tileModel[i]
 		if (target && target.tileType === "group") {
@@ -688,10 +708,11 @@ DropArea {
 	}
 
 	function removeApp(url) {
+		url = "" + url
 		var removedCount = 0
 		for (var i = tileModel.length - 1; i >= 0; i--) {
 			var tile = tileModel[i]
-			if (tile.url == url || tile.favoriteId == url) {
+			if (tile.url == url || tile.favoriteId == url || tile.launchUrl == url) {
 				removedCount += 1
 				tileModel.splice(i, 1) // remove 1 item at index
 			}
@@ -734,33 +755,18 @@ DropArea {
 		}
 	}
 	function addApp(url, x, y, props) {
-		var launchUrl = url
-		var favoriteId = Utils.parseDropUrl(url)
-		var tile = newTile(favoriteId)
-		tile.favoriteId = favoriteId
-		tile.launchUrl = launchUrl
+		var tile = newAppTile(url, props)
 		parseTileXY(tile, x, y)
-		if (props && typeof props === "object") {
-			var keys = Object.keys(props)
-			for (var i = 0; i < keys.length; i++) {
-				var key = keys[i]
-				var value = props[key]
-				if (key === "url") {
-					tile.launchUrl = value
-					continue
-				}
-				tile[key] = value
-			}
-		}
 		tileModel.push(tile)
 		tileModelChanged()
 		return tile
 	}
 
 	function hasAppTile(url) {
+		url = "" + url
 		for (var i = 0; i < tileModel.length; i++) {
 			var tile = tileModel[i]
-			if (tile.url == url || tile.favoriteId == url) {
+			if (tile.url == url || tile.favoriteId == url || tile.launchUrl == url) {
 				return true
 			}
 		}

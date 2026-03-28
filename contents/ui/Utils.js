@@ -1,6 +1,11 @@
 .pragma library
 
 function parseDropUrl(url) {
+	url = "" + url
+	if (!url) {
+		return url
+	}
+
 	var startsWithAppsScheme = url.indexOf('applications:') === 0 // Search Results add this prefix
 	if (startsWithAppsScheme) {
 		url = url.substr('applications:'.length)
