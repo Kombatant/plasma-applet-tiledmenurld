@@ -51,6 +51,144 @@ MouseArea {
 	property alias tileGrid: tileGrid
 	property var aiChatModel
 
+	function logSizeMemory(label, data) {
+		if (!logger.showDebug) {
+			return
+		}
+		try {
+			logger.log(label, JSON.stringify(data))
+		} catch (e) {
+			logger.log(label, data)
+		}
+	}
+
+	function normalizedSizeMemoryView(viewName) {
+		if (viewName === "AiChat" || viewName === "TilesOnly" || viewName === "Categories") {
+			return viewName
+		}
+		return "Alphabetical"
+	}
+
+	function currentSizeMemoryView() {
+		if (searchView && searchView.activeSizeMemoryView) {
+			return normalizedSizeMemoryView(searchView.activeSizeMemoryView)
+		}
+		return "Alphabetical"
+	}
+
+	function sizeConfigKeys(viewName) {
+		var normalizedView = normalizedSizeMemoryView(viewName)
+		return {
+			width: "popupWidth" + normalizedView,
+			height: "popupHeight" + normalizedView,
+			cols: "favGridCols" + normalizedView,
+		}
+	}
+
+	function saveSizeForView(viewName, width, height, cols) {
+		var normalizedView = normalizedSizeMemoryView(viewName)
+		var keys = sizeConfigKeys(normalizedView)
+		if (width > 0 && plasmoid.configuration[keys.width] !== width) {
+			plasmoid.configuration[keys.width] = width
+		}
+		if (height > 0 && plasmoid.configuration[keys.height] !== height) {
+			plasmoid.configuration[keys.height] = height
+		}
+		if (cols > 0 && plasmoid.configuration[keys.cols] !== cols) {
+			plasmoid.configuration[keys.cols] = cols
+		}
+		logSizeMemory("sizeMemory:save", {
+			view: normalizedView,
+			widthKey: keys.width,
+			width: width,
+			heightKey: keys.height,
+			height: height,
+			colsKey: keys.cols,
+			cols: cols,
+			popupWidth: popup.width,
+			popupHeight: popup.height,
+			activeView: currentSizeMemoryView(),
+		})
+	}
+
+	function saveCurrentViewSize() {
+		if (!config) {
+			return
+		}
+
+		var dpr = Screen.devicePixelRatio || 1
+		var logicalWidth = Math.round(popup.width / dpr)
+		var logicalHeight = Math.round(popup.height / dpr)
+		var favWidth = Math.max(0, popup.width - config.leftSectionWidth)
+		var box = config.cellBoxSize
+		var cols = box > 0 ? Math.max(1, Math.floor(favWidth / box)) : 0
+
+		if (logicalHeight > 0 && plasmoid.configuration.popupHeight !== logicalHeight) {
+			plasmoid.configuration.popupHeight = logicalHeight
+		}
+		if (cols > 0 && plasmoid.configuration.favGridCols !== cols) {
+			plasmoid.configuration.favGridCols = cols
+		}
+
+		logSizeMemory("sizeMemory:saveCurrent", {
+			view: currentSizeMemoryView(),
+			logicalWidth: logicalWidth,
+			logicalHeight: logicalHeight,
+			cols: cols,
+			popupWidth: popup.width,
+			popupHeight: popup.height,
+			leftSectionWidth: config.leftSectionWidth,
+			cellBoxSize: box,
+		})
+		saveSizeForView(currentSizeMemoryView(), logicalWidth, logicalHeight, cols)
+	}
+
+	function restoreRememberedSizeForView(viewName) {
+		if (!config) {
+			return
+		}
+
+		var normalizedView = normalizedSizeMemoryView(viewName)
+		var keys = sizeConfigKeys(normalizedView)
+		var savedWidth = parseInt(plasmoid.configuration[keys.width], 10)
+		var savedHeight = parseInt(plasmoid.configuration[keys.height], 10)
+		var savedCols = parseInt(plasmoid.configuration[keys.cols], 10)
+		if (!(savedWidth > 0)) {
+			savedWidth = Math.round(config.popupWidth / (Screen.devicePixelRatio || 1))
+		}
+		if (!(savedHeight > 0)) {
+			savedHeight = plasmoid.configuration.popupHeight
+		}
+		if (!(savedCols > 0)) {
+			savedCols = plasmoid.configuration.favGridCols
+		}
+
+		if (savedHeight > 0 && plasmoid.configuration.popupHeight !== savedHeight) {
+			plasmoid.configuration.popupHeight = savedHeight
+		}
+		if (savedCols > 0 && plasmoid.configuration.favGridCols !== savedCols) {
+			plasmoid.configuration.favGridCols = savedCols
+		}
+
+		logSizeMemory("sizeMemory:restore", {
+			requestedView: viewName,
+			view: normalizedView,
+			widthKey: keys.width,
+			savedWidth: savedWidth,
+			heightKey: keys.height,
+			savedHeight: savedHeight,
+			colsKey: keys.cols,
+			savedCols: savedCols,
+			configPopupHeight: plasmoid.configuration.popupHeight,
+			configFavGridCols: plasmoid.configuration.favGridCols,
+		})
+		popup.applySavedSize(savedWidth, savedHeight)
+	}
+
+	function restoreRememberedSizeForCurrentView() {
+		restoreRememberedSizeForView(currentSizeMemoryView())
+	}
+
 	function normalizeGroupHeaderHeights() {
 		var model = config && config.tileModel ? config.tileModel.value : null
 		if (!model || !model.length) {
@@ -204,6 +342,7 @@ MouseArea {
 		if (changedHeight) {
 			plasmoid.configuration.popupHeight = logicalHeight
 		}
+		saveSizeForView(currentSizeMemoryView(), logicalWidth, logicalHeight, cols)
 
 		// Force the popup's layout hints to the computed size so the view actually resizes.
 		var previousMinW = popup.Layout.minimumWidth
@@ -276,23 +415,70 @@ MouseArea {
 		})
 	}
 
-	function applySavedSize() {
+	function applySavedSize(targetWidthLogical, targetHeightLogical) {
 		if (!config) {
 			return
 		}
-		var targetWidth = config.popupWidth
-		var targetHeight = config.popupHeight
+		var dpr = Screen.devicePixelRatio || 1
+		var targetWidth = (targetWidthLogical > 0 ? targetWidthLogical : Math.round(config.popupWidth / dpr)) * dpr
+		var targetHeight = (targetHeightLogical > 0 ? targetHeightLogical : plasmoid.configuration.popupHeight) * dpr
 		if (!(targetWidth > 0 && targetHeight > 0)) {
 			return
 		}
+
+		var previousMinW = popup.Layout.minimumWidth
+		var previousMinH = popup.Layout.minimumHeight
 		popup._suppressPersist = true
+		popup.Layout.preferredWidth = targetWidth
+		popup.Layout.preferredHeight = targetHeight
+		popup.Layout.minimumWidth = targetWidth
+		popup.Layout.minimumHeight = targetHeight
+		popup.Layout.maximumWidth = targetWidth
+		popup.Layout.maximumHeight = targetHeight
 		popup.width = targetWidth
 		popup.height = targetHeight
 		popup.implicitWidth = targetWidth
 		popup.implicitHeight = targetHeight
+		logSizeMemory("sizeMemory:applySavedSize", {
+			view: currentSizeMemoryView(),
+			targetWidth: targetWidth,
+			targetHeight: targetHeight,
+			configPopupHeight: plasmoid.configuration.popupHeight,
+			configFavGridCols: plasmoid.configuration.favGridCols,
+		})
 		Qt.callLater(function() {
-			popup._suppressPersist = false
-			popup._sizeRestored = true
+			popup.width = targetWidth
+			popup.height = targetHeight
+			logSizeMemory("sizeMemory:applySavedSizePost", {
+				view: currentSizeMemoryView(),
+				popupWidth: popup.width,
+				popupHeight: popup.height,
+				layoutPrefW: popup.Layout.preferredWidth,
+				layoutPrefH: popup.Layout.preferredHeight,
+				layoutMinW: popup.Layout.minimumWidth,
+				layoutMinH: popup.Layout.minimumHeight,
+				layoutMaxW: popup.Layout.maximumWidth,
+				layoutMaxH: popup.Layout.maximumHeight,
+			})
+			Qt.callLater(function() {
+				popup.Layout.maximumWidth = -1
+				popup.Layout.maximumHeight = -1
+				popup.Layout.minimumWidth = previousMinW
+				popup.Layout.minimumHeight = previousMinH
+				popup._suppressPersist = false
+				popup._sizeRestored = true
+				logSizeMemory("sizeMemory:applySavedSizeRelease", {
+					view: currentSizeMemoryView(),
+					popupWidth: popup.width,
+					popupHeight: popup.height,
+					layoutPrefW: popup.Layout.preferredWidth,
+					layoutPrefH: popup.Layout.preferredHeight,
+					layoutMinW: popup.Layout.minimumWidth,
+					layoutMinH: popup.Layout.minimumHeight,
+					layoutMaxW: popup.Layout.maximumWidth,
+					layoutMaxH: popup.Layout.maximumHeight,
+				})
+			})
 		})
 	}
 
@@ -353,15 +539,18 @@ MouseArea {
 	}
 	Component.onCompleted: {
 		enablePersistSize.start()
+		if (searchView && typeof searchView.setActiveSizeMemoryView === "function") {
+			searchView.setActiveSizeMemoryView(searchView.lastRememberedSizeMemoryView)
+		}
 		if (plasmoid.expanded) {
-			popup.applySavedSize()
+			popup.restoreRememberedSizeForCurrentView()
 		}
 	}
 	// Watch plasmoid.expanded via a bound property instead of Connections
 	property bool plasmoidExpanded: (plasmoid && typeof plasmoid.expanded !== "undefined") ? plasmoid.expanded : false
 	onPlasmoidExpandedChanged: {
 		if (plasmoidExpanded) {
-			popup.applySavedSize()
+			popup.restoreRememberedSizeForCurrentView()
 		}
 	}
 
@@ -386,23 +575,7 @@ MouseArea {
 			if (!popup._persistSizeEnabled || popup._suppressPersist || !plasmoid.expanded || !popup._sizeRestored) {
 				return
 			}
-			// Save height in logical pixels.
-			var dpr = Screen.devicePixelRatio || 1
-			var logicalHeight = Math.round(popup.height / dpr)
-			if (logicalHeight > 0 && plasmoid.configuration.popupHeight !== logicalHeight) {
-				plasmoid.configuration.popupHeight = logicalHeight
-			}
-
-			// Save width by converting the right-side tile area into a column count.
-			var favWidth = Math.max(0, popup.width - config.leftSectionWidth)
-			var box = config.cellBoxSize
-			if (box > 0) {
-				var cols = Math.floor(favWidth / box)
-				cols = Math.max(1, cols)
-				if (plasmoid.configuration.favGridCols !== cols) {
-					plasmoid.configuration.favGridCols = cols
-				}
-			}
+			popup.saveCurrentViewSize()
 		}
 	}
 

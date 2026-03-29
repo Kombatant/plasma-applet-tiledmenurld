@@ -25,6 +25,7 @@ Item {
 	property alias jumpToLetterView: jumpToLetterView
 	property alias aiChatView: aiChatView
 	property var aiChatModel
+	property string activeSizeMemoryView: "Alphabetical"
 
 	readonly property bool showingOnlyTiles: !config.showSearch
 	readonly property bool showingAppList: stackView.currentItem == appsView || stackView.currentItem == jumpToLetterView
@@ -32,6 +33,10 @@ Item {
 	readonly property bool showingAppsAlphabetically: config.showSearch && appsModel.order == "alphabetical" && showingAppList
 	readonly property bool showingAppsCategorically: config.showSearch && appsModel.order == "categories" && showingAppList
 	readonly property bool showSearchField: showingAiChat ? false : (config.hideSearchField ? !!searchField.text : true)
+	readonly property string lastRememberedSizeMemoryView: {
+		var rememberedView = normalizeViewName(plasmoid.configuration.lastUsedAppListView)
+		return normalizeSizeMemoryView(rememberedView)
+	}
 
 	readonly property bool searchOnTop: config.searchOnTop
 	property bool _escapeClearingQuery: false
@@ -55,6 +60,29 @@ Item {
 			"AiChat",
 		]
 		return validViews.indexOf(viewName) >= 0 ? viewName : "Alphabetical"
+	}
+
+	function normalizeSizeMemoryView(viewName) {
+		if (viewName === "Categories" || viewName === "JumpToCategory") {
+			return "Categories"
+		}
+		if (viewName === "TilesOnly" || viewName === "AiChat") {
+			return viewName
+		}
+		return "Alphabetical"
+	}
+
+	function setActiveSizeMemoryView(viewName) {
+		var normalizedView = normalizeSizeMemoryView(viewName)
+		if (activeSizeMemoryView !== normalizedView) {
+			activeSizeMemoryView = normalizedView
+		}
+	}
+
+	function saveCurrentSizeMemoryViewBeforeSwitch() {
+		if (popup && typeof popup.saveCurrentViewSize === "function") {
+			popup.saveCurrentViewSize()
+		}
 	}
 
 	function rememberView(viewName) {
@@ -114,7 +142,9 @@ Item {
 	}
 
 	function showTilesOnly() {
+		saveCurrentSizeMemoryViewBeforeSwitch()
 		rememberView("TilesOnly")
+		setActiveSizeMemoryView("TilesOnly")
 		if (!showingAppList) {
 			// appsView.show(stackView.noTransition)
 		
@@ -122,6 +152,7 @@ Item {
 			
 		}
 		config.showSearch = false
+		popup.restoreRememberedSizeForView("TilesOnly")
 	}
 
 	function showSearchView() {
@@ -129,11 +160,14 @@ Item {
 	}
 
 	function showAiChat() {
+		saveCurrentSizeMemoryViewBeforeSwitch()
 		rememberView("AiChat")
+		setActiveSizeMemoryView("AiChat")
 		config.showSearch = true
 		if (stackView.currentItem !== aiChatView) {
 			stackView.replace(aiChatView)
 		}
+		popup.restoreRememberedSizeForView("AiChat")
 		Qt.callLater(function() {
 			focusPrimaryInput()
 		})
@@ -223,13 +257,17 @@ Item {
 			visible: false
 
 			function showAppsAlphabetically() {
+				searchView.saveCurrentSizeMemoryViewBeforeSwitch()
 				searchView.rememberView("Alphabetical")
+				searchView.setActiveSizeMemoryView("Alphabetical")
 				appsModel.order = "alphabetical"
 				show()
 			}
 
 			function showAppsCategorically() {
+				searchView.saveCurrentSizeMemoryViewBeforeSwitch()
 				searchView.rememberView("Categories")
+				searchView.setActiveSizeMemoryView("Categories")
 				appsModel.order = "categories"
 				
 				show()
@@ -241,6 +279,7 @@ Item {
 					// stackView.delegate = animation || stackView.panUp
 					stackView.replace(appsView)
 				}
+				popup.restoreRememberedSizeForView(searchView.activeSizeMemoryView)
 				appsView.scrollToTop()
 			}
 		}
@@ -250,14 +289,18 @@ Item {
 			visible: false
 			
 			function showLetters() {
+				searchView.saveCurrentSizeMemoryViewBeforeSwitch()
 				searchView.rememberView("JumpToLetter")
+				searchView.setActiveSizeMemoryView("JumpToLetter")
 				appsModel.order = "alphabetical"
 				
 				show()
 			}
 
 			function showCategories() {
+				searchView.saveCurrentSizeMemoryViewBeforeSwitch()
 				searchView.rememberView("JumpToCategory")
+				searchView.setActiveSizeMemoryView("JumpToCategory")
 				appsModel.order = "categories"
 				show()
 			}
@@ -268,6 +311,7 @@ Item {
 					// stackView.delegate = stackView.zoomOut
 					stackView.replace(jumpToLetterView)
 				}
+				popup.restoreRememberedSizeForView(searchView.activeSizeMemoryView)
 			}
 		}
 

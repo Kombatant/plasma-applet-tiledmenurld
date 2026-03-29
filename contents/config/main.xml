@@ -181,6 +181,54 @@
 			<label>Popup height in logical pixels (scaled in QML via Screen.devicePixelRatio).</label>
 			<default>620</default>
 		</entry>
+		<entry name="popupHeightAlphabetical" type="int">
+			<label>Saved popup height for the Alphabetical view in logical pixels.</label>
+			<default>620</default>
+		</entry>
+		<entry name="popupWidthAlphabetical" type="int">
+			<label>Saved popup width for the Alphabetical view in logical pixels.</label>
+			<default>830</default>
+		</entry>
+		<entry name="favGridColsAlphabetical" type="int">
+			<label>Saved tile grid column count for the Alphabetical view.</label>
+			<default>6</default>
+		</entry>
+		<entry name="popupHeightCategories" type="int">
+			<label>Saved popup height for the Categories view in logical pixels.</label>
+			<default>620</default>
+		</entry>
+		<entry name="popupWidthCategories" type="int">
+			<label>Saved popup width for the Categories view in logical pixels.</label>
+			<default>830</default>
+		</entry>
+		<entry name="favGridColsCategories" type="int">
+			<label>Saved tile grid column count for the Categories view.</label>
+			<default>6</default>
+		</entry>
+		<entry name="popupHeightTilesOnly" type="int">
+			<label>Saved popup height for the Tiles Only view in logical pixels.</label>
+			<default>620</default>
+		</entry>
+		<entry name="popupWidthTilesOnly" type="int">
+			<label>Saved popup width for the Tiles Only view in logical pixels.</label>
+			<default>830</default>
+		</entry>
+		<entry name="favGridColsTilesOnly" type="int">
+			<label>Saved tile grid column count for the Tiles Only view.</label>
+			<default>6</default>
+		</entry>
+		<entry name="popupHeightAiChat" type="int">
+			<label>Saved popup height for the AI Chat view in logical pixels.</label>
+			<default>620</default>
+		</entry>
+		<entry name="popupWidthAiChat" type="int">
+			<label>Saved popup width for the AI Chat view in logical pixels.</label>
+			<default>830</default>
+		</entry>
+		<entry name="favGridColsAiChat" type="int">
+			<label>Saved tile grid column count for the AI Chat view.</label>
+			<default>6</default>
+		</entry>
 		<entry name="popupBackgroundOpacity" type="double">
 			<label>Opacity of the popup background (0.0 = fully transparent, 1.0 = fully opaque).</label>
 			<default>0.8</default>

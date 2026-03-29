@@ -68,6 +68,18 @@ ColumnLayout {
 		searchFieldHeight: "int",
 		appListWidth: "int",
 		popupHeight: "int",
+		popupWidthAlphabetical: "int",
+		popupHeightAlphabetical: "int",
+		favGridColsAlphabetical: "int",
+		popupWidthCategories: "int",
+		popupHeightCategories: "int",
+		favGridColsCategories: "int",
+		popupWidthTilesOnly: "int",
+		popupHeightTilesOnly: "int",
+		favGridColsTilesOnly: "int",
+		popupWidthAiChat: "int",
+		popupHeightAiChat: "int",
+		favGridColsAiChat: "int",
 		favGridCols: "int",
 		sidebarButtonSize: "int",
 		sidebarIconSize: "int",
@@ -159,7 +171,7 @@ ColumnLayout {
 		if (configKey.indexOf("ai") === 0) {
 			return "AI Chat"
 		}
-		if (configKey.indexOf("tile") === 0 || configKey === "tilesLocked" || configKey === "favGridCols" || configKey === "showTileTooltips" || configKey.indexOf("defaultTile") === 0) {
+		if (configKey.indexOf("tile") === 0 || configKey.indexOf("favGridCols") === 0 || configKey === "tilesLocked" || configKey === "showTileTooltips" || configKey.indexOf("defaultTile") === 0) {
 			return "Tiles"
 		}
 		if (configKey.indexOf("sidebar") === 0) {
@@ -171,7 +183,7 @@ ColumnLayout {
 		if (configKey.indexOf("appList") === 0 || configKey === "appDescription" || configKey === "defaultAppListView" || configKey === "showRecentApps" || configKey === "recentOrdering" || configKey === "numRecentApps") {
 			return "Application List"
 		}
-		if (configKey === "popupHeight" || configKey === "icon" || configKey === "fixedPanelIcon" || configKey === "terminalApp" || configKey === "taskManagerApp" || configKey === "fileManagerApp" || configKey === "presetTilesFolder") {
+		if (configKey.indexOf("popupHeight") === 0 || configKey.indexOf("popupWidth") === 0 || configKey === "icon" || configKey === "fixedPanelIcon" || configKey === "terminalApp" || configKey === "taskManagerApp" || configKey === "fileManagerApp" || configKey === "presetTilesFolder") {
 			return "General"
 		}
 		return "Other"

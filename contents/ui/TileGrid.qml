@@ -586,29 +586,30 @@ DropArea {
 					readonly property real rowTopPadding: Math.max(0, (height - headerRow.implicitHeight) / 2)
 					readonly property real separatorHeight: 2 / Screen.devicePixelRatio
 
-						Item {
-							id: headerRow
-							anchors.left: parent.left
-							anchors.right: parent.right
-							anchors.top: parent.top
-						anchors.leftMargin: parent.sidePadding
-						anchors.rightMargin: parent.sidePadding
-						anchors.topMargin: parent.rowTopPadding
-						implicitHeight: Math.max(titleLabel.implicitHeight, countLabel.implicitHeight)
-
-							QQC2.Label {
-								id: titleLabel
+							Item {
+								id: headerRow
 								anchors.left: parent.left
-								anchors.right: lineRect.left
-								anchors.verticalCenter: parent.verticalCenter
-								text: tile && tile.label ? tile.label : ""
-								font.pointSize: Kirigami.Theme.defaultFont.pointSize + 1
-								font.bold: true
-								font.capitalization: Font.AllUppercase
-								color: Kirigami.Theme.textColor
-								opacity: 0.72
-								elide: Text.ElideNone
-							}
+								anchors.right: parent.right
+								anchors.top: parent.top
+								anchors.leftMargin: parent.sidePadding
+								anchors.rightMargin: parent.sidePadding
+								anchors.topMargin: parent.rowTopPadding
+								implicitHeight: Math.max(titleLabel.implicitHeight, countLabel.implicitHeight)
+								readonly property real separatorSpacing: Kirigami.Units.largeSpacing
+
+								QQC2.Label {
+									id: titleLabel
+									anchors.left: parent.left
+									anchors.verticalCenter: parent.verticalCenter
+									width: Math.max(0, countLabel.x - headerRow.separatorSpacing - x)
+									text: tile && tile.label ? tile.label : ""
+									font.pointSize: Kirigami.Theme.defaultFont.pointSize + 1
+									font.bold: true
+									font.capitalization: Font.AllUppercase
+									color: Kirigami.Theme.textColor
+									opacity: 0.72
+									elide: Text.ElideRight
+								}
 
 						QQC2.Label {
 							id: countLabel
@@ -620,16 +621,16 @@ DropArea {
 							opacity: 0.38
 						}
 
-						Rectangle {
-							id: lineRect
-							anchors.left: titleLabel.right
-							anchors.right: countLabel.left
-							anchors.verticalCenter: parent.verticalCenter
-							anchors.leftMargin: Kirigami.Units.largeSpacing
-							anchors.rightMargin: Kirigami.Units.largeSpacing
-							height: parent.parent.separatorHeight
-							color: Kirigami.Theme.textColor
-							opacity: 0.14
+							Rectangle {
+								id: lineRect
+								anchors.left: titleLabel.right
+								anchors.right: countLabel.left
+								anchors.verticalCenter: parent.verticalCenter
+								anchors.leftMargin: headerRow.separatorSpacing
+								anchors.rightMargin: headerRow.separatorSpacing
+								height: parent.parent.separatorHeight
+								color: Kirigami.Theme.textColor
+								opacity: 0.14
 							visible: width > 0
 						}
 					}

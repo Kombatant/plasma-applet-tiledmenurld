@@ -152,10 +152,12 @@ Item {
 	}
 
 	function switchSidebarView(action) {
+		if (popup && typeof popup.saveCurrentViewSize === "function") {
+			popup.saveCurrentViewSize()
+		}
 		if (typeof action === "function") {
 			action()
 		}
-		autoResizeDebounce.restart()
 	}
 
 	SidebarMenu {

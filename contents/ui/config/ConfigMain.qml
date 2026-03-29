@@ -93,6 +93,30 @@ KCM.AbstractKCM {
     property var cfg_appListWidthDefault
     property var cfg_popupHeight
     property var cfg_popupHeightDefault
+    property var cfg_popupWidthAlphabetical
+    property var cfg_popupWidthAlphabeticalDefault
+    property var cfg_popupHeightAlphabetical
+    property var cfg_popupHeightAlphabeticalDefault
+    property var cfg_favGridColsAlphabetical
+    property var cfg_favGridColsAlphabeticalDefault
+    property var cfg_popupWidthCategories
+    property var cfg_popupWidthCategoriesDefault
+    property var cfg_popupHeightCategories
+    property var cfg_popupHeightCategoriesDefault
+    property var cfg_favGridColsCategories
+    property var cfg_favGridColsCategoriesDefault
+    property var cfg_popupWidthTilesOnly
+    property var cfg_popupWidthTilesOnlyDefault
+    property var cfg_popupHeightTilesOnly
+    property var cfg_popupHeightTilesOnlyDefault
+    property var cfg_favGridColsTilesOnly
+    property var cfg_favGridColsTilesOnlyDefault
+    property var cfg_popupWidthAiChat
+    property var cfg_popupWidthAiChatDefault
+    property var cfg_popupHeightAiChat
+    property var cfg_popupHeightAiChatDefault
+    property var cfg_favGridColsAiChat
+    property var cfg_favGridColsAiChatDefault
     property var cfg_favGridCols
     property var cfg_favGridColsDefault
     property var cfg_sidebarButtonSize
@@ -119,7 +143,7 @@ KCM.AbstractKCM {
     property var cfg_aiChatHistoryDefault
     property var cfg_aiStreamChat
     property var cfg_aiStreamChatDefault
-    readonly property var _cfgKeys: ["icon", "fixedPanelIcon", "searchResultsGrouped", "searchDefaultFilters", "showRecentApps", "recentOrdering", "numRecentApps", "sidebarShortcuts", "defaultAppListView", "aiProvider", "aiApiKey", "aiOllamaUrl", "aiOpenWebUiUrl", "aiModel", "aiDetectedModels", "aiChatHistory", "aiStreamChat", "terminalApp", "taskManagerApp", "fileManagerApp", "tileModel", "tileScale", "tileIconSize", "tileMargin", "tilesLocked", "defaultTileColor", "defaultTileGradient", "sidebarBackgroundColor", "hideSearchField", "searchOnTop", "searchFieldFollowsTheme", "sidebarFollowsTheme", "tileLabelAlignment", "groupLabelAlignment", "showGroupTileNameBorder", "presetTilesFolder", "appDescription", "appListIconSize", "searchFieldHeight", "appListWidth", "popupHeight", "favGridCols", "sidebarButtonSize", "sidebarIconSize", "sidebarPosition", "tileRoundedCorners", "tileCornerRadius", "tileAnimatedPlayOnHover", "showTileTooltips"]
+    readonly property var _cfgKeys: ["icon", "fixedPanelIcon", "searchResultsGrouped", "searchDefaultFilters", "showRecentApps", "recentOrdering", "numRecentApps", "sidebarShortcuts", "defaultAppListView", "aiProvider", "aiApiKey", "aiOllamaUrl", "aiOpenWebUiUrl", "aiModel", "aiDetectedModels", "aiChatHistory", "aiStreamChat", "terminalApp", "taskManagerApp", "fileManagerApp", "tileModel", "tileScale", "tileIconSize", "tileMargin", "tilesLocked", "defaultTileColor", "defaultTileGradient", "sidebarBackgroundColor", "hideSearchField", "searchOnTop", "searchFieldFollowsTheme", "sidebarFollowsTheme", "tileLabelAlignment", "groupLabelAlignment", "showGroupTileNameBorder", "presetTilesFolder", "appDescription", "appListIconSize", "searchFieldHeight", "appListWidth", "popupHeight", "popupWidthAlphabetical", "popupHeightAlphabetical", "favGridColsAlphabetical", "popupWidthCategories", "popupHeightCategories", "favGridColsCategories", "popupWidthTilesOnly", "popupHeightTilesOnly", "favGridColsTilesOnly", "popupWidthAiChat", "popupHeightAiChat", "favGridColsAiChat", "favGridCols", "sidebarButtonSize", "sidebarIconSize", "sidebarPosition", "tileRoundedCorners", "tileCornerRadius", "tileAnimatedPlayOnHover", "showTileTooltips"]
     // Make the initial config window a bit wider so pages lay out cleanly.
     // Do not force shrink: respect user resizing after open.
     readonly property int wideModeMinWidth: Kirigami.Units.gridUnit * 40
