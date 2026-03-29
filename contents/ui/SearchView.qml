@@ -80,7 +80,7 @@ Item {
 	}
 
 	function saveCurrentSizeMemoryViewBeforeSwitch() {
-		if (popup && typeof popup.saveCurrentViewSize === "function") {
+		if (popup && popup._sizeRestored && plasmoid.expanded && typeof popup.saveCurrentViewSize === "function") {
 			popup.saveCurrentViewSize()
 		}
 	}
@@ -118,6 +118,7 @@ Item {
 	}
 
 	function showDefaultView() {
+		setActiveSizeMemoryView(resolveConfiguredDefaultView())
 		openView(resolveConfiguredDefaultView())
 	}
 

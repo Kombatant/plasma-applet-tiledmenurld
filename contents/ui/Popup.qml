@@ -50,16 +50,20 @@ MouseArea {
 	property alias tileEditorViewLoader: searchView.tileEditorViewLoader
 	property alias tileGrid: tileGrid
 	property var aiChatModel
+	property real _lastKnownDevicePixelRatio: 1
+	property real _lastRestoreDevicePixelRatio: 0
+	property bool _pendingDprSyncRestore: false
 
-	function logSizeMemory(label, data) {
-		if (!logger.showDebug) {
-			return
+	function effectiveDevicePixelRatio() {
+		var screenDpr = Screen.devicePixelRatio || 0
+		if (screenDpr > 0) {
+			return screenDpr
 		}
-		try {
-			logger.log(label, JSON.stringify(data))
-		} catch (e) {
-			logger.log(label, data)
+		var kirigamiDpr = Kirigami.Units.devicePixelRatio || 0
+		if (kirigamiDpr > 0) {
+			return kirigamiDpr
 		}
+		return 1
 	}
 
 	function normalizedSizeMemoryView(viewName) {
@@ -97,18 +101,6 @@ MouseArea {
 		if (cols > 0 && plasmoid.configuration[keys.cols] !== cols) {
 			plasmoid.configuration[keys.cols] = cols
 		}
-		logSizeMemory("sizeMemory:save", {
-			view: normalizedView,
-			widthKey: keys.width,
-			width: width,
-			heightKey: keys.height,
-			height: height,
-			colsKey: keys.cols,
-			cols: cols,
-			popupWidth: popup.width,
-			popupHeight: popup.height,
-			activeView: currentSizeMemoryView(),
-		})
 	}
 
 	function saveCurrentViewSize() {
@@ -116,10 +108,16 @@ MouseArea {
 			return
 		}
 
-		var dpr = Screen.devicePixelRatio || 1
-		var logicalWidth = Math.round(popup.width / dpr)
-		var logicalHeight = Math.round(popup.height / dpr)
-		var favWidth = Math.max(0, popup.width - config.leftSectionWidth)
+		var dpr = effectiveDevicePixelRatio()
+		if (popup._sizeRestored && popup._lastRestoreDevicePixelRatio > 0 && Math.abs(dpr - popup._lastRestoreDevicePixelRatio) > 0.01) {
+			popup.scheduleDprSyncRestore()
+			return
+		}
+		var effectiveWidth = popup.Layout.preferredWidth > 0 ? popup.Layout.preferredWidth : popup.width
+		var effectiveHeight = popup.Layout.preferredHeight > 0 ? popup.Layout.preferredHeight : popup.height
+		var logicalWidth = Math.round(effectiveWidth / dpr)
+		var logicalHeight = Math.round(effectiveHeight / dpr)
+		var favWidth = Math.max(0, effectiveWidth - config.leftSectionWidth)
 		var box = config.cellBoxSize
 		var cols = box > 0 ? Math.max(1, Math.floor(favWidth / box)) : 0
 
@@ -129,17 +127,6 @@ MouseArea {
 		if (cols > 0 && plasmoid.configuration.favGridCols !== cols) {
 			plasmoid.configuration.favGridCols = cols
 		}
-
-		logSizeMemory("sizeMemory:saveCurrent", {
-			view: currentSizeMemoryView(),
-			logicalWidth: logicalWidth,
-			logicalHeight: logicalHeight,
-			cols: cols,
-			popupWidth: popup.width,
-			popupHeight: popup.height,
-			leftSectionWidth: config.leftSectionWidth,
-			cellBoxSize: box,
-		})
 		saveSizeForView(currentSizeMemoryView(), logicalWidth, logicalHeight, cols)
 	}
 
@@ -169,24 +156,16 @@ MouseArea {
 		if (savedCols > 0 && plasmoid.configuration.favGridCols !== savedCols) {
 			plasmoid.configuration.favGridCols = savedCols
 		}
-
-		logSizeMemory("sizeMemory:restore", {
-			requestedView: viewName,
-			view: normalizedView,
-			widthKey: keys.width,
-			savedWidth: savedWidth,
-			heightKey: keys.height,
-			savedHeight: savedHeight,
-			colsKey: keys.cols,
-			savedCols: savedCols,
-			configPopupHeight: plasmoid.configuration.popupHeight,
-			configFavGridCols: plasmoid.configuration.favGridCols,
-		})
 		popup.applySavedSize(savedWidth, savedHeight)
 	}
 
 	function restoreRememberedSizeForCurrentView() {
 		restoreRememberedSizeForView(currentSizeMemoryView())
+	}
+
+	function scheduleDprSyncRestore() {
+		popup._pendingDprSyncRestore = true
+		dprSyncDebounced.restart()
 	}
 
 	function normalizeGroupHeaderHeights() {
@@ -330,6 +309,7 @@ MouseArea {
 			targetGridHeight: targetGridHeight,
 			targetWidth: targetWidth,
 			targetHeight: targetHeight,
+			devicePixelRatio: dpr,
 			logicalHeight: logicalHeight,
 			logicalWidth: logicalWidth,
 		})
@@ -419,7 +399,7 @@ MouseArea {
 		if (!config) {
 			return
 		}
-		var dpr = Screen.devicePixelRatio || 1
+		var dpr = effectiveDevicePixelRatio()
 		var targetWidth = (targetWidthLogical > 0 ? targetWidthLogical : Math.round(config.popupWidth / dpr)) * dpr
 		var targetHeight = (targetHeightLogical > 0 ? targetHeightLogical : plasmoid.configuration.popupHeight) * dpr
 		if (!(targetWidth > 0 && targetHeight > 0)) {
@@ -428,6 +408,7 @@ MouseArea {
 
 		var previousMinW = popup.Layout.minimumWidth
 		var previousMinH = popup.Layout.minimumHeight
+		popup._lastRestoreDevicePixelRatio = dpr
 		popup._suppressPersist = true
 		popup.Layout.preferredWidth = targetWidth
 		popup.Layout.preferredHeight = targetHeight
@@ -439,27 +420,9 @@ MouseArea {
 		popup.height = targetHeight
 		popup.implicitWidth = targetWidth
 		popup.implicitHeight = targetHeight
-		logSizeMemory("sizeMemory:applySavedSize", {
-			view: currentSizeMemoryView(),
-			targetWidth: targetWidth,
-			targetHeight: targetHeight,
-			configPopupHeight: plasmoid.configuration.popupHeight,
-			configFavGridCols: plasmoid.configuration.favGridCols,
-		})
 		Qt.callLater(function() {
 			popup.width = targetWidth
 			popup.height = targetHeight
-			logSizeMemory("sizeMemory:applySavedSizePost", {
-				view: currentSizeMemoryView(),
-				popupWidth: popup.width,
-				popupHeight: popup.height,
-				layoutPrefW: popup.Layout.preferredWidth,
-				layoutPrefH: popup.Layout.preferredHeight,
-				layoutMinW: popup.Layout.minimumWidth,
-				layoutMinH: popup.Layout.minimumHeight,
-				layoutMaxW: popup.Layout.maximumWidth,
-				layoutMaxH: popup.Layout.maximumHeight,
-			})
 			Qt.callLater(function() {
 				popup.Layout.maximumWidth = -1
 				popup.Layout.maximumHeight = -1
@@ -467,17 +430,10 @@ MouseArea {
 				popup.Layout.minimumHeight = previousMinH
 				popup._suppressPersist = false
 				popup._sizeRestored = true
-				logSizeMemory("sizeMemory:applySavedSizeRelease", {
-					view: currentSizeMemoryView(),
-					popupWidth: popup.width,
-					popupHeight: popup.height,
-					layoutPrefW: popup.Layout.preferredWidth,
-					layoutPrefH: popup.Layout.preferredHeight,
-					layoutMinW: popup.Layout.minimumWidth,
-					layoutMinH: popup.Layout.minimumHeight,
-					layoutMaxW: popup.Layout.maximumWidth,
-					layoutMaxH: popup.Layout.maximumHeight,
-				})
+				var currentDpr = effectiveDevicePixelRatio()
+				if (Math.abs(currentDpr - popup._lastRestoreDevicePixelRatio) > 0.01) {
+					popup.scheduleDprSyncRestore()
+				}
 			})
 		})
 	}
@@ -537,19 +493,49 @@ MouseArea {
 			popup._pendingEditSidebarResize = false
 		}
 	}
+	Timer {
+		id: dprSyncDebounced
+		interval: 0
+		repeat: false
+		onTriggered: {
+			if (!config || !popup._pendingDprSyncRestore) {
+				return
+			}
+			popup._pendingDprSyncRestore = false
+			var currentDpr = popup.effectiveDevicePixelRatio()
+			popup._lastKnownDevicePixelRatio = currentDpr
+			popup.restoreRememberedSizeForCurrentView()
+		}
+	}
 	Component.onCompleted: {
 		enablePersistSize.start()
+		popup._lastKnownDevicePixelRatio = popup.effectiveDevicePixelRatio()
 		if (searchView && typeof searchView.setActiveSizeMemoryView === "function") {
-			searchView.setActiveSizeMemoryView(searchView.lastRememberedSizeMemoryView)
+			if (typeof searchView.resolveConfiguredDefaultView === "function") {
+				searchView.setActiveSizeMemoryView(searchView.resolveConfiguredDefaultView())
+			} else {
+				searchView.setActiveSizeMemoryView(searchView.lastRememberedSizeMemoryView)
+			}
 		}
 		if (plasmoid.expanded) {
 			popup.restoreRememberedSizeForCurrentView()
+		}
+	}
+	Screen.onDevicePixelRatioChanged: {
+		var currentDpr = popup.effectiveDevicePixelRatio()
+		if (Math.abs(currentDpr - popup._lastKnownDevicePixelRatio) > 0.01) {
+			popup._lastKnownDevicePixelRatio = currentDpr
+			popup.scheduleDprSyncRestore()
 		}
 	}
 	// Watch plasmoid.expanded via a bound property instead of Connections
 	property bool plasmoidExpanded: (plasmoid && typeof plasmoid.expanded !== "undefined") ? plasmoid.expanded : false
 	onPlasmoidExpandedChanged: {
 		if (plasmoidExpanded) {
+			popup._lastKnownDevicePixelRatio = popup.effectiveDevicePixelRatio()
+			if (searchView && typeof searchView.setActiveSizeMemoryView === "function" && typeof searchView.resolveConfiguredDefaultView === "function") {
+				searchView.setActiveSizeMemoryView(searchView.resolveConfiguredDefaultView())
+			}
 			popup.restoreRememberedSizeForCurrentView()
 		}
 	}
