@@ -434,6 +434,30 @@ DropArea {
 	QQC2.ScrollView {
 		id: scrollView
 		anchors.fill: parent
+		background: Item {}
+		clip: true
+		contentWidth: scrollItem.width
+		contentHeight: scrollItem.height
+		QQC2.ScrollBar.horizontal.policy: QQC2.ScrollBar.AlwaysOff
+		QQC2.ScrollBar.vertical: QQC2.ScrollBar {
+			parent: scrollView
+			anchors.top: scrollView.top
+			anchors.bottom: scrollView.bottom
+			anchors.right: scrollView.right
+			implicitWidth: 6
+			width: 6
+			padding: 0
+			policy: QQC2.ScrollBar.AsNeeded
+			background: Item { implicitWidth: 6 }
+			contentItem: Rectangle {
+				implicitWidth: 4
+				width: 4
+				radius: width / 2
+				color: Kirigami.Theme.textColor
+				opacity: parent.pressed ? 0.6 : parent.hovered ? 0.4 : 0.25
+				Behavior on opacity { NumberAnimation { duration: 120 } }
+			}
+		}
 		// Flickable becomes available after component creation; guard lookups.
 		readonly property var flickableItem: contentItem ? contentItem : null
 		readonly property var viewport: flickableItem ? flickableItem.contentItem : null
@@ -640,6 +664,30 @@ DropArea {
 					}
 				}
 			}
+		}
+
+	}
+
+	// Tile delegates use MouseAreas for clicks and dragging. Handle wheel input
+	// at the tile-area level so scrolling works anywhere over the grid.
+	WheelHandler {
+		id: tileGridWheelHandler
+		target: null
+		orientation: Qt.Vertical
+		acceptedDevices: PointerDevice.Mouse | PointerDevice.TouchPad
+		onWheel: function(event) {
+			var dy = 0
+			if (event.pixelDelta && event.pixelDelta.y) {
+				dy = event.pixelDelta.y
+			} else if (event.angleDelta && event.angleDelta.y) {
+				dy = (event.angleDelta.y / 120) * (Kirigami.Units.gridUnit * 3)
+			}
+			if (dy === 0) {
+				return
+			}
+
+			scrollView.scrollBy(-dy)
+			event.accepted = true
 		}
 	}
 

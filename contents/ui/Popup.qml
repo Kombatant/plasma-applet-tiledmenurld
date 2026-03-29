@@ -121,6 +121,15 @@ MouseArea {
 		var box = config.cellBoxSize
 		var cols = box > 0 ? Math.max(1, Math.floor(favWidth / box)) : 0
 
+		if (effectiveWidth > 0) {
+			popup.Layout.preferredWidth = effectiveWidth
+			popup.implicitWidth = effectiveWidth
+		}
+		if (effectiveHeight > 0) {
+			popup.Layout.preferredHeight = effectiveHeight
+			popup.implicitHeight = effectiveHeight
+		}
+
 		if (logicalHeight > 0 && plasmoid.configuration.popupHeight !== logicalHeight) {
 			plasmoid.configuration.popupHeight = logicalHeight
 		}
@@ -567,11 +576,17 @@ MouseArea {
 
 	onWidthChanged: {
 		if (popup._persistSizeEnabled) {
+			if (!popup._suppressPersist && plasmoid.expanded && popup._sizeRestored) {
+				popup.saveCurrentViewSize()
+			}
 			persistSizeDebounced.restart()
 		}
 	}
 	onHeightChanged: {
 		if (popup._persistSizeEnabled) {
+			if (!popup._suppressPersist && plasmoid.expanded && popup._sizeRestored) {
+				popup.saveCurrentViewSize()
+			}
 			persistSizeDebounced.restart()
 		}
 	}
