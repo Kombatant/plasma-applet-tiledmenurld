@@ -248,6 +248,25 @@ DropArea {
 		canDrop = !hits(dropHoverX, dropHoverY, dropWidth, dropHeight)
 	}
 
+	function countGroupTiles(groupTile) {
+		if (!groupTile || groupTile.tileType !== "group") {
+			return 0
+		}
+
+		var area = getGroupAreaRect(groupTile)
+		var count = 0
+		for (var i = 0; i < tileModel.length; i++) {
+			var tile = tileModel[i]
+			if (!tile || tile === groupTile || tile.tileType === "group") {
+				continue
+			}
+			if (tileWithin(tile, area.x1, area.y1, area.x2, area.y2)) {
+				count += 1
+			}
+		}
+		return count
+	}
+
 	property var hitBox: [] // hitBox[y][x]
 	function updateSize() {
 		var c = 0;
@@ -547,26 +566,72 @@ DropArea {
 				
 			}
 
-			// Draw group header separators above all tiles so they cannot be hidden
-			// by sub-pixel overlap or neighboring items.
+			// Draw styled group headers above all tiles so they cannot be hidden by
+			// sub-pixel overlap or neighboring items.
 			Repeater {
 				id: groupHeaderSeparatorRepeater
 				model: 0
-				Rectangle {
+				Item {
 					readonly property var tile: modelData
+					readonly property int itemCount: tileGrid.countGroupTiles(tile)
 					visible: plasmoid.configuration.showGroupTileNameBorder && tile && tile.tileType === "group"
 					z: 10000
-					color: Kirigami.Theme.textColor
-					opacity: 0.25
-					// 2 physical pixels for improved visibility.
-					readonly property real separatorHeight: 2 / Screen.devicePixelRatio
-					height: separatorHeight
 					x: (tile ? tile.x : 0) * cellBoxSize + _holoPad
 					width: (tile ? tile.w : 0) * cellBoxSize
 					readonly property int headerH: (tile && typeof tile.h !== "undefined") ? tile.h : 1
-					y: {
-						var bottom = ((tile ? tile.y : 0) + headerH) * cellBoxSize + _holoPad
-						return Math.round((bottom - separatorHeight) * Screen.devicePixelRatio) / Screen.devicePixelRatio
+					height: headerH * cellBoxSize
+					y: (tile ? tile.y : 0) * cellBoxSize + _holoPad
+
+					readonly property real sidePadding: Kirigami.Units.smallSpacing
+					readonly property real rowTopPadding: Math.max(0, (height - headerRow.implicitHeight) / 2)
+					readonly property real separatorHeight: 2 / Screen.devicePixelRatio
+
+						Item {
+							id: headerRow
+							anchors.left: parent.left
+							anchors.right: parent.right
+							anchors.top: parent.top
+						anchors.leftMargin: parent.sidePadding
+						anchors.rightMargin: parent.sidePadding
+						anchors.topMargin: parent.rowTopPadding
+						implicitHeight: Math.max(titleLabel.implicitHeight, countLabel.implicitHeight)
+
+							QQC2.Label {
+								id: titleLabel
+								anchors.left: parent.left
+								anchors.right: lineRect.left
+								anchors.verticalCenter: parent.verticalCenter
+								text: tile && tile.label ? tile.label : ""
+								font.pointSize: Kirigami.Theme.defaultFont.pointSize + 1
+								font.bold: true
+								font.capitalization: Font.AllUppercase
+								color: Kirigami.Theme.textColor
+								opacity: 0.72
+								elide: Text.ElideNone
+							}
+
+						QQC2.Label {
+							id: countLabel
+							anchors.right: parent.right
+							anchors.verticalCenter: parent.verticalCenter
+							text: i18np("%1 app", "%1 apps", parent.parent.itemCount)
+							font.pointSize: Kirigami.Theme.defaultFont.pointSize
+							color: Kirigami.Theme.textColor
+							opacity: 0.38
+						}
+
+						Rectangle {
+							id: lineRect
+							anchors.left: titleLabel.right
+							anchors.right: countLabel.left
+							anchors.verticalCenter: parent.verticalCenter
+							anchors.leftMargin: Kirigami.Units.largeSpacing
+							anchors.rightMargin: Kirigami.Units.largeSpacing
+							height: parent.parent.separatorHeight
+							color: Kirigami.Theme.textColor
+							opacity: 0.14
+							visible: width > 0
+						}
 					}
 				}
 			}

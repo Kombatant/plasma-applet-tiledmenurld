@@ -36,6 +36,7 @@ Item {
 	readonly property string tileTooltipText: (appObj.labelText || "").trim()
 	readonly property real descriptionSpacing: cellMargin
 	readonly property bool useOverlayLabel: !!appObj.backgroundImage
+	readonly property bool useStyledGroupHeader: appObj.isGroup && plasmoid && plasmoid.configuration && plasmoid.configuration.showGroupTileNameBorder
 	readonly property real labelPaddingX: cellMargin + (6 * Screen.devicePixelRatio)
 	readonly property real labelPaddingY: cellMargin + (4 * Screen.devicePixelRatio)
 	readonly property real labelShadowOffset: Math.max(1, Math.round(1 * Screen.devicePixelRatio))
@@ -94,7 +95,7 @@ Item {
 
 		Item {
 			id: labelOverlay
-			visible: useOverlayLabel && appObj.showLabel && appObj.labelText.length > 0
+			visible: useOverlayLabel && !useStyledGroupHeader && appObj.showLabel && appObj.labelText.length > 0
 			anchors.left: parent.left
 			anchors.right: parent.right
 			anchors.bottom: parent.bottom
@@ -193,7 +194,7 @@ Item {
 		QQC2.Label {
 			id: descriptionLabelBelow
 			// Hide when inline label is used (wide single-row non-group tiles with label)
-			visible: !useOverlayLabel && appObj.showLabel && appObj.labelText.length > 0 && !tileItemView.useInlineLabel
+			visible: !useOverlayLabel && !useStyledGroupHeader && appObj.showLabel && appObj.labelText.length > 0 && !tileItemView.useInlineLabel
 			text: appObj.labelText
 			anchors.top: tileItemView.bottom
 			anchors.left: parent.left

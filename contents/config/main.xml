@@ -157,7 +157,7 @@
 			<default>left</default>
 		</entry>
 		<entry name="showGroupTileNameBorder" type="bool">
-			<label>Whether to show a separator line under the Group tile header.</label>
+			<label>Whether group headers use the plain style or the section header style.</label>
 			<default>true</default>
 		</entry>
 		<entry name="presetTilesFolder" type="string">

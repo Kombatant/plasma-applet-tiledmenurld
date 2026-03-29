@@ -18,15 +18,15 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: ../contents/ui/config/ConfigGeneral.qml
-msgid "Show border under Group Tile name"
+msgid "Group header style"
 msgstr "Εμφάνιση περιγράμματος κάτω από το όνομα της ομάδας"
 
 #: ../contents/ui/config/ConfigGeneral.qml
-msgid "Yes"
+msgid "Plain"
 msgstr "Ναι"
 
 #: ../contents/ui/config/ConfigGeneral.qml
-msgid "No"
+msgid "Section header"
 msgstr "Όχι"
 
 #: ../metadata.json

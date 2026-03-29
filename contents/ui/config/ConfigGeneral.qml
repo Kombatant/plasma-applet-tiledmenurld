@@ -216,10 +216,10 @@ LibConfig.FormKCM {
 	}
 	LibConfig.ComboBox {
 		configKey: "showGroupTileNameBorder"
-		Kirigami.FormData.label: i18n("Show border under Group Tile name")
+		Kirigami.FormData.label: i18n("Group header style")
 		model: [
-			{ value: true, text: i18n("Yes") },
-			{ value: false, text: i18n("No") },
+			{ value: false, text: i18n("Plain") },
+			{ value: true, text: i18n("Section header") },
 		]
 	}
 	RowLayout {

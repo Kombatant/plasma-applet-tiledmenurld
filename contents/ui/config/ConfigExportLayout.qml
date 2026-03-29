@@ -59,6 +59,8 @@ ColumnLayout {
 		sidebarFollowsTheme: "bool",
 		tileLabelAlignment: "string",
 		groupLabelAlignment: "string",
+		// Legacy bool key retained for import/export compatibility:
+		// false = Plain, true = Section header.
 		showGroupTileNameBorder: "bool",
 		presetTilesFolder: "string",
 		appDescription: "string",
@@ -143,6 +145,14 @@ ColumnLayout {
 		var keys = Object.keys(settingsSchema)
 		keys.sort()
 		return keys
+	}
+
+	function _tileScaleToPercent(scale) {
+		return Math.round((parseFloat(scale) || 0) * 250)
+	}
+
+	function _percentToTileScale(percent) {
+		return (parseFloat(percent) || 0) / 250
 	}
 
 	function _sectionForKey(configKey) {
@@ -334,7 +344,7 @@ ColumnLayout {
 
 		var lines = []
 		lines.push("<?xml version=\"1.0\" encoding=\"UTF-8\"?>")
-		lines.push("<tiledmenu format=\"tiled_rld\" version=\"1\">")
+		lines.push("<tiledmenu format=\"tiled_rld\" version=\"2\">")
 		var sectionOrder = ["General", "Application List", "Search", "AI Chat", "Sidebar", "Tiles", "Other"]
 		for (var si = 0; si < sectionOrder.length; si++) {
 			var sectionName = sectionOrder[si]
@@ -358,6 +368,8 @@ ColumnLayout {
 						lines.push("      <value>" + _escapeXml(list[li]) + "</value>")
 					}
 					lines.push("    </entry>")
+				} else if (k === "tileScale") {
+					lines.push("    <entry key=\"tileScale\" type=\"int\">" + _escapeXml(_tileScaleToPercent(item.value)) + "</entry>")
 				} else {
 					lines.push("    <entry key=\"" + _escapeXml(k) + "\" type=\"" + _escapeXml(t) + "\">" + _escapeXml(item.value) + "</entry>")
 				}
@@ -382,6 +394,11 @@ ColumnLayout {
 		_lastTileModelError = ""
 		var out = {}
 		var xml = (xmlText || "")
+		var rootMatch = /<tiledmenu\s+[^>]*version=\"([^\"]+)\"/.exec(xml)
+		var importVersion = rootMatch && rootMatch.length >= 2 ? parseInt(rootMatch[1], 10) : 1
+		if (isNaN(importVersion) || importVersion < 1) {
+			importVersion = 1
+		}
 		var reEntry = /<entry\s+[^>]*key=\"([^\"]+)\"[^>]*>([\s\S]*?)<\/entry>/g
 		var match
 		while ((match = reEntry.exec(xml)) !== null) {
@@ -404,7 +421,12 @@ ColumnLayout {
 					_lastImportError = _lastTileModelError
 				}
 			} else {
-				out[key] = _extractCdataOrText(inner)
+				var value = _extractCdataOrText(inner)
+				if (key === "tileScale" && importVersion >= 2) {
+					out[key] = _percentToTileScale(value)
+				} else {
+					out[key] = value
+				}
 			}
 		}
 		return out

@@ -19,15 +19,15 @@ msgstr ""
 "X-Generator: Poedit 2.3\n"
 
 #: ../contents/ui/config/ConfigGeneral.qml
-msgid "Show border under Group Tile name"
+msgid "Group header style"
 msgstr ""
 
 #: ../contents/ui/config/ConfigGeneral.qml
-msgid "Yes"
+msgid "Plain"
 msgstr ""
 
 #: ../contents/ui/config/ConfigGeneral.qml
-msgid "No"
+msgid "Section header"
 msgstr ""
 
 #: ../metadata.json
