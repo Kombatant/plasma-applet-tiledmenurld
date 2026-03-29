@@ -89,7 +89,7 @@
 			<default></default>
 		</entry>
 		<entry name="tileScale" type="double">
-			<default>0.8</default>
+			<default>0.4</default>
 		</entry>
 		<entry name="tileIconSize" type="int">
 			<label>Base icon size (px) used for tiles.</label>

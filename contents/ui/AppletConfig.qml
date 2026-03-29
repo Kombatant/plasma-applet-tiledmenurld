@@ -67,7 +67,7 @@ Item {
 
 		// Base64 encoded XML string; empty string means "use default".
 		_ensureSettingInitialized('tileModel', '')
-		_ensureSettingInitialized('tileScale', 0.8)
+		_ensureSettingInitialized('tileScale', 0.4)
 		_ensureSettingInitialized('tileIconSize', 72)
 		_ensureSettingInitialized('tileMargin', 12)
 		_ensureSettingInitialized('tileRoundedCorners', true)
@@ -212,7 +212,7 @@ Item {
 	readonly property int cellSize: Math.round(cellSizeUnits * tileScale * Screen.devicePixelRatio)
 	readonly property real cellMargin: cellMarginUnits * tileScale * Screen.devicePixelRatio
 	readonly property real cellPushedMargin: cellMargin * 2
-	readonly property int cellBoxSize: Math.round(cellMargin + cellSize + cellMargin)
+	readonly property int cellBoxSize: Math.max(1, Math.round(cellMargin + cellSize + cellMargin))
 	readonly property int tileGridWidth: plasmoid.configuration.favGridCols * cellBoxSize
 	readonly property int tileCornerRadius: Math.max(0, Math.round((plasmoid.configuration.tileRoundedCorners ? plasmoid.configuration.tileCornerRadius : 0) * Screen.devicePixelRatio))
 

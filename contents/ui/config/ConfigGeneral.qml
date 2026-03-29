@@ -12,6 +12,14 @@ import "../libconfig" as LibConfig
 LibConfig.FormKCM {
 	id: formLayout
 
+	function tileScaleToPercent(scale) {
+		return Math.round((scale || 0) * 250)
+	}
+
+	function percentToTileScale(percent) {
+		return percent / 250
+	}
+
 	readonly property string plasmaStyleLabelText: {
 		var plasmaStyleText = i18nd("kcm_desktoptheme", "Plasma Style")
 		return plasmaStyleText + ' (' + KSvg.ImageSet.imageSetName + ')'
@@ -60,13 +68,34 @@ LibConfig.FormKCM {
 	}
 
 	RowLayout {
+		id: tileSizeRow
 		Kirigami.FormData.label: i18n("Tile Size")
-		LibConfig.SpinBox {
-			configKey: 'tileScale'
-			suffix: 'x'
-			minimumValue: 0.1
-			maximumValue: 4
-			decimals: 1
+		Layout.fillWidth: true
+
+		QQC2.Slider {
+			id: tileSizeSlider
+			Layout.fillWidth: true
+			from: 0
+			to: 200
+			stepSize: 1
+			live: true
+			value: formLayout.tileScaleToPercent(plasmoid.configuration.tileScale)
+
+			onValueChanged: {
+				var scale = formLayout.percentToTileScale(value)
+				if ((pressed || activeFocus) && Math.abs((plasmoid.configuration.tileScale || 0) - scale) > 0.0001) {
+					plasmoid.configuration.tileScale = scale
+					return
+				}
+
+				var expectedValue = formLayout.tileScaleToPercent(plasmoid.configuration.tileScale)
+				if (!pressed && !activeFocus && Math.abs(value - expectedValue) > 0.5) {
+					value = expectedValue
+				}
+			}
+		}
+		QQC2.Label {
+			text: Math.round(tileSizeSlider.value) + "%"
 		}
 		QQC2.Label {
 			text: '' + config.cellBoxSize + i18n("px")
