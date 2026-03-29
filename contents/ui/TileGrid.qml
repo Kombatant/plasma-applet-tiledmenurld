@@ -596,12 +596,16 @@ DropArea {
 								anchors.topMargin: parent.rowTopPadding
 								implicitHeight: Math.max(titleLabel.implicitHeight, countLabel.implicitHeight)
 								readonly property real separatorSpacing: Kirigami.Units.largeSpacing
+								readonly property real minimumSeparatorWidth: Kirigami.Units.gridUnit * 2
 
 								QQC2.Label {
 									id: titleLabel
 									anchors.left: parent.left
 									anchors.verticalCenter: parent.verticalCenter
-									width: Math.max(0, countLabel.x - headerRow.separatorSpacing - x)
+									width: Math.min(
+										implicitWidth,
+										Math.max(0, headerRow.width - countLabel.width - (headerRow.separatorSpacing * 2) - headerRow.minimumSeparatorWidth)
+									)
 									text: tile && tile.label ? tile.label : ""
 									font.pointSize: Kirigami.Theme.defaultFont.pointSize + 1
 									font.bold: true

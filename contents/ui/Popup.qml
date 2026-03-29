@@ -325,8 +325,8 @@ MouseArea {
 		saveSizeForView(currentSizeMemoryView(), logicalWidth, logicalHeight, cols)
 
 		// Force the popup's layout hints to the computed size so the view actually resizes.
-		var previousMinW = popup.Layout.minimumWidth
-		var previousMinH = popup.Layout.minimumHeight
+		var restoreMinW = config.minimumWidth
+		var restoreMinH = config.minimumHeight
 		popup.Layout.preferredWidth = targetWidth
 		popup.Layout.preferredHeight = targetHeight
 		popup.Layout.minimumWidth = targetWidth
@@ -356,8 +356,8 @@ MouseArea {
 			Qt.callLater(function() {
 					popup.Layout.maximumWidth = -1
 					popup.Layout.maximumHeight = -1
-					popup.Layout.minimumWidth = previousMinW
-					popup.Layout.minimumHeight = previousMinH
+					popup.Layout.minimumWidth = restoreMinW
+					popup.Layout.minimumHeight = restoreMinH
 				logObj('autoResize:releaseLimits', {
 					layoutPrefW: popup.Layout.preferredWidth,
 					layoutPrefH: popup.Layout.preferredHeight,
@@ -406,8 +406,8 @@ MouseArea {
 			return
 		}
 
-		var previousMinW = popup.Layout.minimumWidth
-		var previousMinH = popup.Layout.minimumHeight
+		var restoreMinW = config.minimumWidth
+		var restoreMinH = config.minimumHeight
 		popup._lastRestoreDevicePixelRatio = dpr
 		popup._suppressPersist = true
 		popup.Layout.preferredWidth = targetWidth
@@ -426,8 +426,8 @@ MouseArea {
 			Qt.callLater(function() {
 				popup.Layout.maximumWidth = -1
 				popup.Layout.maximumHeight = -1
-				popup.Layout.minimumWidth = previousMinW
-				popup.Layout.minimumHeight = previousMinH
+				popup.Layout.minimumWidth = restoreMinW
+				popup.Layout.minimumHeight = restoreMinH
 				popup._suppressPersist = false
 				popup._sizeRestored = true
 				var currentDpr = effectiveDevicePixelRatio()
@@ -448,7 +448,7 @@ MouseArea {
 			return
 		}
 
-		var previousMinW = popup.Layout.minimumWidth
+		var restoreMinW = config.minimumWidth
 		popup.Layout.preferredWidth = targetWidth
 		popup.Layout.minimumWidth = targetWidth
 		popup.Layout.maximumWidth = targetWidth
@@ -459,7 +459,7 @@ MouseArea {
 			popup.width = targetWidth
 			Qt.callLater(function() {
 				popup.Layout.maximumWidth = -1
-				popup.Layout.minimumWidth = previousMinW
+				popup.Layout.minimumWidth = restoreMinW
 			})
 		})
 	}
