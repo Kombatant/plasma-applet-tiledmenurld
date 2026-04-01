@@ -171,6 +171,46 @@ Item {
 		serialize()
 	}
 
+	function removeItem(str) {
+		var target = ("" + str).trim()
+		if (!target.length) {
+			return false
+		}
+		for (var i = 0; i < listModel.count; i++) {
+			if (listModel.get(i).value !== target) {
+				continue
+			}
+			if (i === pendingIndex) {
+				pendingIndex = -1
+				inputValid = true
+				validationMessage = ""
+			} else if (pendingIndex > i) {
+				pendingIndex--
+			}
+			listModel.remove(i)
+			var nextIndex = Math.min(i, listModel.count - 1)
+			listView.currentIndex = nextIndex
+			entryField.text = currentValue
+			serialize()
+			return true
+		}
+		return false
+	}
+
+	function toggleItem(str) {
+		var target = transformInput(str)
+		if (!target.length) {
+			return false
+		}
+		if (removeItem(target)) {
+			return false
+		}
+		prepend(target)
+		selectItem(target)
+		entryField.text = target
+		return true
+	}
+
 	function clearSelection() {
 		listView.currentIndex = -1
 	}

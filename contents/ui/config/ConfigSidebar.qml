@@ -372,10 +372,7 @@ LibConfig.FormKCM {
 			}
 
 			function addUrl(str) {
-				if (!hasItem(str)) {
-					prepend(str)
-				}
-				selectItem(str)
+				toggleItem(str)
 			}
 		}
 
@@ -407,36 +404,50 @@ LibConfig.FormKCM {
 
 						QQC2.ToolButton {
 							icon.name: "folder-documents-symbolic"
+							checkable: true
+							checked: sidebarShortcuts.hasItem('xdg:DOCUMENTS')
 							text: i18nd("xdg-user-dirs", "Documents")
 							onClicked: sidebarShortcuts.addUrl('xdg:DOCUMENTS')
 						}
 						QQC2.ToolButton {
 							icon.name: "folder-download-symbolic"
+							checkable: true
+							checked: sidebarShortcuts.hasItem('xdg:DOWNLOAD')
 							text: i18nd("xdg-user-dirs", "Download")
 							onClicked: sidebarShortcuts.addUrl('xdg:DOWNLOAD')
 						}
 						QQC2.ToolButton {
 							icon.name: "folder-music-symbolic"
+							checkable: true
+							checked: sidebarShortcuts.hasItem('xdg:MUSIC')
 							text: i18nd("xdg-user-dirs", "Music")
 							onClicked: sidebarShortcuts.addUrl('xdg:MUSIC')
 						}
 						QQC2.ToolButton {
 							icon.name: "folder-pictures-symbolic"
+							checkable: true
+							checked: sidebarShortcuts.hasItem('xdg:PICTURES')
 							text: i18nd("xdg-user-dirs", "Pictures")
 							onClicked: sidebarShortcuts.addUrl('xdg:PICTURES')
 						}
 						QQC2.ToolButton {
 							icon.name: "folder-videos-symbolic"
+							checkable: true
+							checked: sidebarShortcuts.hasItem('xdg:VIDEOS')
 							text: i18nd("xdg-user-dirs", "Videos")
 							onClicked: sidebarShortcuts.addUrl('xdg:VIDEOS')
 						}
 						QQC2.ToolButton {
 							icon.name: "folder-open-symbolic"
+							checkable: true
+							checked: sidebarShortcuts.hasItem('org.kde.dolphin.desktop')
 							text: i18nd("dolphin", "Dolphin")
 							onClicked: sidebarShortcuts.addUrl('org.kde.dolphin.desktop')
 						}
 						QQC2.ToolButton {
 							icon.name: "configure"
+							checkable: true
+							checked: sidebarShortcuts.hasItem('systemsettings.desktop')
 							text: i18nd("systemsettings", "System Settings")
 							onClicked: sidebarShortcuts.addUrl('systemsettings.desktop')
 						}
