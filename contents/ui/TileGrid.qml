@@ -620,28 +620,32 @@ DropArea {
 								implicitHeight: Math.max(titleLabel.implicitHeight, countLabel.implicitHeight)
 								readonly property real separatorSpacing: Kirigami.Units.largeSpacing
 								readonly property real minimumSeparatorWidth: Kirigami.Units.gridUnit * 2
+								readonly property bool reversed: plasmoid.configuration.groupLabelAlignment === "right"
+								readonly property real countWidth: countLabel.implicitWidth
+								readonly property real titleWidth: Math.min(
+									titleLabel.implicitWidth,
+									Math.max(0, headerRow.width - countWidth - (separatorSpacing * 2) - minimumSeparatorWidth)
+								)
 
 								QQC2.Label {
 									id: titleLabel
-									anchors.left: parent.left
-									anchors.verticalCenter: parent.verticalCenter
-									width: Math.min(
-										implicitWidth,
-										Math.max(0, headerRow.width - countLabel.width - (headerRow.separatorSpacing * 2) - headerRow.minimumSeparatorWidth)
-									)
+									x: headerRow.reversed ? headerRow.width - width : 0
+									y: (parent.height - height) / 2
+									width: headerRow.titleWidth
 									text: tile && tile.label ? tile.label : ""
 									font.pointSize: Kirigami.Theme.defaultFont.pointSize + 1
 									font.bold: true
 									font.capitalization: Font.AllUppercase
 									color: Kirigami.Theme.textColor
 									opacity: 0.72
-									elide: Text.ElideRight
+									horizontalAlignment: headerRow.reversed ? Text.AlignRight : Text.AlignLeft
+									elide: headerRow.reversed ? Text.ElideLeft : Text.ElideRight
 								}
 
 						QQC2.Label {
 							id: countLabel
-							anchors.right: parent.right
-							anchors.verticalCenter: parent.verticalCenter
+							x: headerRow.reversed ? 0 : headerRow.width - width
+							y: (parent.height - height) / 2
 							text: i18np("%1 app", "%1 apps", parent.parent.itemCount)
 							font.pointSize: Kirigami.Theme.defaultFont.pointSize
 							color: Kirigami.Theme.textColor
@@ -650,15 +654,17 @@ DropArea {
 
 							Rectangle {
 								id: lineRect
-								anchors.left: titleLabel.right
-								anchors.right: countLabel.left
-								anchors.verticalCenter: parent.verticalCenter
-								anchors.leftMargin: headerRow.separatorSpacing
-								anchors.rightMargin: headerRow.separatorSpacing
+								x: headerRow.reversed
+									? countLabel.x + countLabel.width + headerRow.separatorSpacing
+									: titleLabel.x + titleLabel.width + headerRow.separatorSpacing
+								y: (parent.height - height) / 2
+								width: headerRow.reversed
+									? Math.max(0, titleLabel.x - x - headerRow.separatorSpacing)
+									: Math.max(0, countLabel.x - x - headerRow.separatorSpacing)
 								height: parent.parent.separatorHeight
 								color: Kirigami.Theme.textColor
 								opacity: 0.14
-							visible: width > 0
+								visible: width > 0
 						}
 					}
 				}

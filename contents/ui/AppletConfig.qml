@@ -88,6 +88,9 @@ Item {
 		_ensureSettingInitialized('sidebarFollowsTheme', false)
 		_ensureSettingInitialized('tileLabelAlignment', 'left')
 		_ensureSettingInitialized('groupLabelAlignment', 'left')
+		if (plasmoid.configuration.groupLabelAlignment === 'center') {
+			plasmoid.configuration.groupLabelAlignment = 'left'
+		}
 		_ensureSettingInitialized('showGroupTileNameBorder', true)
 		_ensureSettingInitialized('presetTilesFolder', '')
 		_ensureSettingInitialized('appDescription', 'after')
@@ -299,9 +302,7 @@ Item {
 	}
 	readonly property int groupLabelAlignment: {
 		var val = plasmoid.configuration.groupLabelAlignment
-		if (val === 'center') {
-			return Text.AlignHCenter
-		} else if (val === 'right') {
+		if (val === 'right') {
 			return Text.AlignRight
 		} else { // left
 			return Text.AlignLeft

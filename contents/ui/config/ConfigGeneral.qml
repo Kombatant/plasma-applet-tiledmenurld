@@ -241,7 +241,6 @@ LibConfig.FormKCM {
 		Kirigami.FormData.label: i18n("Group Text Alignment")
 		model: [
 			{ value: "left", text: i18n("Left") },
-			{ value: "center", text: i18n("Centre") },
 			{ value: "right", text: i18n("Right") },
 		]
 	}
