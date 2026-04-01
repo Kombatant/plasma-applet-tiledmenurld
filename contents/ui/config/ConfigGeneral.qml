@@ -13,12 +13,16 @@ import "../libconfig" as LibConfig
 LibConfig.FormKCM {
 	id: formLayout
 
-	function tileScaleToPercent(scale) {
-		return Math.round((scale || 0) * 250)
+	function tileScaleToAbsoluteSize(scale) {
+		return Math.round((scale || 0) * 160)
 	}
 
-	function percentToTileScale(percent) {
-		return percent / 250
+	function absoluteSizeToTileScale(size) {
+		return size / 160
+	}
+
+	function absoluteSizeToPercent(size) {
+		return Math.round((size / 64) * 100)
 	}
 
 	function getRootKcm() {
@@ -117,19 +121,19 @@ LibConfig.FormKCM {
 		QQC2.Slider {
 			id: tileSizeSlider
 			Layout.fillWidth: true
-			from: 0
-			to: 200
+			from: 32
+			to: 128
 			stepSize: 1
 			live: true
-			value: formLayout.tileScaleToPercent(formLayout.pendingTileScale)
+			value: formLayout.tileScaleToAbsoluteSize(formLayout.pendingTileScale)
 
-			onMoved: formLayout.setPendingTileScale(formLayout.percentToTileScale(value))
+			onMoved: formLayout.setPendingTileScale(formLayout.absoluteSizeToTileScale(value))
 		}
 		QQC2.Label {
-			text: Math.round(tileSizeSlider.value) + "%"
+			text: Math.round(tileSizeSlider.value) + i18n("px")
 		}
 		QQC2.Label {
-			text: '' + formLayout.pendingCellBoxSize + i18n("px")
+			text: '(' + formLayout.absoluteSizeToPercent(tileSizeSlider.value) + "%)"
 		}
 	}
 	RowLayout {
