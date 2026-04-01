@@ -94,7 +94,7 @@ Rectangle {
 	gradient: appObj.backgroundGradient ? tileGradient.createObject(tileItemView) : null
 
 	readonly property real tilePadding: 4 * Screen.devicePixelRatio
-	readonly property real iconBaseSize: (plasmoid && plasmoid.configuration && plasmoid.configuration.tileIconSize ? plasmoid.configuration.tileIconSize : 72) * Screen.devicePixelRatio
+	readonly property real iconBaseSize: (plasmoid && plasmoid.configuration && plasmoid.configuration.tileIconSize ? plasmoid.configuration.tileIconSize : 32) * Screen.devicePixelRatio
 	readonly property real smallIconSize: Math.max(16 * Screen.devicePixelRatio, Math.round(iconBaseSize * 0.45))
 	readonly property real mediumIconSize: Math.max(16 * Screen.devicePixelRatio, Math.round(iconBaseSize))
 	readonly property real largeIconSize: Math.max(16 * Screen.devicePixelRatio, Math.round(iconBaseSize * 1.33))

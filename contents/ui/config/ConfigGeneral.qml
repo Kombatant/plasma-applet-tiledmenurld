@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Controls as QQC2
 import QtQuick.Layouts
+import QtQuick.Window
 import org.kde.ksvg as KSvg
 import org.kde.kirigami as Kirigami
 import Qt.labs.platform as QtLabsPlatform
@@ -18,6 +19,47 @@ LibConfig.FormKCM {
 
 	function percentToTileScale(percent) {
 		return percent / 250
+	}
+
+	function getRootKcm() {
+		var root = formLayout
+		while (root && root.parent) {
+			root = root.parent
+			if (root && typeof root.configurationChanged === "function") {
+				break
+			}
+		}
+		return (root && typeof root.configurationChanged === "function") ? root : null
+	}
+
+	readonly property real pendingTileScale: {
+		var rootKcm = getRootKcm()
+		if (rootKcm && typeof rootKcm.cfg_tileScale !== "undefined") {
+			return rootKcm.cfg_tileScale || 0
+		}
+		return plasmoid.configuration.tileScale || 0
+	}
+
+	readonly property int pendingCellBoxSize: {
+		var tileMarginUnits = plasmoid.configuration.tileMargin || 0
+		var cellMarginUnits = tileMarginUnits / 2
+		var cellSizeUnits = config.cellBoxUnits - tileMarginUnits
+		var scale = pendingTileScale || 0
+		var cellSize = Math.round(cellSizeUnits * scale * Screen.devicePixelRatio)
+		var cellMargin = cellMarginUnits * scale * Screen.devicePixelRatio
+		return Math.max(1, Math.round(cellMargin + cellSize + cellMargin))
+	}
+
+	function setPendingTileScale(scale) {
+		var rootKcm = getRootKcm()
+		if (!rootKcm || typeof rootKcm.cfg_tileScale === "undefined") {
+			return
+		}
+		if (Math.abs((rootKcm.cfg_tileScale || 0) - scale) <= 0.0001) {
+			return
+		}
+		rootKcm.cfg_tileScale = scale
+		rootKcm.configurationChanged()
 	}
 
 	readonly property string plasmaStyleLabelText: {
@@ -79,26 +121,15 @@ LibConfig.FormKCM {
 			to: 200
 			stepSize: 1
 			live: true
-			value: formLayout.tileScaleToPercent(plasmoid.configuration.tileScale)
+			value: formLayout.tileScaleToPercent(formLayout.pendingTileScale)
 
-			onValueChanged: {
-				var scale = formLayout.percentToTileScale(value)
-				if ((pressed || activeFocus) && Math.abs((plasmoid.configuration.tileScale || 0) - scale) > 0.0001) {
-					plasmoid.configuration.tileScale = scale
-					return
-				}
-
-				var expectedValue = formLayout.tileScaleToPercent(plasmoid.configuration.tileScale)
-				if (!pressed && !activeFocus && Math.abs(value - expectedValue) > 0.5) {
-					value = expectedValue
-				}
-			}
+			onMoved: formLayout.setPendingTileScale(formLayout.percentToTileScale(value))
 		}
 		QQC2.Label {
 			text: Math.round(tileSizeSlider.value) + "%"
 		}
 		QQC2.Label {
-			text: '' + config.cellBoxSize + i18n("px")
+			text: '' + formLayout.pendingCellBoxSize + i18n("px")
 		}
 	}
 	RowLayout {

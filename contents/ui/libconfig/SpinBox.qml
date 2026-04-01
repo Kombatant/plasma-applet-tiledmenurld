@@ -34,6 +34,7 @@ QQC2.SpinBox {
 
 	property string configKey: ''
 	readonly property var configValue: configKey ? plasmoid.configuration[configKey] : 0
+	property var _boundContentItem: null
 
 	readonly property real factor: Math.pow(10, decimals)
 	readonly property real valueReal: value / factor
@@ -128,6 +129,8 @@ QQC2.SpinBox {
 	onActiveFocusChanged: {
 		if (activeFocus) {
 			selectValue()
+		} else {
+			syncDisplayedText()
 		}
 	}
 	function selectValue() {
@@ -136,6 +139,12 @@ QQC2.SpinBox {
 		// https://doc.qt.io/qt-5/qml-qtquick-textinput.html#select-method
 		if (contentItem && contentItem instanceof TextInput) {
 			contentItem.selectAll()
+		}
+	}
+
+	function syncDisplayedText() {
+		if (contentItem && contentItem instanceof TextInput) {
+			contentItem.text = textFromValue(value, locale)
 		}
 	}
 
@@ -161,43 +170,52 @@ QQC2.SpinBox {
 	}
 
 	function onTextEdited() {
-		var oldText = spinBox.contentItem.text
-		oldText = fixText(oldText)
-		var oldPeriodIndex = oldText.indexOf('.')
-		if (oldPeriodIndex == -1) {
-			oldPeriodIndex = oldText.length
+		var textInput = spinBox.contentItem
+		if (!textInput || !(textInput instanceof TextInput)) {
+			return
 		}
-		var oldCursorPosition = spinBox.contentItem.cursorPosition
-		var oldCursorDelta = oldPeriodIndex - oldCursorPosition
 
-		spinBox.value = spinBox.valueFromText(oldText, spinBox.locale)
+		var oldText = textInput.text
+		var oldCursorPosition = textInput.cursorPosition
+		var newText = fixText(oldText)
+		var cursorPrefix = fixText(oldText.substr(0, oldCursorPosition))
+
+		if (newText !== oldText) {
+			textInput.text = newText
+			textInput.cursorPosition = Math.min(cursorPrefix.length, newText.length)
+		}
+
+		spinBox.value = spinBox.valueFromText(newText, spinBox.locale)
 		spinBox.valueModified()
-
-		var newText = spinBox.contentItem.text
-		newText = fixText(newText)
-		var newPeriodIndex = newText.indexOf('.')
-		if (newPeriodIndex == -1) {
-			newPeriodIndex = newText.length
-		}
-		if (newText != spinBox.contentItem.text) {
-			spinBox.contentItem.text = Qt.binding(function(){
-				return spinBox.textFromValue(spinBox.value, spinBox.locale)
-			})
-		}
-		spinBox.contentItem.cursorPosition = newPeriodIndex - oldCursorDelta
 	}
 
 	function bindContentItem() {
-		if (contentItem && contentItem instanceof TextInput) {
-			// We bind the left/right padding in the TextInput so that
-			// clicking the prefix/suffix will focus the TextInput. If we set
-			// the SpinBox left/right padding, then they do not focus the TextInput.
-			contentItem.leftPadding = Qt.binding(function(){ return prefixLabel.implicitWidth })
-			contentItem.rightPadding = Qt.binding(function(){ return suffixLabel.implicitWidth })
-
-			// Bind value update on keypress, while retaining cursor position
-			spinBox.contentItem.textEdited.connect(spinBox.onTextEdited)
+		if (!(contentItem && contentItem instanceof TextInput)) {
+			return
 		}
+
+		if (_boundContentItem === contentItem) {
+			return
+		}
+
+		if (_boundContentItem) {
+			try {
+				_boundContentItem.textEdited.disconnect(spinBox.onTextEdited)
+			} catch (e) {
+			}
+		}
+
+		_boundContentItem = contentItem
+
+		// We bind the left/right padding in the TextInput so that
+		// clicking the prefix/suffix will focus the TextInput. If we set
+		// the SpinBox left/right padding, then they do not focus the TextInput.
+		contentItem.leftPadding = Qt.binding(function(){ return prefixLabel.implicitWidth })
+		contentItem.rightPadding = Qt.binding(function(){ return suffixLabel.implicitWidth })
+
+		// Bind value update on keypress, while retaining the user's text.
+		contentItem.textEdited.connect(spinBox.onTextEdited)
+		syncDisplayedText()
 	}
 
 	onContentItemChanged: {

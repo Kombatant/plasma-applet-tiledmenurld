@@ -68,7 +68,7 @@ Item {
 		// Base64 encoded XML string; empty string means "use default".
 		_ensureSettingInitialized('tileModel', '')
 		_ensureSettingInitialized('tileScale', 0.4)
-		_ensureSettingInitialized('tileIconSize', 72)
+		_ensureSettingInitialized('tileIconSize', 32)
 		_ensureSettingInitialized('tileMargin', 12)
 		_ensureSettingInitialized('tileRoundedCorners', true)
 		_ensureSettingInitialized('tileCornerRadius', 6)

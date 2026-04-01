@@ -93,7 +93,7 @@
 		</entry>
 		<entry name="tileIconSize" type="int">
 			<label>Base icon size (px) used for tiles.</label>
-			<default>72</default>
+			<default>32</default>
 		</entry>
 		<entry name="tileMargin" type="double">
 		<default>12</default>
