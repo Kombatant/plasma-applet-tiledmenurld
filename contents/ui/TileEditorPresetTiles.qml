@@ -114,7 +114,6 @@ TileEditorGroupBox {
 		target: appObj
 
 		function onAppUrlChanged() {
-			logger.debug('onAppUrlChanged', appObj.appUrl)
 			tileEditorPresetTiles.checkIfRecognizedLauncher()
 		}
 	}

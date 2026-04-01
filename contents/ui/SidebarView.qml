@@ -55,10 +55,9 @@ Item {
 		return appsModel.sidebarModel.count < sidebarShortcutLimit
 	}
 
-	// Watch plasmoid.expanded via a bound property instead of Connections
-	property bool plasmoidExpanded: (plasmoid && typeof plasmoid.expanded !== "undefined") ? plasmoid.expanded : false
-	onPlasmoidExpandedChanged: {
-		if (plasmoidExpanded && config.sidebarHorizontal) {
+	readonly property bool widgetExpanded: (typeof widget !== "undefined" && widget && typeof widget.expanded !== "undefined") ? widget.expanded : false
+	onWidgetExpandedChanged: {
+		if (widgetExpanded && config.sidebarHorizontal) {
 			sidebarView._horizontalSearchWidth = config.appListWidth
 		}
 	}
@@ -547,7 +546,6 @@ Item {
 		}
 
 		onFocusChanged: {
-			logger.debug('searchView.onFocusChanged', focus)
 			if (!focus) {
 				open = false
 			}

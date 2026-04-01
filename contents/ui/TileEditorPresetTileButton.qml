@@ -139,7 +139,6 @@ Item {
 
 	function setTileBackgroundImage(filepath) {
 		var url = toFileUrl(filepath)
-		logger.debug('setTileBackgroundImage', filepath, url)
 		if (backgroundImageField) {
 			backgroundImageField.text = url
 		}
@@ -152,8 +151,6 @@ Item {
 	}
 
 	function select() {
-		logger.debug('select', source)
-
 		var sourceFilepath = '' + source // cast to string
 		var isLocalFilepath = sourceFilepath.indexOf('file://') == 0 || sourceFilepath.indexOf('/') == 0
 		if (isLocalFilepath) {
@@ -162,26 +159,19 @@ Item {
 		} else {
 			var dirs = candidateDirs()
 			if (dirs.length === 0) {
-				logger.debug('No writable location found; skipping save')
 				return
 			}
-			logger.debug('grabToImage.start')
 			image.grabToImage(function(result){
-				logger.debug('grabToImage.done', result, result.url)
 				var saved = false
 				for (var i = 0; i < dirs.length; i++) {
 					var localFilepath = dirs[i] + filename
 					var ok = result.saveToFile(localFilepath)
-					logger.debug('saveToFile', ok, localFilepath)
 					if (ok) {
 						presetTileButton.setTileBackgroundImage(localFilepath)
 						presetTileButton.resizeTile()
 						saved = true
 						break
 					}
-				}
-				if (!saved) {
-					logger.debug('Failed to save preset tile image in any candidate dir')
 				}
 			}, image.sourceSize)
 		}

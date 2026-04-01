@@ -117,9 +117,6 @@ AppToolButton {
 		} else if (mouse.buttons & Qt.RightButton) {
 			mouse.accepted = true
 			resetDragState()
-			if (typeof logger !== "undefined" && logger) {
-				logger.debug('MenuListItem.openContextMenu (pressed)', 'index', index, 'name', model && model.name)
-			}
 			var targetModel = contextMenuModel()
 			// Avoid probing action lists on unsafe models (some runner models can hard-crash plasmashell).
 			if (modelSupportsActionLists(targetModel) && targetModel && typeof targetModel.hasActionList === "function") {
@@ -206,9 +203,6 @@ AppToolButton {
 	onClicked: function(mouse) {
 		mouse.accepted = true
 		resetDragState()
-		if (typeof logger !== "undefined" && logger) {
-			logger.debug('MenuListItem.onClicked', 'button', mouse.button, 'index', index, 'name', model && model.name)
-		}
 		if (mouse.button == Qt.LeftButton) {
 			trigger()
 		}

@@ -14,12 +14,6 @@ Item {
 	onOrderChanged: allAppsModel.refresh()
 	readonly property bool hasConfiguration: (typeof plasmoid !== "undefined") && plasmoid && plasmoid.configuration
 
-	function logDebug() {
-		if (typeof logger !== "undefined" && logger && typeof logger.debug === "function") {
-			logger.debug.apply(logger, arguments)
-		}
-	}
-
 	function logWarn() {
 		if (typeof logger !== "undefined" && logger && typeof logger.warn === "function") {
 			logger.warn.apply(logger, arguments)
@@ -83,9 +77,7 @@ Item {
 		id: rootModelRefresh
 		interval: 400
 		onTriggered: {
-			appsModel.logDebug('rootModel.refresh.star', Date.now())
 			rootModel.refresh()
-			appsModel.logDebug('rootModel.refresh.done', Date.now())
 		}
 	}
 
@@ -514,7 +506,6 @@ Item {
 
 		function refresh() {
 			refreshing()
-			appsModel.logDebug("allAppsModel.refresh().star", Date.now())
 			
 			//--- Apps
 			var appList = []
@@ -548,7 +539,6 @@ Item {
 			//--- apply model
 			allAppsModel.list = appList;
 
-			appsModel.logDebug("allAppsModel.refresh().done", Date.now())
 			refreshed()
 		}
 	}

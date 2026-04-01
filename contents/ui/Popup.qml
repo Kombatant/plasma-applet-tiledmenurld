@@ -53,6 +53,7 @@ MouseArea {
 	property real _lastKnownDevicePixelRatio: 1
 	property real _lastRestoreDevicePixelRatio: 0
 	property bool _pendingDprSyncRestore: false
+	readonly property bool widgetExpanded: (typeof widget !== "undefined" && widget && typeof widget.expanded !== "undefined") ? widget.expanded : false
 
 	function effectiveDevicePixelRatio() {
 		var screenDpr = Screen.devicePixelRatio || 0
@@ -113,8 +114,10 @@ MouseArea {
 			popup.scheduleDprSyncRestore()
 			return
 		}
-		var effectiveWidth = popup.Layout.preferredWidth > 0 ? popup.Layout.preferredWidth : popup.width
-		var effectiveHeight = popup.Layout.preferredHeight > 0 ? popup.Layout.preferredHeight : popup.height
+		// Manual popup resizing updates the live item size first. Persist from the
+		// rendered geometry so width/height don't get stuck on stale layout hints.
+		var effectiveWidth = popup.width > 0 ? popup.width : popup.Layout.preferredWidth
+		var effectiveHeight = popup.height > 0 ? popup.height : popup.Layout.preferredHeight
 		var logicalWidth = Math.round(effectiveWidth / dpr)
 		var logicalHeight = Math.round(effectiveHeight / dpr)
 		var favWidth = Math.max(0, effectiveWidth - config.leftSectionWidth)
@@ -247,39 +250,7 @@ MouseArea {
 	}
 
 	function autoResizeToContent() {
-		function logObj(label, obj) {
-			if (!logger.showDebug) {
-				return
-			}
-			try {
-				logger.log(label, JSON.stringify(obj))
-			} catch (e) {
-				logger.log(label, obj)
-			}
-		}
-
-		logObj('autoResize:start', {
-			popupW: width,
-			popupH: height,
-			favGridCols: plasmoid.configuration.favGridCols,
-			popupHeightCfg: plasmoid.configuration.popupHeight,
-			tileCount: tileGrid && tileGrid.tileModel ? tileGrid.tileModel.length : -1,
-			tileGridMaxCol: tileGrid ? tileGrid.maxColumn : -1,
-			tileGridMaxRow: tileGrid ? tileGrid.maxRow : -1,
-			cellBox: config ? config.cellBoxSize : -1,
-			layoutPrefW: popup.Layout.preferredWidth,
-			layoutPrefH: popup.Layout.preferredHeight,
-			layoutMinW: popup.Layout.minimumWidth,
-			layoutMinH: popup.Layout.minimumHeight,
-			screenW: Screen.width,
-			screenH: Screen.height,
-			screenAvailW: Screen.desktopAvailableWidth,
-			screenAvailH: Screen.desktopAvailableHeight,
-			leftSectionWidth: config ? config.leftSectionWidth : -1,
-		})
-
 		if (!tileGrid || !config) {
-			logger.log('autoResize:abort', 'missing tileGrid/config')
 			return
 		}
 
@@ -308,23 +279,12 @@ MouseArea {
 		var logicalHeight = Math.ceil(targetHeight / dpr)
 		var logicalWidth = Math.ceil(targetWidth / dpr)
 
-		logObj('autoResize:computed', {
-			beforeMax: beforeMax,
-			afterMax: afterMax,
-			cellBox: cellBox,
-			cols: cols,
-			rows: rows,
-			targetGridWidth: targetGridWidth,
-			targetGridHeight: targetGridHeight,
-			targetWidth: targetWidth,
-			targetHeight: targetHeight,
-			devicePixelRatio: dpr,
-			logicalHeight: logicalHeight,
-			logicalWidth: logicalWidth,
-		})
-
 		var changedCols = plasmoid.configuration.favGridCols !== cols
 		var changedHeight = plasmoid.configuration.popupHeight !== logicalHeight
+		if (typeof widget !== "undefined" && widget) {
+			widget.suppressHideOnWindowDeactivate = true
+			autoResizeDeactivateGuard.restart()
+		}
 		if (changedCols) {
 			plasmoid.configuration.favGridCols = cols
 		}
@@ -351,55 +311,13 @@ MouseArea {
 		Qt.callLater(function() {
 			popup.width = targetWidth
 			popup.height = targetHeight
-				logObj('autoResize:forceSizes', {
-				popupWidth: popup.width,
-				popupHeight: popup.height,
-				layoutPrefW: popup.Layout.preferredWidth,
-				layoutPrefH: popup.Layout.preferredHeight,
-				layoutMinW: popup.Layout.minimumWidth,
-				layoutMinH: popup.Layout.minimumHeight,
-				layoutMaxW: popup.Layout.maximumWidth,
-				layoutMaxH: popup.Layout.maximumHeight,
-			})
 			// Release max/implicit on the following frame to re-enable manual resize.
 			Qt.callLater(function() {
-					popup.Layout.maximumWidth = -1
-					popup.Layout.maximumHeight = -1
-					popup.Layout.minimumWidth = restoreMinW
-					popup.Layout.minimumHeight = restoreMinH
-				logObj('autoResize:releaseLimits', {
-					layoutPrefW: popup.Layout.preferredWidth,
-					layoutPrefH: popup.Layout.preferredHeight,
-					layoutMinW: popup.Layout.minimumWidth,
-					layoutMinH: popup.Layout.minimumHeight,
-					layoutMaxW: popup.Layout.maximumWidth,
-					layoutMaxH: popup.Layout.maximumHeight,
-				})
-				if (plasmoid.expanded) {
-					plasmoid.expanded = false
-					Qt.callLater(function() { plasmoid.expanded = true })
-				}
-			})
-		})
-
-		logObj('autoResize:apply', {
-			changedCols: changedCols,
-			changedHeight: changedHeight,
-			newFavGridCols: plasmoid.configuration.favGridCols,
-			newPopupHeightCfg: plasmoid.configuration.popupHeight,
-			popupWidthNow: width,
-			popupHeightNow: height,
-			targetWidth: targetWidth,
-			targetHeight: targetHeight,
-		})
-
-		// Log again on the next frame so we can see the actual size after bindings settle.
-		Qt.callLater(function() {
-			logObj('autoResize:postLayout', {
-				popupWidth: width,
-				popupHeight: height,
-				favGridCols: plasmoid.configuration.favGridCols,
-				popupHeightCfg: plasmoid.configuration.popupHeight,
+				popup.Layout.maximumWidth = -1
+				popup.Layout.maximumHeight = -1
+				popup.Layout.minimumWidth = restoreMinW
+				popup.Layout.minimumHeight = restoreMinH
+				autoResizeDeactivateGuard.restart()
 			})
 		})
 	}
@@ -516,6 +434,16 @@ MouseArea {
 			popup.restoreRememberedSizeForCurrentView()
 		}
 	}
+	Timer {
+		id: autoResizeDeactivateGuard
+		interval: 250
+		repeat: false
+		onTriggered: {
+			if (typeof widget !== "undefined" && widget) {
+				widget.suppressHideOnWindowDeactivate = false
+			}
+		}
+	}
 	Component.onCompleted: {
 		enablePersistSize.start()
 		popup._lastKnownDevicePixelRatio = popup.effectiveDevicePixelRatio()
@@ -526,7 +454,7 @@ MouseArea {
 				searchView.setActiveSizeMemoryView(searchView.lastRememberedSizeMemoryView)
 			}
 		}
-		if (plasmoid.expanded) {
+		if (popup.widgetExpanded) {
 			popup.restoreRememberedSizeForCurrentView()
 		}
 	}
@@ -537,15 +465,17 @@ MouseArea {
 			popup.scheduleDprSyncRestore()
 		}
 	}
-	// Watch plasmoid.expanded via a bound property instead of Connections
-	property bool plasmoidExpanded: (plasmoid && typeof plasmoid.expanded !== "undefined") ? plasmoid.expanded : false
-	onPlasmoidExpandedChanged: {
-		if (plasmoidExpanded) {
+	onWidgetExpandedChanged: {
+		if (popup.widgetExpanded) {
 			popup._lastKnownDevicePixelRatio = popup.effectiveDevicePixelRatio()
 			if (searchView && typeof searchView.setActiveSizeMemoryView === "function" && typeof searchView.resolveConfiguredDefaultView === "function") {
 				searchView.setActiveSizeMemoryView(searchView.resolveConfiguredDefaultView())
 			}
 			popup.restoreRememberedSizeForCurrentView()
+		} else if (!popup._suppressPersist && popup._sizeRestored) {
+			// The debounced saver can lose the final manual resize if the popup is
+			// closed before it fires. Persist the live size one last time on close.
+			popup.saveCurrentViewSize()
 		}
 	}
 
@@ -567,7 +497,7 @@ MouseArea {
 		interval: 400
 		repeat: false
 		onTriggered: {
-			if (!popup._persistSizeEnabled || popup._suppressPersist || !plasmoid.expanded || !popup._sizeRestored) {
+			if (!popup._persistSizeEnabled || popup._suppressPersist || !popup.widgetExpanded || !popup._sizeRestored) {
 				return
 			}
 			popup.saveCurrentViewSize()
@@ -576,7 +506,7 @@ MouseArea {
 
 	onWidthChanged: {
 		if (popup._persistSizeEnabled) {
-			if (!popup._suppressPersist && plasmoid.expanded && popup._sizeRestored) {
+			if (!popup._suppressPersist && popup.widgetExpanded && popup._sizeRestored) {
 				popup.saveCurrentViewSize()
 			}
 			persistSizeDebounced.restart()
@@ -584,7 +514,7 @@ MouseArea {
 	}
 	onHeightChanged: {
 		if (popup._persistSizeEnabled) {
-			if (!popup._suppressPersist && plasmoid.expanded && popup._sizeRestored) {
+			if (!popup._suppressPersist && popup.widgetExpanded && popup._sizeRestored) {
 				popup.saveCurrentViewSize()
 			}
 			persistSizeDebounced.restart()

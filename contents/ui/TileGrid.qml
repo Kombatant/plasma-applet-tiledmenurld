@@ -582,7 +582,6 @@ DropArea {
 			Repeater {
 				id: tileModelRepeater
 				model: 0
-				// onCountChanged: console.log('onCountChanged', count)
 				
 				TileItem {
 					id: tileItem

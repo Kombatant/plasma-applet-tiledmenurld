@@ -14,6 +14,7 @@ PlasmoidItem {
 	id: widget
 	property string systemTerminalApp: ""
 	property string systemFileManagerApp: ""
+	property bool suppressHideOnWindowDeactivate: false
 
 	// Disable the default Plasma dialog background for a cleaner look
 	// (blur effect is controlled by KDE Desktop Effects, not by the plasmoid)
@@ -126,7 +127,7 @@ PlasmoidItem {
 		iconSource: plasmoid.configuration.icon || "tiled_rld"
 	}
 
-	hideOnWindowDeactivate: !widget.userConfiguring
+	hideOnWindowDeactivate: !widget.userConfiguring && !widget.suppressHideOnWindowDeactivate
 	activationTogglesExpanded: true
 	onExpandedChanged: function(expanded) {
 		if (expanded) {

@@ -26,6 +26,7 @@ Item {
 	property alias aiChatView: aiChatView
 	property var aiChatModel
 	property string activeSizeMemoryView: "Alphabetical"
+	readonly property bool widgetExpanded: (typeof widget !== "undefined" && widget && typeof widget.expanded !== "undefined") ? widget.expanded : false
 
 	readonly property bool showingOnlyTiles: !config.showSearch
 	readonly property bool showingAppList: stackView.currentItem == appsView || stackView.currentItem == jumpToLetterView
@@ -80,7 +81,7 @@ Item {
 	}
 
 	function saveCurrentSizeMemoryViewBeforeSwitch() {
-		if (popup && popup._sizeRestored && plasmoid.expanded && typeof popup.saveCurrentViewSize === "function") {
+		if (popup && popup._sizeRestored && widgetExpanded && typeof popup.saveCurrentViewSize === "function") {
 			popup.saveCurrentViewSize()
 		}
 	}
