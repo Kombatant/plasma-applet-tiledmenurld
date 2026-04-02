@@ -4,6 +4,7 @@ import QtQuick.Layouts
 import QtQuick.Controls as QQC2
 import org.kde.kirigami as Kirigami
 import org.kde.plasma.extras as PlasmaExtras
+import org.kde.iconthemes as KIconThemes
 
 // Tab bar shown above the TileGrid when the "Use Tabs" option is enabled.
 // Each entry in `tabs` is an object with at least a `name` string property.
@@ -13,7 +14,7 @@ Item {
 	// Index of the currently selected tab (0-based).
 	property int activeTab: 0
 
-	// Array of tab descriptor objects: [{id: string, name: string}, ...]
+	// Array of tab descriptor objects: [{id: string, name: string, icon: string}, ...]
 	property var tabs: []
 
 	// Emitted when the user selects a different tab.
@@ -26,6 +27,43 @@ Item {
 	signal tabRenamed(int index, string newName)
 	// Emitted when the user drags a tab to a new position.
 	signal tabMoved(int fromIndex, int toIndex)
+	// Emitted when the tab icon changes (index, newIcon).
+	signal tabIconChanged(int index, string newIcon)
+
+	// ── Keyword → icon mapping ─────────────────────────────────────────────
+	// Returns a symbolic icon name that best matches the given tab name,
+	// or "" if no keyword matched (caller decides the fallback).
+	function inferIconForName(name) {
+		var n = (name || "").toLowerCase()
+		var map = [
+			[["game", "gaming", "steam", "play"], "applications-games"],
+			[["music", "audio", "sound", "spotify"], "applications-multimedia"],
+			[["video", "movie", "film", "stream", "youtube", "vlc"], "camera-video"],
+			[["work", "office", "productivity", "business"], "applications-office"],
+			[["dev", "code", "programming", "develop", "terminal", "ide"], "applications-development"],
+			[["web", "browser", "internet", "firefox", "chrome", "chromium"], "applications-internet"],
+			[["social", "chat", "message", "discord", "telegram", "signal"], "applications-chat"],
+			[["mail", "email", "e-mail"], "mail-message"],
+			[["photo", "image", "picture", "graphic", "design", "art", "gimp", "inkscape"], "applications-graphics"],
+			[["tool", "utility", "utilities", "system", "settings", "config"], "applications-utilities"],
+			[["science", "math", "education", "learn"], "applications-science"],
+			[["file", "folder", "document", "documents", "files", "dolphin"], "system-file-manager"],
+			[["download", "torrent", "transfer"], "folder-download"],
+			[["security", "privacy", "password", "vault", "encrypt"], "security-high"],
+			[["network", "vpn", "server", "remote", "ssh"], "network-workgroup"],
+			[["favorite", "favourite", "starred", "pinned", "bookmark"], "starred"],
+			[["main", "home", "start", "all", "general", "default", "application"], "go-home"],
+			[["new", "recent", "latest"], "document-new"],
+		]
+		for (var i = 0; i < map.length; i++) {
+			var keywords = map[i][0]
+			var icon = map[i][1]
+			for (var j = 0; j < keywords.length; j++) {
+				if (n.indexOf(keywords[j]) >= 0) return icon
+			}
+		}
+		return ""
+	}
 
 	// ── Internal drag state ─────────────────────────────────────────────────
 	property int _dragSourceIndex: -1
@@ -41,7 +79,7 @@ Item {
 		return tabRepeater.count
 	}
 
-	readonly property int tabHeight: Math.max(28, Kirigami.Units.gridUnit * 1.75)
+	readonly property int tabHeight: Kirigami.Units.gridUnit * 2.5
 	implicitHeight: tabHeight
 
 	// ── Shared context menu ─────────────────────────────────────────────────
@@ -61,6 +99,25 @@ Item {
 		}
 
 		PlasmaExtras.MenuItem {
+			icon: "preferences-desktop-icons"
+			text: i18n("Change Icon…")
+			onClicked: tabIconDialog.open()
+		}
+
+		PlasmaExtras.MenuItem {
+			icon: "edit-clear"
+			text: i18n("Clear Icon")
+			enabled: {
+				var idx = tabContextMenu.tabIdx
+				return idx >= 0 && idx < tabBar.tabs.length
+					&& (tabBar.tabs[idx].icon || "") !== ""
+			}
+			onClicked: tabBar.tabIconChanged(tabContextMenu.tabIdx, "")
+		}
+
+		PlasmaExtras.MenuItem { separator: true }
+
+		PlasmaExtras.MenuItem {
 			icon: "edit-delete-remove"
 			text: i18n("Delete Tab")
 			enabled: tabBar.tabs.length > 1
@@ -68,10 +125,19 @@ Item {
 		}
 	}
 
+	KIconThemes.IconDialog {
+		id: tabIconDialog
+		onIconNameChanged: {
+			if (iconName && tabContextMenu.tabIdx >= 0) {
+				tabBar.tabIconChanged(tabContextMenu.tabIdx, iconName)
+			}
+		}
+	}
+
 	// ── Layout ───────────────────────────────────────────────────────────────
 	RowLayout {
 		anchors.fill: parent
-		spacing: 2
+		spacing: Kirigami.Units.smallSpacing
 
 		// ── Tab buttons ──────────────────────────────────────────────────────
 		Repeater {
@@ -84,8 +150,10 @@ Item {
 				readonly property bool isActive: tabBar.activeTab === index
 				property bool isEditing: false
 
-				Layout.preferredWidth: Math.max(60, tabLabelText.implicitWidth + 24)
+				Layout.preferredWidth: Math.max(Kirigami.Units.gridUnit * 4.5, tabLabelText.implicitWidth + (tabIconItem.visible ? tabIconItem.width + Kirigami.Units.smallSpacing : 0) + Kirigami.Units.gridUnit * 2)
 				Layout.fillHeight: true
+
+				readonly property string tabIcon: modelData.icon || ""
 
 				function startEditing() {
 					tabDelegate.isEditing = true
@@ -98,6 +166,11 @@ Item {
 					var trimmed = tabInput.text.trim()
 					if (trimmed.length > 0) {
 						tabBar.tabRenamed(index, trimmed)
+						// Auto-assign icon based on the new name
+						var inferred = tabBar.inferIconForName(trimmed)
+						if (inferred) {
+							tabBar.tabIconChanged(index, inferred)
+						}
 					}
 					tabDelegate.isEditing = false
 				}
@@ -105,8 +178,8 @@ Item {
 				// ── Background (hover highlight) ────────────────────────────
 				Rectangle {
 					anchors.fill: parent
-					anchors.margins: 2
-					radius: 4
+					anchors.margins: Math.round(Kirigami.Units.smallSpacing / 2)
+					radius: Kirigami.Units.smallSpacing
 					color: Kirigami.Theme.highlightColor
 					opacity: hoverArea.containsMouse && !tabDelegate.isActive ? 0.15 : 0
 					Behavior on opacity { NumberAnimation { duration: 100 } }
@@ -114,40 +187,57 @@ Item {
 
 				// ── Active tab bottom indicator (text-width underline) ──────
 				Rectangle {
-					anchors.left: tabLabelText.left
-					anchors.right: tabLabelText.right
+					anchors.left: tabLabelRow.left
+					anchors.right: tabLabelRow.right
 					anchors.bottom: parent.bottom
 					height: 2
 					color: Kirigami.Theme.highlightColor
 					visible: tabDelegate.isActive && !tabDelegate.isEditing
 				}
 
-				// ── Label (read-only) ────────────────────────────────────────
-				QQC2.Label {
-					id: tabLabelText
+				// ── Label (read-only) with icon ──────────────────────────────
+				Row {
+					id: tabLabelRow
 					anchors.fill: parent
-					anchors.leftMargin: 8
-					anchors.rightMargin: 8
-					verticalAlignment: Text.AlignVCenter
-					font.pointSize: Kirigami.Theme.defaultFont.pointSize + 4
-					text: modelData.name || ""
-					color: Kirigami.Theme.textColor
-					opacity: (tabBar._dragSourceIndex === index) ? 0.3
-					: tabDelegate.isActive ? 1.0
-					: hoverArea.containsMouse ? 0.85 : 0.6
-					Behavior on opacity { NumberAnimation { duration: 100 } }
-					elide: Text.ElideRight
+					anchors.leftMargin: Kirigami.Units.largeSpacing
+					anchors.rightMargin: Kirigami.Units.largeSpacing
+					spacing: Kirigami.Units.smallSpacing
 					visible: !tabDelegate.isEditing
+					opacity: (tabBar._dragSourceIndex === index) ? 0.3
+						: tabDelegate.isActive ? 1.0
+						: hoverArea.containsMouse ? 0.85 : 0.6
+					Behavior on opacity { NumberAnimation { duration: 100 } }
+
+					Kirigami.Icon {
+						id: tabIconItem
+						visible: tabDelegate.tabIcon !== ""
+						source: tabDelegate.tabIcon
+						width: visible ? tabLabelText.font.pixelSize : 0
+						height: width
+						anchors.verticalCenter: parent.verticalCenter
+						color: Kirigami.Theme.textColor
+					}
+
+					QQC2.Label {
+						id: tabLabelText
+						width: parent.width - (tabIconItem.visible ? tabIconItem.width + parent.spacing : 0)
+						height: parent.height
+						verticalAlignment: Text.AlignVCenter
+						font.pointSize: Math.round(Kirigami.Theme.defaultFont.pointSize * 1.3)
+						text: modelData.name || ""
+						color: Kirigami.Theme.textColor
+						elide: Text.ElideRight
+					}
 				}
 
 				// ── Edit input ───────────────────────────────────────────────
 				TextInput {
 					id: tabInput
 					anchors.fill: parent
-					anchors.leftMargin: 8
-					anchors.rightMargin: 8
+					anchors.leftMargin: Kirigami.Units.largeSpacing
+					anchors.rightMargin: Kirigami.Units.largeSpacing
 					verticalAlignment: TextInput.AlignVCenter
-					font.pointSize: Kirigami.Theme.defaultFont.pointSize + 4
+					font.pointSize: Math.round(Kirigami.Theme.defaultFont.pointSize * 1.3)
 					color: Kirigami.Theme.textColor
 					visible: tabDelegate.isEditing
 					clip: true
@@ -241,7 +331,7 @@ Item {
 			QQC2.Label {
 				anchors.centerIn: parent
 				text: "+"
-				font.pixelSize: 16
+				font.pixelSize: Kirigami.Units.gridUnit
 				color: Kirigami.Theme.textColor
 				opacity: addTabMA.containsMouse ? 0.9 : 0.55
 			}

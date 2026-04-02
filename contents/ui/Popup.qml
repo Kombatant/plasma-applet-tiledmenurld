@@ -64,6 +64,40 @@ MouseArea {
 	property bool _tabsWriting: false  // suppress config-change reload during save
 	property int _tabIdCounter: 0   // monotonic counter for unique tab IDs
 
+	// Keyword → icon mapping (mirrors TileTabBar.inferIconForName).
+	// Defined here so it's available before TileTabBar is instantiated.
+	function inferTabIcon(name) {
+		var n = (name || "").toLowerCase()
+		var map = [
+			[["game", "gaming", "steam", "play"], "applications-games"],
+			[["music", "audio", "sound", "spotify"], "applications-multimedia"],
+			[["video", "movie", "film", "stream", "youtube", "vlc"], "camera-video"],
+			[["work", "office", "productivity", "business"], "applications-office"],
+			[["dev", "code", "programming", "develop", "terminal", "ide"], "applications-development"],
+			[["web", "browser", "internet", "firefox", "chrome", "chromium"], "applications-internet"],
+			[["social", "chat", "message", "discord", "telegram", "signal"], "applications-chat"],
+			[["mail", "email", "e-mail"], "mail-message"],
+			[["photo", "image", "picture", "graphic", "design", "art", "gimp", "inkscape"], "applications-graphics"],
+			[["tool", "utility", "utilities", "system", "settings", "config"], "applications-utilities"],
+			[["science", "math", "education", "learn"], "applications-science"],
+			[["file", "folder", "document", "documents", "files", "dolphin"], "system-file-manager"],
+			[["download", "torrent", "transfer"], "folder-download"],
+			[["security", "privacy", "password", "vault", "encrypt"], "security-high"],
+			[["network", "vpn", "server", "remote", "ssh"], "network-workgroup"],
+			[["favorite", "favourite", "starred", "pinned", "bookmark"], "starred"],
+			[["main", "home", "start", "all", "general", "default", "application"], "go-home"],
+			[["new", "recent", "latest"], "document-new"],
+		]
+		for (var i = 0; i < map.length; i++) {
+			var keywords = map[i][0]
+			var icon = map[i][1]
+			for (var j = 0; j < keywords.length; j++) {
+				if (n.indexOf(keywords[j]) >= 0) return icon
+			}
+		}
+		return ""
+	}
+
 	readonly property var activeTabTiles: {
 		if (!config.useTileTabs || tileTabsData.length === 0) {
 			return config.tileModel.value
@@ -85,6 +119,7 @@ MouseArea {
 			tileTabsData = [{
 				id: '1',
 				name: i18n('Main'),
+				icon: 'go-home',
 				tiles: existingTiles,
 			}]
 			popup.saveTileTabs()
@@ -93,12 +128,24 @@ MouseArea {
 				var decoded = Qt.atob(raw)
 				var parsed = JSON.parse(decoded)
 				if (!Array.isArray(parsed) || parsed.length === 0) {
-					tileTabsData = [{id: '1', name: i18n('Main'), tiles: []}]
+					tileTabsData = [{id: '1', name: i18n('Main'), icon: 'go-home', tiles: []}]
 				} else {
 					tileTabsData = parsed
+					// Backfill icons for tabs saved before icon support was added
+					var dirty = false
+					for (var i = 0; i < tileTabsData.length; i++) {
+						if (!tileTabsData[i].icon) {
+							var inferred = popup.inferTabIcon(tileTabsData[i].name)
+							if (inferred) {
+								tileTabsData[i].icon = inferred
+								dirty = true
+							}
+						}
+					}
+					if (dirty) popup.saveTileTabs()
 				}
 			} catch (e) {
-				tileTabsData = [{id: '1', name: i18n('Main'), tiles: []}]
+				tileTabsData = [{id: '1', name: i18n('Main'), icon: 'go-home', tiles: []}]
 			}
 		}
 		if (activeTabIndex >= tileTabsData.length) {
@@ -136,7 +183,9 @@ MouseArea {
 		_tabIdCounter++
 		var newId = 'tab_' + _tabIdCounter
 		var newTabs = tileTabsData.slice()
-		newTabs.push({id: newId, name: i18n('New Tab'), tiles: []})
+		var newTabName = i18n('New Tab')
+		var newTabIcon = popup.inferTabIcon(newTabName)
+		newTabs.push({id: newId, name: newTabName, icon: newTabIcon, tiles: []})
 		tileTabsData = newTabs
 		activeTabIndex = newTabs.length - 1
 		popup.saveTileTabs()
@@ -165,6 +214,20 @@ MouseArea {
 		newTabs[index] = {
 			id: newTabs[index].id,
 			name: newName,
+			icon: newTabs[index].icon || "",
+			tiles: newTabs[index].tiles,
+		}
+		tileTabsData = newTabs
+		popup.saveTileTabs()
+	}
+
+	function changeTabIcon(index, newIcon) {
+		if (index < 0 || index >= tileTabsData.length) return
+		var newTabs = tileTabsData.slice()
+		newTabs[index] = {
+			id: newTabs[index].id,
+			name: newTabs[index].name,
+			icon: newIcon,
 			tiles: newTabs[index].tiles,
 		}
 		tileTabsData = newTabs
@@ -927,13 +990,14 @@ MouseArea {
 						visible: config.useTileTabs
 						activeTab: popup.activeTabIndex
 						tabs: popup.tileTabsData.map(function(t) {
-							return {id: t.id, name: t.name}
+							return {id: t.id, name: t.name, icon: t.icon || ""}
 						})
 
 						onTabSelected: function(index) { popup.selectTab(index) }
 						onTabAdded: popup.addTab()
 						onTabDeleted: function(index) { popup.deleteTab(index) }
 						onTabRenamed: function(index, newName) { popup.renameTab(index, newName) }
+						onTabIconChanged: function(index, newIcon) { popup.changeTabIcon(index, newIcon) }
 						onTabMoved: function(fromIndex, toIndex) { popup.moveTab(fromIndex, toIndex) }
 					}
 
