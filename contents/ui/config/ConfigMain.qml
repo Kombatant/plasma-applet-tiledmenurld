@@ -537,15 +537,6 @@ KCM.AbstractKCM {
                 Layout.fillHeight: true
                 spacing: Kirigami.Units.smallSpacing
 
-                Kirigami.Heading {
-                    Layout.fillWidth: true
-                    level: 2
-                    text: {
-                        var s = page._sectionByKey(page.currentSectionKey);
-                        return s ? s.name : "";
-                    }
-                }
-
                 QQC2.Frame {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
