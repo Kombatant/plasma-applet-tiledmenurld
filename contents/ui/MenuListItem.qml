@@ -27,6 +27,8 @@ AppToolButton {
 	property bool showItemUrl: listView.showItemUrl && (!isDesktopFile || listView.showDesktopFileUrl)
 	property string secondRowText: showItemUrl && model.url ? model.url : modelDescription
 	property bool secondRowVisible: secondRowText
+	property bool hoverScrollDescriptions: !showItemUrl
+	property int hoverScrollPixelsPerSecond: 45
 	property string launcherUrl: model.favoriteId || model.url
 	property string iconName: model.iconName || ''
 	property alias iconSource: itemIcon.source
@@ -175,24 +177,95 @@ AppToolButton {
 					height: implicitHeight
 				}
 
-				PlasmaComponents3.Label {
+				Item {
+					id: inlineDescriptionClip
 					Layout.fillWidth: true
-					text: !itemDelegate.secondRowVisible ? itemDelegate.description : ''
-					color: config.menuItemTextColor2
-					maximumLineCount: 1
-					elide: Text.ElideRight
-					height: implicitHeight // ElideRight causes some top padding for some reason
+					implicitHeight: inlineDescriptionLabel.implicitHeight
+					clip: true
+
+					readonly property bool scrolling: itemDelegate.containsMouse
+						&& itemDelegate.hoverScrollDescriptions
+						&& inlineDescriptionLabel.implicitWidth > width
+						&& inlineDescriptionLabel.text.length > 0
+
+					PlasmaComponents3.Label {
+						id: inlineDescriptionLabel
+						x: 0
+						width: Math.max(implicitWidth, inlineDescriptionClip.width)
+						text: !itemDelegate.secondRowVisible ? itemDelegate.description : ''
+						color: config.menuItemTextColor2
+						maximumLineCount: 1
+						elide: inlineDescriptionClip.scrolling ? Text.ElideNone : Text.ElideRight
+						height: implicitHeight // ElideRight causes some top padding for some reason
+					}
+
+					SequentialAnimation {
+						running: inlineDescriptionClip.scrolling
+						loops: Animation.Infinite
+
+						PauseAnimation { duration: 350 }
+						NumberAnimation {
+							target: inlineDescriptionLabel
+							property: "x"
+							to: -(inlineDescriptionLabel.implicitWidth - inlineDescriptionClip.width)
+							duration: Math.max(1, Math.round(((inlineDescriptionLabel.implicitWidth - inlineDescriptionClip.width) / itemDelegate.hoverScrollPixelsPerSecond) * 1000))
+							easing.type: Easing.Linear
+						}
+						PauseAnimation { duration: 500 }
+					}
+
+					onScrollingChanged: {
+						if (!scrolling) {
+							inlineDescriptionLabel.x = 0
+						}
+					}
 				}
 			}
 
-			PlasmaComponents3.Label {
+			Item {
+				id: secondRowClip
 				visible: itemDelegate.secondRowVisible
 				Layout.fillWidth: true
-				text: itemDelegate.secondRowText
-				color: config.menuItemTextColor2
-				maximumLineCount: 1
-				elide: Text.ElideMiddle
-				height: implicitHeight
+				implicitHeight: secondRowLabel.implicitHeight
+				clip: true
+
+				readonly property bool scrolling: visible
+					&& itemDelegate.containsMouse
+					&& itemDelegate.hoverScrollDescriptions
+					&& secondRowLabel.implicitWidth > width
+					&& secondRowLabel.text.length > 0
+
+				PlasmaComponents3.Label {
+					id: secondRowLabel
+					x: 0
+					width: Math.max(implicitWidth, secondRowClip.width)
+					text: itemDelegate.secondRowText
+					color: config.menuItemTextColor2
+					maximumLineCount: 1
+					elide: secondRowClip.scrolling ? Text.ElideNone : Text.ElideRight
+					height: implicitHeight
+				}
+
+				SequentialAnimation {
+					running: secondRowClip.scrolling
+					loops: Animation.Infinite
+
+					PauseAnimation { duration: 350 }
+					NumberAnimation {
+						target: secondRowLabel
+						property: "x"
+						to: -(secondRowLabel.implicitWidth - secondRowClip.width)
+						duration: Math.max(1, Math.round(((secondRowLabel.implicitWidth - secondRowClip.width) / itemDelegate.hoverScrollPixelsPerSecond) * 1000))
+						easing.type: Easing.Linear
+					}
+					PauseAnimation { duration: 500 }
+				}
+
+				onScrollingChanged: {
+					if (!scrolling) {
+						secondRowLabel.x = 0
+					}
+				}
 			}
 		}
 
