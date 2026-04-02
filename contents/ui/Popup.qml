@@ -541,6 +541,44 @@ MouseArea {
 		})
 	}
 
+	function autoResizeWidthToContent() {
+		if (!tileGrid || !config) {
+			return
+		}
+
+		tileGrid.update()
+
+		var cols = Math.max(1, Math.ceil(tileGrid.maxColumn))
+		var cellBox = tileGrid.cellBoxSize
+		var holoPad = tileGrid._holoPad || 0
+		var targetGridWidth = cols * cellBox + 2 * holoPad
+		var targetWidth = Math.max(config.minimumWidth, config.leftSectionWidth + targetGridWidth)
+
+		var changedCols = plasmoid.configuration.favGridCols !== cols
+		if (typeof widget !== "undefined" && widget) {
+			widget.suppressHideOnWindowDeactivate = true
+			autoResizeDeactivateGuard.restart()
+		}
+		if (changedCols) {
+			plasmoid.configuration.favGridCols = cols
+		}
+
+		var restoreMinW = config.minimumWidth
+		popup.Layout.preferredWidth = targetWidth
+		popup.Layout.minimumWidth = targetWidth
+		popup.Layout.maximumWidth = targetWidth
+		popup.implicitWidth = targetWidth
+		popup.width = targetWidth
+		Qt.callLater(function() {
+			popup.width = targetWidth
+			Qt.callLater(function() {
+				popup.Layout.maximumWidth = -1
+				popup.Layout.minimumWidth = restoreMinW
+				autoResizeDeactivateGuard.restart()
+			})
+		})
+	}
+
 	function applySavedSize(targetWidthLogical, targetHeightLogical) {
 		if (!config) {
 			return
@@ -635,7 +673,7 @@ MouseArea {
 		interval: 0
 		repeat: false
 		onTriggered: {
-			popup.autoResizeToContent()
+			popup.autoResizeWidthToContent()
 			popup._pendingEditSidebarResize = false
 		}
 	}
