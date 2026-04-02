@@ -58,6 +58,120 @@ MouseArea {
 	property string _lastAppliedRestoreKey: ""
 	property bool _restoreQueuedWhileCollapsed: false
 
+	// ── Tile Tabs ─────────────────────────────────────────────────────────────
+	property int activeTabIndex: 0
+	property var tileTabsData: []   // [{id: string, name: string, tiles: [tileObj]}]
+	property bool _tabsWriting: false  // suppress config-change reload during save
+	property int _tabIdCounter: 0   // monotonic counter for unique tab IDs
+
+	readonly property var activeTabTiles: {
+		if (!config.useTileTabs || tileTabsData.length === 0) {
+			return config.tileModel.value
+		}
+		var idx = Math.min(activeTabIndex, tileTabsData.length - 1)
+		if (idx < 0) {
+			return []
+		}
+		return tileTabsData[idx].tiles || []
+	}
+
+	function loadTileTabs() {
+		var raw = plasmoid.configuration.tileTabs || ''
+		if (!raw) {
+			// First-time enable: migrate existing single tileModel into tab "Main"
+			var existingTiles = (config.tileModel && config.tileModel.value)
+				? config.tileModel.value.slice()
+				: []
+			tileTabsData = [{
+				id: '1',
+				name: i18n('Main'),
+				tiles: existingTiles,
+			}]
+			popup.saveTileTabs()
+		} else {
+			try {
+				var decoded = Qt.atob(raw)
+				var parsed = JSON.parse(decoded)
+				if (!Array.isArray(parsed) || parsed.length === 0) {
+					tileTabsData = [{id: '1', name: i18n('Main'), tiles: []}]
+				} else {
+					tileTabsData = parsed
+				}
+			} catch (e) {
+				tileTabsData = [{id: '1', name: i18n('Main'), tiles: []}]
+			}
+		}
+		if (activeTabIndex >= tileTabsData.length) {
+			activeTabIndex = 0
+		}
+		popup.normalizeGroupHeaderHeights()
+		popup.resetViewsAfterTileModelReload()
+	}
+
+	function saveTileTabs() {
+		try {
+			var json = JSON.stringify(tileTabsData)
+			_tabsWriting = true
+			plasmoid.configuration.tileTabs = Qt.btoa(json)
+			_tabsWriting = false
+		} catch (e) {
+			_tabsWriting = false
+		}
+	}
+
+	function selectTab(index) {
+		if (index < 0 || index >= tileTabsData.length) return
+		if (index === activeTabIndex) return
+		// Persist current tab tiles before switching
+		popup.saveTileTabs()
+		// Close the tile editor: the tile reference belongs to the current tab and
+		// would become stale once the model switches to a different tab's tiles.
+		if (tileEditorViewLoader && tileEditorViewLoader.active) {
+			tileEditorViewLoader.active = false
+		}
+		activeTabIndex = index
+	}
+
+	function addTab() {
+		_tabIdCounter++
+		var newId = 'tab_' + _tabIdCounter
+		var newTabs = tileTabsData.slice()
+		newTabs.push({id: newId, name: i18n('New Tab'), tiles: []})
+		tileTabsData = newTabs
+		activeTabIndex = newTabs.length - 1
+		popup.saveTileTabs()
+	}
+
+	function deleteTab(index) {
+		if (tileTabsData.length <= 1) return
+		// Persist before deleting
+		popup.saveTileTabs()
+		// Close editor if it is editing a tile from the deleted tab
+		if (tileEditorViewLoader && tileEditorViewLoader.active) {
+			tileEditorViewLoader.active = false
+		}
+		var newTabs = tileTabsData.slice()
+		newTabs.splice(index, 1)
+		tileTabsData = newTabs
+		if (activeTabIndex >= newTabs.length) {
+			activeTabIndex = newTabs.length - 1
+		}
+		popup.saveTileTabs()
+	}
+
+	function renameTab(index, newName) {
+		if (index < 0 || index >= tileTabsData.length) return
+		var newTabs = tileTabsData.slice()
+		newTabs[index] = {
+			id: newTabs[index].id,
+			name: newName,
+			tiles: newTabs[index].tiles,
+		}
+		tileTabsData = newTabs
+		popup.saveTileTabs()
+	}
+
+
 	function effectiveDevicePixelRatio() {
 		var screenDpr = Screen.devicePixelRatio || 0
 		if (screenDpr > 0) {
@@ -220,7 +334,12 @@ MouseArea {
 	}
 
 	function normalizeGroupHeaderHeights() {
-		var model = config && config.tileModel ? config.tileModel.value : null
+		var model
+		if (config && config.useTileTabs) {
+			model = popup.activeTabTiles
+		} else {
+			model = config && config.tileModel ? config.tileModel.value : null
+		}
 		if (!model || !model.length) {
 			return
 		}
@@ -510,6 +629,9 @@ MouseArea {
 		if (popup.widgetExpanded) {
 			popup.scheduleRestoreForCurrentView("component-completed")
 		}
+		if (config.useTileTabs) {
+			popup.loadTileTabs()
+		}
 	}
 	Screen.onDevicePixelRatioChanged: {
 		var currentDpr = popup.effectiveDevicePixelRatio()
@@ -542,6 +664,31 @@ MouseArea {
 		function onShowSearchChanged() {
 			if (popup._pendingEditSidebarResize) {
 				editSidebarResizeDebounced.restart()
+			}
+		}
+		function onUseTileTabsChanged() {
+			if (config.useTileTabs) {
+				popup.loadTileTabs()
+			} else {
+				// Restore the active tab's tiles back to the single tileModel so
+				// the user doesn't lose their work when they disable tabs.
+				var idx = Math.min(popup.activeTabIndex, popup.tileTabsData.length - 1)
+				if (idx >= 0 && popup.tileTabsData.length > 0) {
+					var activeTiles = popup.tileTabsData[idx].tiles || []
+					if (activeTiles.length > 0) {
+						config.tileModel.value = activeTiles
+						config.tileModel.save()
+					}
+				}
+			}
+		}
+	}
+
+	Connections {
+		target: plasmoid.configuration
+		function onTileTabsChanged() {
+			if (config.useTileTabs && !popup._tabsWriting) {
+				popup.loadTileTabs()
 			}
 		}
 	}
@@ -670,24 +817,60 @@ MouseArea {
 					}
 				}
 
-				TileGrid {
-					id: tileGrid
+				ColumnLayout {
 					Layout.fillWidth: true
 					Layout.fillHeight: true
+					spacing: 0
 
-					cellSize: config.cellSize
-					cellMargin: config.cellMargin
-					cellPushedMargin: config.cellPushedMargin
+					TileTabBar {
+						id: tileTabBar
+						Layout.fillWidth: true
+						visible: config.useTileTabs
+						activeTab: popup.activeTabIndex
+						tabs: popup.tileTabsData.map(function(t) {
+							return {id: t.id, name: t.name}
+						})
 
-					tileModel: config.tileModel.value
+						onTabSelected: function(index) { popup.selectTab(index) }
+						onTabAdded: popup.addTab()
+						onTabDeleted: function(index) { popup.deleteTab(index) }
+						onTabRenamed: function(index, newName) { popup.renameTab(index, newName) }
+					}
 
-					onEditTile: function(tile) { tileEditorViewLoader.open(tile) }
+					TileGrid {
+						id: tileGrid
+						Layout.fillWidth: true
+						Layout.fillHeight: true
 
-					onTileModelChanged: saveTileModel.restart()
-					Timer {
-						id: saveTileModel
-						interval: 2000
-						onTriggered: config.tileModel.save()
+						cellSize: config.cellSize
+						cellMargin: config.cellMargin
+						cellPushedMargin: config.cellPushedMargin
+
+						tileModel: config.useTileTabs ? popup.activeTabTiles : config.tileModel.value
+
+						onEditTile: function(tile) { tileEditorViewLoader.open(tile) }
+
+						onTileModelChanged: {
+							if (config.useTileTabs) {
+								saveActiveTabTilesDebounced.restart()
+							} else {
+								saveTileModel.restart()
+							}
+						}
+						Timer {
+							id: saveTileModel
+							interval: 2000
+							onTriggered: config.tileModel.save()
+						}
+						Timer {
+							id: saveActiveTabTilesDebounced
+							interval: 2000
+							onTriggered: {
+								if (config.useTileTabs) {
+									popup.saveTileTabs()
+								}
+							}
+						}
 					}
 				}
 			}
