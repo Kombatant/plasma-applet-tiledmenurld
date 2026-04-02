@@ -54,6 +54,9 @@ MouseArea {
 	property real _lastRestoreDevicePixelRatio: 0
 	property bool _pendingDprSyncRestore: false
 	readonly property bool widgetExpanded: (typeof widget !== "undefined" && widget && typeof widget.expanded !== "undefined") ? widget.expanded : false
+	property string _pendingRestoreView: ""
+	property string _lastAppliedRestoreKey: ""
+	property bool _restoreQueuedWhileCollapsed: false
 
 	function effectiveDevicePixelRatio() {
 		var screenDpr = Screen.devicePixelRatio || 0
@@ -114,10 +117,21 @@ MouseArea {
 			popup.scheduleDprSyncRestore()
 			return
 		}
+		function normalizedRenderedSize(liveValue, preferredValue, implicitValue) {
+			var candidate = liveValue > 0 ? liveValue : preferredValue
+			if (!(candidate > 0)) {
+				candidate = implicitValue
+			}
+			var stableTarget = preferredValue > 0 ? preferredValue : implicitValue
+			if (candidate > 0 && stableTarget > 0 && Math.abs(candidate - stableTarget) <= Math.max(2, dpr)) {
+				return stableTarget
+			}
+			return candidate
+		}
 		// Manual popup resizing updates the live item size first. Persist from the
 		// rendered geometry so width/height don't get stuck on stale layout hints.
-		var effectiveWidth = popup.width > 0 ? popup.width : popup.Layout.preferredWidth
-		var effectiveHeight = popup.height > 0 ? popup.height : popup.Layout.preferredHeight
+		var effectiveWidth = normalizedRenderedSize(popup.width, popup.Layout.preferredWidth, popup.implicitWidth)
+		var effectiveHeight = normalizedRenderedSize(popup.height, popup.Layout.preferredHeight, popup.implicitHeight)
 		var logicalWidth = Math.round(effectiveWidth / dpr)
 		var logicalHeight = Math.round(effectiveHeight / dpr)
 		var favWidth = Math.max(0, effectiveWidth - config.leftSectionWidth)
@@ -143,6 +157,16 @@ MouseArea {
 	}
 
 	function restoreRememberedSizeForView(viewName) {
+		var normalizedView = normalizedSizeMemoryView(viewName)
+		popup._pendingRestoreView = normalizedView
+		if (!popup.widgetExpanded) {
+			popup._restoreQueuedWhileCollapsed = true
+			return
+		}
+		restoreViewDebounced.restart()
+	}
+
+	function performRestoreRememberedSizeForView(viewName) {
 		if (!config) {
 			return
 		}
@@ -161,6 +185,11 @@ MouseArea {
 		if (!(savedCols > 0)) {
 			savedCols = plasmoid.configuration.favGridCols
 		}
+		var restoreKey = [normalizedView, savedWidth, savedHeight, savedCols, effectiveDevicePixelRatio()].join("|")
+		if (popup._lastAppliedRestoreKey === restoreKey && popup._sizeRestored && !popup._pendingDprSyncRestore) {
+			return
+		}
+		popup._lastAppliedRestoreKey = restoreKey
 
 		if (savedHeight > 0 && plasmoid.configuration.popupHeight !== savedHeight) {
 			plasmoid.configuration.popupHeight = savedHeight
@@ -173,6 +202,16 @@ MouseArea {
 
 	function restoreRememberedSizeForCurrentView() {
 		restoreRememberedSizeForView(currentSizeMemoryView())
+	}
+
+	function scheduleRestoreForCurrentView(reason) {
+		var viewName = currentSizeMemoryView()
+		popup._pendingRestoreView = viewName
+		if (popup.widgetExpanded) {
+			restoreViewDebounced.restart()
+		} else {
+			popup._restoreQueuedWhileCollapsed = true
+		}
 	}
 
 	function scheduleDprSyncRestore() {
@@ -431,7 +470,21 @@ MouseArea {
 			popup._pendingDprSyncRestore = false
 			var currentDpr = popup.effectiveDevicePixelRatio()
 			popup._lastKnownDevicePixelRatio = currentDpr
-			popup.restoreRememberedSizeForCurrentView()
+			popup.scheduleRestoreForCurrentView("dpr-sync")
+		}
+	}
+	Timer {
+		id: restoreViewDebounced
+		interval: 0
+		repeat: false
+		onTriggered: {
+			if (!popup.widgetExpanded) {
+				popup._restoreQueuedWhileCollapsed = true
+				return
+			}
+			var targetView = popup._pendingRestoreView || popup.currentSizeMemoryView()
+			popup._restoreQueuedWhileCollapsed = false
+			popup.performRestoreRememberedSizeForView(targetView)
 		}
 	}
 	Timer {
@@ -455,7 +508,7 @@ MouseArea {
 			}
 		}
 		if (popup.widgetExpanded) {
-			popup.restoreRememberedSizeForCurrentView()
+			popup.scheduleRestoreForCurrentView("component-completed")
 		}
 	}
 	Screen.onDevicePixelRatioChanged: {
@@ -468,10 +521,11 @@ MouseArea {
 	onWidgetExpandedChanged: {
 		if (popup.widgetExpanded) {
 			popup._lastKnownDevicePixelRatio = popup.effectiveDevicePixelRatio()
+			popup._lastAppliedRestoreKey = ""
 			if (searchView && typeof searchView.setActiveSizeMemoryView === "function" && typeof searchView.resolveConfiguredDefaultView === "function") {
 				searchView.setActiveSizeMemoryView(searchView.resolveConfiguredDefaultView())
 			}
-			popup.restoreRememberedSizeForCurrentView()
+			popup.scheduleRestoreForCurrentView("widget-expanded")
 		} else if (!popup._suppressPersist && popup._sizeRestored) {
 			// The debounced saver can lose the final manual resize if the popup is
 			// closed before it fires. Persist the live size one last time on close.
