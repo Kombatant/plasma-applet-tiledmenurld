@@ -1,6 +1,5 @@
 import QtQuick
 import QtQuick.Window
-import QtQuick.Layouts
 import QtQuick.Controls as QQC2
 import org.kde.kirigami as Kirigami
 import org.kde.plasma.extras as PlasmaExtras
@@ -120,7 +119,6 @@ Item {
 		PlasmaExtras.MenuItem {
 			icon: "edit-delete-remove"
 			text: i18n("Delete Tab")
-			enabled: tabBar.tabs.length > 1
 			onClicked: tabBar.tabDeleted(tabContextMenu.tabIdx)
 		}
 	}
@@ -134,10 +132,26 @@ Item {
 		}
 	}
 
+	// Whether the tab row overflows and needs scrolling
+	readonly property bool _canScroll: tabFlickable.contentWidth > tabFlickable.width
+
 	// ── Layout ───────────────────────────────────────────────────────────────
-	RowLayout {
-		anchors.fill: parent
-		spacing: Kirigami.Units.smallSpacing
+	Flickable {
+		id: tabFlickable
+		anchors.left: parent.left
+		anchors.right: scrollArrows.visible ? scrollArrows.left : parent.right
+		anchors.top: parent.top
+		anchors.bottom: parent.bottom
+		contentWidth: tabRow.width
+		contentHeight: height
+		clip: true
+		flickableDirection: Flickable.HorizontalFlick
+		boundsBehavior: Flickable.StopAtBounds
+
+		Row {
+			id: tabRow
+			height: parent.height
+			spacing: Kirigami.Units.smallSpacing
 
 		// ── Tab buttons ──────────────────────────────────────────────────────
 		Repeater {
@@ -150,8 +164,8 @@ Item {
 				readonly property bool isActive: tabBar.activeTab === index
 				property bool isEditing: false
 
-				Layout.preferredWidth: Math.max(Kirigami.Units.gridUnit * 4.5, tabLabelText.implicitWidth + (tabIconItem.visible ? tabIconItem.width + Kirigami.Units.smallSpacing : 0) + Kirigami.Units.gridUnit * 2)
-				Layout.fillHeight: true
+				width: Math.max(Kirigami.Units.gridUnit * 4.5, tabLabelText.implicitWidth + (tabIconItem.visible ? tabIconItem.width + Kirigami.Units.smallSpacing : 0) + Kirigami.Units.gridUnit * 2)
+				height: tabFlickable.height
 
 				readonly property string tabIcon: modelData.icon || ""
 
@@ -256,7 +270,7 @@ Item {
 					id: hoverArea
 					anchors.fill: parent
 					hoverEnabled: true
-					acceptedButtons: Qt.LeftButton | Qt.RightButton
+					acceptedButtons: Qt.LeftButton | Qt.MiddleButton | Qt.RightButton
 					cursorShape: tabBar._dragSourceIndex >= 0
 						? Qt.ClosedHandCursor : Qt.ArrowCursor
 
@@ -272,7 +286,8 @@ Item {
 					}
 
 					onPositionChanged: function(mouse) {
-						if (pressed && !tabDelegate.isEditing
+						if (pressed && mouse.buttons & Qt.LeftButton
+								&& !tabDelegate.isEditing
 								&& tabBar._dragSourceIndex < 0) {
 							if (Math.abs(mouse.x - _pressPos.x) > 8) {
 								tabBar._dragSourceIndex = index
@@ -302,7 +317,9 @@ Item {
 
 					onClicked: function(mouse) {
 						if (_didDrag) return
-						if (mouse.button === Qt.RightButton) {
+						if (mouse.button === Qt.MiddleButton) {
+							tabBar.tabDeleted(index)
+						} else if (mouse.button === Qt.RightButton) {
 							tabContextMenu.tabIdx = index
 							var pos = mapToItem(tabBar, mouse.x,
 								mouse.y)
@@ -322,8 +339,8 @@ Item {
 		// ── "+" Add Tab button ───────────────────────────────────────────────
 		Item {
 			id: addTabBtn
-			Layout.preferredWidth: tabBar.tabHeight
-			Layout.fillHeight: true
+			width: tabBar.tabHeight
+			height: tabFlickable.height
 
 			// No background fill – flat style
 			Item { anchors.fill: parent }
@@ -344,9 +361,97 @@ Item {
 				onClicked: tabBar.tabAdded()
 			}
 		}
+		}
+	}
 
-		// ── Spacer ───────────────────────────────────────────────────────────
-		Item { Layout.fillWidth: true }
+	// ── Scroll arrow controls ────────────────────────────────────────────────
+	Row {
+		id: scrollArrows
+		anchors.right: parent.right
+		anchors.top: parent.top
+		anchors.bottom: parent.bottom
+		visible: tabBar._canScroll
+		spacing: 0
+
+		Rectangle {
+			width: 1
+			height: parent.height
+			color: Kirigami.Theme.textColor
+			opacity: 0.12
+		}
+
+		Item {
+			width: Kirigami.Units.gridUnit * 1.5
+			height: parent.height
+			Kirigami.Icon {
+				anchors.centerIn: parent
+				width: Kirigami.Units.iconSizes.small
+				height: width
+				source: "go-previous"
+				color: Kirigami.Theme.textColor
+				opacity: scrollBackMA.containsMouse ? 0.9 : (tabFlickable.contentX > 0 ? 0.55 : 0.2)
+			}
+			MouseArea {
+				id: scrollBackMA
+				anchors.fill: parent
+				hoverEnabled: true
+				cursorShape: Qt.PointingHandCursor
+				onClicked: {
+					tabFlickable.contentX = Math.max(0,
+						tabFlickable.contentX - tabFlickable.width * 0.6)
+				}
+			}
+		}
+
+		Item {
+			width: Kirigami.Units.gridUnit * 1.5
+			height: parent.height
+			Kirigami.Icon {
+				anchors.centerIn: parent
+				width: Kirigami.Units.iconSizes.small
+				height: width
+				source: "go-next"
+				color: Kirigami.Theme.textColor
+				opacity: scrollFwdMA.containsMouse ? 0.9 : (tabFlickable.contentX < tabFlickable.contentWidth - tabFlickable.width ? 0.55 : 0.2)
+			}
+			MouseArea {
+				id: scrollFwdMA
+				anchors.fill: parent
+				hoverEnabled: true
+				cursorShape: Qt.PointingHandCursor
+				onClicked: {
+					tabFlickable.contentX = Math.min(
+						tabFlickable.contentWidth - tabFlickable.width,
+						tabFlickable.contentX + tabFlickable.width * 0.6)
+				}
+			}
+		}
+	}
+
+	// Translate vertical mouse-wheel into horizontal tab scrolling
+	MouseArea {
+		anchors.fill: tabFlickable
+		acceptedButtons: Qt.NoButton
+		onWheel: function(wheel) {
+			var delta = wheel.angleDelta.y !== 0 ? wheel.angleDelta.y : wheel.angleDelta.x
+			if (delta !== 0 && tabFlickable.contentWidth > tabFlickable.width) {
+				tabFlickable.contentX = Math.max(0,
+					Math.min(tabFlickable.contentWidth - tabFlickable.width,
+						tabFlickable.contentX - delta))
+			}
+		}
+	}
+
+	// Auto-scroll so the active tab is always visible
+	onActiveTabChanged: {
+		var item = tabRepeater.itemAt(activeTab)
+		if (!item || !tabFlickable) return
+		var itemLeft = item.x
+		var itemRight = item.x + item.width
+		if (itemLeft < tabFlickable.contentX)
+			tabFlickable.contentX = itemLeft
+		else if (itemRight > tabFlickable.contentX + tabFlickable.width)
+			tabFlickable.contentX = itemRight - tabFlickable.width
 	}
 
 	// ── Drop indicator ──────────────────────────────────────────────────────

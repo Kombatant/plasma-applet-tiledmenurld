@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Layouts
+import QtQuick.Dialogs as QtDialogs
 import org.kde.kirigami as Kirigami
 import org.kde.plasma.core as PlasmaCore
 
@@ -192,7 +193,25 @@ MouseArea {
 	}
 
 	function deleteTab(index) {
-		if (tileTabsData.length <= 1) return
+		if (index < 0 || index >= tileTabsData.length) return
+		var tab = tileTabsData[index]
+		var tiles = tab.tiles || []
+		var hasTiles = false
+		for (var i = 0; i < tiles.length; i++) {
+			if (tiles[i].tileType !== "group") { hasTiles = true; break }
+		}
+		if (hasTiles) {
+			_pendingDeleteTabIndex = index
+			deleteTabDialog.open()
+			return
+		}
+		_doDeleteTab(index)
+	}
+
+	property int _pendingDeleteTabIndex: -1
+
+	function _doDeleteTab(index) {
+		if (index < 0 || index >= tileTabsData.length) return
 		// Persist before deleting
 		popup.saveTileTabs()
 		// Close editor if it is editing a tile from the deleted tab
@@ -201,11 +220,41 @@ MouseArea {
 		}
 		var newTabs = tileTabsData.slice()
 		newTabs.splice(index, 1)
+		if (newTabs.length === 0) {
+			// Deleting the last tab – replace with a fresh empty one
+			_tabIdCounter++
+			var freshName = i18n('Tiles')
+			newTabs.push({id: 'tab_' + _tabIdCounter, name: freshName, icon: popup.inferTabIcon(freshName), tiles: []})
+		}
 		tileTabsData = newTabs
 		if (activeTabIndex >= newTabs.length) {
 			activeTabIndex = newTabs.length - 1
 		}
 		popup.saveTileTabs()
+	}
+
+	QtDialogs.MessageDialog {
+		id: deleteTabDialog
+		title: i18n("Delete Tab")
+		text: {
+			var idx = popup._pendingDeleteTabIndex
+			var tabName = (idx >= 0 && idx < popup.tileTabsData.length)
+				? popup.tileTabsData[idx].name : ""
+			var tiles = (idx >= 0 && idx < popup.tileTabsData.length)
+				? (popup.tileTabsData[idx].tiles || []) : []
+			var count = 0
+			for (var i = 0; i < tiles.length; i++) {
+				if (tiles[i].tileType !== "group") count++
+			}
+			return i18n("The tab \"%1\" contains %2 tile(s). Delete it anyway?", tabName, count)
+		}
+		buttons: QtDialogs.MessageDialog.Yes | QtDialogs.MessageDialog.No
+		onButtonClicked: function(button, role) {
+			if (button === QtDialogs.MessageDialog.Yes) {
+				popup._doDeleteTab(popup._pendingDeleteTabIndex)
+			}
+			popup._pendingDeleteTabIndex = -1
+		}
 	}
 
 	function renameTab(index, newName) {
