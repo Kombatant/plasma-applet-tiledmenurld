@@ -82,6 +82,17 @@
 			<default>org.kde.dolphin.desktop</default>
 		</entry>
 
+		<!-- Tabs -->
+		<entry name="useTileTabs" type="bool">
+			<label>Whether to use a tabbed tile grid instead of a single tile area.</label>
+			<default>false</default>
+		</entry>
+		<entry name="tileTabs" type="string">
+			<!-- Base64-encoded JSON array (encoded/decoded in JS via Qt.btoa/Qt.atob):
+			     [{id: string, name: string, tiles: [{x,y,w,h,url,...}]}] -->
+			<default></default>
+		</entry>
+
 		<!-- Base64 encoded XML -->
 		<entry name="tileModel" type="string" stringType="base64xml">
 			<!-- Schema: [{ url: "konsole.desktop", x: 3, y: 0, w: 2, h: 2, label: "Terminal" }, ...] -->

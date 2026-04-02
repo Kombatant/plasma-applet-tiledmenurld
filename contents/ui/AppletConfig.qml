@@ -65,6 +65,10 @@ Item {
 		_ensureSettingInitialized('taskManagerApp', 'org.kde.plasma-systemmonitor.desktop')
 		_ensureSettingInitialized('fileManagerApp', 'org.kde.dolphin.desktop')
 
+		// Tile tabs
+		_ensureSettingInitialized('useTileTabs', false)
+		_ensureSettingInitialized('tileTabs', '')
+
 		// Base64 encoded XML string; empty string means "use default".
 		_ensureSettingInitialized('tileModel', '')
 		_ensureSettingInitialized('tileScale', 0.4)
@@ -290,6 +294,7 @@ Item {
 	//--- Style
 	// Tiles
 	readonly property bool showTileTooltips: !!plasmoid.configuration.showTileTooltips
+	readonly property bool useTileTabs: !!plasmoid.configuration.useTileTabs
 	readonly property int tileLabelAlignment: {
 		var val = plasmoid.configuration.tileLabelAlignment
 		if (val === 'center') {

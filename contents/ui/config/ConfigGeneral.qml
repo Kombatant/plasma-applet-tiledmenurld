@@ -113,6 +113,12 @@ LibConfig.FormKCM {
 		text: i18n("Tiles")
 	}
 
+	LibConfig.CheckBox {
+		configKey: 'useTileTabs'
+		text: i18n("Use multiple tabs in the tile area")
+		Kirigami.FormData.label: i18n("Tabs")
+	}
+
 	RowLayout {
 		id: tileSizeRow
 		Kirigami.FormData.label: i18n("Tile Size")
