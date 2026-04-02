@@ -424,6 +424,33 @@ Item {
 					tileItem.openTileEditor()
 				})
 				menu.addMenuItem(menuItem)
+
+				// "Move to" submenu — only when tabs are enabled and >1 tab
+				if (config.useTileTabs
+						&& popup.tileTabsData.length > 1) {
+					var moveItem = menu.newMenuItem()
+					moveItem.text = i18n("Move to")
+					moveItem.icon = 'tab-duplicate'
+					var subMenu = Qt.createQmlObject(
+						"import org.kde.plasma.extras as PlasmaExtras; PlasmaExtras.Menu {}",
+						moveItem)
+					subMenu.visualParent = moveItem.action
+					for (var t = 0; t < popup.tileTabsData.length; t++) {
+						if (t === popup.activeTabIndex) continue
+						var tab = popup.tileTabsData[t]
+						var tabItem = Qt.createQmlObject(
+							"import org.kde.plasma.extras as PlasmaExtras; PlasmaExtras.MenuItem {}",
+							subMenu)
+						tabItem.text = tab.name
+						;(function(tabId) {
+							tabItem.clicked.connect(function() {
+								tileGrid.moveTileToTab(index, tabId)
+							})
+						})(tab.id)
+						subMenu.addMenuItem(tabItem)
+					}
+					menu.addMenuItem(moveItem)
+				}
 			}
 		}
 	}

@@ -171,6 +171,64 @@ MouseArea {
 		popup.saveTileTabs()
 	}
 
+	function moveTileToTab(tileIndex, tabId) {
+		if (!config.useTileTabs) return
+		var srcTiles = tileTabsData[activeTabIndex].tiles
+		if (tileIndex < 0 || tileIndex >= srcTiles.length) return
+		var destIdx = -1
+		for (var i = 0; i < tileTabsData.length; i++) {
+			if (tileTabsData[i].id === tabId) { destIdx = i; break }
+		}
+		if (destIdx < 0 || destIdx === activeTabIndex) return
+
+		// Close tile editor — references belong to the current tab's model
+		if (tileEditorViewLoader && tileEditorViewLoader.active) {
+			tileEditorViewLoader.active = false
+		}
+
+		var target = srcTiles[tileIndex]
+		var moved = []
+		if (target.tileType === 'group') {
+			var area = tileGrid.getGroupAreaRect(target)
+			for (var j = srcTiles.length - 1; j >= 0; j--) {
+				var t = srcTiles[j]
+				if (t === target || tileGrid.tileWithin(t, area.x1, area.y1, area.x2, area.y2)) {
+					moved.unshift(srcTiles.splice(j, 1)[0])
+				}
+			}
+		} else {
+			moved.push(srcTiles.splice(tileIndex, 1)[0])
+		}
+
+		var destTiles = tileTabsData[destIdx].tiles
+		for (var k = 0; k < moved.length; k++) {
+			destTiles.push(moved[k])
+		}
+
+		tileGrid.tileModelChanged()
+		popup.saveTileTabs()
+	}
+
+	function moveTab(fromIndex, toIndex) {
+		if (fromIndex < 0 || fromIndex >= tileTabsData.length) return
+		if (toIndex < 0 || toIndex >= tileTabsData.length) return
+		if (fromIndex === toIndex) return
+		var newTabs = tileTabsData.slice()
+		var tab = newTabs.splice(fromIndex, 1)[0]
+		newTabs.splice(toIndex, 0, tab)
+		tileTabsData = newTabs
+		if (activeTabIndex === fromIndex) {
+			activeTabIndex = toIndex
+		} else if (fromIndex < activeTabIndex
+				&& toIndex >= activeTabIndex) {
+			activeTabIndex--
+		} else if (fromIndex > activeTabIndex
+				&& toIndex <= activeTabIndex) {
+			activeTabIndex++
+		}
+		popup.saveTileTabs()
+	}
+
 
 	function effectiveDevicePixelRatio() {
 		var screenDpr = Screen.devicePixelRatio || 0
@@ -430,9 +488,12 @@ MouseArea {
 		var sidebarExtraHeight = (config.sidebarOnTop || config.sidebarOnBottom)
 			? (config.sidebarHeight + config.sidebarRightMargin)
 			: 0
+		var tabBarExtraHeight = (config.useTileTabs && tileTabBar)
+			? tileTabBar.implicitHeight
+			: 0
 		var targetGridHeight = rows * cellBox + 2 * holoPad
 		var targetWidth = Math.max(config.minimumWidth, config.leftSectionWidth + targetGridWidth)
-		var targetHeight = Math.max(config.minimumHeight, targetGridHeight + sidebarExtraHeight)
+		var targetHeight = Math.max(config.minimumHeight, targetGridHeight + sidebarExtraHeight + tabBarExtraHeight)
 		var dpr = Screen.devicePixelRatio || 1
 		var logicalHeight = Math.ceil(targetHeight / dpr)
 		var logicalWidth = Math.ceil(targetWidth / dpr)
@@ -835,6 +896,7 @@ MouseArea {
 						onTabAdded: popup.addTab()
 						onTabDeleted: function(index) { popup.deleteTab(index) }
 						onTabRenamed: function(index, newName) { popup.renameTab(index, newName) }
+						onTabMoved: function(fromIndex, toIndex) { popup.moveTab(fromIndex, toIndex) }
 					}
 
 					TileGrid {
@@ -849,6 +911,7 @@ MouseArea {
 						tileModel: config.useTileTabs ? popup.activeTabTiles : config.tileModel.value
 
 						onEditTile: function(tile) { tileEditorViewLoader.open(tile) }
+						onMoveTileToTab: function(tileIndex, tabId) { popup.moveTileToTab(tileIndex, tabId) }
 
 						onTileModelChanged: {
 							if (config.useTileTabs) {

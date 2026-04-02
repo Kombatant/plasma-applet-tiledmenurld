@@ -48,6 +48,9 @@ DropArea {
 	property bool canDrop: false
 	readonly property bool hasDrag: tileGrid.editing && dropHoverX >= 0 && dropHoverY >= 0
 	readonly property bool isDraggingGroup: hasDrag && draggedItem && draggedItem.tileType == "group"
+
+	signal moveTileToTab(int tileIndex, string tabId)
+
 	readonly property var draggedGroupRect: {
 		if (isDraggingGroup) {
 			return getGroupAreaRect(draggedItem)
