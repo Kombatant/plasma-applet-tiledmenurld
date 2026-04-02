@@ -102,9 +102,14 @@ Item {
 					tabDelegate.isEditing = false
 				}
 
-				// ── Background (flat – no fill) ─────────────────────────────
-				Item {
+				// ── Background (hover highlight) ────────────────────────────
+				Rectangle {
 					anchors.fill: parent
+					anchors.margins: 2
+					radius: 4
+					color: Kirigami.Theme.highlightColor
+					opacity: hoverArea.containsMouse && !tabDelegate.isActive ? 0.15 : 0
+					Behavior on opacity { NumberAnimation { duration: 100 } }
 				}
 
 				// ── Active tab bottom indicator (text-width underline) ──────
@@ -128,7 +133,8 @@ Item {
 					text: modelData.name || ""
 					color: Kirigami.Theme.textColor
 					opacity: (tabBar._dragSourceIndex === index) ? 0.3
-					: (tabDelegate.isActive ? 1.0 : 0.6)
+					: tabDelegate.isActive ? 1.0
+					: hoverArea.containsMouse ? 0.85 : 0.6
 					Behavior on opacity { NumberAnimation { duration: 100 } }
 					elide: Text.ElideRight
 					visible: !tabDelegate.isEditing
