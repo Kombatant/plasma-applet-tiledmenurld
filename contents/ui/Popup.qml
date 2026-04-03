@@ -619,8 +619,6 @@ MouseArea {
 			? tileTabBar.implicitHeight
 			: 0
 		var targetGridHeight = rows * cellBox + 2 * holoPad
-		var handleVisible = (typeof appAreaResizeHandle !== "undefined") && appAreaResizeHandle.visible
-		var handleW = handleVisible ? appAreaResizeHandle.width : 0
 		var targetWidth = Math.max(config.minimumWidth, config.leftSectionWidth + targetGridWidth)
 		var targetHeight = Math.max(config.minimumHeight, targetGridHeight + sidebarExtraHeight + tabBarExtraHeight)
 		var dpr = Screen.devicePixelRatio || 1
@@ -656,39 +654,9 @@ MouseArea {
 		// Also set the actual item sizes to push the change through even if a binding was broken earlier.
 		popup.width = targetWidth
 		popup.height = targetHeight
-
-		// Diagnostic: dump auto-resize values for debugging
-		console.log("[AutoResize] DPR=" + dpr
-			+ " cellBox(grid)=" + cellBox
-			+ " cellBox(config)=" + config.cellBoxSize
-			+ " holoPad=" + holoPad
-			+ " cols=" + cols + " rows=" + rows
-			+ " maxCol=" + tileGrid.maxColumn + " maxRow=" + tileGrid.maxRow
-			+ " gridColumns=" + tileGrid.columns
-			+ " targetGridW=" + targetGridWidth + " targetGridH=" + targetGridHeight
-			+ " leftSection=" + config.leftSectionWidth
-			+ " handleVisible=" + handleVisible + " handleW=" + handleW
-			+ " targetW=" + targetWidth + " targetH=" + targetHeight
-			+ " popup.width=" + popup.width + " popup.height=" + popup.height
-			+ " tileGrid.width=" + tileGrid.width + " tileGrid.height=" + tileGrid.height
-			+ " scrollItem=" + (tileGrid.columns * cellBox + 2 * holoPad)
-			+ " tabBarH=" + tabBarExtraHeight
-			+ " sidebarExtraH=" + sidebarExtraHeight
-			+ " showSearch=" + config.showSearch
-			+ " configPopupWidth=" + config.popupWidth
-		)
-
 		Qt.callLater(function() {
 			popup.width = targetWidth
 			popup.height = targetHeight
-			console.log("[AutoResize:deferred] popup.width=" + popup.width
-				+ " popup.height=" + popup.height
-				+ " tileGrid.width=" + tileGrid.width
-				+ " tileGrid.height=" + tileGrid.height
-				+ " gridColumns=" + tileGrid.columns
-				+ " gridRows=" + tileGrid.rows
-				+ " preferredW=" + popup.Layout.preferredWidth
-			)
 			// Release max/implicit on the following frame to re-enable manual resize.
 			Qt.callLater(function() {
 				popup.Layout.maximumWidth = -1
@@ -696,11 +664,6 @@ MouseArea {
 				popup.Layout.minimumWidth = restoreMinW
 				popup.Layout.minimumHeight = restoreMinH
 				autoResizeDeactivateGuard.restart()
-				console.log("[AutoResize:settled] popup.width=" + popup.width
-					+ " tileGrid.width=" + tileGrid.width
-					+ " preferredW=" + popup.Layout.preferredWidth
-					+ " configPopupWidth=" + config.popupWidth
-				)
 			})
 		})
 	}
