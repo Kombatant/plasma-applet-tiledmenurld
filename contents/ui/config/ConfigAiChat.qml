@@ -8,6 +8,7 @@ import "../lib"
 
 LibConfig.FormKCM {
 	id: form
+	wideMode: false
 
 	readonly property var providerOptions: [
 		{ value: "openai", text: "OpenAI" },
@@ -463,6 +464,7 @@ LibConfig.FormKCM {
 	LibConfig.CheckBox {
 		configKey: "aiStreamChat"
 		text: i18n("Enable streaming responses")
+		Kirigami.FormData.label: ""
 	}
 
 	Item {

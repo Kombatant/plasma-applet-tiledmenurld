@@ -12,6 +12,7 @@ import "../libconfig" as LibConfig
 
 LibConfig.FormKCM {
 	id: formLayout
+	wideMode: false
 
 	function tileScaleToAbsoluteSize(scale) {
 		return Math.round((scale || 0) * 160)

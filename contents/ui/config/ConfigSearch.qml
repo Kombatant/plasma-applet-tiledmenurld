@@ -10,6 +10,7 @@ import "../libconfig" as LibConfig
 
 LibConfig.FormKCM {
 	id: formLayout
+	wideMode: false
 	readonly property bool searchFieldHidden: !!plasmoid.configuration.hideSearchField
 	readonly property bool searchOptionsEnabled: !searchFieldHidden
 	readonly property bool groupedSearchResultsEnabled: formLayout.searchOptionsEnabled
@@ -37,11 +38,13 @@ LibConfig.FormKCM {
 	LibConfig.CheckBox {
 		configKey: 'hideSearchField'
 		text: i18n("Hide Search Field")
+		Kirigami.FormData.label: ""
 	}
 
 	LibConfig.CheckBox {
 		configKey: 'searchOnTop'
 		text: i18n("Search On Top")
+		Kirigami.FormData.label: ""
 		enabled: formLayout.searchOptionsEnabled
 		opacity: enabled ? 1 : 0.45
 	}
@@ -80,6 +83,7 @@ LibConfig.FormKCM {
 	LibConfig.CheckBox {
 		configKey: 'searchResultsGrouped'
 		text: i18n("Group search results")
+		Kirigami.FormData.label: ""
 		enabled: formLayout.searchOptionsEnabled
 		opacity: enabled ? 1 : 0.45
 	}

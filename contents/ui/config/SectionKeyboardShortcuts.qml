@@ -26,7 +26,8 @@ Item {
 		ColumnLayout {
 			// Bind to the viewport width so long labels wrap instead of expanding
 			// the content width and causing a horizontal scrollbar.
-			width: scrollView.availableWidth
+			x: Kirigami.Units.gridUnit
+			width: Math.max(0, scrollView.availableWidth - (Kirigami.Units.gridUnit * 2))
 			spacing: Kirigami.Units.largeSpacing
 
 			QQC2.Label {

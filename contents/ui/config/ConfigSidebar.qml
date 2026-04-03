@@ -13,6 +13,7 @@ import "../libconfig" as LibConfig
 
 LibConfig.FormKCM {
 	id: formLayout
+	wideMode: false
 
 	readonly property string plasmaStyleLabelText: {
 		var plasmaStyleText = i18nd("kcm_desktoptheme", "Plasma Style")

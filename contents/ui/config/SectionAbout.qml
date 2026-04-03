@@ -80,9 +80,9 @@ KCM.SimpleKCM {
 			id: column
 			anchors {
 				left: parent.left; right: parent.right; top: parent.top; bottom: parent.bottom
-				leftMargin: Kirigami.Units.largeSpacing; rightMargin: Kirigami.Units.largeSpacing; topMargin: Kirigami.Units.largeSpacing; bottomMargin: Kirigami.Units.largeSpacing
+				leftMargin: Kirigami.Units.gridUnit; rightMargin: Kirigami.Units.gridUnit; topMargin: Kirigami.Units.gridUnit; bottomMargin: Kirigami.Units.gridUnit
 			}
-			width: Math.max(0, parent.width - (Kirigami.Units.largeSpacing * 2))
+			width: Math.max(0, parent.width - (Kirigami.Units.gridUnit * 2))
 			spacing: Kirigami.Units.largeSpacing
 
 			GridLayout {
@@ -207,7 +207,7 @@ KCM.SimpleKCM {
 			}
 
 			QQC2.Button {
-				Layout.alignment: Qt.AlignHCenter
+				Layout.alignment: Qt.AlignLeft
 				icon.name: "tools-report-bug"
 				text: i18nd("plasma_shell_org.kde.plasma.desktop", "Report a Bug…")
 				visible: page.metaData.bugReportUrl && page.metaData.bugReportUrl.length > 0

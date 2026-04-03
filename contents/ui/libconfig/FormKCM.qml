@@ -8,6 +8,7 @@ import org.kde.kcmutils as KCM
 KCM.SimpleKCM {
 	id: simpleKCM
 	default property alias _formChildren: formLayout.data
+	property alias wideMode: formLayout.wideMode
 
 	// Force Window color scheme instead of inheriting Plasma theme colors
 	// This ensures controls look correct in light mode when Plasma theme is dark
@@ -19,6 +20,24 @@ KCM.SimpleKCM {
 		anchors.left: parent.left
 		anchors.right: parent.right
 		anchors.rightMargin: Kirigami.Units.gridUnit
+	}
+
+	function _alignInternalFormLayout() {
+		const internalLayout = formLayout.children.length > 0 ? formLayout.children[0] : null
+		if (!internalLayout || !internalLayout.anchors) {
+			return
+		}
+
+		// Kirigami.FormLayout narrows to its implicit width and centers itself
+		// when wideMode is false. That makes sparse settings pages look centered
+		// instead of following the left edge used by denser pages such as General.
+		internalLayout.anchors.horizontalCenter = undefined
+		internalLayout.anchors.left = Qt.binding(function() {
+			return formLayout.left
+		})
+		internalLayout.width = Qt.binding(function() {
+			return formLayout.wideMode ? formLayout.implicitWidth : formLayout.width
+		})
 	}
 
 	// Historically we forced a large minimum width to keep FormLayout in wideMode.
@@ -57,5 +76,9 @@ KCM.SimpleKCM {
 				}
 			})
 		}
+	}
+
+	Component.onCompleted: {
+		Qt.callLater(simpleKCM._alignInternalFormLayout)
 	}
 }
