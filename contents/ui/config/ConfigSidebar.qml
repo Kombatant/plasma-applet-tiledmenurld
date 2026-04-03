@@ -25,6 +25,10 @@ LibConfig.FormKCM {
 		id: config
 	}
 
+	function endsWith(a, b) {
+		return a.indexOf(b, a.length - b.length) !== -1
+	}
+
 	Kicker.RootModel {
 		id: appAutocompleteRootModel
 		appletInterface: (typeof plasmoid !== "undefined" && plasmoid) ? plasmoid : formLayout
@@ -80,6 +84,112 @@ LibConfig.FormKCM {
 			list = appList
 			refreshed()
 		}
+	}
+
+	function desktopEntryIdFromUrl(url) {
+		var value = ("" + (url || "")).trim()
+		if (!value.length) {
+			return ""
+		}
+		var queryIndex = value.indexOf("?")
+		if (queryIndex >= 0) {
+			value = value.substring(0, queryIndex)
+		}
+		var fragmentIndex = value.indexOf("#")
+		if (fragmentIndex >= 0) {
+			value = value.substring(0, fragmentIndex)
+		}
+		var lastSlash = Math.max(value.lastIndexOf("/"), value.lastIndexOf(":"))
+		var entryId = lastSlash >= 0 ? value.substring(lastSlash + 1) : value
+		return endsWith(entryId, ".desktop") ? entryId : ""
+	}
+
+	function desktopEntryIdForApp(app) {
+		if (!app) {
+			return ""
+		}
+		if (app.favoriteId && endsWith(app.favoriteId, ".desktop")) {
+			return app.favoriteId
+		}
+		return desktopEntryIdFromUrl(app.url)
+	}
+
+	function findInstalledAppByDesktopEntry(shortcut) {
+		var target = ("" + shortcut).trim()
+		if (!target.length) {
+			return null
+		}
+		for (var i = 0; i < installedAppsModel.count; i++) {
+			var app = installedAppsModel.get(i)
+			if (desktopEntryIdForApp(app) === target) {
+				return app
+			}
+		}
+		return null
+	}
+
+	function sidebarSuggestionScore(candidate, query) {
+		var lowerQuery = query.toLowerCase()
+		var fields = [candidate.label || "", candidate.value || "", candidate.description || ""]
+		var bestScore = -1
+		for (var i = 0; i < fields.length; i++) {
+			var field = ("" + fields[i]).toLowerCase()
+			var index = field.indexOf(lowerQuery)
+			if (index < 0) {
+				continue
+			}
+			var score = 1000 - index - field.length
+			if (index === 0) {
+				score += 250
+			}
+			if (i === 0) {
+				score += 200
+			} else if (i === 1) {
+				score += 100
+			}
+			if (score > bestScore) {
+				bestScore = score
+			}
+		}
+		return bestScore
+	}
+
+	function appSuggestionItemsForInput(value) {
+		var query = ("" + value).trim()
+		if (!query.length) {
+			return []
+		}
+
+		var results = []
+		var seen = {}
+		for (var i = 0; i < installedAppsModel.count; i++) {
+			var app = installedAppsModel.get(i)
+			var desktopEntryId = desktopEntryIdForApp(app)
+			if (!desktopEntryId.length || seen[desktopEntryId]) {
+				continue
+			}
+			var candidate = {
+				value: desktopEntryId,
+				label: app.name || desktopEntryId,
+				description: app.description || desktopEntryId
+			}
+			var score = sidebarSuggestionScore(candidate, query)
+			if (score < 0) {
+				continue
+			}
+			candidate.score = score
+			results.push(candidate)
+			seen[desktopEntryId] = true
+		}
+
+		results.sort(function(a, b) {
+			if (a.score !== b.score) {
+				return b.score - a.score
+			}
+			return (a.label || "").toLowerCase().localeCompare((b.label || "").toLowerCase())
+		})
+
+		return results.slice(0, 10)
 	}
 
 	//-------------------------------------------------------
@@ -175,52 +285,6 @@ LibConfig.FormKCM {
 				return url
 			}
 
-			function endsWith(a, b) {
-				return a.indexOf(b, a.length - b.length) !== -1
-			}
-
-			function desktopEntryIdFromUrl(url) {
-				var value = ("" + (url || "")).trim()
-				if (!value.length) {
-					return ""
-				}
-				var queryIndex = value.indexOf("?")
-				if (queryIndex >= 0) {
-					value = value.substring(0, queryIndex)
-				}
-				var fragmentIndex = value.indexOf("#")
-				if (fragmentIndex >= 0) {
-					value = value.substring(0, fragmentIndex)
-				}
-				var lastSlash = Math.max(value.lastIndexOf("/"), value.lastIndexOf(":"))
-				var entryId = lastSlash >= 0 ? value.substring(lastSlash + 1) : value
-				return endsWith(entryId, ".desktop") ? entryId : ""
-			}
-
-			function desktopEntryIdForApp(app) {
-				if (!app) {
-					return ""
-				}
-				if (app.favoriteId && endsWith(app.favoriteId, ".desktop")) {
-					return app.favoriteId
-				}
-				return desktopEntryIdFromUrl(app.url)
-			}
-
-			function findInstalledAppByDesktopEntry(shortcut) {
-				var target = ("" + shortcut).trim()
-				if (!target.length) {
-					return null
-				}
-				for (var i = 0; i < installedAppsModel.count; i++) {
-					var app = installedAppsModel.get(i)
-					if (desktopEntryIdForApp(app) === target) {
-						return app
-					}
-				}
-				return null
-			}
-
 			function supportedShortcutSuggestions() {
 				return [{
 					value: "xdg:DOCUMENTS",
@@ -243,32 +307,6 @@ LibConfig.FormKCM {
 					label: i18nd("xdg-user-dirs", "Videos"),
 					description: "xdg:VIDEOS"
 				}]
-			}
-
-			function sidebarSuggestionScore(candidate, query) {
-				var lowerQuery = query.toLowerCase()
-				var fields = [candidate.label || "", candidate.value || "", candidate.description || ""]
-				var bestScore = -1
-				for (var i = 0; i < fields.length; i++) {
-					var field = ("" + fields[i]).toLowerCase()
-					var index = field.indexOf(lowerQuery)
-					if (index < 0) {
-						continue
-					}
-					var score = 1000 - index - field.length
-					if (index === 0) {
-						score += 250
-					}
-					if (i === 0) {
-						score += 200
-					} else if (i === 1) {
-						score += 100
-					}
-					if (score > bestScore) {
-						bestScore = score
-					}
-				}
-				return bestScore
 			}
 
 			function suggestionItemsForInput(value) {
@@ -531,16 +569,22 @@ LibConfig.FormKCM {
 	LibConfig.Heading {
 		text: i18n("Right Click Menu")
 	}
-	LibConfig.TextArea{
+	LibConfig.AutocompleteTextField {
 		configKey: 'terminalApp'
 		Kirigami.FormData.label: i18n("Terminal")
+		placeholderText: cfg_terminalAppDefault || "org.kde.konsole.desktop"
+		suggestionsProvider: formLayout.appSuggestionItemsForInput
 	}
-	LibConfig.TextArea {
+	LibConfig.AutocompleteTextField {
 		configKey: 'taskManagerApp'
 		Kirigami.FormData.label: i18n("Task Manager")
+		placeholderText: cfg_taskManagerAppDefault || "org.kde.plasma-systemmonitor.desktop"
+		suggestionsProvider: formLayout.appSuggestionItemsForInput
 	}
-	LibConfig.TextArea {
+	LibConfig.AutocompleteTextField {
 		configKey: 'fileManagerApp'
 		Kirigami.FormData.label: i18n("File Manager")
+		placeholderText: cfg_fileManagerAppDefault || "org.kde.dolphin.desktop"
+		suggestionsProvider: formLayout.appSuggestionItemsForInput
 	}
 }

@@ -503,6 +503,11 @@ Item {
 					}
 					event.accepted = true
 				}
+				Keys.onTabPressed: function(event) {
+					if (root.acceptHighlightedSuggestion()) {
+						event.accepted = true
+					}
+				}
 				Keys.onEscapePressed: function(event) {
 					if (root.suggestionsVisible) {
 						suggestionsPopup.close()
