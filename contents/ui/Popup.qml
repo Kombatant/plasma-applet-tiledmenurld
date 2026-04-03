@@ -577,23 +577,38 @@ MouseArea {
 		}
 	}
 
+	// Compute effective tile bounds, excluding group headers that can be
+	// wider than their actual child content and inflate maxColumn.
+	function contentBounds() {
+		var model = tileGrid.tileModel
+		var c = 0, r = 0
+		if (model) {
+			for (var i = 0; i < model.length; i++) {
+				var t = model[i]
+				if (!t) continue
+				if (t.tileType === "group") {
+					// Group headers only drive row count (h is typically 1),
+					// not column count — their w may exceed child content.
+					r = Math.max(r, t.y + t.h)
+					continue
+				}
+				c = Math.max(c, t.x + t.w)
+				r = Math.max(r, t.y + t.h)
+			}
+		}
+		return { cols: Math.max(1, c), rows: Math.max(1, r) }
+	}
+
 	function autoResizeToContent() {
 		if (!tileGrid || !config) {
 			return
 		}
 
-		var beforeMax = {
-			cols: tileGrid.maxColumn,
-			rows: tileGrid.maxRow,
-		}
-		tileGrid.update() // refresh cached bounds
-		var afterMax = {
-			cols: tileGrid.maxColumn,
-			rows: tileGrid.maxRow,
-		}
+		tileGrid.update() // refresh cached bounds & favorites
 
-		var cols = Math.max(1, Math.ceil(tileGrid.maxColumn))
-		var rows = Math.max(1, Math.ceil(tileGrid.maxRow))
+		var bounds = contentBounds()
+		var cols = bounds.cols
+		var rows = bounds.rows
 		var cellBox = tileGrid.cellBoxSize
 		var holoPad = tileGrid._holoPad || 0
 		var targetGridWidth = cols * cellBox + 2 * holoPad
@@ -604,6 +619,8 @@ MouseArea {
 			? tileTabBar.implicitHeight
 			: 0
 		var targetGridHeight = rows * cellBox + 2 * holoPad
+		var handleVisible = (typeof appAreaResizeHandle !== "undefined") && appAreaResizeHandle.visible
+		var handleW = handleVisible ? appAreaResizeHandle.width : 0
 		var targetWidth = Math.max(config.minimumWidth, config.leftSectionWidth + targetGridWidth)
 		var targetHeight = Math.max(config.minimumHeight, targetGridHeight + sidebarExtraHeight + tabBarExtraHeight)
 		var dpr = Screen.devicePixelRatio || 1
@@ -639,9 +656,39 @@ MouseArea {
 		// Also set the actual item sizes to push the change through even if a binding was broken earlier.
 		popup.width = targetWidth
 		popup.height = targetHeight
+
+		// Diagnostic: dump auto-resize values for debugging
+		console.log("[AutoResize] DPR=" + dpr
+			+ " cellBox(grid)=" + cellBox
+			+ " cellBox(config)=" + config.cellBoxSize
+			+ " holoPad=" + holoPad
+			+ " cols=" + cols + " rows=" + rows
+			+ " maxCol=" + tileGrid.maxColumn + " maxRow=" + tileGrid.maxRow
+			+ " gridColumns=" + tileGrid.columns
+			+ " targetGridW=" + targetGridWidth + " targetGridH=" + targetGridHeight
+			+ " leftSection=" + config.leftSectionWidth
+			+ " handleVisible=" + handleVisible + " handleW=" + handleW
+			+ " targetW=" + targetWidth + " targetH=" + targetHeight
+			+ " popup.width=" + popup.width + " popup.height=" + popup.height
+			+ " tileGrid.width=" + tileGrid.width + " tileGrid.height=" + tileGrid.height
+			+ " scrollItem=" + (tileGrid.columns * cellBox + 2 * holoPad)
+			+ " tabBarH=" + tabBarExtraHeight
+			+ " sidebarExtraH=" + sidebarExtraHeight
+			+ " showSearch=" + config.showSearch
+			+ " configPopupWidth=" + config.popupWidth
+		)
+
 		Qt.callLater(function() {
 			popup.width = targetWidth
 			popup.height = targetHeight
+			console.log("[AutoResize:deferred] popup.width=" + popup.width
+				+ " popup.height=" + popup.height
+				+ " tileGrid.width=" + tileGrid.width
+				+ " tileGrid.height=" + tileGrid.height
+				+ " gridColumns=" + tileGrid.columns
+				+ " gridRows=" + tileGrid.rows
+				+ " preferredW=" + popup.Layout.preferredWidth
+			)
 			// Release max/implicit on the following frame to re-enable manual resize.
 			Qt.callLater(function() {
 				popup.Layout.maximumWidth = -1
@@ -649,6 +696,11 @@ MouseArea {
 				popup.Layout.minimumWidth = restoreMinW
 				popup.Layout.minimumHeight = restoreMinH
 				autoResizeDeactivateGuard.restart()
+				console.log("[AutoResize:settled] popup.width=" + popup.width
+					+ " tileGrid.width=" + tileGrid.width
+					+ " preferredW=" + popup.Layout.preferredWidth
+					+ " configPopupWidth=" + config.popupWidth
+				)
 			})
 		})
 	}
@@ -660,7 +712,8 @@ MouseArea {
 
 		tileGrid.update()
 
-		var cols = Math.max(1, Math.ceil(tileGrid.maxColumn))
+		var bounds = contentBounds()
+		var cols = bounds.cols
 		var cellBox = tileGrid.cellBoxSize
 		var holoPad = tileGrid._holoPad || 0
 		var targetGridWidth = cols * cellBox + 2 * holoPad
