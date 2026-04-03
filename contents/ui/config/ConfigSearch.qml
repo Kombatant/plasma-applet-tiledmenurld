@@ -20,7 +20,7 @@ LibConfig.FormKCM {
 
 	readonly property string plasmaStyleLabelText: {
 		var plasmaStyleText = i18nd("kcm_desktoptheme", "Plasma Style")
-		return plasmaStyleText + ' (' + KSvg.ImageSet.imageSetName + ')'
+		return i18n("Follow Current %1 (%2)", plasmaStyleText, KSvg.ImageSet.imageSetName)
 	}
 
 	// Keyboard shortcuts are handled by the main settings shell.
