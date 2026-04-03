@@ -577,10 +577,9 @@ MouseArea {
 		}
 	}
 
-	// Compute effective tile bounds, excluding group headers that can be
-	// wider than their actual child content and inflate maxColumn.
-	function contentBounds() {
-		var model = tileGrid.tileModel
+	// Compute effective tile bounds for a single tile model, excluding
+	// group headers that can be wider than their actual child content.
+	function modelBounds(model) {
 		var c = 0, r = 0
 		if (model) {
 			for (var i = 0; i < model.length; i++) {
@@ -597,6 +596,21 @@ MouseArea {
 			}
 		}
 		return { cols: Math.max(1, c), rows: Math.max(1, r) }
+	}
+
+	// When tabs are enabled, return the maximum bounds across all tabs
+	// so that auto-resize fits the largest tab.
+	function contentBounds() {
+		if (config.useTileTabs && tileTabsData.length > 0) {
+			var c = 0, r = 0
+			for (var ti = 0; ti < tileTabsData.length; ti++) {
+				var b = modelBounds(tileTabsData[ti].tiles)
+				c = Math.max(c, b.cols)
+				r = Math.max(r, b.rows)
+			}
+			return { cols: Math.max(1, c), rows: Math.max(1, r) }
+		}
+		return modelBounds(tileGrid.tileModel)
 	}
 
 	function autoResizeToContent() {
