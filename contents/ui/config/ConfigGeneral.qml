@@ -183,7 +183,7 @@ LibConfig.FormKCM {
 
 	LibConfig.RadioButtonGroup {
 		id: tilesThemeGroup
-		Kirigami.FormData.label: i18n("Background Colour")
+		Kirigami.FormData.label: i18n("Tile Background Colour")
 		spacing: 0 // "Custom Color" has lots of spacings already
 		RowLayout {
 			QQC2.RadioButton {

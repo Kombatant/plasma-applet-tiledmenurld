@@ -32,6 +32,7 @@ ColumnLayout {
 		sidebarShortcuts: "stringlist",
 		sidebarCollapsibleSearchResults: "bool",
 		defaultAppListView: "string",
+		lastUsedAppListView: "string",
 		aiProvider: "string",
 		aiOllamaUrl: "string",
 		aiOpenWebUiUrl: "string",
@@ -42,14 +43,16 @@ ColumnLayout {
 		terminalApp: "string",
 		taskManagerApp: "string",
 		fileManagerApp: "string",
+		useTileTabs: "bool",
+		tileTabs: "string",
 		tileModel: "tilemodel",
 		tileScale: "double",
 		tileIconSize: "int",
 		tileMargin: "double",
-			tilesLocked: "bool",
-			tileHoverEffect: "string",
-			tileAnimatedPlayOnHover: "bool",
-			showTileTooltips: "bool",
+		tilesLocked: "bool",
+		tileHoverEffect: "string",
+		tileAnimatedPlayOnHover: "bool",
+		showTileTooltips: "bool",
 		defaultTileColor: "string",
 		defaultTileGradient: "bool",
 		sidebarBackgroundColor: "string",
@@ -180,7 +183,7 @@ ColumnLayout {
 		if (configKey.indexOf("search") === 0 || configKey === "hideSearchField") {
 			return "Search"
 		}
-		if (configKey.indexOf("appList") === 0 || configKey === "appDescription" || configKey === "defaultAppListView" || configKey === "showRecentApps" || configKey === "recentOrdering" || configKey === "numRecentApps") {
+		if (configKey.indexOf("appList") === 0 || configKey === "appDescription" || configKey === "defaultAppListView" || configKey === "lastUsedAppListView" || configKey === "showRecentApps" || configKey === "recentOrdering" || configKey === "numRecentApps") {
 			return "Application List"
 		}
 		if (configKey.indexOf("popupHeight") === 0 || configKey.indexOf("popupWidth") === 0 || configKey === "icon" || configKey === "fixedPanelIcon" || configKey === "terminalApp" || configKey === "taskManagerApp" || configKey === "fileManagerApp" || configKey === "presetTilesFolder") {

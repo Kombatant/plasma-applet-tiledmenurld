@@ -114,7 +114,6 @@ Item {
 		_ensureSettingInitialized('popupWidthAiChat', Math.round(popupWidth / (Screen.devicePixelRatio || 1)))
 		_ensureSettingInitialized('popupHeightAiChat', plasmoid.configuration.popupHeight)
 		_ensureSettingInitialized('favGridColsAiChat', plasmoid.configuration.favGridCols)
-		_ensureSettingInitialized('popupBackgroundOpacity', 0.8)
 		_ensureSettingInitialized('favGridCols', 6)
 		_ensureSettingInitialized('sidebarButtonSize', 48)
 		_ensureSettingInitialized('sidebarIconSize', 30)
@@ -248,9 +247,6 @@ Item {
 
 	readonly property int popupWidth: leftSectionWidth + tileGridWidth
 	readonly property int popupHeight: Math.floor((plasmoid.configuration.popupHeight || 620) * Screen.devicePixelRatio)
-	// Hardcoded to 0 - fully transparent (blur is controlled by KDE Desktop Effects)
-	readonly property real popupBackgroundOpacity: 0
-	
 	readonly property int appListIconSize: plasmoid.configuration.appListIconSize * Screen.devicePixelRatio
 	
 	readonly property int searchFilterRowHeight: {

@@ -43,14 +43,22 @@ KCM.AbstractKCM {
     property var cfg_numRecentAppsDefault
     property var cfg_sidebarShortcuts
     property var cfg_sidebarShortcutsDefault
+    property var cfg_sidebarCollapsibleSearchResults
+    property var cfg_sidebarCollapsibleSearchResultsDefault
     property var cfg_defaultAppListView
     property var cfg_defaultAppListViewDefault
+    property var cfg_lastUsedAppListView
+    property var cfg_lastUsedAppListViewDefault
     property var cfg_terminalApp
     property var cfg_terminalAppDefault
     property var cfg_taskManagerApp
     property var cfg_taskManagerAppDefault
     property var cfg_fileManagerApp
     property var cfg_fileManagerAppDefault
+    property var cfg_useTileTabs
+    property var cfg_useTileTabsDefault
+    property var cfg_tileTabs
+    property var cfg_tileTabsDefault
     property var cfg_tileModel
     property var cfg_tileModelDefault
     property var cfg_tileScale
@@ -61,6 +69,8 @@ KCM.AbstractKCM {
     property var cfg_tileMarginDefault
     property var cfg_tilesLocked
     property var cfg_tilesLockedDefault
+    property var cfg_tileHoverEffect
+    property var cfg_tileHoverEffectDefault
     property var cfg_defaultTileColor
     property var cfg_defaultTileColorDefault
     property var cfg_defaultTileGradient
@@ -123,6 +133,12 @@ KCM.AbstractKCM {
     property var cfg_sidebarButtonSizeDefault
     property var cfg_sidebarIconSize
     property var cfg_sidebarIconSizeDefault
+    property var cfg_sidebarPosition
+    property var cfg_sidebarPositionDefault
+    property var cfg_tileRoundedCorners
+    property var cfg_tileRoundedCornersDefault
+    property var cfg_tileCornerRadius
+    property var cfg_tileCornerRadiusDefault
     property var cfg_tileAnimatedPlayOnHover
     property var cfg_tileAnimatedPlayOnHoverDefault
     property var cfg_showTileTooltips
@@ -143,7 +159,7 @@ KCM.AbstractKCM {
     property var cfg_aiChatHistoryDefault
     property var cfg_aiStreamChat
     property var cfg_aiStreamChatDefault
-    readonly property var _cfgKeys: ["icon", "fixedPanelIcon", "searchResultsGrouped", "searchDefaultFilters", "showRecentApps", "recentOrdering", "numRecentApps", "sidebarShortcuts", "defaultAppListView", "aiProvider", "aiApiKey", "aiOllamaUrl", "aiOpenWebUiUrl", "aiModel", "aiDetectedModels", "aiChatHistory", "aiStreamChat", "terminalApp", "taskManagerApp", "fileManagerApp", "tileModel", "tileScale", "tileIconSize", "tileMargin", "tilesLocked", "defaultTileColor", "defaultTileGradient", "sidebarBackgroundColor", "hideSearchField", "searchOnTop", "searchFieldFollowsTheme", "sidebarFollowsTheme", "tileLabelAlignment", "groupLabelAlignment", "showGroupTileNameBorder", "presetTilesFolder", "appDescription", "appListIconSize", "searchFieldHeight", "appListWidth", "popupHeight", "popupWidthAlphabetical", "popupHeightAlphabetical", "favGridColsAlphabetical", "popupWidthCategories", "popupHeightCategories", "favGridColsCategories", "popupWidthTilesOnly", "popupHeightTilesOnly", "favGridColsTilesOnly", "popupWidthAiChat", "popupHeightAiChat", "favGridColsAiChat", "favGridCols", "sidebarButtonSize", "sidebarIconSize", "sidebarPosition", "tileRoundedCorners", "tileCornerRadius", "tileAnimatedPlayOnHover", "showTileTooltips"]
+    readonly property var _cfgKeys: ["icon", "fixedPanelIcon", "searchResultsGrouped", "searchDefaultFilters", "showRecentApps", "recentOrdering", "numRecentApps", "sidebarShortcuts", "sidebarCollapsibleSearchResults", "defaultAppListView", "lastUsedAppListView", "aiProvider", "aiApiKey", "aiOllamaUrl", "aiOpenWebUiUrl", "aiModel", "aiDetectedModels", "aiChatHistory", "aiStreamChat", "terminalApp", "taskManagerApp", "fileManagerApp", "useTileTabs", "tileTabs", "tileModel", "tileScale", "tileIconSize", "tileMargin", "tilesLocked", "tileHoverEffect", "defaultTileColor", "defaultTileGradient", "sidebarBackgroundColor", "hideSearchField", "searchOnTop", "searchFieldFollowsTheme", "sidebarFollowsTheme", "tileLabelAlignment", "groupLabelAlignment", "showGroupTileNameBorder", "presetTilesFolder", "appDescription", "appListIconSize", "searchFieldHeight", "appListWidth", "popupHeight", "popupWidthAlphabetical", "popupHeightAlphabetical", "favGridColsAlphabetical", "popupWidthCategories", "popupHeightCategories", "favGridColsCategories", "popupWidthTilesOnly", "popupHeightTilesOnly", "favGridColsTilesOnly", "popupWidthAiChat", "popupHeightAiChat", "favGridColsAiChat", "favGridCols", "sidebarButtonSize", "sidebarIconSize", "sidebarPosition", "tileRoundedCorners", "tileCornerRadius", "tileAnimatedPlayOnHover", "showTileTooltips"]
     // Make the initial config window a bit wider so pages lay out cleanly.
     // Do not force shrink: respect user resizing after open.
     readonly property int wideModeMinWidth: Kirigami.Units.gridUnit * 40

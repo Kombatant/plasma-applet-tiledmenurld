@@ -240,10 +240,6 @@
 			<label>Saved tile grid column count for the AI Chat view.</label>
 			<default>6</default>
 		</entry>
-		<entry name="popupBackgroundOpacity" type="double">
-			<label>Opacity of the popup background (0.0 = fully transparent, 1.0 = fully opaque).</label>
-			<default>0.8</default>
-		</entry>
 		<entry name="favGridCols" type="int">
 			<default>6</default>
 		</entry>
