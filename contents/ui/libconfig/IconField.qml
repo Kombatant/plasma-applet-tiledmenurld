@@ -7,6 +7,7 @@ import org.kde.kirigami as Kirigami
 import org.kde.ksvg as KSvg
 import org.kde.plasma.core as PlasmaCore
 import org.kde.iconthemes as KIconThemes // IconDialog
+import "ConfigUtils.js" as ConfigUtils
 
 RowLayout {
 	id: iconField
@@ -15,7 +16,7 @@ RowLayout {
 
 	property string configKey: ''
 	property alias value: textField.text
-	readonly property string configValue: configKey ? plasmoid.configuration[configKey] : ""
+	readonly property string configValue: configKey ? ConfigUtils.pendingValue(iconField, configKey, plasmoid.configuration[configKey]) : ""
 	onConfigValueChanged: {
 		if (!textField.focus && value != configValue) {
 			value = configValue
@@ -150,7 +151,7 @@ RowLayout {
 		interval: 300
 		onTriggered: {
 			if (configKey) {
-				plasmoid.configuration[configKey] = iconField.value
+				ConfigUtils.setPendingValue(iconField, configKey, iconField.value)
 			}
 		}
 	}

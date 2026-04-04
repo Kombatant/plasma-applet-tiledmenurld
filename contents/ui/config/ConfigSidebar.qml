@@ -10,10 +10,13 @@ import Qt.labs.platform as QtLabsPlatform
 
 import ".." as TiledMenu
 import "../libconfig" as LibConfig
+import "../libconfig/ConfigUtils.js" as ConfigUtils
 
 LibConfig.FormKCM {
 	id: formLayout
 	wideMode: false
+	readonly property string pendingSidebarPosition: ConfigUtils.pendingValue(formLayout, "sidebarPosition", plasmoid.configuration.sidebarPosition)
+	readonly property bool pendingSidebarFollowsTheme: !!ConfigUtils.pendingValue(formLayout, "sidebarFollowsTheme", plasmoid.configuration.sidebarFollowsTheme)
 
 	readonly property string plasmaStyleLabelText: {
 		var plasmaStyleText = i18nd("kcm_desktoptheme", "Plasma Style")
@@ -212,7 +215,7 @@ LibConfig.FormKCM {
 	LibConfig.SpinBox {
 		id: sidebarButtonSize
 		configKey: 'sidebarButtonSize'
-		Kirigami.FormData.label: plasmoid.configuration.sidebarPosition === 'left' ? i18n("Width") : i18n("Height")
+		Kirigami.FormData.label: formLayout.pendingSidebarPosition === 'left' ? i18n("Width") : i18n("Height")
 		suffix: i18n("px")
 		minimumValue: 24
 		stepSize: 2
@@ -236,15 +239,15 @@ LibConfig.FormKCM {
 		QQC2.RadioButton {
 			text: plasmaStyleLabelText
 			QQC2.ButtonGroup.group: sidebarThemeGroup.group
-			checked: plasmoid.configuration.sidebarFollowsTheme
-			onClicked: plasmoid.configuration.sidebarFollowsTheme = true
+			checked: formLayout.pendingSidebarFollowsTheme
+			onClicked: ConfigUtils.setPendingValue(formLayout, "sidebarFollowsTheme", true)
 		}
 		RowLayout {
 			QQC2.RadioButton {
 				text: i18n("Custom Colour")
 				QQC2.ButtonGroup.group: sidebarThemeGroup.group
-				checked: !plasmoid.configuration.sidebarFollowsTheme
-				onClicked: plasmoid.configuration.sidebarFollowsTheme = false
+				checked: !formLayout.pendingSidebarFollowsTheme
+				onClicked: ConfigUtils.setPendingValue(formLayout, "sidebarFollowsTheme", false)
 			}
 			LibConfig.ColorField {
 				configKey: 'sidebarBackgroundColor'
@@ -319,7 +322,7 @@ LibConfig.FormKCM {
 				var results = []
 				var seen = {}
 				var configured = {}
-				var entries = plasmoid.configuration.sidebarShortcuts || []
+				var entries = ConfigUtils.pendingValue(formLayout, "sidebarShortcuts", plasmoid.configuration.sidebarShortcuts) || []
 				for (var i = 0; i < entries.length; i++) {
 					configured[("" + entries[i]).trim()] = true
 				}

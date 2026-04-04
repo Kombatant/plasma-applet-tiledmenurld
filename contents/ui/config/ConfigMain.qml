@@ -5,6 +5,7 @@ import QtQuick.Window
 import org.kde.kcmutils as KCM
 import org.kde.kirigami as Kirigami
 import org.kde.plasma.plasmoid
+import "../libconfig/ConfigUtils.js" as ConfigUtils
 
 // NOTE: Do not use KCM.SimpleKCM here.
 // SimpleKCM is a Kirigami.ScrollablePage with its own internal flickable.
@@ -24,9 +25,9 @@ KCM.AbstractKCM {
     Kirigami.Theme.colorSet: Kirigami.Theme.Window
     Kirigami.Theme.inherit: false
 
-    // Plasma's config dialog tries to set `cfg_<key>` and `cfg_<key>Default` properties
-    // on the root item. We write directly to `plasmoid.configuration` in our pages, but
-    // defining these avoids noisy "Setting initial properties failed" warnings.
+    // Plasma's config dialog sets `cfg_<key>` and `cfg_<key>Default` properties
+    // on the root item. Our pages stage edits through these properties so
+    // changes are only committed on Apply/OK.
     property var cfg_icon
     property var cfg_iconDefault
     property var cfg_fixedPanelIcon
@@ -160,6 +161,10 @@ KCM.AbstractKCM {
     property var cfg_aiStreamChat
     property var cfg_aiStreamChatDefault
     readonly property var _cfgKeys: ["icon", "fixedPanelIcon", "searchResultsGrouped", "searchDefaultFilters", "showRecentApps", "recentOrdering", "numRecentApps", "sidebarShortcuts", "sidebarCollapsibleSearchResults", "defaultAppListView", "lastUsedAppListView", "aiProvider", "aiApiKey", "aiOllamaUrl", "aiOpenWebUiUrl", "aiModel", "aiDetectedModels", "aiChatHistory", "aiStreamChat", "terminalApp", "taskManagerApp", "fileManagerApp", "useTileTabs", "tileTabs", "tileModel", "tileScale", "tileIconSize", "tileMargin", "tilesLocked", "tileHoverEffect", "defaultTileColor", "defaultTileGradient", "sidebarBackgroundColor", "hideSearchField", "searchOnTop", "searchFieldFollowsTheme", "sidebarFollowsTheme", "tileLabelAlignment", "groupLabelAlignment", "showGroupTileNameBorder", "presetTilesFolder", "appDescription", "appListIconSize", "searchFieldHeight", "appListWidth", "popupHeight", "popupWidthAlphabetical", "popupHeightAlphabetical", "favGridColsAlphabetical", "popupWidthCategories", "popupHeightCategories", "favGridColsCategories", "popupWidthTilesOnly", "popupHeightTilesOnly", "favGridColsTilesOnly", "popupWidthAiChat", "popupHeightAiChat", "favGridColsAiChat", "favGridCols", "sidebarButtonSize", "sidebarIconSize", "sidebarPosition", "tileRoundedCorners", "tileCornerRadius", "tileAnimatedPlayOnHover", "showTileTooltips"]
+    property string pendingAiApiKey: ""
+    property bool pendingAiApiKeyInitialized: false
+    property var _saveHookOwners: []
+    property var _saveHooks: []
     // Make the initial config window a bit wider so pages lay out cleanly.
     // Do not force shrink: respect user resizing after open.
     readonly property int wideModeMinWidth: Kirigami.Units.gridUnit * 40
@@ -228,19 +233,39 @@ KCM.AbstractKCM {
 
     signal configurationChanged()
 
-    function _bindCfgToConfiguration() {
+    function _ensureCfgInitialized() {
         for (var i = 0; i < _cfgKeys.length; i++) {
             var key = _cfgKeys[i];
             var propName = "cfg_" + key;
             if (typeof page[propName] === "undefined")
                 continue;
 
-            page[propName] = Qt.binding((function(k) {
-                return function() {
-                    return plasmoid.configuration[k];
-                };
-            })(key));
+            if (typeof page[propName] === "undefined" || page[propName] === null)
+                page[propName] = ConfigUtils.cloneValue(plasmoid.configuration[key]);
         }
+    }
+
+    function registerSaveHook(owner, callback) {
+        var index = _saveHookOwners.indexOf(owner)
+        if (index >= 0) {
+            _saveHooks[index] = callback
+            return
+        }
+        _saveHookOwners = _saveHookOwners.concat([owner])
+        _saveHooks = _saveHooks.concat([callback])
+    }
+
+    function unregisterSaveHook(owner) {
+        var index = _saveHookOwners.indexOf(owner)
+        if (index < 0)
+            return
+
+        var owners = _saveHookOwners.slice()
+        var hooks = _saveHooks.slice()
+        owners.splice(index, 1)
+        hooks.splice(index, 1)
+        _saveHookOwners = owners
+        _saveHooks = hooks
     }
 
     function _isClassName(item, className) {
@@ -305,6 +330,10 @@ KCM.AbstractKCM {
 
     function saveConfig() {
         // Called by the config dialog on Apply/OK.
+        for (var i = 0; i < _saveHooks.length; i++) {
+            if (typeof _saveHooks[i] === "function")
+                _saveHooks[i]();
+        }
         if (("" + Plasmoid.globalShortcut) !== ("" + _shortcutPending))
             Plasmoid.globalShortcut = _shortcutPending;
 
@@ -395,45 +424,6 @@ KCM.AbstractKCM {
         return true;
     }
 
-    function _hideHostApplyButtonOnce() {
-        // Plasma's AppletConfiguration.qml defines an Apply button in the footer.
-        // It is often redundant for our settings shell; hide it to avoid a
-        // permanently-disabled control in the UI.
-        var appletConfiguration = _getAppletConfigurationRoot()
-        if (!appletConfiguration) {
-            return false
-        }
-
-        var applyButton = _findFirst(appletConfiguration, 6, function(node) {
-            if (!node)
-                return false;
-
-            // Match by icon name; text is translated.
-            try {
-                return node.icon && node.icon.name === "dialog-ok-apply";
-            } catch (e) {
-                return false;
-            }
-        });
-        if (!applyButton)
-            return false;
-
-        applyButton.visible = false;
-        applyButton.enabled = false;
-        // Try to also remove any remaining layout allocation.
-        if (typeof applyButton.implicitWidth !== "undefined")
-            applyButton.implicitWidth = 0;
-
-        if (typeof applyButton.width !== "undefined")
-            applyButton.width = 0;
-
-        if (typeof applyButton.Layout !== "undefined") {
-            applyButton.Layout.preferredWidth = 0;
-            applyButton.Layout.maximumWidth = 0;
-        }
-        return true;
-    }
-
     // Kate-like: sidebar search + section list + page content.
     title: i18n("Settings")
     Window.onWindowChanged: {
@@ -452,10 +442,12 @@ KCM.AbstractKCM {
         // in the graphics scene" warnings on some Plasma versions.
         Qt.callLater(function() {
             try {
-                _bindCfgToConfiguration();
+                _ensureCfgInitialized();
                 _startCollapseOuterNavigation();
                 _ensureValidSelection();
                 _shortcutPending = ("" + Plasmoid.globalShortcut);
+                pendingAiApiKey = ""
+                pendingAiApiKeyInitialized = false
                 _applyWindowWidthConstraints();
 
                 // On some Plasma versions, the config page attaches late.
@@ -481,8 +473,7 @@ KCM.AbstractKCM {
         repeat: true
         onTriggered: {
             var collapsed = page._collapseOuterNavigationOnce();
-            var applyHidden = page._hideHostApplyButtonOnce();
-            if (collapsed && applyHidden) {
+            if (collapsed) {
                 stop();
                 return ;
             }

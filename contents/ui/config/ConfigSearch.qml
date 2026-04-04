@@ -6,18 +6,19 @@ import org.kde.ksvg as KSvg
 
 import ".." as TiledMenu
 import "../libconfig" as LibConfig
+import "../libconfig/ConfigUtils.js" as ConfigUtils
 
 
 LibConfig.FormKCM {
 	id: formLayout
 	wideMode: false
-	readonly property bool searchFieldHidden: !!plasmoid.configuration.hideSearchField
+	readonly property bool searchFieldHidden: !!ConfigUtils.pendingValue(formLayout, "hideSearchField", plasmoid.configuration.hideSearchField)
 	readonly property bool searchOptionsEnabled: !searchFieldHidden
 	readonly property bool groupedSearchResultsEnabled: formLayout.searchOptionsEnabled
-		&& !!plasmoid.configuration.searchResultsGrouped
+		&& !!ConfigUtils.pendingValue(formLayout, "searchResultsGrouped", plasmoid.configuration.searchResultsGrouped)
 	readonly property bool searchFieldHeightEnabled: searchOptionsEnabled
-		&& plasmoid.configuration.sidebarPosition !== 'top'
-		&& plasmoid.configuration.sidebarPosition !== 'bottom'
+		&& ConfigUtils.pendingValue(formLayout, "sidebarPosition", plasmoid.configuration.sidebarPosition) !== 'top'
+		&& ConfigUtils.pendingValue(formLayout, "sidebarPosition", plasmoid.configuration.sidebarPosition) !== 'bottom'
 
 	readonly property string plasmaStyleLabelText: {
 		var plasmaStyleText = i18nd("kcm_desktoptheme", "Plasma Style")
@@ -64,13 +65,13 @@ LibConfig.FormKCM {
 		opacity: enabled ? 1 : 0.45
 		QQC2.RadioButton {
 			text: plasmaStyleLabelText
-			checked: plasmoid.configuration.searchFieldFollowsTheme
-			onClicked: plasmoid.configuration.searchFieldFollowsTheme = true
+			checked: !!ConfigUtils.pendingValue(formLayout, "searchFieldFollowsTheme", plasmoid.configuration.searchFieldFollowsTheme)
+			onClicked: ConfigUtils.setPendingValue(formLayout, "searchFieldFollowsTheme", true)
 		}
 		QQC2.RadioButton {
 			text: i18n("Windows (White)")
-			checked: !plasmoid.configuration.searchFieldFollowsTheme
-			onClicked: plasmoid.configuration.searchFieldFollowsTheme = false
+			checked: !ConfigUtils.pendingValue(formLayout, "searchFieldFollowsTheme", plasmoid.configuration.searchFieldFollowsTheme)
+			onClicked: ConfigUtils.setPendingValue(formLayout, "searchFieldFollowsTheme", false)
 		}
 	}
 

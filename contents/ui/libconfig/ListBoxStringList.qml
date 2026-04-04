@@ -2,12 +2,13 @@ import QtQuick
 import QtQuick.Controls as QQC2
 import QtQuick.Layouts
 import org.kde.kirigami as Kirigami
+import "ConfigUtils.js" as ConfigUtils
 
 Item {
 	id: root
 
 	property string configKey: ""
-	readonly property var configValue: configKey ? plasmoid.configuration[configKey] : []
+	readonly property var configValue: configKey ? ConfigUtils.pendingValue(root, configKey, plasmoid.configuration[configKey]) : []
 	property alias inputText: entryField.text
 	readonly property int currentIndex: listView.currentIndex
 	readonly property string currentValue: (currentIndex >= 0 && currentIndex < listModel.count) ? listModel.get(currentIndex).value : ""
@@ -120,9 +121,9 @@ Item {
 		for (var i = 0; i < listModel.count; i++) {
 			values.push(listModel.get(i).value)
 		}
-		var currentConfig = normalizeValue(plasmoid.configuration[configKey])
+		var currentConfig = normalizeValue(ConfigUtils.pendingValue(root, configKey, plasmoid.configuration[configKey]))
 		if (JSON.stringify(currentConfig) !== JSON.stringify(values)) {
-			plasmoid.configuration[configKey] = values
+			ConfigUtils.setPendingValue(root, configKey, values)
 		}
 	}
 

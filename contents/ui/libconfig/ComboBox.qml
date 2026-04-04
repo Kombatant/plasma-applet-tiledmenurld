@@ -2,6 +2,7 @@
 
 import QtQuick
 import QtQuick.Controls as QQC2
+import "ConfigUtils.js" as ConfigUtils
 
 /*
 ** Example:
@@ -32,7 +33,7 @@ QQC2.ComboBox {
 	id: configComboBox
 
 	property string configKey: ''
-	readonly property var configValue: configKey ? plasmoid.configuration[configKey] : ""
+	readonly property var configValue: configKey ? ConfigUtils.pendingValue(configComboBox, configKey, plasmoid.configuration[configKey]) : ""
 	onConfigValueChanged: {
 		if (!focus && value != configValue) {
 			selectValue(configValue)
@@ -66,7 +67,7 @@ QQC2.ComboBox {
 			if (typeof item !== "undefined") {
 				var val = item[_valueRole]
 				if (configKey && (typeof val !== "undefined") && populated) {
-					plasmoid.configuration[configKey] = val
+					ConfigUtils.setPendingValue(configComboBox, configKey, val)
 				}
 			}
 		}

@@ -4,11 +4,12 @@ import QtQuick
 import QtQuick.Controls as QQC2
 import QtQuick.Layouts
 import org.kde.kirigami as Kirigami
+import "ConfigUtils.js" as ConfigUtils
 
 QQC2.TextArea {
 	id: textArea
 	property string configKey: ''
-	readonly property var configValue: configKey ? plasmoid.configuration[configKey] : ""
+	readonly property var configValue: configKey ? ConfigUtils.pendingValue(textArea, configKey, plasmoid.configuration[configKey]) : ""
 	onConfigValueChanged: deserialize()
 
 
@@ -114,9 +115,9 @@ QQC2.TextArea {
 	}
 	function setConfigValue(newValue) {
 		if (configKey) {
-			var oldValue = plasmoid.configuration[configKey]
+			var oldValue = ConfigUtils.pendingValue(textArea, configKey, plasmoid.configuration[configKey])
 			if (oldValue != newValue) {
-				plasmoid.configuration[configKey] = newValue
+				ConfigUtils.setPendingValue(textArea, configKey, newValue)
 			}
 		}
 	}

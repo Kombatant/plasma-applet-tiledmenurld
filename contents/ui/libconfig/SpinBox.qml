@@ -2,6 +2,7 @@
 
 import QtQuick
 import QtQuick.Controls as QQC2
+import "ConfigUtils.js" as ConfigUtils
 
 /*
 ** Example:
@@ -33,7 +34,7 @@ QQC2.SpinBox {
 	id: spinBox
 
 	property string configKey: ''
-	readonly property var configValue: configKey ? plasmoid.configuration[configKey] : 0
+	readonly property var configValue: configKey ? ConfigUtils.pendingValue(spinBox, configKey, plasmoid.configuration[configKey]) : 0
 	property var _boundContentItem: null
 	property bool _editingText: false
 
@@ -97,9 +98,9 @@ QQC2.SpinBox {
 		onTriggered: {
 			if (configKey) {
 				if (decimals == 0) {
-					plasmoid.configuration[configKey] = spinBox.value
+					ConfigUtils.setPendingValue(spinBox, configKey, spinBox.value)
 				} else {
-					plasmoid.configuration[configKey] = spinBox.valueReal
+					ConfigUtils.setPendingValue(spinBox, configKey, spinBox.valueReal)
 				}
 			}
 		}

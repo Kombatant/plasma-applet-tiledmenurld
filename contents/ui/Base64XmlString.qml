@@ -1,10 +1,12 @@
 // Version 1
 
 import QtQuick
+import "libconfig/ConfigUtils.js" as ConfigUtils
 
 QtObject {
+    id: base64XmlString
     property string configKey
-    readonly property string configValue: configKey ? plasmoid.configuration[configKey] : ""
+    readonly property string configValue: configKey ? ConfigUtils.pendingValue(base64XmlString, configKey, plasmoid.configuration[configKey]) : ""
     property variant value: { return {} }
     property variant defaultValue: { return {} }
     property bool writing: false
@@ -176,7 +178,7 @@ QtObject {
         var xml = _buildTilesXmlFragment(data)
         var val = Qt.btoa(xml)
         writing = true
-        plasmoid.configuration[key] = val
+        ConfigUtils.setPendingValue(base64XmlString, key, val)
         writing = false
     }
 

@@ -5,6 +5,7 @@ import QtQuick.Controls as QQC2
 import QtQuick.Dialogs as QtDialogs
 import QtQuick.Window
 import org.kde.kirigami as Kirigami
+import "ConfigUtils.js" as ConfigUtils
 
 
 QQC2.TextField {
@@ -31,7 +32,7 @@ QQC2.TextField {
 	property string defaultColor: ''
 	property string value: {
 		if (configKey) {
-			return plasmoid.configuration[configKey]
+			return ConfigUtils.pendingValue(colorField, configKey, plasmoid.configuration[configKey])
 		} else {
 			return "#000"
 		}
@@ -52,9 +53,9 @@ QQC2.TextField {
 		}
 		if (configKey) {
 			if (value == defaultColorValue) {
-				plasmoid.configuration[configKey] = ""
+				ConfigUtils.setPendingValue(colorField, configKey, "")
 			} else {
-				plasmoid.configuration[configKey] = value
+				ConfigUtils.setPendingValue(colorField, configKey, value)
 			}
 		}
 	}

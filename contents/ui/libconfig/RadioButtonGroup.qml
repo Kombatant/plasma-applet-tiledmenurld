@@ -4,6 +4,7 @@ import QtQuick
 import QtQuick.Controls as QQC2
 import QtQuick.Layouts
 import org.kde.kirigami as Kirigami
+import "ConfigUtils.js" as ConfigUtils
 
 /*
 ** Example:
@@ -22,7 +23,7 @@ ColumnLayout {
 	id: radioButtonGroup
 
 	property string configKey: ''
-	readonly property var configValue: configKey ? plasmoid.configuration[configKey] : ""
+	readonly property var configValue: configKey ? ConfigUtils.pendingValue(radioButtonGroup, configKey, plasmoid.configuration[configKey]) : ""
 	
 	Kirigami.FormData.labelAlignment: Qt.AlignTop
 
@@ -61,7 +62,7 @@ ColumnLayout {
 			onClicked: {
 				focus = true
 				if (configKey) {
-					plasmoid.configuration[configKey] = modelData.value
+					ConfigUtils.setPendingValue(radioButtonGroup, configKey, modelData.value)
 				}
 			}
 		}

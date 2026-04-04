@@ -4,6 +4,7 @@ import QtQuick.Layouts
 import org.kde.kirigami as Kirigami
 
 import "../libconfig" as LibConfig
+import "../libconfig/ConfigUtils.js" as ConfigUtils
 import "../lib"
 
 LibConfig.FormKCM {
@@ -24,7 +25,7 @@ LibConfig.FormKCM {
 	readonly property bool keyRequired: _providerValue() !== "ollama" && _providerValue() !== "openwebui"
 	readonly property bool usesOllamaUrl: _providerValue() === "ollama"
 	readonly property bool usesOpenWebUiUrl: _providerValue() === "openwebui"
-	readonly property var detectedModels: plasmoid.configuration.aiDetectedModels || []
+	readonly property var detectedModels: ConfigUtils.pendingValue(form, "aiDetectedModels", plasmoid.configuration.aiDetectedModels) || []
 	property bool isDetectingModels: false
 	property string detectionStatus: ""
 	property bool _updatingApiKeyField: false
@@ -53,11 +54,12 @@ LibConfig.FormKCM {
 	}
 
 	function _providerValue() {
-		return (providerCombo.value || plasmoid.configuration.aiProvider || "openai").toLowerCase()
+		return (providerCombo.value || ConfigUtils.pendingValue(form, "aiProvider", plasmoid.configuration.aiProvider) || "openai").toLowerCase()
 	}
 
 	function _apiKeyValue() {
-		return (apiKeyField.text || "").trim()
+		var rootKcm = ConfigUtils.getRootKcm(form)
+		return rootKcm ? (rootKcm.pendingAiApiKey || "").trim() : (apiKeyField.text || "").trim()
 	}
 
 	function _needsKey(provider) {
@@ -89,10 +91,10 @@ LibConfig.FormKCM {
 			return "https://generativelanguage.googleapis.com/v1beta/models?key=" + encodeURIComponent(apiKey)
 		}
 		if (provider === "openwebui") {
-			var openWebUiBase = _normalizedOpenWebUiApiBase(plasmoid.configuration.aiOpenWebUiUrl || "http://127.0.0.1:3000")
+			var openWebUiBase = _normalizedOpenWebUiApiBase(ConfigUtils.pendingValue(form, "aiOpenWebUiUrl", plasmoid.configuration.aiOpenWebUiUrl) || "http://127.0.0.1:3000")
 			return openWebUiBase + "/models"
 		}
-		var ollamaBase = (plasmoid.configuration.aiOllamaUrl || "http://127.0.0.1:11434").replace(/\/+$/, "")
+		var ollamaBase = (ConfigUtils.pendingValue(form, "aiOllamaUrl", plasmoid.configuration.aiOllamaUrl) || "http://127.0.0.1:11434").replace(/\/+$/, "")
 		return ollamaBase + "/api/tags"
 	}
 
@@ -159,8 +161,8 @@ LibConfig.FormKCM {
 		var shouldForce = !!force
 		var provider = _providerValue()
 		var apiKey = _apiKeyValue()
-		var ollamaUrl = (plasmoid.configuration.aiOllamaUrl || "http://127.0.0.1:11434").replace(/\/+$/, "")
-		var openWebUiUrl = _normalizedOpenWebUiApiBase(plasmoid.configuration.aiOpenWebUiUrl || "http://127.0.0.1:3000")
+		var ollamaUrl = (ConfigUtils.pendingValue(form, "aiOllamaUrl", plasmoid.configuration.aiOllamaUrl) || "http://127.0.0.1:11434").replace(/\/+$/, "")
+		var openWebUiUrl = _normalizedOpenWebUiApiBase(ConfigUtils.pendingValue(form, "aiOpenWebUiUrl", plasmoid.configuration.aiOpenWebUiUrl) || "http://127.0.0.1:3000")
 		var signature = provider + "|" + (provider === "ollama" ? ollamaUrl : (provider === "openwebui" ? openWebUiUrl + "|" + apiKey : apiKey))
 
 		if (!shouldForce && signature === _lastDetectionSignature) {
@@ -203,14 +205,16 @@ LibConfig.FormKCM {
 				return
 			}
 
-			plasmoid.configuration.aiDetectedModels = models
-			if (!plasmoid.configuration.aiModel || models.indexOf(plasmoid.configuration.aiModel) < 0) {
-				plasmoid.configuration.aiModel = models[0]
+			ConfigUtils.setPendingValue(form, "aiDetectedModels", models)
+			var selectedModel = ConfigUtils.pendingValue(form, "aiModel", plasmoid.configuration.aiModel)
+			if (!selectedModel || models.indexOf(selectedModel) < 0) {
+				ConfigUtils.setPendingValue(form, "aiModel", models[0])
+				selectedModel = models[0]
 			}
 			detectionStatus = i18n("Detected %1 model(s).", models.length)
 			Qt.callLater(function() {
 				if (modelCombo && typeof modelCombo.selectValue === "function") {
-					modelCombo.selectValue(plasmoid.configuration.aiModel)
+					modelCombo.selectValue(selectedModel)
 				}
 			})
 		}
@@ -225,26 +229,18 @@ LibConfig.FormKCM {
 		onTriggered: form.detectModelsNow()
 	}
 
-	Timer {
-		id: apiKeyAutoSaveDebounce
-		interval: 250
-		repeat: false
-		onTriggered: form._persistApiKeyDraft()
-	}
-
 	KWalletSecret {
 		id: secureApiKey
 		onLoaded: function(success) {
-			if (success) {
-				form._updatingApiKeyField = true
-				apiKeyField.text = secret
-				form._updatingApiKeyField = false
-				form._migrateLegacyApiKeyIfNeeded()
+			var rootKcm = ConfigUtils.getRootKcm(form)
+			if (success && rootKcm && !rootKcm.pendingAiApiKeyInitialized) {
+				form._setPendingApiKey(secret || ((plasmoid.configuration.aiApiKey || "").trim()), false)
+				rootKcm.pendingAiApiKeyInitialized = true
 			}
 		}
 		onSaved: function(success) {
 			if (success) {
-				plasmoid.configuration.aiApiKey = ""
+				ConfigUtils.setPendingValue(form, "aiApiKey", "", false)
 				form._scheduleDetection()
 				return
 			}
@@ -254,8 +250,8 @@ LibConfig.FormKCM {
 		}
 		onCleared: function(success) {
 			if (success) {
-				plasmoid.configuration.aiApiKey = ""
-				apiKeyField.text = ""
+				ConfigUtils.setPendingValue(form, "aiApiKey", "", false)
+				form._setPendingApiKey("", false)
 				form._lastDetectionSignature = ""
 				form._scheduleDetection()
 				return
@@ -266,12 +262,32 @@ LibConfig.FormKCM {
 		}
 	}
 
-	function _persistApiKeyDraft() {
-		if (_updatingApiKeyField || !keyRequired || secureApiKey.saving) {
+	function _setPendingApiKey(value, markDirty) {
+		var rootKcm = ConfigUtils.getRootKcm(form)
+		if (!rootKcm) {
+			return
+		}
+		var nextValue = value || ""
+		if (rootKcm.pendingAiApiKey === nextValue) {
+			return
+		}
+		rootKcm.pendingAiApiKey = nextValue
+		if (markDirty !== false) {
+			rootKcm.configurationChanged()
+		}
+		form._updatingApiKeyField = true
+		apiKeyField.text = nextValue
+		form._updatingApiKeyField = false
+	}
+
+	function _applyPendingApiKey() {
+		if (!secureApiKey.secureStorageAvailable || secureApiKey.saving) {
 			return
 		}
 		var draft = _apiKeyValue()
-		if (draft === (secureApiKey.secret || "")) {
+		var stored = secureApiKey.secret || ""
+		ConfigUtils.setPendingValue(form, "aiApiKey", "", false)
+		if (draft === stored) {
 			return
 		}
 		if (!draft) {
@@ -281,34 +297,27 @@ LibConfig.FormKCM {
 		secureApiKey.saveSecret(draft)
 	}
 
-	function _migrateLegacyApiKeyIfNeeded() {
-		var legacy = (plasmoid.configuration.aiApiKey || "").trim()
-		if (!legacy) {
-			return
-		}
-		if (secureApiKey.secret && secureApiKey.secret !== legacy) {
-			plasmoid.configuration.aiApiKey = ""
-			return
-		}
-		secureApiKey.migrateLegacy(legacy, function(success) {
-			if (success) {
-				plasmoid.configuration.aiApiKey = ""
-				apiKeyField.text = secureApiKey.secret
-				form._scheduleDetection()
-				return
-			}
-			if (typeof showPassiveNotification === "function") {
-				showPassiveNotification(i18n("Could not migrate API key to KWallet."))
-			}
-		})
-	}
-
 	Component.onCompleted: {
+		var rootKcm = ConfigUtils.getRootKcm(form)
+		if (rootKcm) {
+			rootKcm.registerSaveHook(form, form._applyPendingApiKey)
+			if (!rootKcm.pendingAiApiKeyInitialized) {
+				rootKcm.pendingAiApiKey = (plasmoid.configuration.aiApiKey || "").trim()
+				rootKcm.pendingAiApiKeyInitialized = true
+			}
+			form._setPendingApiKey(rootKcm.pendingAiApiKey, false)
+		}
 		secureApiKey.inspectAvailability()
 		secureApiKey.readSecret()
 		detectionStatus = detectedModels.length
 			? i18n("Detected %1 model(s).", detectedModels.length)
 			: i18n("Paste your API key to auto-detect models.")
+	}
+	Component.onDestruction: {
+		var rootKcm = ConfigUtils.getRootKcm(form)
+		if (rootKcm) {
+			rootKcm.unregisterSaveHook(form)
+		}
 	}
 
 		Kirigami.InlineMessage {
@@ -333,8 +342,8 @@ LibConfig.FormKCM {
 			if (!_initialized) {
 				return
 			}
-			plasmoid.configuration.aiDetectedModels = []
-			plasmoid.configuration.aiModel = ""
+			ConfigUtils.setPendingValue(form, "aiDetectedModels", [])
+			ConfigUtils.setPendingValue(form, "aiModel", "")
 			form._lastDetectionSignature = ""
 			form._scheduleDetection()
 		}
@@ -380,13 +389,9 @@ LibConfig.FormKCM {
 			if (form._updatingApiKeyField) {
 				return
 			}
+			form._setPendingApiKey(text, true)
 			if (activeFocus) {
 				form._scheduleDetection()
-			}
-		}
-		onActiveFocusChanged: {
-			if (!activeFocus) {
-				apiKeyAutoSaveDebounce.restart()
 			}
 		}
 	}

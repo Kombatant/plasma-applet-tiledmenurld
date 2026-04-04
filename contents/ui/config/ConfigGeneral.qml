@@ -8,6 +8,7 @@ import Qt.labs.platform as QtLabsPlatform
 
 import ".." as TiledMenu
 import "../libconfig" as LibConfig
+import "../libconfig/ConfigUtils.js" as ConfigUtils
 
 
 LibConfig.FormKCM {
@@ -46,7 +47,7 @@ LibConfig.FormKCM {
 	}
 
 	readonly property int pendingCellBoxSize: {
-		var tileMarginUnits = plasmoid.configuration.tileMargin || 0
+		var tileMarginUnits = ConfigUtils.pendingValue(formLayout, "tileMargin", plasmoid.configuration.tileMargin) || 0
 		var cellMarginUnits = tileMarginUnits / 2
 		var cellSizeUnits = config.cellBoxUnits - tileMarginUnits
 		var scale = pendingTileScale || 0

@@ -3,6 +3,7 @@ import QtQuick.Layouts
 
 import ".." as TiledMenu
 import "../libconfig" as LibConfig
+import "../libconfig/ConfigUtils.js" as ConfigUtils
 
 LibConfig.TextArea {
 	id: textArea
@@ -21,7 +22,7 @@ LibConfig.TextArea {
 
 	property alias enabled: textArea.enabled
 
-	readonly property var configValue: configKey ? plasmoid.configuration[configKey] : ""
+	readonly property var configValue: configKey ? ConfigUtils.pendingValue(textArea, configKey, plasmoid.configuration[configKey]) : ""
 	onConfigValueChanged: deserialize()
 	readonly property var value: base64XmlString.value
 

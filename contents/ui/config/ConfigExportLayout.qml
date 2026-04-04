@@ -4,6 +4,7 @@ import QtQuick.Layouts
 import org.kde.plasma.plasma5support as Plasma5Support
 import org.kde.kirigami as Kirigami
 import Qt.labs.platform as QtLabsPlatform
+import "../libconfig/ConfigUtils.js" as ConfigUtils
 
 import ".." as TiledMenu
 
@@ -196,7 +197,7 @@ ColumnLayout {
 		if (key === "tileModel") {
 			return configTileModel.value
 		}
-		return plasmoid.configuration[key]
+		return ConfigUtils.pendingValue(page, key, plasmoid.configuration[key])
 	}
 
 	function _normalizeValueForType(value, typeName) {
@@ -456,14 +457,7 @@ ColumnLayout {
 		_applyingXmlToConfig = true
 		try {
 			function getRootKcm() {
-				var root = page
-				while (root && root.parent) {
-					root = root.parent
-					if (root && typeof root.configurationChanged === "function") {
-						break
-					}
-				}
-				return (root && typeof root.configurationChanged === "function") ? root : null
+				return ConfigUtils.getRootKcm(page)
 			}
 
 			function notifyConfigurationChanged() {
@@ -486,7 +480,8 @@ ColumnLayout {
 					return
 				}
 				if (typeName === "tilemodel") {
-					// main.xml stores tileModel as a base64-encoded XML fragment (<tiles>...)</n+                    var encoded = ""
+					var encoded = ""
+					// main.xml stores tileModel as a base64-encoded XML fragment (<tiles>...</tiles>).
 					try {
 						var lines = _buildTileModelXml(normalizedValue || [])
 						// _buildTileModelXml returns an <entry> wrapper; extract inner <tiles>...</tiles>
@@ -501,7 +496,7 @@ ColumnLayout {
 					}
 					rootKcm[propName] = encoded
 				} else {
-					rootKcm[propName] = normalizedValue
+					rootKcm[propName] = ConfigUtils.cloneValue(normalizedValue)
 				}
 			}
 
@@ -520,14 +515,12 @@ ColumnLayout {
 					if (configTileModel.value !== normalized) {
 						configTileModel.value = normalized
 					}
-					configTileModel.set(normalized)
 					setCfgValue(key, normalized, typeName)
 					appliedTileModel = true
 					appliedTileModelCount = Array.isArray(normalized) ? normalized.length : 0
 					changedSomething = true
 				} else {
-					if (plasmoid.configuration[key] !== normalized) {
-						plasmoid.configuration[key] = normalized
+					if (!ConfigUtils.valuesEqual(_readConfigValue(key), normalized)) {
 						setCfgValue(key, normalized, typeName)
 						changedSomething = true
 					}
