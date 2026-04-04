@@ -35,11 +35,17 @@ QQC2.SpinBox {
 	property string configKey: ''
 	readonly property var configValue: configKey ? plasmoid.configuration[configKey] : 0
 	property var _boundContentItem: null
+	property bool _editingText: false
 
 	readonly property real factor: Math.pow(10, decimals)
 	readonly property real valueReal: value / factor
 	value: Math.round(configValue * factor)
 	onValueRealChanged: serializeTimer.start()
+	onValueChanged: {
+		if (!_editingText) {
+			syncDisplayedText()
+		}
+	}
 
 	readonly property int spinBox_MININT: Math.ceil(-2147483648 / factor)
 	readonly property int spinBox_MAXINT: Math.floor(2147483647 / factor)
@@ -185,7 +191,9 @@ QQC2.SpinBox {
 			textInput.cursorPosition = Math.min(cursorPrefix.length, newText.length)
 		}
 
+		_editingText = true
 		spinBox.value = spinBox.valueFromText(newText, spinBox.locale)
+		_editingText = false
 		spinBox.valueModified()
 	}
 
