@@ -11,7 +11,9 @@ Item {
 	property alias sidebarModel: sidebarModel
 
 	property string order: "categories"
-	onOrderChanged: allAppsModel.refresh()
+	onOrderChanged: {
+		allAppsModel.refresh()
+	}
 	readonly property bool hasConfiguration: (typeof plasmoid !== "undefined") && plasmoid && plasmoid.configuration
 
 	function logWarn() {

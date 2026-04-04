@@ -999,10 +999,10 @@ MouseArea {
 				Layout.fillHeight: true
 				spacing: 0
 
-				SearchView {
-					id: searchView
-					aiChatModel: popup.aiChatModel
+				Item {
+					id: searchViewSlot
 					Layout.fillHeight: true
+					implicitWidth: config.appAreaWidth
 				}
 
 				// Drag handle for resizing the app area width
@@ -1010,7 +1010,7 @@ MouseArea {
 					id: appAreaResizeHandle
 					Layout.fillHeight: true
 					Layout.preferredWidth: Kirigami.Units.smallSpacing * 2
-					visible: config.showSearch && !config.isEditingTile
+					visible: config.showSearch && !config.isEditingTile && !config.searchOverlayActive
 					z: 1
 
 					Rectangle {
@@ -1134,6 +1134,48 @@ MouseArea {
 				// positioned at the bottom.
 			}
 		}
+	}
+
+	// Search overlay drawer for TilesOnly mode
+	Item {
+		id: searchOverlayContainer
+		visible: config.searchOverlayActive
+		z: 2
+		anchors.top: parent.top
+		anchors.bottom: parent.bottom
+		anchors.topMargin: config.sidebarOnTop ? (config.sidebarHeight + config.sidebarRightMargin) : 0
+		anchors.bottomMargin: config.sidebarOnBottom ? (config.sidebarHeight + config.sidebarRightMargin) : 0
+		x: config.sidebarOnLeft ? (config.sidebarWidth + config.sidebarRightMargin) : 0
+		width: config.appListWidth
+
+		Rectangle {
+			anchors.fill: parent
+			color: Kirigami.Theme.backgroundColor
+		}
+	}
+
+	// Scrim behind the search overlay (covers tile area)
+	Rectangle {
+		id: searchOverlayScrim
+		visible: config.searchOverlayActive
+		z: 1
+		anchors.top: searchOverlayContainer.top
+		anchors.bottom: searchOverlayContainer.bottom
+		anchors.left: searchOverlayContainer.right
+		anchors.right: parent.right
+		color: "#40000000"
+
+		MouseArea {
+			anchors.fill: parent
+			onClicked: searchView.showTilesOnly()
+		}
+	}
+
+	SearchView {
+		id: searchView
+		aiChatModel: popup.aiChatModel
+		parent: config.searchOverlayActive ? searchOverlayContainer : searchViewSlot
+		anchors.fill: parent
 	}
 
 	SidebarView {

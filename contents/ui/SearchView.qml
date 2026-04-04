@@ -41,6 +41,7 @@ Item {
 
 	readonly property bool searchOnTop: config.searchOnTop
 	property bool _escapeClearingQuery: false
+	property bool _viewSwitchClearingQuery: false
 
 	Connections {
 		target: searchField
@@ -147,17 +148,24 @@ Item {
 		saveCurrentSizeMemoryViewBeforeSwitch()
 		rememberView("TilesOnly")
 		setActiveSizeMemoryView("TilesOnly")
-		if (!showingAppList) {
-			// appsView.show(stackView.noTransition)
-		
-			appsView.show()
-			
+		if (search.query !== "") {
+			_viewSwitchClearingQuery = true
+			search.query = ""
+		}
+		// Reset the stack to appsView without going through appsView.show(),
+		// which would set showSearch=true and trigger size restores.
+		if (stackView.currentItem !== appsView) {
+			stackView.replace(appsView)
 		}
 		config.showSearch = false
+		config.searchOverlayActive = false
 		popup.restoreRememberedSizeForView("TilesOnly")
 	}
 
 	function showSearchView() {
+		if (showingOnlyTiles) {
+			config.searchOverlayActive = true
+		}
 		config.showSearch = true
 	}
 
@@ -165,7 +173,12 @@ Item {
 		saveCurrentSizeMemoryViewBeforeSwitch()
 		rememberView("AiChat")
 		setActiveSizeMemoryView("AiChat")
+		config.searchOverlayActive = false
 		config.showSearch = true
+		if (search.query !== "") {
+			_viewSwitchClearingQuery = true
+			search.query = ""
+		}
 		if (stackView.currentItem !== aiChatView) {
 			stackView.replace(aiChatView)
 		}
@@ -229,7 +242,13 @@ Item {
 						search.applyDefaultFilters()
 						if (searchView._escapeClearingQuery) {
 							searchView._escapeClearingQuery = false
-							appsView.show()
+							if (config.searchOverlayActive) {
+								searchView.showTilesOnly()
+							} else {
+								appsView.show()
+							}
+						} else if (searchView._viewSwitchClearingQuery) {
+							searchView._viewSwitchClearingQuery = false
 						} else {
 							searchView.showDefaultView()
 						}
@@ -276,7 +295,12 @@ Item {
 			}
 
 			function show(animation) {
+				config.searchOverlayActive = false
 				config.showSearch = true
+				if (search.query !== "") {
+					searchView._viewSwitchClearingQuery = true
+					search.query = ""
+				}
 				if (stackView.currentItem != appsView) {
 					// stackView.delegate = animation || stackView.panUp
 					stackView.replace(appsView)
@@ -308,7 +332,12 @@ Item {
 			}
 
 			function show() {
+				config.searchOverlayActive = false
 				config.showSearch = true
+				if (search.query !== "") {
+					searchView._viewSwitchClearingQuery = true
+					search.query = ""
+				}
 				if (stackView.currentItem != jumpToLetterView) {
 					// stackView.delegate = stackView.zoomOut
 					stackView.replace(jumpToLetterView)
@@ -330,6 +359,7 @@ Item {
 			active: false
 			// asynchronous: true
 			function open(tile) {
+				config.searchOverlayActive = false
 				config.showSearch = true
 				active = true
 				item.open(tile)

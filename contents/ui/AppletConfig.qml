@@ -197,11 +197,12 @@ Item {
 	readonly property int minimumHeight: Math.max(flatButtonSize * 5, sidebarHorizontal ? (sidebarHeight + sidebarRightMargin) : sidebarFixedVerticalHeight) // Issue #125
 
 	property bool showSearch: false
+	property bool searchOverlayActive: false
 	property bool isEditingTile: false
 	readonly property int appAreaWidth: {
 		if (isEditingTile) {
 			return tileEditorMinWidth
-		} else if (showSearch) {
+		} else if (showSearch && !searchOverlayActive) {
 			return appListWidth
 		} else {
 			return 0
