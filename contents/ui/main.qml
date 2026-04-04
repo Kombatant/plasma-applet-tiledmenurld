@@ -16,9 +16,9 @@ PlasmoidItem {
 	property string systemFileManagerApp: ""
 	property bool suppressHideOnWindowDeactivate: false
 
-	// Disable the default Plasma dialog background for a cleaner look
-	// (blur effect is controlled by KDE Desktop Effects, not by the plasmoid)
-	Plasmoid.backgroundHints: PlasmaCore.Types.NoBackground
+	// Use Plasma's standard popup background so compositor/window-rule opacity
+	// is applied to the same shell treatment as other Plasma dialogs.
+	Plasmoid.backgroundHints: PlasmaCore.Types.DefaultBackground | PlasmaCore.Types.ConfigurableBackground
 
 	function resolveTerminalLauncher() {
 		if (systemTerminalApp) {
