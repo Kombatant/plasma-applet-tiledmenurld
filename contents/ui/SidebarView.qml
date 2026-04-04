@@ -407,6 +407,7 @@ Item {
 					icon.name: resolvedIconName
 					icon.source: resolvedIconSource
 					forceMonochromeIcon: true
+					desaturateIcon: true
 					text: xdgDisplayName || model.name || model.display
 					tooltipText: text
 					visible: index >= sidebarFavouritesHorizontal.minVisibleIndex

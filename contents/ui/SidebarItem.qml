@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Controls as QQC2
+import QtQuick.Effects
 import QtQuick.Layouts
 import org.kde.kirigami as Kirigami
 
@@ -21,7 +22,12 @@ FlatButton {
 	property bool closeOnClick: true
 	property string tooltipText: ""
 	property bool forceMonochromeIcon: false
+	property bool desaturateIcon: false
 	icon.color: forceMonochromeIcon ? (checked ? Kirigami.Theme.highlightColor : Kirigami.Theme.textColor) : "transparent"
+	layer.enabled: desaturateIcon
+	layer.effect: MultiEffect {
+		saturation: -1.0
+	}
 
 	QQC2.ToolTip {
 		id: control

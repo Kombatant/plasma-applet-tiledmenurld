@@ -14,6 +14,7 @@ Repeater {
 		icon.name: resolvedIconName
 		icon.source: resolvedIconSource
 		forceMonochromeIcon: true
+		desaturateIcon: true
 		text: xdgDisplayName || model.name || model.display
 		tooltipText: text
 		sidebarMenu: repeater.parent.parent // SidebarContextMenu { Column { Repeater{} } }
