@@ -123,24 +123,18 @@ LibConfig.FormKCM {
 	RowLayout {
 		id: tileSizeRow
 		Kirigami.FormData.label: i18n("Tile Size")
-		Layout.fillWidth: true
 
-		QQC2.Slider {
-			id: tileSizeSlider
-			Layout.fillWidth: true
-			from: 32
-			to: 128
-			stepSize: 1
-			live: true
+		LibConfig.SpinBox {
+			id: tileSizeSpinBox
+			suffix: i18n("px")
+			minimumValue: 32
+			maximumValue: 128
+			decimals: 0
 			value: formLayout.tileScaleToAbsoluteSize(formLayout.pendingTileScale)
-
-			onMoved: formLayout.setPendingTileScale(formLayout.absoluteSizeToTileScale(value))
+			onValueModified: formLayout.setPendingTileScale(formLayout.absoluteSizeToTileScale(value))
 		}
 		QQC2.Label {
-			text: Math.round(tileSizeSlider.value) + i18n("px")
-		}
-		QQC2.Label {
-			text: '(' + formLayout.absoluteSizeToPercent(tileSizeSlider.value) + "%)"
+			text: '(' + formLayout.absoluteSizeToPercent(tileSizeSpinBox.value) + "%)"
 		}
 	}
 	RowLayout {
