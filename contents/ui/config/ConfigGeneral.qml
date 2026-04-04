@@ -116,7 +116,7 @@ LibConfig.FormKCM {
 
 	LibConfig.CheckBox {
 		configKey: 'useTileTabs'
-		text: i18n("Use multiple tabs in the tile area (UNDER ACTIVE DEVELOPMENT)")
+		text: i18n("Tab Support (EXPERIMENTAL - HAS BUGS)")
 		Kirigami.FormData.label: i18n("Tabs")
 	}
 
