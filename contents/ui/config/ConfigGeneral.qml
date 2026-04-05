@@ -4,6 +4,7 @@ import QtQuick.Layouts
 import QtQuick.Window
 import org.kde.ksvg as KSvg
 import org.kde.kirigami as Kirigami
+import org.kde.coreaddons as KCoreAddons
 import Qt.labs.platform as QtLabsPlatform
 
 import ".." as TiledMenu
@@ -36,6 +37,75 @@ LibConfig.FormKCM {
 			}
 		}
 		return (root && typeof root.configurationChanged === "function") ? root : null
+	}
+
+	function normalizeDistroIconToken(token) {
+		token = (token || "").toLowerCase().trim()
+		if (!token) {
+			return ""
+		}
+
+		if (token.indexOf("distributor-logo-") === 0) {
+			token = token.substring("distributor-logo-".length)
+		}
+
+		token = token.replace(/^["']|["']$/g, "")
+
+		var aliases = {
+			"arch": "archlinux",
+			"arch-linux": "archlinux",
+			"opensuse": "opensuse",
+			"opensuse-leap": "opensuse",
+			"opensuse-microos": "opensuse",
+			"opensuse-slowroll": "opensuse",
+			"opensuse-tumbleweed": "opensuse",
+			"redhat": "rhel",
+			"red-hat": "rhel",
+			"red-hat-enterprise-linux": "rhel",
+			"rhel": "rhel",
+			"linuxmint": "linux-mint",
+			"linux-mint": "linux-mint",
+			"pop": "pop-os",
+			"pop-os": "pop-os",
+			"pop_os": "pop-os",
+			"endeavour": "endeavouros",
+			"endeavouros": "endeavouros",
+		}
+
+		return aliases[token] || token
+	}
+
+	function pushUnique(target, value) {
+		if (!value || target.indexOf(value) >= 0) {
+			return
+		}
+		target.push(value)
+	}
+
+	function distroIconCandidates() {
+		var candidates = []
+		var tokens = []
+
+		pushUnique(tokens, KCoreAddons.KOSRelease.id)
+		pushUnique(tokens, KCoreAddons.KOSRelease.logo)
+
+		var idLike = KCoreAddons.KOSRelease.idLike || []
+		for (var i = 0; i < idLike.length; ++i) {
+			pushUnique(tokens, idLike[i])
+		}
+
+		for (var j = 0; j < tokens.length; ++j) {
+			var normalized = normalizeDistroIconToken(tokens[j])
+			if (!normalized) {
+				continue
+			}
+			pushUnique(candidates, "distributor-logo-" + normalized)
+			pushUnique(candidates, normalized)
+		}
+
+		pushUnique(candidates, "start-here-kde")
+		pushUnique(candidates, "start-here")
+		return candidates
 	}
 
 	readonly property real pendingTileScale: {
@@ -72,11 +142,35 @@ LibConfig.FormKCM {
 		var plasmaStyleText = i18nd("kcm_desktoptheme", "Plasma Style")
 		return i18n("Follow Current %1 (%2)", plasmaStyleText, KSvg.ImageSet.imageSetName)
 	}
+	readonly property var distroIconCandidateList: distroIconCandidates()
+	property string distroPresetIcon: "start-here-kde"
+	property bool distroPresetResolved: false
 
 	// Keyboard shortcuts are handled by the main settings shell.
 
 	property var config: TiledMenu.AppletConfig {
 		id: config
+	}
+
+	Repeater {
+		model: formLayout.distroIconCandidateList
+		delegate: Kirigami.Icon {
+			required property string modelData
+			source: modelData
+			visible: false
+			onValidChanged: {
+				if (valid && !formLayout.distroPresetResolved) {
+					formLayout.distroPresetIcon = modelData
+					formLayout.distroPresetResolved = true
+				}
+			}
+			Component.onCompleted: {
+				if (valid && !formLayout.distroPresetResolved) {
+					formLayout.distroPresetIcon = modelData
+					formLayout.distroPresetResolved = true
+				}
+			}
+		}
 	}
 
 
@@ -96,7 +190,7 @@ LibConfig.FormKCM {
 			'format-border-set-none-symbolic',
 			'applications-all-symbolic',
 			'kde-symbolic',
-			'openSUSE-distributor-logo',
+			formLayout.distroPresetIcon,
 			'choice-rhomb-symbolic',
 			'choice-round-symbolic',
 			'stateshape-symbolic',
