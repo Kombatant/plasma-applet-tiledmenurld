@@ -531,14 +531,15 @@ ColumnLayout {
 				var typeName = settingsSchema[key]
 				var normalized = _normalizeValueForType(imported[key], typeName)
 				if (key === "tileModel") {
-					// Ensure the config page's own Base64XmlString mirrors the new value.
-					if (configTileModel.value !== normalized) {
+					var tileModelChanged = !ConfigUtils.valuesEqual(_readConfigValue(key), normalized)
+					if (tileModelChanged) {
+						// Ensure the config page's own Base64XmlString mirrors the new value.
 						configTileModel.value = normalized
+						setCfgValue(key, normalized, typeName)
+						appliedTileModel = true
+						appliedTileModelCount = Array.isArray(normalized) ? normalized.length : 0
+						changedSomething = true
 					}
-					setCfgValue(key, normalized, typeName)
-					appliedTileModel = true
-					appliedTileModelCount = Array.isArray(normalized) ? normalized.length : 0
-					changedSomething = true
 				} else {
 					if (!ConfigUtils.valuesEqual(_readConfigValue(key), normalized)) {
 						setCfgValue(key, normalized, typeName)
