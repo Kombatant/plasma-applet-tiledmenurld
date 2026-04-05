@@ -100,6 +100,7 @@ ColumnLayout {
 
 	property bool _updatingTextFromConfig: false
 	property bool _applyingXmlToConfig: false
+	property bool _xmlEditedByUser: false
 	property string _lastImportError: ""
 	property string _lastTileModelError: ""
 
@@ -107,9 +108,10 @@ ColumnLayout {
 		if (!xmlEditor) {
 			return
 		}
-		if (applyXmlDebounced.running && !_updatingTextFromConfig) {
+		if (_xmlEditedByUser && applyXmlDebounced.running && !_updatingTextFromConfig) {
 			applyXmlDebounced.stop()
 			applyXmlToConfig(xmlEditor.text)
+			_xmlEditedByUser = false
 		}
 	}
 
@@ -200,9 +202,27 @@ ColumnLayout {
 		return ConfigUtils.pendingValue(page, key, plasmoid.configuration[key])
 	}
 
+	function _stringListToArray(value) {
+		if (!value) {
+			return []
+		}
+		if (Array.isArray(value)) {
+			return value.slice()
+		}
+		if (typeof value === "string") {
+			return value ? [value] : []
+		}
+		var list = []
+		var length = typeof value.length === "number" ? value.length : 0
+		for (var i = 0; i < length; i++) {
+			list.push("" + value[i])
+		}
+		return list
+	}
+
 	function _normalizeValueForType(value, typeName) {
 		if (typeName === "stringlist") {
-			return Array.isArray(value) ? value : (typeof value === "undefined" || value === null || value === "" ? [] : ["" + value])
+			return _stringListToArray(value)
 		}
 		if (typeName === "bool") {
 			if (typeof value === "boolean") {
@@ -547,6 +567,7 @@ ColumnLayout {
 			if (xmlEditor.text !== next) {
 				xmlEditor.text = next
 			}
+			_xmlEditedByUser = false
 		} finally {
 			_updatingTextFromConfig = false
 		}
@@ -602,7 +623,13 @@ ColumnLayout {
 				return
 			}
 			try {
+				page._updatingTextFromConfig = true
 				xmlEditor.text = text
+			} finally {
+				page._updatingTextFromConfig = false
+			}
+			try {
+				page._xmlEditedByUser = false
 				applyXmlToConfig(text)
 				if (typeof showPassiveNotification === "function") {
 					showPassiveNotification(i18n("Imported from %1", pendingImportPath || ""))
@@ -655,7 +682,9 @@ ColumnLayout {
 	Component.onDestruction: {
 		// If the user hits OK immediately after editing, the debounce timer may not fire.
 		// Flush pending XML->config changes before this page is torn down.
-		_flushPendingXmlApply()
+		if (_xmlEditedByUser) {
+			_flushPendingXmlApply()
+		}
 	}
 
 	function saveExportToFilePath(filePath) {
@@ -710,6 +739,7 @@ ColumnLayout {
 				if (page._updatingTextFromConfig) {
 					return
 				}
+				page._xmlEditedByUser = true
 				applyXmlDebounced.restart()
 			}
 			onActiveFocusChanged: {
@@ -727,10 +757,11 @@ ColumnLayout {
 		interval: 400
 		repeat: false
 		onTriggered: {
-			if (!xmlEditor || page._updatingTextFromConfig) {
+			if (!xmlEditor || page._updatingTextFromConfig || !page._xmlEditedByUser) {
 				return
 			}
 			page.applyXmlToConfig(xmlEditor.text)
+			page._xmlEditedByUser = false
 		}
 	}
 
@@ -749,7 +780,7 @@ ColumnLayout {
 			var t = settingsSchema[k]
 			var v = _readConfigValue(k)
 			if (t === "stringlist") {
-				parts.push(k + "=" + JSON.stringify(Array.isArray(v) ? v : []))
+				parts.push(k + "=" + JSON.stringify(_stringListToArray(v)))
 			} else if (t === "json") {
 				try {
 					parts.push(k + "=" + JSON.stringify(v))
