@@ -31,6 +31,8 @@ Tiled Menu Reloaded is a Plasma applet that provides a tiled launcher loosely in
 
 ![Main menu](contents/docs/main.png)
 
+![With tab support enabled](contents/docs/tabs.png)
+
 ![Settings](contents/docs/settings.png)
 
 ![Bottom Sidebar position](contents/docs/bottom_sidebar.png)
