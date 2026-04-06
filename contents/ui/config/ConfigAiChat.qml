@@ -26,9 +26,11 @@ LibConfig.FormKCM {
 	readonly property bool usesOllamaUrl: _providerValue() === "ollama"
 	readonly property bool usesOpenWebUiUrl: _providerValue() === "openwebui"
 	readonly property var detectedModels: ConfigUtils.pendingValue(form, "aiDetectedModels", plasmoid.configuration.aiDetectedModels) || []
+	readonly property bool hasStoredApiKey: !!((secureApiKey.secret || "").trim())
 	property bool isDetectingModels: false
 	property string detectionStatus: ""
 	property bool _updatingApiKeyField: false
+	property bool _apiKeyEdited: false
 	property string _lastDetectionSignature: ""
 	property int _requestToken: 0
 	readonly property int wrappedLabelPreferredWidth: Kirigami.Units.gridUnit * 20
@@ -59,7 +61,14 @@ LibConfig.FormKCM {
 
 	function _apiKeyValue() {
 		var rootKcm = ConfigUtils.getRootKcm(form)
-		return rootKcm ? (rootKcm.pendingAiApiKey || "").trim() : (apiKeyField.text || "").trim()
+		var pendingValue = rootKcm ? (rootKcm.pendingAiApiKey || "").trim() : (apiKeyField.text || "").trim()
+		if (pendingValue) {
+			return pendingValue
+		}
+		if (form._apiKeyEdited) {
+			return ""
+		}
+		return (secureApiKey.secret || "").trim()
 	}
 
 	function _needsKey(provider) {
@@ -236,6 +245,10 @@ LibConfig.FormKCM {
 			if (success && rootKcm && !rootKcm.pendingAiApiKeyInitialized) {
 				form._setPendingApiKey(secret || ((plasmoid.configuration.aiApiKey || "").trim()), false)
 				rootKcm.pendingAiApiKeyInitialized = true
+				form._lastDetectionSignature = ""
+				if (!form.detectedModels.length && form._apiKeyValue()) {
+					form._scheduleDetection()
+				}
 			}
 		}
 		onSaved: function(success) {
@@ -278,6 +291,9 @@ LibConfig.FormKCM {
 		form._updatingApiKeyField = true
 		apiKeyField.text = nextValue
 		form._updatingApiKeyField = false
+		if (markDirty === false) {
+			form._apiKeyEdited = false
+		}
 	}
 
 	function _applyPendingApiKey() {
@@ -301,7 +317,7 @@ LibConfig.FormKCM {
 		var rootKcm = ConfigUtils.getRootKcm(form)
 		if (rootKcm) {
 			rootKcm.registerSaveHook(form, form._applyPendingApiKey)
-			if (!rootKcm.pendingAiApiKeyInitialized) {
+			if (!rootKcm.pendingAiApiKeyInitialized && (plasmoid.configuration.aiApiKey || "").trim()) {
 				rootKcm.pendingAiApiKey = (plasmoid.configuration.aiApiKey || "").trim()
 				rootKcm.pendingAiApiKeyInitialized = true
 			}
@@ -389,11 +405,22 @@ LibConfig.FormKCM {
 			if (form._updatingApiKeyField) {
 				return
 			}
+			form._apiKeyEdited = true
 			form._setPendingApiKey(text, true)
 			if (activeFocus) {
 				form._scheduleDetection()
 			}
 		}
+	}
+
+	QQC2.Label {
+		visible: form.keyVisible && secureApiKey.loadedOnce && form.hasStoredApiKey
+		Layout.fillWidth: true
+		Layout.minimumHeight: Kirigami.Units.gridUnit
+		Layout.preferredWidth: form.wrappedLabelPreferredWidth
+		wrapMode: Text.Wrap
+		opacity: 0.8
+		text: i18n("An API key is already stored in KWallet. Enter a new key here to replace it.")
 	}
 
 	LibConfig.TextField {

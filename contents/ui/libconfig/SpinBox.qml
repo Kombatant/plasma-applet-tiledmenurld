@@ -2,6 +2,7 @@
 
 import QtQuick
 import QtQuick.Controls as QQC2
+import org.kde.kirigami as Kirigami
 import "ConfigUtils.js" as ConfigUtils
 
 /*
@@ -32,6 +33,9 @@ LibConfig.SpinBox {
 // Qt6 QQC2.SpinBox: https://github.com/qt/qtquickcontrols2/blob/dev/src/imports/controls/basic/SpinBox.qml
 QQC2.SpinBox {
 	id: spinBox
+	implicitWidth: sizingRoot ? sizingRoot.uniformSpinBoxWidth : Kirigami.Units.gridUnit * 10
+
+	property Item sizingRoot: findSizingRoot()
 
 	property string configKey: ''
 	readonly property var configValue: configKey ? ConfigUtils.pendingValue(spinBox, configKey, plasmoid.configuration[configKey]) : 0
@@ -241,5 +245,16 @@ QQC2.SpinBox {
 			}
 		}
 		bindContentItem()
+	}
+
+	function findSizingRoot() {
+		var item = parent
+		while (item) {
+			if (typeof item.uniformSpinBoxWidth === "number") {
+				return item
+			}
+			item = item.parent
+		}
+		return null
 	}
 }

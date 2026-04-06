@@ -2,6 +2,7 @@
 
 import QtQuick
 import QtQuick.Controls as QQC2
+import org.kde.kirigami as Kirigami
 import "ConfigUtils.js" as ConfigUtils
 
 /*
@@ -31,6 +32,9 @@ LibConfig.ComboBox {
 */
 QQC2.ComboBox {
 	id: configComboBox
+	implicitWidth: sizingRoot ? sizingRoot.uniformComboBoxWidth : Kirigami.Units.gridUnit * 16
+
+	property Item sizingRoot: findSizingRoot()
 
 	property string configKey: ''
 	readonly property var configValue: configKey ? ConfigUtils.pendingValue(configComboBox, configKey, plasmoid.configuration[configKey]) : ""
@@ -99,5 +103,16 @@ QQC2.ComboBox {
 		if (index >= 0) {
 			currentIndex = index
 		}
+	}
+
+	function findSizingRoot() {
+		var item = parent
+		while (item) {
+			if (typeof item.uniformComboBoxWidth === "number") {
+				return item
+			}
+			item = item.parent
+		}
+		return null
 	}
 }
