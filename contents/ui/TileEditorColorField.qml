@@ -149,14 +149,13 @@ PlasmaComponents3.TextField {
 			}
 			onRejected: {
 				// This event is also triggered when the user clicks outside the popup modal.
-				// TODO Find a way to only trigger when Cancel is clicked.
-				colorField.text = initColor
+				colorField.text = initValue
 				dialogLoader.active = false
 			}
 
-			property color initColor
+			property string initValue
 			Component.onCompleted: {
-				initColor = colorField.valueColor
+				initValue = colorField.value
 			}
 		}
 	}

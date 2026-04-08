@@ -18,21 +18,7 @@
  *   51 Franklin Street, Fifth Floor, Boston, MA  2.010-1301, USA.
  */
 
-/**Documented API
-Inherits:
-        Item
-
-Imports:
-        QtQuick 2.1
-        org.kde.plasma.core
-
-Description:
-        It is a simple Radio button which is using the plasma theme.
-        TODO Do we need more info?
-
-Properties:
-        TODO needs more info??
-**/
+/* Theme-based hover/focus/shadow decoration item. */
 
 import QtQuick
 import org.kde.kirigami as Kirigami

@@ -18,20 +18,7 @@
  *   51 Franklin Street, Fifth Floor, Boston, MA  2.010-1301, USA.
  */
 
-/**Documented API
-Inherits:
-        Item
-
-Imports:
-        QtQuick 2.1
-        org.kde.plasma.core
-
-Description:
-TODO i need more info here
-
-
-Properties:
-**/
+/* Theme-based hover/focus/shadow frame for button-like controls. */
 
 import QtQuick
 import org.kde.kirigami as Kirigami
