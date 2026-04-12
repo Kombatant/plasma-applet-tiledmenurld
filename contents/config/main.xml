@@ -45,6 +45,9 @@
 			<!-- enum: Alphabetical, Categories, JumpToLetter, JumpToCategory, TilesOnly, AiChat -->
 			<default>Alphabetical</default>
 		</entry>
+		<entry name="aiChatEnabled" type="bool">
+			<default>true</default>
+		</entry>
 		<entry name="aiProvider" type="string">
 			<!-- enum: openai, openrouter, anthropic, google, perplexity, ollama, openwebui -->
 			<default>openai</default>

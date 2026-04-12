@@ -10,6 +10,7 @@ import org.kde.kcmutils as KCM
 KCM.SimpleKCM {
 	id: page
 	title: i18n("About")
+	readonly property int pagePadding: Kirigami.Units.largeSpacing
 
 	// Force Window color scheme instead of inheriting Plasma theme colors
 	Kirigami.Theme.colorSet: Kirigami.Theme.Window
@@ -80,9 +81,9 @@ KCM.SimpleKCM {
 			id: column
 			anchors {
 				left: parent.left; right: parent.right; top: parent.top; bottom: parent.bottom
-				leftMargin: Kirigami.Units.gridUnit; rightMargin: Kirigami.Units.gridUnit; topMargin: Kirigami.Units.gridUnit; bottomMargin: Kirigami.Units.gridUnit
+				leftMargin: page.pagePadding; rightMargin: page.pagePadding; topMargin: page.pagePadding; bottomMargin: page.pagePadding
 			}
-			width: Math.max(0, parent.width - (Kirigami.Units.gridUnit * 2))
+			width: Math.max(0, parent.width - (page.pagePadding * 2))
 			spacing: Kirigami.Units.largeSpacing
 
 			GridLayout {

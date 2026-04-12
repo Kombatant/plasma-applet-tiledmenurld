@@ -53,6 +53,7 @@ Item {
 		_ensureSettingInitialized('sidebarCollapsibleSearchResults', false)
 		_ensureSettingInitialized('defaultAppListView', 'Alphabetical')
 		_ensureSettingInitialized('lastUsedAppListView', 'Alphabetical')
+		_ensureSettingInitialized('aiChatEnabled', true)
 		_ensureSettingInitialized('aiProvider', 'openai')
 		_ensureSettingInitialized('aiApiKey', '')
 		_ensureSettingInitialized('aiOllamaUrl', 'http://127.0.0.1:11434')
@@ -187,8 +188,9 @@ Item {
 	readonly property bool sidebarHorizontal: sidebarOnTop || sidebarOnBottom
 	readonly property int sidebarHeight: sidebarHorizontal ? flatButtonSize : -1
 	readonly property int sidebarSeparatorThickness: Math.max(1, Math.round(Screen.devicePixelRatio))
-	readonly property int sidebarFixedHorizontalButtons: 8
-	readonly property int sidebarFixedVerticalButtons: 8
+	readonly property bool aiChatEnabled: plasmoid.configuration.aiChatEnabled !== false
+	readonly property int sidebarFixedHorizontalButtons: aiChatEnabled ? 8 : 7
+	readonly property int sidebarFixedVerticalButtons: aiChatEnabled ? 8 : 7
 	readonly property int sidebarFixedHorizontalWidth: (sidebarFixedHorizontalButtons * flatButtonSize) + (2 * sidebarSeparatorThickness)
 	readonly property int sidebarFixedVerticalHeight: (sidebarFixedVerticalButtons * flatButtonSize) + (2 * sidebarSeparatorThickness)
 	readonly property int appListWidth: plasmoid.configuration.appListWidth * Screen.devicePixelRatio

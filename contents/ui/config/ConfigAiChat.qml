@@ -25,6 +25,7 @@ LibConfig.FormKCM {
 	readonly property bool keyRequired: _providerValue() !== "ollama" && _providerValue() !== "openwebui"
 	readonly property bool usesOllamaUrl: _providerValue() === "ollama"
 	readonly property bool usesOpenWebUiUrl: _providerValue() === "openwebui"
+	readonly property bool aiChatEnabled: ConfigUtils.pendingValue(form, "aiChatEnabled", plasmoid.configuration.aiChatEnabled) !== false
 	readonly property var detectedModels: ConfigUtils.pendingValue(form, "aiDetectedModels", plasmoid.configuration.aiDetectedModels) || []
 	readonly property bool hasStoredApiKey: !!((secureApiKey.secret || "").trim())
 	property bool isDetectingModels: false
@@ -336,19 +337,31 @@ LibConfig.FormKCM {
 		}
 	}
 
-		Kirigami.InlineMessage {
+	Kirigami.InlineMessage {
 		Layout.fillWidth: true
 		visible: form.keyRequired && secureApiKey.checkedAvailability && !secureApiKey.secureStorageAvailable && !!secureApiKey.availabilityMessage
 		type: Kirigami.MessageType.Warning
 		text: secureApiKey.availabilityMessage
 	}
 
+	LibConfig.ComboBox {
+		id: aiChatEnabledCombo
+		configKey: "aiChatEnabled"
+		Kirigami.FormData.label: i18n("AI Chat")
+		model: [
+			{ value: true, text: i18n("Enabled") },
+			{ value: false, text: i18n("Disabled") },
+		]
+	}
+
 	LibConfig.Heading {
+		enabled: form.aiChatEnabled
 		text: i18n("Provider")
 	}
 
 	LibConfig.ComboBox {
 		id: providerCombo
+		enabled: form.aiChatEnabled
 		configKey: "aiProvider"
 		Kirigami.FormData.label: i18n("AI Provider")
 		model: form.providerOptions
@@ -367,8 +380,8 @@ LibConfig.FormKCM {
 
 	LibConfig.TextField {
 		id: apiKeyField
+		enabled: form.aiChatEnabled && secureApiKey.secureStorageAvailable
 		visible: form.keyVisible
-		enabled: secureApiKey.secureStorageAvailable
 		Kirigami.FormData.label: form.keyRequired ? i18n("API Key") : i18n("API Key (Optional)")
 		echoMode: _showKey ? TextInput.Normal : TextInput.Password
 		placeholderText: form.keyRequired
@@ -414,6 +427,7 @@ LibConfig.FormKCM {
 	}
 
 	QQC2.Label {
+		enabled: form.aiChatEnabled
 		visible: form.keyVisible && secureApiKey.loadedOnce && form.hasStoredApiKey
 		Layout.fillWidth: true
 		Layout.minimumHeight: Kirigami.Units.gridUnit
@@ -425,6 +439,7 @@ LibConfig.FormKCM {
 
 	LibConfig.TextField {
 		id: ollamaUrlField
+		enabled: form.aiChatEnabled
 		configKey: "aiOllamaUrl"
 		visible: form.usesOllamaUrl
 		Kirigami.FormData.label: i18n("Ollama Server")
@@ -439,6 +454,7 @@ LibConfig.FormKCM {
 
 	LibConfig.TextField {
 		id: openWebUiUrlField
+		enabled: form.aiChatEnabled
 		configKey: "aiOpenWebUiUrl"
 		visible: form.usesOpenWebUiUrl
 		Kirigami.FormData.label: i18n("Open WebUI Server")
@@ -452,6 +468,7 @@ LibConfig.FormKCM {
 	}
 
 	RowLayout {
+		enabled: form.aiChatEnabled
 		Kirigami.FormData.label: i18n("Detected Models")
 
 		LibConfig.ComboBox {
@@ -473,6 +490,7 @@ LibConfig.FormKCM {
 
 	QQC2.Label {
 		id: detectionStatusLabel
+		enabled: form.aiChatEnabled
 		Layout.fillWidth: true
 		Layout.minimumHeight: Kirigami.Units.gridUnit
 		Layout.preferredWidth: form.wrappedLabelPreferredWidth
@@ -490,22 +508,26 @@ LibConfig.FormKCM {
 	}
 
 	LibConfig.Heading {
+		enabled: form.aiChatEnabled
 		text: i18n("Chat Options")
 	}
 
 	LibConfig.CheckBox {
+		enabled: form.aiChatEnabled
 		configKey: "aiStreamChat"
 		text: i18n("Enable streaming responses")
 		Kirigami.FormData.label: ""
 	}
 
 	Item {
+		enabled: form.aiChatEnabled
 		Kirigami.FormData.isSection: false
 		Kirigami.FormData.label: ""
 		implicitHeight: Kirigami.Units.gridUnit
 	}
 
 	Kirigami.InlineMessage {
+		enabled: form.aiChatEnabled
 		Layout.fillWidth: true
 		visible: true
 		icon.source: "help-info-symbolic"

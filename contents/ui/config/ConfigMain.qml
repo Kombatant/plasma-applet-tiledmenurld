@@ -50,6 +50,8 @@ KCM.AbstractKCM {
     property var cfg_defaultAppListViewDefault
     property var cfg_lastUsedAppListView
     property var cfg_lastUsedAppListViewDefault
+    property var cfg_aiChatEnabled
+    property var cfg_aiChatEnabledDefault
     property var cfg_terminalApp
     property var cfg_terminalAppDefault
     property var cfg_taskManagerApp
@@ -160,7 +162,7 @@ KCM.AbstractKCM {
     property var cfg_aiChatHistoryDefault
     property var cfg_aiStreamChat
     property var cfg_aiStreamChatDefault
-    readonly property var _cfgKeys: ["icon", "fixedPanelIcon", "searchResultsGrouped", "searchDefaultFilters", "showRecentApps", "recentOrdering", "numRecentApps", "sidebarShortcuts", "sidebarCollapsibleSearchResults", "defaultAppListView", "lastUsedAppListView", "aiProvider", "aiApiKey", "aiOllamaUrl", "aiOpenWebUiUrl", "aiModel", "aiDetectedModels", "aiChatHistory", "aiStreamChat", "terminalApp", "taskManagerApp", "fileManagerApp", "useTileTabs", "tileTabs", "tileModel", "tileScale", "tileIconSize", "tileMargin", "tilesLocked", "tileHoverEffect", "defaultTileColor", "defaultTileGradient", "sidebarBackgroundColor", "hideSearchField", "searchOnTop", "searchFieldFollowsTheme", "sidebarFollowsTheme", "tileLabelAlignment", "groupLabelAlignment", "showGroupTileNameBorder", "presetTilesFolder", "appDescription", "appListIconSize", "searchFieldHeight", "appListWidth", "popupHeight", "popupWidthAlphabetical", "popupHeightAlphabetical", "favGridColsAlphabetical", "popupWidthCategories", "popupHeightCategories", "favGridColsCategories", "popupWidthTilesOnly", "popupHeightTilesOnly", "favGridColsTilesOnly", "popupWidthAiChat", "popupHeightAiChat", "favGridColsAiChat", "favGridCols", "sidebarButtonSize", "sidebarIconSize", "sidebarPosition", "tileRoundedCorners", "tileCornerRadius", "tileAnimatedPlayOnHover", "showTileTooltips"]
+    readonly property var _cfgKeys: ["icon", "fixedPanelIcon", "searchResultsGrouped", "searchDefaultFilters", "showRecentApps", "recentOrdering", "numRecentApps", "sidebarShortcuts", "sidebarCollapsibleSearchResults", "defaultAppListView", "lastUsedAppListView", "aiChatEnabled", "aiProvider", "aiApiKey", "aiOllamaUrl", "aiOpenWebUiUrl", "aiModel", "aiDetectedModels", "aiChatHistory", "aiStreamChat", "terminalApp", "taskManagerApp", "fileManagerApp", "useTileTabs", "tileTabs", "tileModel", "tileScale", "tileIconSize", "tileMargin", "tilesLocked", "tileHoverEffect", "defaultTileColor", "defaultTileGradient", "sidebarBackgroundColor", "hideSearchField", "searchOnTop", "searchFieldFollowsTheme", "sidebarFollowsTheme", "tileLabelAlignment", "groupLabelAlignment", "showGroupTileNameBorder", "presetTilesFolder", "appDescription", "appListIconSize", "searchFieldHeight", "appListWidth", "popupHeight", "popupWidthAlphabetical", "popupHeightAlphabetical", "favGridColsAlphabetical", "popupWidthCategories", "popupHeightCategories", "favGridColsCategories", "popupWidthTilesOnly", "popupHeightTilesOnly", "favGridColsTilesOnly", "popupWidthAiChat", "popupHeightAiChat", "favGridColsAiChat", "favGridCols", "sidebarButtonSize", "sidebarIconSize", "sidebarPosition", "tileRoundedCorners", "tileCornerRadius", "tileAnimatedPlayOnHover", "showTileTooltips"]
     property string pendingAiApiKey: ""
     property bool pendingAiApiKeyInitialized: false
     property var _saveHookOwners: []
@@ -169,6 +171,7 @@ KCM.AbstractKCM {
     // Do not force shrink: respect user resizing after open.
     readonly property int wideModeMinWidth: Kirigami.Units.gridUnit * 40
     readonly property int preferredWindowWidth: Kirigami.Units.gridUnit * 48
+    readonly property int rightPanePadding: Kirigami.Units.largeSpacing
     property string currentSectionKey: ""
     readonly property var _allSections: [{
         "key": "general",
@@ -564,7 +567,7 @@ KCM.AbstractKCM {
                                 id: scrollContent
 
                                 width: contentScroll.availableWidth
-                                implicitHeight: sectionScrollLoader.height
+                                implicitHeight: sectionScrollLoader.height + (page.rightPanePadding * 2)
 
                                 // Target source derived from section key.
                                 // We disable the outgoing item before
@@ -596,7 +599,9 @@ KCM.AbstractKCM {
 
                                     readonly property real _itemImplicitHeight: item ? item.implicitHeight : 0
 
-                                    width: scrollContent.width
+                                    x: page.rightPanePadding
+                                    y: page.rightPanePadding
+                                    width: Math.max(0, scrollContent.width - (page.rightPanePadding * 2))
                                     active: !!page.currentSectionKey
                                     // Many pages (especially those containing their own ScrollView)
                                     // report implicitHeight as 0. Ensure we still allocate visible

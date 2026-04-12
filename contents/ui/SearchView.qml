@@ -26,6 +26,7 @@ Item {
 	property alias aiChatView: aiChatView
 	property var aiChatModel
 	property string activeSizeMemoryView: "Alphabetical"
+	readonly property bool aiChatEnabled: plasmoid.configuration.aiChatEnabled !== false
 	readonly property bool widgetExpanded: (typeof widget !== "undefined" && widget && typeof widget.expanded !== "undefined") ? widget.expanded : false
 
 	readonly property bool showingOnlyTiles: !config.showSearch
@@ -35,7 +36,7 @@ Item {
 	readonly property bool showingAppsCategorically: config.showSearch && appsModel.order == "categories" && showingAppList
 	readonly property bool showSearchField: showingAiChat ? false : (config.hideSearchField ? !!searchField.text : true)
 	readonly property string lastRememberedSizeMemoryView: {
-		var rememberedView = normalizeViewName(plasmoid.configuration.lastUsedAppListView)
+		var rememberedView = sanitizeViewName(plasmoid.configuration.lastUsedAppListView)
 		return normalizeSizeMemoryView(rememberedView)
 	}
 
@@ -64,6 +65,14 @@ Item {
 		return validViews.indexOf(viewName) >= 0 ? viewName : "Alphabetical"
 	}
 
+	function sanitizeViewName(viewName) {
+		var normalizedView = normalizeViewName(viewName)
+		if (!aiChatEnabled && normalizedView === "AiChat") {
+			return "Alphabetical"
+		}
+		return normalizedView
+	}
+
 	function normalizeSizeMemoryView(viewName) {
 		if (viewName === "Categories" || viewName === "JumpToCategory") {
 			return "Categories"
@@ -88,7 +97,7 @@ Item {
 	}
 
 	function rememberView(viewName) {
-		var normalizedView = normalizeViewName(viewName)
+		var normalizedView = sanitizeViewName(viewName)
 		if (plasmoid.configuration.lastUsedAppListView !== normalizedView) {
 			plasmoid.configuration.lastUsedAppListView = normalizedView
 		}
@@ -97,13 +106,13 @@ Item {
 	function resolveConfiguredDefaultView() {
 		var configuredView = plasmoid.configuration.defaultAppListView
 		if (configuredView === "LastUsedView") {
-			return normalizeViewName(plasmoid.configuration.lastUsedAppListView)
+			return sanitizeViewName(plasmoid.configuration.lastUsedAppListView)
 		}
-		return normalizeViewName(configuredView)
+		return sanitizeViewName(configuredView)
 	}
 
 	function openView(viewName) {
-		var resolvedView = normalizeViewName(viewName)
+		var resolvedView = sanitizeViewName(viewName)
 		if (resolvedView == "Alphabetical") {
 			appsView.showAppsAlphabetically()
 		} else if (resolvedView == "Categories") {
@@ -170,6 +179,10 @@ Item {
 	}
 
 	function showAiChat() {
+		if (!aiChatEnabled) {
+			appsView.showAppsAlphabetically()
+			return
+		}
 		saveCurrentSizeMemoryViewBeforeSwitch()
 		rememberView("AiChat")
 		setActiveSizeMemoryView("AiChat")

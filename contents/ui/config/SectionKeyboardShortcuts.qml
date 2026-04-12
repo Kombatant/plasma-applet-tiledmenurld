@@ -9,6 +9,7 @@ import org.kde.plasma.plasmoid
 Item {
 	id: page
 	anchors.fill: parent
+	readonly property int pagePadding: Kirigami.Units.largeSpacing
 
 	// Force Window color scheme instead of inheriting Plasma theme colors
 	Kirigami.Theme.colorSet: Kirigami.Theme.Window
@@ -23,52 +24,59 @@ Item {
 		anchors.fill: parent
 		clip: true
 
-		ColumnLayout {
-			// Bind to the viewport width so long labels wrap instead of expanding
-			// the content width and causing a horizontal scrollbar.
-			x: Kirigami.Units.gridUnit
-			width: Math.max(0, scrollView.availableWidth - (Kirigami.Units.gridUnit * 2))
-			spacing: Kirigami.Units.largeSpacing
+		Item {
+			width: scrollView.availableWidth
+			implicitHeight: shortcutsColumn.implicitHeight + (page.pagePadding * 2)
 
-			QQC2.Label {
-				Layout.fillWidth: true
-				Layout.maximumWidth: scrollView.availableWidth
-				text: i18nd("plasma_shell_org.kde.plasma.desktop", "This shortcut will activate the applet as though it had been clicked.")
-				wrapMode: Text.WordWrap
-			}
+			ColumnLayout {
+				id: shortcutsColumn
+				// Bind to the viewport width so long labels wrap instead of expanding
+				// the content width and causing a horizontal scrollbar.
+				x: page.pagePadding
+				y: page.pagePadding
+				width: Math.max(0, scrollView.availableWidth - (page.pagePadding * 2))
+				spacing: Kirigami.Units.largeSpacing
 
-			KQuickControls.KeySequenceItem {
-				id: keySequenceItem
-				keySequence: (page.parent && page.parent._shortcutPending !== undefined)
-					? page.parent._shortcutPending
-					: Plasmoid.globalShortcut
-				modifierOnlyAllowed: true
-				onCaptureFinished: {
-					// bubble up to ConfigMain so Apply becomes enabled
-					var root = page
-					while (root && root.parent) {
-						root = root.parent
+				QQC2.Label {
+					Layout.fillWidth: true
+					Layout.maximumWidth: scrollView.availableWidth
+					text: i18nd("plasma_shell_org.kde.plasma.desktop", "This shortcut will activate the applet as though it had been clicked.")
+					wrapMode: Text.WordWrap
+				}
+
+				KQuickControls.KeySequenceItem {
+					id: keySequenceItem
+					keySequence: (page.parent && page.parent._shortcutPending !== undefined)
+						? page.parent._shortcutPending
+						: Plasmoid.globalShortcut
+					modifierOnlyAllowed: true
+					onCaptureFinished: {
+						// bubble up to ConfigMain so Apply becomes enabled
+						var root = page
+						while (root && root.parent) {
+							root = root.parent
+							if (root && typeof root.configurationChanged === "function") {
+								break
+							}
+						}
+						if (root && typeof root._shortcutPending !== "undefined") {
+							root._shortcutPending = keySequence
+						}
 						if (root && typeof root.configurationChanged === "function") {
-							break
+							root.configurationChanged()
 						}
 					}
-					if (root && typeof root._shortcutPending !== "undefined") {
-						root._shortcutPending = keySequence
-					}
-					if (root && typeof root.configurationChanged === "function") {
-						root.configurationChanged()
-					}
 				}
-			}
 
-			QQC2.Label {
-				Layout.fillWidth: true
-				Layout.maximumWidth: scrollView.availableWidth
-				text: i18n("When this widget has a global shortcut set, like 'Alt+F1', Plasma will open this menu with just the ⊞ Windows / Meta key.")
-				wrapMode: Text.WordWrap
-			}
+				QQC2.Label {
+					Layout.fillWidth: true
+					Layout.maximumWidth: scrollView.availableWidth
+					text: i18n("When this widget has a global shortcut set, like 'Alt+F1', Plasma will open this menu with just the ⊞ Windows / Meta key.")
+					wrapMode: Text.WordWrap
+				}
 
-			Item { Layout.fillHeight: true }
+				Item { Layout.fillHeight: true }
+			}
 		}
 	}
 }

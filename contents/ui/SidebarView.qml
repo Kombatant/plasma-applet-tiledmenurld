@@ -14,6 +14,7 @@ Item {
 	property var popup
 	z: 1
 	property int _horizontalSearchWidth: config.appListWidth
+	readonly property bool _aiChatEnabled: plasmoid.configuration.aiChatEnabled !== false
 	
 	function _relativeLuminance(color) {
 		function channel(c) {
@@ -25,7 +26,7 @@ Item {
 		return (0.2126 * r) + (0.7152 * g) + (0.0722 * b)
 	}
 
-	readonly property int _fixedHorizontalButtons: 8 // auto resize + 4 view buttons + user + settings + power
+	readonly property int _fixedHorizontalButtons: _aiChatEnabled ? 8 : 7 // auto resize + 3/4 view buttons + user + settings + power
 	readonly property int _fixedVerticalBottomButtons: 3 // user + settings + power
 	readonly property color _sidebarIconBackdrop: plasmoid.configuration.sidebarFollowsTheme ? Kirigami.Theme.backgroundColor : config.sidebarBackgroundColor
 	readonly property bool _sidebarIsLight: _relativeLuminance(_sidebarIconBackdrop) > 0.6
@@ -197,6 +198,7 @@ Item {
 				height: 1
 				color: Kirigami.Theme.textColor
 				opacity: 0.25
+				visible: sidebarView._aiChatEnabled
 			}
 
 			SidebarViewButton {
@@ -204,6 +206,7 @@ Item {
 				labelText: i18n("AI Chat")
 				onClicked: sidebarView.switchSidebarView(function() { searchView.showAiChat() })
 				checked: searchView.showingAiChat
+				visible: sidebarView._aiChatEnabled
 			}
 
 			SidebarItem {
@@ -320,6 +323,7 @@ Item {
 				width: 1
 				color: Kirigami.Theme.textColor
 				opacity: 0.25
+				visible: sidebarView._aiChatEnabled
 			}
 
 			SidebarViewButton {
@@ -327,6 +331,7 @@ Item {
 				labelText: i18n("AI Chat")
 				onClicked: sidebarView.switchSidebarView(function() { searchView.showAiChat() })
 				checked: searchView.showingAiChat
+				visible: sidebarView._aiChatEnabled
 			}
 
 			SidebarItem {
