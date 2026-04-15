@@ -181,7 +181,8 @@ Item {
 				readonly property bool isActive: tabBar.activeTab === index
 				property bool isEditing: false
 
-				width: Math.max(Kirigami.Units.gridUnit * 6, tabLabelMetrics.advanceWidth + Kirigami.Units.gridUnit * 3)
+				readonly property bool hasIcon: tabIcon !== ""
+				width: Math.max(Kirigami.Units.gridUnit * 6, tabLabelMetrics.advanceWidth + (hasIcon ? tabIconItem.width + Kirigami.Units.smallSpacing : 0) + Kirigami.Units.gridUnit * 3)
 				height: tabRow.height
 
 				readonly property string tabIcon: modelData.icon || ""
@@ -259,22 +260,37 @@ Item {
 					onHeightChanged: requestPaint()
 				}
 
-				// ── Label ────────────────────────────────────────────────
-				QQC2.Label {
-					id: tabLabelText
-					anchors.fill: parent
-					horizontalAlignment: Text.AlignHCenter
-					verticalAlignment: Text.AlignVCenter
-					font.pointSize: Math.round(Kirigami.Theme.defaultFont.pointSize * 1.05)
-					font.weight: tabDelegate.isActive ? Font.DemiBold : Font.Normal
-					text: modelData.name || ""
-					color: Kirigami.Theme.textColor
-					elide: Text.ElideRight
+				// ── Icon + Label ─────────────────────────────────────────
+				Row {
+					id: tabLabelRow
+					anchors.centerIn: parent
+					spacing: Kirigami.Units.largeSpacing
 					visible: !tabDelegate.isEditing
 					opacity: (tabBar._dragSourceIndex === index) ? 0.3
 						: tabDelegate.isActive ? 1.0
 						: hoverArea.containsMouse ? 0.85 : 0.55
 					Behavior on opacity { NumberAnimation { duration: 100 } }
+
+					Kirigami.Icon {
+						id: tabIconItem
+						visible: tabDelegate.hasIcon
+						source: tabDelegate.tabIcon
+						width: visible ? tabLabelText.font.pixelSize : 0
+						height: width
+						anchors.verticalCenter: parent.verticalCenter
+						color: Kirigami.Theme.textColor
+					}
+
+					QQC2.Label {
+						id: tabLabelText
+						horizontalAlignment: Text.AlignHCenter
+						verticalAlignment: Text.AlignVCenter
+						font.pointSize: Math.round(Kirigami.Theme.defaultFont.pointSize * 1.05)
+						font.weight: tabDelegate.isActive ? Font.DemiBold : Font.Normal
+						text: modelData.name || ""
+						color: Kirigami.Theme.textColor
+						elide: Text.ElideRight
+					}
 				}
 
 				// ── Edit input ───────────────────────────────────────────
