@@ -250,6 +250,54 @@
 			<label>Saved tile grid column count for the AI Chat view.</label>
 			<default>6</default>
 		</entry>
+		<entry name="popupHeightDockedAlphabetical" type="int">
+			<label>Saved popup height for the Alphabetical view in Docked layout (logical pixels).</label>
+			<default>620</default>
+		</entry>
+		<entry name="popupWidthDockedAlphabetical" type="int">
+			<label>Saved popup width for the Alphabetical view in Docked layout (logical pixels).</label>
+			<default>830</default>
+		</entry>
+		<entry name="favGridColsDockedAlphabetical" type="int">
+			<label>Saved tile grid column count for the Alphabetical view in Docked layout.</label>
+			<default>6</default>
+		</entry>
+		<entry name="popupHeightDockedCategories" type="int">
+			<label>Saved popup height for the Categories view in Docked layout (logical pixels).</label>
+			<default>620</default>
+		</entry>
+		<entry name="popupWidthDockedCategories" type="int">
+			<label>Saved popup width for the Categories view in Docked layout (logical pixels).</label>
+			<default>830</default>
+		</entry>
+		<entry name="favGridColsDockedCategories" type="int">
+			<label>Saved tile grid column count for the Categories view in Docked layout.</label>
+			<default>6</default>
+		</entry>
+		<entry name="popupHeightDockedTilesOnly" type="int">
+			<label>Saved popup height for the Tiles Only view in Docked layout (logical pixels).</label>
+			<default>620</default>
+		</entry>
+		<entry name="popupWidthDockedTilesOnly" type="int">
+			<label>Saved popup width for the Tiles Only view in Docked layout (logical pixels).</label>
+			<default>830</default>
+		</entry>
+		<entry name="favGridColsDockedTilesOnly" type="int">
+			<label>Saved tile grid column count for the Tiles Only view in Docked layout.</label>
+			<default>6</default>
+		</entry>
+		<entry name="popupHeightDockedAiChat" type="int">
+			<label>Saved popup height for the AI Chat view in Docked layout (logical pixels).</label>
+			<default>620</default>
+		</entry>
+		<entry name="popupWidthDockedAiChat" type="int">
+			<label>Saved popup width for the AI Chat view in Docked layout (logical pixels).</label>
+			<default>830</default>
+		</entry>
+		<entry name="favGridColsDockedAiChat" type="int">
+			<label>Saved tile grid column count for the AI Chat view in Docked layout.</label>
+			<default>6</default>
+		</entry>
 		<entry name="favGridCols" type="int">
 			<default>6</default>
 		</entry>

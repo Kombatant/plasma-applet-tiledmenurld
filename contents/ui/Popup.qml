@@ -372,10 +372,11 @@ MouseArea {
 
 	function sizeConfigKeys(viewName) {
 		var normalizedView = normalizedSizeMemoryView(viewName)
+		var layoutPrefix = (config && config.usesDockedSidebarLayout) ? "Docked" : ""
 		return {
-			width: "popupWidth" + normalizedView,
-			height: "popupHeight" + normalizedView,
-			cols: "favGridCols" + normalizedView,
+			width: "popupWidth" + layoutPrefix + normalizedView,
+			height: "popupHeight" + layoutPrefix + normalizedView,
+			cols: "favGridCols" + layoutPrefix + normalizedView,
 		}
 	}
 
@@ -471,7 +472,8 @@ MouseArea {
 		if (!(savedCols > 0)) {
 			savedCols = plasmoid.configuration.favGridCols
 		}
-		var restoreKey = [normalizedView, savedWidth, savedHeight, savedCols, effectiveDevicePixelRatio()].join("|")
+		var layoutMode = (config && config.usesDockedSidebarLayout) ? "docked" : "classic"
+		var restoreKey = [layoutMode, normalizedView, savedWidth, savedHeight, savedCols, effectiveDevicePixelRatio()].join("|")
 		if (popup._lastAppliedRestoreKey === restoreKey && popup._sizeRestored && !popup._pendingDprSyncRestore) {
 			return
 		}
