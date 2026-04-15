@@ -321,6 +321,15 @@ ColumnLayout {
 		}
 	}
 
+	Rectangle {
+		Layout.fillWidth: true
+		Layout.leftMargin: Kirigami.Units.smallSpacing
+		Layout.rightMargin: Kirigami.Units.smallSpacing
+		height: 1
+		color: Kirigami.Theme.textColor
+		opacity: 0.2
+	}
+
 	// ──────────────────────────────────────────────
 	// 7. Power actions row
 	// ──────────────────────────────────────────────

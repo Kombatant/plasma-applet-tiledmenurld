@@ -15,7 +15,7 @@ Tiled Menu Reloaded is a Plasma applet that provides a tiled launcher loosely in
 
 ## Highlights
 - **New with 0.9 version**: New Docked Sidebar layout - still in early stages but it works, with support for custom user avatars (animated or static)
-- Tabs support in the tile area.)
+- Tabs support in the tile area.
 - Added a AI Chat tab to the sidebar, which can be used to interact with various LLMs. 
 - Tile-based launcher with configurable sizes (1×1, 2×2, 4×4, and mixed layouts). 
 - Rounded tiles with customizable corner radius now supported.
