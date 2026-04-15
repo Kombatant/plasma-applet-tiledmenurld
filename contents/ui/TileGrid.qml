@@ -649,7 +649,7 @@ DropArea {
 							id: countLabel
 							x: headerRow.reversed ? 0 : headerRow.width - width
 							y: (parent.height - height) / 2
-							text: i18np("%1 app", "%1 apps", parent.parent.itemCount)
+							text: i18np("%1 tile", "%1 tiles", parent.parent.itemCount)
 							font.pointSize: Kirigami.Theme.defaultFont.pointSize
 							color: Kirigami.Theme.textColor
 							opacity: 0.38
