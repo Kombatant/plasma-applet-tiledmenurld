@@ -37,6 +37,10 @@
 			<label>Whether grouped search results in the sidebar can be collapsed and start with only the first group expanded.</label>
 			<default>false</default>
 		</entry>
+		<entry name="customAvatarPath" type="string">
+			<label>Optional custom avatar image path used only by this plasmoid.</label>
+			<default></default>
+		</entry>
 		<entry name="defaultAppListView" type="string">
 			<!-- enum: Alphabetical, Categories, JumpToLetter, JumpToCategory, TilesOnly, AiChat, LastUsedView -->
 			<default>Alphabetical</default>
@@ -191,6 +195,9 @@
 		<entry name="appListWidth" type="int">
 			<default>350</default>
 		</entry>
+		<entry name="dockedSidebarWidth" type="int">
+			<default>350</default>
+		</entry>
 		<entry name="popupHeight" type="int">
 			<label>Popup height in logical pixels (scaled in QML via Screen.devicePixelRatio).</label>
 			<default>620</default>
@@ -256,6 +263,10 @@
 			<!-- enum: left, top, bottom -->
 			<label>Position of the sidebar: left, top, or bottom.</label>
 			<default>left</default>
+		</entry>
+		<entry name="useDockedLayout" type="bool">
+			<label>Layout mode: true = Docked Sidebar layout, false = Classic layout.</label>
+			<default>true</default>
 		</entry>
 	</group>
 

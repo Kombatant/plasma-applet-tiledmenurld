@@ -117,6 +117,12 @@ Item {
 		PlasmaExtras.MenuItem { separator: true }
 
 		PlasmaExtras.MenuItem {
+			icon: "list-add"
+			text: i18n("Add Tab")
+			onClicked: tabBar.tabAdded()
+		}
+
+		PlasmaExtras.MenuItem {
 			icon: "edit-delete-remove"
 			text: i18n("Delete Tab")
 			onClicked: tabBar.tabDeleted(tabContextMenu.tabIdx)
@@ -132,28 +138,39 @@ Item {
 		}
 	}
 
-	// Whether the tab row overflows and needs scrolling
-	readonly property bool _canScroll: tabFlickable.contentWidth > tabFlickable.width
+	readonly property real _borderWidth: Math.max(1, Math.round(Screen.devicePixelRatio))
+	readonly property color _borderColor: Qt.rgba(1.0, 1.0, 1.0, 0.35)
+
+	// Active tab edges in tabBar coordinates — reactive bindings via
+	// tabRow.x + item.x instead of imperative mapToItem calls.
+	// We read tabRepeater.count to force re-evaluation when items are created.
+	readonly property bool _activeTabReady: {
+		if (tabRepeater.count <= 0) return false
+		var item = tabRepeater.itemAt(activeTab)
+		return item !== null && item.width > 0
+	}
+	readonly property real _activeTabLeft: {
+		void(tabRepeater.count) // dependency on count so binding re-evaluates when items are created
+		var item = tabRepeater.itemAt(activeTab)
+		if (!item) return 0
+		return tabRow.x + item.x
+	}
+	readonly property real _activeTabRight: {
+		void(tabRepeater.count)
+		var item = tabRepeater.itemAt(activeTab)
+		if (!item) return 0
+		return tabRow.x + item.x + item.width
+	}
 
 	// ── Layout ───────────────────────────────────────────────────────────────
-	Flickable {
-		id: tabFlickable
+	Row {
+		id: tabRow
 		anchors.left: parent.left
-		anchors.right: scrollArrows.visible ? scrollArrows.left : parent.right
-		anchors.top: parent.top
 		anchors.bottom: parent.bottom
-		contentWidth: tabRow.width
-		contentHeight: height
-		clip: true
-		flickableDirection: Flickable.HorizontalFlick
-		boundsBehavior: Flickable.StopAtBounds
+		height: parent.height
+		spacing: 0
 
-		Row {
-			id: tabRow
-			height: parent.height
-			spacing: Kirigami.Units.smallSpacing
-
-		// ── Tab buttons ──────────────────────────────────────────────────────
+		// ── Tab buttons ──────────────────────────────────────────────────
 		Repeater {
 			id: tabRepeater
 			model: tabBar.tabs
@@ -164,10 +181,16 @@ Item {
 				readonly property bool isActive: tabBar.activeTab === index
 				property bool isEditing: false
 
-				width: Math.max(Kirigami.Units.gridUnit * 4.5, tabLabelText.implicitWidth + (tabIconItem.visible ? tabIconItem.width + Kirigami.Units.smallSpacing : 0) + Kirigami.Units.gridUnit * 2)
-				height: tabFlickable.height
+				width: Math.max(Kirigami.Units.gridUnit * 6, tabLabelMetrics.advanceWidth + Kirigami.Units.gridUnit * 3)
+				height: tabRow.height
 
 				readonly property string tabIcon: modelData.icon || ""
+
+				TextMetrics {
+					id: tabLabelMetrics
+					font: tabLabelText.font
+					text: modelData.name || ""
+				}
 
 				function startEditing() {
 					tabDelegate.isEditing = true
@@ -180,7 +203,6 @@ Item {
 					var trimmed = tabInput.text.trim()
 					if (trimmed.length > 0) {
 						tabBar.tabRenamed(index, trimmed)
-						// Auto-assign icon based on the new name
 						var inferred = tabBar.inferIconForName(trimmed)
 						if (inferred) {
 							tabBar.tabIconChanged(index, inferred)
@@ -189,69 +211,81 @@ Item {
 					tabDelegate.isEditing = false
 				}
 
-				// ── Background (hover highlight) ────────────────────────────
-				Rectangle {
+				// ── Curved tab shape (fill + border) for active tab ──
+				Canvas {
+					id: tabShape
+					visible: tabDelegate.isActive
 					anchors.fill: parent
-					anchors.margins: Math.round(Kirigami.Units.smallSpacing / 2)
-					radius: Kirigami.Units.smallSpacing
-					color: Kirigami.Theme.highlightColor
-					opacity: hoverArea.containsMouse && !tabDelegate.isActive ? 0.15 : 0
-					Behavior on opacity { NumberAnimation { duration: 100 } }
+
+					readonly property real r: Kirigami.Units.smallSpacing * 2
+					readonly property real bw: tabBar._borderWidth
+					readonly property color bc: tabBar._borderColor
+
+					onPaint: {
+						var ctx = getContext("2d")
+						ctx.clearRect(0, 0, width, height)
+						var w = width, h = height
+
+						// ── Filled background with gradient ──
+						ctx.beginPath()
+						ctx.moveTo(0, h)
+						ctx.lineTo(0, r)
+						ctx.arcTo(0, 0, r, 0, r)
+						ctx.lineTo(w - r, 0)
+						ctx.arcTo(w, 0, w, r, r)
+						ctx.lineTo(w, h)
+						ctx.closePath()
+
+						var grad = ctx.createLinearGradient(0, 0, 0, h)
+						grad.addColorStop(0.0, Qt.rgba(1.0, 1.0, 1.0, 0.08))
+						grad.addColorStop(1.0, "transparent")
+						ctx.fillStyle = grad
+						ctx.fill()
+
+						// ── Border stroke (top + left + right, no bottom) ──
+						ctx.beginPath()
+						ctx.moveTo(0, h)
+						ctx.lineTo(0, r)
+						ctx.arcTo(0, 0, r, 0, r)
+						ctx.lineTo(w - r, 0)
+						ctx.arcTo(w, 0, w, r, r)
+						ctx.lineTo(w, h)
+						ctx.lineWidth = bw
+						ctx.strokeStyle = bc
+						ctx.stroke()
+					}
+
+					onWidthChanged: requestPaint()
+					onHeightChanged: requestPaint()
 				}
 
-				// ── Active tab bottom indicator (text-width underline) ──────
-				Rectangle {
-					anchors.left: tabLabelRow.left
-					anchors.right: tabLabelRow.right
-					anchors.bottom: parent.bottom
-					height: 2
-					color: Kirigami.Theme.highlightColor
-					visible: tabDelegate.isActive && !tabDelegate.isEditing
-				}
-
-				// ── Label (read-only) with icon ──────────────────────────────
-				Row {
-					id: tabLabelRow
+				// ── Label ────────────────────────────────────────────────
+				QQC2.Label {
+					id: tabLabelText
 					anchors.fill: parent
-					anchors.leftMargin: Kirigami.Units.largeSpacing
-					anchors.rightMargin: Kirigami.Units.largeSpacing
-					spacing: Kirigami.Units.smallSpacing
+					horizontalAlignment: Text.AlignHCenter
+					verticalAlignment: Text.AlignVCenter
+					font.pointSize: Math.round(Kirigami.Theme.defaultFont.pointSize * 1.05)
+					font.weight: tabDelegate.isActive ? Font.DemiBold : Font.Normal
+					text: modelData.name || ""
+					color: Kirigami.Theme.textColor
+					elide: Text.ElideRight
 					visible: !tabDelegate.isEditing
 					opacity: (tabBar._dragSourceIndex === index) ? 0.3
 						: tabDelegate.isActive ? 1.0
-						: hoverArea.containsMouse ? 0.85 : 0.6
+						: hoverArea.containsMouse ? 0.85 : 0.55
 					Behavior on opacity { NumberAnimation { duration: 100 } }
-
-					Kirigami.Icon {
-						id: tabIconItem
-						visible: tabDelegate.tabIcon !== ""
-						source: tabDelegate.tabIcon
-						width: visible ? tabLabelText.font.pixelSize : 0
-						height: width
-						anchors.verticalCenter: parent.verticalCenter
-						color: Kirigami.Theme.textColor
-					}
-
-					QQC2.Label {
-						id: tabLabelText
-						width: parent.width - (tabIconItem.visible ? tabIconItem.width + parent.spacing : 0)
-						height: parent.height
-						verticalAlignment: Text.AlignVCenter
-						font.pointSize: Math.round(Kirigami.Theme.defaultFont.pointSize * 1.3)
-						text: modelData.name || ""
-						color: Kirigami.Theme.textColor
-						elide: Text.ElideRight
-					}
 				}
 
-				// ── Edit input ───────────────────────────────────────────────
+				// ── Edit input ───────────────────────────────────────────
 				TextInput {
 					id: tabInput
 					anchors.fill: parent
 					anchors.leftMargin: Kirigami.Units.largeSpacing
 					anchors.rightMargin: Kirigami.Units.largeSpacing
+					horizontalAlignment: TextInput.AlignHCenter
 					verticalAlignment: TextInput.AlignVCenter
-					font.pointSize: Math.round(Kirigami.Theme.defaultFont.pointSize * 1.3)
+					font.pointSize: Math.round(Kirigami.Theme.defaultFont.pointSize * 1.05)
 					color: Kirigami.Theme.textColor
 					visible: tabDelegate.isEditing
 					clip: true
@@ -265,14 +299,14 @@ Item {
 					}
 				}
 
-				// ── Mouse interaction ────────────────────────────────────────
+				// ── Mouse interaction ────────────────────────────────────
 				MouseArea {
 					id: hoverArea
 					anchors.fill: parent
 					hoverEnabled: true
 					acceptedButtons: Qt.LeftButton | Qt.MiddleButton | Qt.RightButton
 					cursorShape: tabBar._dragSourceIndex >= 0
-						? Qt.ClosedHandCursor : Qt.ArrowCursor
+						? Qt.ClosedHandCursor : Qt.PointingHandCursor
 
 					property point _pressPos
 					property bool _didDrag: false
@@ -335,123 +369,62 @@ Item {
 				}
 			}
 		}
-
-		// ── "+" Add Tab button ───────────────────────────────────────────────
-		Item {
-			id: addTabBtn
-			width: tabBar.tabHeight
-			height: tabFlickable.height
-
-			// No background fill – flat style
-			Item { anchors.fill: parent }
-
-			QQC2.Label {
-				anchors.centerIn: parent
-				text: "+"
-				font.pixelSize: Kirigami.Units.gridUnit
-				color: Kirigami.Theme.textColor
-				opacity: addTabMA.containsMouse ? 0.9 : 0.55
-			}
-
-			MouseArea {
-				id: addTabMA
-				anchors.fill: parent
-				hoverEnabled: true
-				cursorShape: Qt.PointingHandCursor
-				onClicked: tabBar.tabAdded()
-			}
-		}
-		}
 	}
 
-	// ── Scroll arrow controls ────────────────────────────────────────────────
-	Row {
-		id: scrollArrows
-		anchors.right: parent.right
-		anchors.top: parent.top
+	// ── "+" Add Tab button ──────────────────────────────────────────────────
+	Item {
+		id: addTabBtn
+		anchors.left: tabRow.right
 		anchors.bottom: parent.bottom
-		visible: tabBar._canScroll
-		spacing: 0
+		width: tabBar.tabHeight
+		height: tabBar.tabHeight
 
-		Rectangle {
-			width: 1
-			height: parent.height
+		QQC2.Label {
+			anchors.centerIn: parent
+			text: "+"
+			font.pixelSize: Kirigami.Units.gridUnit
 			color: Kirigami.Theme.textColor
-			opacity: 0.12
+			opacity: addTabMA.containsMouse ? 0.9 : 0.55
 		}
 
-		Item {
-			width: Kirigami.Units.gridUnit * 1.5
-			height: parent.height
-			Kirigami.Icon {
-				anchors.centerIn: parent
-				width: Kirigami.Units.iconSizes.small
-				height: width
-				source: "go-previous"
-				color: Kirigami.Theme.textColor
-				opacity: scrollBackMA.containsMouse ? 0.9 : (tabFlickable.contentX > 0 ? 0.55 : 0.2)
-			}
-			MouseArea {
-				id: scrollBackMA
-				anchors.fill: parent
-				hoverEnabled: true
-				cursorShape: Qt.PointingHandCursor
-				onClicked: {
-					tabFlickable.contentX = Math.max(0,
-						tabFlickable.contentX - tabFlickable.width * 0.6)
-				}
-			}
-		}
-
-		Item {
-			width: Kirigami.Units.gridUnit * 1.5
-			height: parent.height
-			Kirigami.Icon {
-				anchors.centerIn: parent
-				width: Kirigami.Units.iconSizes.small
-				height: width
-				source: "go-next"
-				color: Kirigami.Theme.textColor
-				opacity: scrollFwdMA.containsMouse ? 0.9 : (tabFlickable.contentX < tabFlickable.contentWidth - tabFlickable.width ? 0.55 : 0.2)
-			}
-			MouseArea {
-				id: scrollFwdMA
-				anchors.fill: parent
-				hoverEnabled: true
-				cursorShape: Qt.PointingHandCursor
-				onClicked: {
-					tabFlickable.contentX = Math.min(
-						tabFlickable.contentWidth - tabFlickable.width,
-						tabFlickable.contentX + tabFlickable.width * 0.6)
-				}
-			}
+		MouseArea {
+			id: addTabMA
+			anchors.fill: parent
+			hoverEnabled: true
+			cursorShape: Qt.PointingHandCursor
+			onClicked: tabBar.tabAdded()
 		}
 	}
 
-	// Translate vertical mouse-wheel into horizontal tab scrolling
-	MouseArea {
-		anchors.fill: tabFlickable
-		acceptedButtons: Qt.NoButton
-		onWheel: function(wheel) {
-			var delta = wheel.angleDelta.y !== 0 ? wheel.angleDelta.y : wheel.angleDelta.x
-			if (delta !== 0 && tabFlickable.contentWidth > tabFlickable.width) {
-				tabFlickable.contentX = Math.max(0,
-					Math.min(tabFlickable.contentWidth - tabFlickable.width,
-						tabFlickable.contentX - delta))
-			}
-		}
+	// ── Bottom line — split around the active tab to create the tab illusion ──
+	// When the Repeater hasn't instantiated items yet, draw one full-width line
+	// as a fallback (no tab gap to cut out yet).
+	Rectangle {
+		id: bottomLineFull
+		visible: !tabBar._activeTabReady
+		anchors.left: parent.left
+		anchors.right: parent.right
+		anchors.bottom: parent.bottom
+		height: tabBar._borderWidth
+		color: tabBar._borderColor
 	}
-
-	// Auto-scroll so the active tab is always visible
-	onActiveTabChanged: {
-		var item = tabRepeater.itemAt(activeTab)
-		if (!item || !tabFlickable) return
-		var itemLeft = item.x
-		var itemRight = item.x + item.width
-		if (itemLeft < tabFlickable.contentX)
-			tabFlickable.contentX = itemLeft
-		else if (itemRight > tabFlickable.contentX + tabFlickable.width)
-			tabFlickable.contentX = itemRight - tabFlickable.width
+	Rectangle {
+		id: bottomLineLeft
+		visible: tabBar._activeTabReady
+		anchors.left: parent.left
+		anchors.bottom: parent.bottom
+		width: tabBar._activeTabLeft
+		height: tabBar._borderWidth
+		color: tabBar._borderColor
+	}
+	Rectangle {
+		id: bottomLineRight
+		visible: tabBar._activeTabReady
+		x: tabBar._activeTabRight
+		anchors.bottom: parent.bottom
+		width: parent.width - tabBar._activeTabRight
+		height: tabBar._borderWidth
+		color: tabBar._borderColor
 	}
 
 	// ── Drop indicator ──────────────────────────────────────────────────────
@@ -484,15 +457,5 @@ Item {
 			}
 			return 0
 		}
-	}
-
-	// ── Bottom separator line ────────────────────────────────────────────────
-	Rectangle {
-		anchors.left: parent.left
-		anchors.right: parent.right
-		anchors.bottom: parent.bottom
-		height: Math.max(1, Math.round(Screen.devicePixelRatio * 0.5))
-		color: Kirigami.Theme.textColor
-		opacity: 0.15
 	}
 }

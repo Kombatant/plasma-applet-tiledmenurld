@@ -211,7 +211,7 @@ LibConfig.FormKCM {
 
 	LibConfig.CheckBox {
 		configKey: 'useTileTabs'
-		text: i18n("Tab Support (EXPERIMENTAL - HAS BUGS)")
+		text: i18n("Tab Support")
 		Kirigami.FormData.label: i18n("Tabs")
 	}
 

@@ -46,6 +46,8 @@ KCM.AbstractKCM {
     property var cfg_sidebarShortcutsDefault
     property var cfg_sidebarCollapsibleSearchResults
     property var cfg_sidebarCollapsibleSearchResultsDefault
+    property var cfg_customAvatarPath
+    property var cfg_customAvatarPathDefault
     property var cfg_defaultAppListView
     property var cfg_defaultAppListViewDefault
     property var cfg_lastUsedAppListView
@@ -104,6 +106,8 @@ KCM.AbstractKCM {
     property var cfg_searchFieldHeightDefault
     property var cfg_appListWidth
     property var cfg_appListWidthDefault
+    property var cfg_dockedSidebarWidth
+    property var cfg_dockedSidebarWidthDefault
     property var cfg_popupHeight
     property var cfg_popupHeightDefault
     property var cfg_popupWidthAlphabetical
@@ -138,6 +142,8 @@ KCM.AbstractKCM {
     property var cfg_sidebarIconSizeDefault
     property var cfg_sidebarPosition
     property var cfg_sidebarPositionDefault
+    property var cfg_useDockedLayout
+    property var cfg_useDockedLayoutDefault
     property var cfg_tileRoundedCorners
     property var cfg_tileRoundedCornersDefault
     property var cfg_tileCornerRadius
@@ -162,7 +168,7 @@ KCM.AbstractKCM {
     property var cfg_aiChatHistoryDefault
     property var cfg_aiStreamChat
     property var cfg_aiStreamChatDefault
-    readonly property var _cfgKeys: ["icon", "fixedPanelIcon", "searchResultsGrouped", "searchDefaultFilters", "showRecentApps", "recentOrdering", "numRecentApps", "sidebarShortcuts", "sidebarCollapsibleSearchResults", "defaultAppListView", "lastUsedAppListView", "aiChatEnabled", "aiProvider", "aiApiKey", "aiOllamaUrl", "aiOpenWebUiUrl", "aiModel", "aiDetectedModels", "aiChatHistory", "aiStreamChat", "terminalApp", "taskManagerApp", "fileManagerApp", "useTileTabs", "tileTabs", "tileModel", "tileScale", "tileIconSize", "tileMargin", "tilesLocked", "tileHoverEffect", "defaultTileColor", "defaultTileGradient", "sidebarBackgroundColor", "hideSearchField", "searchOnTop", "searchFieldFollowsTheme", "sidebarFollowsTheme", "tileLabelAlignment", "groupLabelAlignment", "showGroupTileNameBorder", "presetTilesFolder", "appDescription", "appListIconSize", "searchFieldHeight", "appListWidth", "popupHeight", "popupWidthAlphabetical", "popupHeightAlphabetical", "favGridColsAlphabetical", "popupWidthCategories", "popupHeightCategories", "favGridColsCategories", "popupWidthTilesOnly", "popupHeightTilesOnly", "favGridColsTilesOnly", "popupWidthAiChat", "popupHeightAiChat", "favGridColsAiChat", "favGridCols", "sidebarButtonSize", "sidebarIconSize", "sidebarPosition", "tileRoundedCorners", "tileCornerRadius", "tileAnimatedPlayOnHover", "showTileTooltips"]
+    readonly property var _cfgKeys: ["icon", "fixedPanelIcon", "searchResultsGrouped", "searchDefaultFilters", "showRecentApps", "recentOrdering", "numRecentApps", "sidebarShortcuts", "sidebarCollapsibleSearchResults", "customAvatarPath", "defaultAppListView", "lastUsedAppListView", "aiChatEnabled", "aiProvider", "aiApiKey", "aiOllamaUrl", "aiOpenWebUiUrl", "aiModel", "aiDetectedModels", "aiChatHistory", "aiStreamChat", "terminalApp", "taskManagerApp", "fileManagerApp", "useTileTabs", "tileTabs", "tileModel", "tileScale", "tileIconSize", "tileMargin", "tilesLocked", "tileHoverEffect", "defaultTileColor", "defaultTileGradient", "sidebarBackgroundColor", "hideSearchField", "searchOnTop", "searchFieldFollowsTheme", "sidebarFollowsTheme", "tileLabelAlignment", "groupLabelAlignment", "showGroupTileNameBorder", "presetTilesFolder", "appDescription", "appListIconSize", "searchFieldHeight", "appListWidth", "dockedSidebarWidth", "popupHeight", "popupWidthAlphabetical", "popupHeightAlphabetical", "favGridColsAlphabetical", "popupWidthCategories", "popupHeightCategories", "favGridColsCategories", "popupWidthTilesOnly", "popupHeightTilesOnly", "favGridColsTilesOnly", "popupWidthAiChat", "popupHeightAiChat", "favGridColsAiChat", "favGridCols", "sidebarButtonSize", "sidebarIconSize", "sidebarPosition", "useDockedLayout", "tileRoundedCorners", "tileCornerRadius", "tileAnimatedPlayOnHover", "showTileTooltips"]
     property string pendingAiApiKey: ""
     property bool pendingAiApiKeyInitialized: false
     property var _saveHookOwners: []

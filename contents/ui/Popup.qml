@@ -55,6 +55,8 @@ MouseArea {
 	property real _lastRestoreDevicePixelRatio: 0
 	property bool _pendingDprSyncRestore: false
 	readonly property bool widgetExpanded: (typeof widget !== "undefined" && widget && typeof widget.expanded !== "undefined") ? widget.expanded : false
+	readonly property int minimumPopupWidth: config.minimumPopupWidth
+	readonly property int popupLeftSectionWidth: config.popupLeftSectionWidth
 	property string _pendingRestoreView: ""
 	property string _lastAppliedRestoreKey: ""
 	property bool _restoreQueuedWhileCollapsed: false
@@ -418,7 +420,7 @@ MouseArea {
 		var effectiveHeight = normalizedRenderedSize(popup.height, popup.Layout.preferredHeight, popup.implicitHeight)
 		var logicalWidth = Math.round(effectiveWidth / dpr)
 		var logicalHeight = Math.round(effectiveHeight / dpr)
-		var favWidth = Math.max(0, effectiveWidth - config.leftSectionWidth)
+		var favWidth = Math.max(0, effectiveWidth - popup.popupLeftSectionWidth)
 		var box = config.cellBoxSize
 		var cols = box > 0 ? Math.max(1, Math.floor(favWidth / box)) : 0
 
@@ -629,13 +631,20 @@ MouseArea {
 		var sidebarExtraHeight = (config.sidebarOnTop || config.sidebarOnBottom)
 			? (config.sidebarHeight + config.sidebarRightMargin)
 			: 0
+		// Include the tab bar's Layout.topMargin (Kirigami.Units.smallSpacing)
+		// so the popup is tall enough for the grid not to scroll.
 		var tabBarExtraHeight = (config.useTileTabs && tileTabBar)
-			? tileTabBar.implicitHeight
+			? tileTabBar.implicitHeight + Kirigami.Units.smallSpacing
+			: 0
+		// In integrated layout, the right pane has a search field above the tile grid.
+		// Include its Layout.topMargin and Layout.bottomMargin as well.
+		var dpr = Screen.devicePixelRatio || 1
+		var searchFieldExtraHeight = (config.usesDockedSidebarLayout && rightPaneSearchField && rightPaneSearchField.visible)
+			? config.searchFieldHeight + Math.round(10 * dpr) + Math.round(6 * dpr)
 			: 0
 		var targetGridHeight = rows * cellBox + 2 * holoPad
-		var targetWidth = Math.max(config.minimumWidth, config.leftSectionWidth + targetGridWidth)
-		var targetHeight = Math.max(config.minimumHeight, targetGridHeight + sidebarExtraHeight + tabBarExtraHeight)
-		var dpr = Screen.devicePixelRatio || 1
+		var targetWidth = Math.max(popup.minimumPopupWidth, popup.popupLeftSectionWidth + targetGridWidth)
+		var targetHeight = Math.max(config.minimumHeight, targetGridHeight + sidebarExtraHeight + tabBarExtraHeight + searchFieldExtraHeight)
 		var logicalHeight = Math.ceil(targetHeight / dpr)
 		var logicalWidth = Math.ceil(targetWidth / dpr)
 
@@ -654,7 +663,7 @@ MouseArea {
 		saveSizeForView(currentSizeMemoryView(), logicalWidth, logicalHeight, cols)
 
 		// Force the popup's layout hints to the computed size so the view actually resizes.
-		var restoreMinW = config.minimumWidth
+		var restoreMinW = popup.minimumPopupWidth
 		var restoreMinH = config.minimumHeight
 		popup.Layout.preferredWidth = targetWidth
 		popup.Layout.preferredHeight = targetHeight
@@ -694,7 +703,7 @@ MouseArea {
 		var cellBox = tileGrid.cellBoxSize
 		var holoPad = tileGrid._holoPad || 0
 		var targetGridWidth = cols * cellBox + 2 * holoPad
-		var targetWidth = Math.max(config.minimumWidth, config.leftSectionWidth + targetGridWidth)
+		var targetWidth = Math.max(popup.minimumPopupWidth, popup.popupLeftSectionWidth + targetGridWidth)
 
 		var changedCols = plasmoid.configuration.favGridCols !== cols
 		if (typeof widget !== "undefined" && widget) {
@@ -705,7 +714,7 @@ MouseArea {
 			plasmoid.configuration.favGridCols = cols
 		}
 
-		var restoreMinW = config.minimumWidth
+		var restoreMinW = popup.minimumPopupWidth
 		popup.Layout.preferredWidth = targetWidth
 		popup.Layout.minimumWidth = targetWidth
 		popup.Layout.maximumWidth = targetWidth
@@ -732,7 +741,7 @@ MouseArea {
 			return
 		}
 
-		var restoreMinW = config.minimumWidth
+		var restoreMinW = popup.minimumPopupWidth
 		var restoreMinH = config.minimumHeight
 		popup._lastRestoreDevicePixelRatio = dpr
 		popup._suppressPersist = true
@@ -774,7 +783,7 @@ MouseArea {
 			return
 		}
 
-		var restoreMinW = config.minimumWidth
+		var restoreMinW = popup.minimumPopupWidth
 		popup.Layout.preferredWidth = targetWidth
 		popup.Layout.minimumWidth = targetWidth
 		popup.Layout.maximumWidth = targetWidth
@@ -967,13 +976,24 @@ MouseArea {
 		anchors.fill: parent
 		spacing: 0
 
+		// === Docked Sidebar layout: Left pane ===
+		LeftPaneView {
+			id: leftPaneView
+			visible: config.usesDockedSidebarLayout
+			Layout.preferredWidth: config.usesDockedSidebarLayout ? config.dockedSidebarWidth : 0
+			Layout.minimumWidth: config.usesDockedSidebarLayout ? config.dockedSidebarWidth : 0
+			Layout.maximumWidth: config.usesDockedSidebarLayout ? config.dockedSidebarWidth : 0
+			Layout.fillHeight: true
+		}
+
+		// === Classic layout: sidebar placeholder ===
 		Item {
 			id: sidebarPlaceholder
 			Layout.preferredWidth: config.sidebarWidth + config.sidebarRightMargin
 			Layout.minimumWidth: config.sidebarWidth + config.sidebarRightMargin
 			Layout.maximumWidth: config.sidebarWidth + config.sidebarRightMargin
 			Layout.fillHeight: true
-			visible: config.sidebarOnLeft
+			visible: config.usesClassicLayout && config.sidebarOnLeft
 		}
 
 		ColumnLayout {
@@ -982,7 +1002,7 @@ MouseArea {
 			Layout.fillHeight: true
 			spacing: 0
 
-			// Top sidebar placeholder
+			// Top sidebar placeholder (Classic layout only)
 			Item {
 				id: topSidebarPlaceholder
 				Layout.preferredHeight: config.sidebarHeight
@@ -990,7 +1010,20 @@ MouseArea {
 				Layout.maximumHeight: config.sidebarHeight
 				Layout.fillWidth: true
 				Layout.bottomMargin: config.sidebarRightMargin
-				visible: config.sidebarOnTop
+				visible: config.usesClassicLayout && config.sidebarOnTop
+			}
+
+			// Docked Sidebar layout: search field in right pane
+			SearchField {
+				id: rightPaneSearchField
+				visible: config.usesDockedSidebarLayout && !config.isEditingTile && searchView.showSearchField
+				Layout.fillWidth: true
+				Layout.preferredHeight: config.searchFieldHeight
+				Layout.topMargin: Math.round(10 * (Screen.devicePixelRatio || 1))
+				Layout.bottomMargin: Math.round(6 * (Screen.devicePixelRatio || 1))
+				Layout.leftMargin: Kirigami.Units.largeSpacing
+				Layout.rightMargin: Kirigami.Units.largeSpacing
+				listView: searchView.stackView && searchView.stackView.currentItem && searchView.stackView.currentItem.listView ? searchView.stackView.currentItem.listView : []
 			}
 
 			RowLayout {
@@ -999,10 +1032,12 @@ MouseArea {
 				Layout.fillHeight: true
 				spacing: 0
 
+				// Classic layout: SearchView slot
 				Item {
 					id: searchViewSlot
 					Layout.fillHeight: true
 					implicitWidth: config.appAreaWidth
+					visible: config.usesClassicLayout
 				}
 
 				// Drag handle for resizing the app area width
@@ -1010,7 +1045,12 @@ MouseArea {
 					id: appAreaResizeHandle
 					Layout.fillHeight: true
 					Layout.preferredWidth: Kirigami.Units.smallSpacing * 2
-					visible: config.showSearch && !config.isEditingTile && !config.searchOverlayActive
+					visible: {
+						if (config.usesDockedSidebarLayout) {
+							return true // Always show resize handle in Docked Sidebar layout
+						}
+						return config.showSearch && !config.isEditingTile && !config.searchOverlayActive
+					}
 					z: 1
 
 					Rectangle {
@@ -1028,8 +1068,7 @@ MouseArea {
 					MouseArea {
 						id: appAreaResizeMouseArea
 						anchors.fill: parent
-						// Only extend the grab area toward the tile grid (right), not
-						// into the app list where it would overlap the scrollbar.
+						anchors.leftMargin: config.usesDockedSidebarLayout ? 0 : -Kirigami.Units.smallSpacing * 2
 						anchors.rightMargin: -Kirigami.Units.smallSpacing * 2
 						cursorShape: Qt.SplitHCursor
 						hoverEnabled: true
@@ -1040,7 +1079,7 @@ MouseArea {
 
 						onPressed: function(mouse) {
 							dragStartX = mapToItem(popup, mouse.x, 0).x
-							dragStartConfigWidth = plasmoid.configuration.appListWidth
+							dragStartConfigWidth = config.usesDockedSidebarLayout ? (plasmoid.configuration.dockedSidebarWidth || 350) : plasmoid.configuration.appListWidth
 						}
 
 						onPositionChanged: function(mouse) {
@@ -1048,10 +1087,13 @@ MouseArea {
 											var currentX = mapToItem(popup, mouse.x, 0).x
 											var dpr = Screen.devicePixelRatio || 1
 											var delta = (currentX - dragStartX) / dpr
-											var newWidth = Math.round(dragStartConfigWidth + delta)
-											// Allow any width value (no fixed clamping). Let plasmoid/config
-											// and the layout system handle limits if needed by environment.
-											if (plasmoid.configuration.appListWidth !== newWidth) {
+											var minWidth = config.usesDockedSidebarLayout ? Math.ceil(config.dockedSidebarMinWidth / dpr) : 120
+											var newWidth = Math.max(minWidth, Math.round(dragStartConfigWidth + delta))
+											if (config.usesDockedSidebarLayout) {
+												if (plasmoid.configuration.dockedSidebarWidth !== newWidth) {
+													plasmoid.configuration.dockedSidebarWidth = newWidth
+												}
+											} else if (plasmoid.configuration.appListWidth !== newWidth) {
 												plasmoid.configuration.appListWidth = newWidth
 											}
 										}
@@ -1066,6 +1108,7 @@ MouseArea {
 					TileTabBar {
 						id: tileTabBar
 						Layout.fillWidth: true
+						Layout.topMargin: Kirigami.Units.smallSpacing
 						visible: config.useTileTabs
 						activeTab: popup.activeTabIndex
 						tabs: popup.tileTabsData.map(function(t) {
@@ -1119,27 +1162,22 @@ MouseArea {
 				}
 			}
 
-			// Bottom sidebar placeholder
+			// Bottom sidebar placeholder (Classic layout only)
 			Item {
 				id: bottomSidebarPlaceholder
 				Layout.preferredHeight: config.sidebarHeight + config.sidebarRightMargin
 				Layout.minimumHeight: config.sidebarHeight + config.sidebarRightMargin
 				Layout.maximumHeight: config.sidebarHeight + config.sidebarRightMargin
 				Layout.fillWidth: true
-				visible: config.sidebarOnBottom
-
-				// The horizontal sidebar contains its own centered SearchField (in
-				// SidebarView.RowLayout) to avoid overlap / z-order issues. This placeholder
-				// remains so the rest of the layout reserves space when the sidebar is
-				// positioned at the bottom.
+				visible: config.usesClassicLayout && config.sidebarOnBottom
 			}
 		}
 	}
 
-	// Search overlay drawer for TilesOnly mode
+	// Search overlay drawer for TilesOnly mode (Classic layout only)
 	Item {
 		id: searchOverlayContainer
-		visible: config.searchOverlayActive
+		visible: config.usesClassicLayout && config.searchOverlayActive
 		z: 2
 		anchors.top: parent.top
 		anchors.bottom: parent.bottom
@@ -1154,10 +1192,10 @@ MouseArea {
 		}
 	}
 
-	// Scrim behind the search overlay (covers tile area)
+	// Scrim behind the search overlay (Classic layout only)
 	Rectangle {
 		id: searchOverlayScrim
-		visible: config.searchOverlayActive
+		visible: config.usesClassicLayout && config.searchOverlayActive
 		z: 1
 		anchors.top: searchOverlayContainer.top
 		anchors.bottom: searchOverlayContainer.bottom
@@ -1174,12 +1212,19 @@ MouseArea {
 	SearchView {
 		id: searchView
 		aiChatModel: popup.aiChatModel
-		parent: config.searchOverlayActive ? searchOverlayContainer : searchViewSlot
+		parent: {
+			if (config.usesDockedSidebarLayout) {
+				return leftPaneView.searchViewSlot
+			}
+			return config.searchOverlayActive ? searchOverlayContainer : searchViewSlot
+		}
 		anchors.fill: parent
+		externalSearchField: config.usesDockedSidebarLayout ? rightPaneSearchField : null
 	}
 
 	SidebarView {
 		id: sidebarView
+		visible: config.usesClassicLayout
 		popup: popup
 	}
 

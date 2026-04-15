@@ -13,8 +13,9 @@ SidebarItem {
 	// Use theme-provided icon names to follow the current KDE icon theme.
 	property string appletIconName: ""
 
-	// Adjust checked edge based on sidebar orientation
-	checkedEdge: config.sidebarHorizontal ? (config.sidebarOnTop ? Qt.BottomEdge : Qt.TopEdge) : Qt.LeftEdge
+	// Adjust checked edge based on sidebar orientation. Overridable by parent.
+	property int defaultCheckedEdge: config.sidebarHorizontal ? (config.sidebarOnTop ? Qt.BottomEdge : Qt.TopEdge) : Qt.LeftEdge
+	checkedEdge: defaultCheckedEdge
 	checkedEdgeWidth: 4 * Screen.devicePixelRatio // Twice as thick as normal
 	display: QQC2.AbstractButton.IconOnly
 	tooltipText: labelText

@@ -16,8 +16,8 @@ FlatButton {
 	Layout.alignment: config.sidebarHorizontal ? Qt.AlignVCenter : Qt.AlignHCenter
 	implicitWidth: config.flatButtonSize
 	implicitHeight: config.flatButtonSize
-	property var sidebarMenu: parent.parent // Column.SidebarMenu
-	expanded: sidebarMenu ? sidebarMenu.open : false
+	property var sidebarMenu: parent ? parent.parent : null // Column.SidebarMenu
+	expanded: sidebarMenu && typeof sidebarMenu.open !== 'undefined' ? sidebarMenu.open : false
 	labelVisible: expanded
 	property bool closeOnClick: true
 	property string tooltipText: ""

@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Layouts
+import QtQuick.Effects
 import org.kde.plasma.core as PlasmaCore
 import org.kde.plasma.extras as PlasmaExtras
 import org.kde.kirigami as Kirigami
@@ -232,25 +233,62 @@ Item {
 
 			SidebarItem {
 				id: userMenuButton
-				icon.name: kuser.hasFaceIcon ? kuser.faceIconUrl : 'user-identity'
-				text: kuser.fullName
+				icon.name: ""
+				icon.source: ""
+				property string profileName: kuser.fullName
+				text: ""
 				tooltipText: kuser.fullName
+				contentItem: Item {
+					anchors.fill: parent
+
+					Item {
+						anchors.centerIn: parent
+						width: config.flatButtonIconSize
+						height: config.flatButtonIconSize
+
+						Rectangle {
+							id: userAvatarMask
+							anchors.fill: parent
+							radius: width / 2
+							visible: false
+							layer.enabled: true
+						}
+
+						Item {
+							anchors.fill: parent
+							layer.enabled: true
+							layer.live: true
+							layer.effect: MultiEffect {
+								maskEnabled: true
+								maskSource: userAvatarMask
+							}
+
+							AnimatedImage {
+								anchors.fill: parent
+								source: widget.hasUserAvatar ? widget.userAvatarSource : ""
+								cache: false
+								asynchronous: true
+								fillMode: Image.PreserveAspectCrop
+								sourceSize.width: width
+								sourceSize.height: height
+								playing: visible
+								visible: widget.hasUserAvatar
+							}
+
+							Kirigami.Icon {
+								anchors.fill: parent
+								source: "user-identity"
+								visible: !widget.hasUserAvatar
+							}
+						}
+					}
+				}
 				onClicked: {
 					userMenu.toggleOpen()
 				}
-				SidebarContextMenu {
+				ProfileContextMenu {
 					id: userMenu
 					visualParent: userMenuButton
-					model: appsModel.sessionActionsModel
-
-					PlasmaExtras.MenuItem {
-						icon: 'system-users'
-						text: i18n("User Manager")
-						onClicked: KCM.KCMLauncher.open('kcm_users')
-						visible: KConfig.KAuthorized.authorizeControlModule('kcm_users')
-					}
-
-					// ... appsModel.sessionActionsModel
 				}
 			}
 
@@ -381,23 +419,61 @@ Item {
 
 			SidebarItem {
 				id: userMenuButtonHoriz
-				icon.name: kuser.hasFaceIcon ? kuser.faceIconUrl : 'user-identity'
-				text: kuser.fullName
+				icon.name: ""
+				icon.source: ""
+				text: ""
 				tooltipText: kuser.fullName
+				contentItem: Item {
+					anchors.fill: parent
+
+					Item {
+						anchors.centerIn: parent
+						width: config.flatButtonIconSize
+						height: config.flatButtonIconSize
+
+						Rectangle {
+							id: userAvatarMaskHoriz
+							anchors.fill: parent
+							radius: width / 2
+							visible: false
+							layer.enabled: true
+						}
+
+						Item {
+							anchors.fill: parent
+							layer.enabled: true
+							layer.live: true
+							layer.effect: MultiEffect {
+								maskEnabled: true
+								maskSource: userAvatarMaskHoriz
+							}
+
+							AnimatedImage {
+								anchors.fill: parent
+								source: widget.hasUserAvatar ? widget.userAvatarSource : ""
+								cache: false
+								asynchronous: true
+								fillMode: Image.PreserveAspectCrop
+								sourceSize.width: width
+								sourceSize.height: height
+								playing: visible
+								visible: widget.hasUserAvatar
+							}
+
+							Kirigami.Icon {
+								anchors.fill: parent
+								source: "user-identity"
+								visible: !widget.hasUserAvatar
+							}
+						}
+					}
+				}
 				onClicked: {
 					userMenuHoriz.toggleOpen()
 				}
-				SidebarContextMenu {
+				ProfileContextMenu {
 					id: userMenuHoriz
 					visualParent: userMenuButtonHoriz
-					model: appsModel.sessionActionsModel
-
-					PlasmaExtras.MenuItem {
-						icon: 'system-users'
-						text: i18n("User Manager")
-						onClicked: KCM.KCMLauncher.open('kcm_users')
-						visible: KConfig.KAuthorized.authorizeControlModule('kcm_users')
-					}
 				}
 			}
 

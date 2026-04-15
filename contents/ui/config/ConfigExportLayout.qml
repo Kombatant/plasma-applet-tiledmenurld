@@ -32,9 +32,12 @@ ColumnLayout {
 		numRecentApps: "int",
 		sidebarShortcuts: "stringlist",
 		sidebarCollapsibleSearchResults: "bool",
+		customAvatarPath: "string",
 		defaultAppListView: "string",
 		lastUsedAppListView: "string",
+		aiChatEnabled: "bool",
 		aiProvider: "string",
+		aiApiKey: "string",
 		aiOllamaUrl: "string",
 		aiOpenWebUiUrl: "string",
 		aiModel: "string",
@@ -71,6 +74,8 @@ ColumnLayout {
 		appListIconSize: "int",
 		searchFieldHeight: "int",
 		appListWidth: "int",
+		dockedSidebarWidth: "int",
+		useDockedLayout: "bool",
 		popupHeight: "int",
 		popupWidthAlphabetical: "int",
 		popupHeightAlphabetical: "int",
@@ -180,7 +185,7 @@ ColumnLayout {
 		if (configKey.indexOf("tile") === 0 || configKey.indexOf("favGridCols") === 0 || configKey === "tilesLocked" || configKey === "showTileTooltips" || configKey.indexOf("defaultTile") === 0) {
 			return "Tiles"
 		}
-		if (configKey.indexOf("sidebar") === 0) {
+		if (configKey.indexOf("sidebar") === 0 || configKey === "dockedSidebarWidth") {
 			return "Sidebar"
 		}
 		if (configKey.indexOf("search") === 0 || configKey === "hideSearchField") {

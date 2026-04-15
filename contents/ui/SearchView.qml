@@ -5,7 +5,7 @@ Item {
 	implicitWidth: config.appAreaWidth
 
 	visible: opacity > 0
-	opacity: config.showSearch ? 1 : 0
+	opacity: (config.usesDockedSidebarLayout || config.showSearch) ? 1 : 0
 
 	Connections {
 		target: search
@@ -22,6 +22,9 @@ Item {
 	property alias tileEditorView: tileEditorViewLoader.item
 	property alias tileEditorViewLoader: tileEditorViewLoader
 	property alias searchField: searchField
+	property Item externalSearchField: null
+	readonly property bool _useExternalSearch: externalSearchField !== null
+	property alias stackView: stackView
 	property alias jumpToLetterView: jumpToLetterView
 	property alias aiChatView: aiChatView
 	property var aiChatModel
@@ -29,12 +32,17 @@ Item {
 	readonly property bool aiChatEnabled: plasmoid.configuration.aiChatEnabled !== false
 	readonly property bool widgetExpanded: (typeof widget !== "undefined" && widget && typeof widget.expanded !== "undefined") ? widget.expanded : false
 
-	readonly property bool showingOnlyTiles: !config.showSearch
+	readonly property bool showingOnlyTiles: config.usesClassicLayout && !config.showSearch
 	readonly property bool showingAppList: stackView.currentItem == appsView || stackView.currentItem == jumpToLetterView
-	readonly property bool showingAiChat: config.showSearch && stackView.currentItem == aiChatView
-	readonly property bool showingAppsAlphabetically: config.showSearch && appsModel.order == "alphabetical" && showingAppList
-	readonly property bool showingAppsCategorically: config.showSearch && appsModel.order == "categories" && showingAppList
-	readonly property bool showSearchField: showingAiChat ? false : (config.hideSearchField ? !!searchField.text : true)
+	readonly property bool showingAiChat: (config.usesDockedSidebarLayout || config.showSearch) && stackView.currentItem == aiChatView
+	readonly property bool showingAppsAlphabetically: (config.usesDockedSidebarLayout || config.showSearch) && appsModel.order == "alphabetical" && showingAppList
+	readonly property bool showingAppsCategorically: (config.usesDockedSidebarLayout || config.showSearch) && appsModel.order == "categories" && showingAppList
+	readonly property bool hideSearchFieldForAiChat: config.usesClassicLayout && showingAiChat
+	readonly property string _searchFieldText: {
+		var field = _useExternalSearch ? externalSearchField : searchField
+		return field && typeof field.text === "string" ? field.text : ""
+	}
+	readonly property bool showSearchField: !hideSearchFieldForAiChat && (config.hideSearchField ? !!_searchFieldText : true)
 	readonly property string lastRememberedSizeMemoryView: {
 		var rememberedView = sanitizeViewName(plasmoid.configuration.lastUsedAppListView)
 		return normalizeSizeMemoryView(rememberedView)
@@ -48,6 +56,14 @@ Item {
 		target: searchField
 		function onEscapeClearsSearchRequested() {
 			// Special-case Esc when the user has already typed.
+			searchView._escapeClearingQuery = true
+			search.query = ""
+		}
+	}
+
+	Connections {
+		target: _useExternalSearch ? externalSearchField : null
+		function onEscapeClearsSearchRequested() {
 			searchView._escapeClearingQuery = true
 			search.query = ""
 		}
@@ -138,8 +154,9 @@ Item {
 			aiChatView.focusComposer()
 			return
 		}
-		if (searchField && typeof searchField.forceActiveFocus === "function") {
-			searchField.forceActiveFocus()
+		var field = _useExternalSearch ? externalSearchField : searchField
+		if (field && typeof field.forceActiveFocus === "function") {
+			field.forceActiveFocus()
 		}
 	}
 
@@ -148,8 +165,9 @@ Item {
 			aiChatView.focusAndInsert(text)
 			return
 		}
-		if (searchField && typeof searchField.focusAndInsert === "function") {
-			searchField.focusAndInsert(text)
+		var field = _useExternalSearch ? externalSearchField : searchField
+		if (field && typeof field.focusAndInsert === "function") {
+			field.focusAndInsert(text)
 		}
 	}
 
@@ -203,8 +221,17 @@ Item {
 
 	states: [
 		State {
+			name: "externalSearch"
+			when: _useExternalSearch
+			PropertyChanges {
+				target: stackViewContainer
+				anchors.topMargin: 0
+				anchors.bottomMargin: 0
+			}
+		},
+		State {
 			name: "searchOnTop"
-			when: searchOnTop
+			when: !_useExternalSearch && searchOnTop
 			PropertyChanges {
 				target: stackViewContainer
 				anchors.topMargin: searchField.visible ? searchField.height: 0
@@ -218,7 +245,7 @@ Item {
 		},
 		State {
 			name: "searchOnBottom"
-			when: !searchOnTop
+			when: !_useExternalSearch && !searchOnTop
 			PropertyChanges {
 				target: stackViewContainer
 				anchors.bottomMargin: searchField.visible ? searchField.height : 0
@@ -393,9 +420,9 @@ Item {
 
 	SearchField {
 		id: searchField
-		// Hide the main search field when the sidebar is at the top or bottom so
-		// only the centered sidebar search is visible in those configurations.
-		visible: !config.isEditingTile && searchView.showSearchField && !config.sidebarOnBottom && !config.sidebarOnTop
+		// Hide when using the Docked Sidebar layout external search field, or when
+		// sidebar is at top/bottom (centered sidebar search is visible instead).
+		visible: !_useExternalSearch && !config.isEditingTile && searchView.showSearchField && !config.sidebarOnBottom && !config.sidebarOnTop
 		height: config.searchFieldHeight
 		implicitHeight: config.searchFieldHeight
 		

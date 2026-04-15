@@ -17,6 +17,7 @@ LibConfig.FormKCM {
 	wideMode: false
 	readonly property string pendingSidebarPosition: ConfigUtils.pendingValue(formLayout, "sidebarPosition", plasmoid.configuration.sidebarPosition)
 	readonly property bool pendingSidebarFollowsTheme: !!ConfigUtils.pendingValue(formLayout, "sidebarFollowsTheme", plasmoid.configuration.sidebarFollowsTheme)
+	readonly property bool pendingUsesClassicLayout: !ConfigUtils.pendingValue(formLayout, "useDockedLayout", plasmoid.configuration.useDockedLayout)
 
 	readonly property string plasmaStyleLabelText: {
 		var plasmaStyleText = i18nd("kcm_desktoptheme", "Plasma Style")
@@ -198,12 +199,30 @@ LibConfig.FormKCM {
 
 	//-------------------------------------------------------
 	LibConfig.Heading {
-		text: i18n("Sidebar")
+		text: i18n("Layout")
+	}
+
+	LibConfig.ComboBox {
+		id: layoutModeControl
+		configKey: "useDockedLayout"
+		Kirigami.FormData.label: i18n("Layout Mode")
+		model: [
+			{ value: true, text: i18n("Docked Sidebar Layout") },
+			{ value: false, text: i18n("Classic Layout") },
+		]
+	}
+
+	//-------------------------------------------------------
+	LibConfig.Heading {
+		text: i18n("Classic Sidebar")
+		opacity: formLayout.pendingUsesClassicLayout ? 1 : 0.45
 	}
 
 	LibConfig.ComboBox {
 		id: sidebarPositionControl
 		configKey: "sidebarPosition"
+		enabled: formLayout.pendingUsesClassicLayout
+		opacity: enabled ? 1 : 0.45
 		Kirigami.FormData.label: i18n("Position")
 		model: [
 			{ value: "left", text: i18n("Left") },
@@ -219,6 +238,8 @@ LibConfig.FormKCM {
 		suffix: i18n("px")
 		minimumValue: 24
 		stepSize: 2
+		enabled: formLayout.pendingUsesClassicLayout
+		opacity: enabled ? 1 : 0.45
 	}
 
 	LibConfig.SpinBox {
@@ -229,12 +250,16 @@ LibConfig.FormKCM {
 		minimumValue: 16
 		maximumValue: sidebarButtonSize.configValue
 		stepSize: 2
+		enabled: formLayout.pendingUsesClassicLayout
+		opacity: enabled ? 1 : 0.45
 	}
 
 	LibConfig.RadioButtonGroup {
 		id: sidebarThemeGroup
 		spacing: 0
 		Kirigami.FormData.label: i18n("Theme")
+		enabled: formLayout.pendingUsesClassicLayout
+		opacity: enabled ? 1 : 0.45
 
 		QQC2.RadioButton {
 			text: plasmaStyleLabelText
@@ -518,6 +543,15 @@ LibConfig.FormKCM {
 		Kirigami.FormData.label: i18n("App List Area Width")
 		suffix: i18n("px")
 		minimumValue: 0
+		visible: formLayout.pendingUsesClassicLayout
+	}
+
+	LibConfig.SpinBox {
+		configKey: 'dockedSidebarWidth'
+		Kirigami.FormData.label: i18n("Docked Sidebar Width")
+		suffix: i18n("px")
+		minimumValue: 0
+		visible: !formLayout.pendingUsesClassicLayout
 	}
 
 	LibConfig.ComboBox {

@@ -14,11 +14,13 @@ LibConfig.FormKCM {
 	wideMode: false
 	readonly property bool searchFieldHidden: !!ConfigUtils.pendingValue(formLayout, "hideSearchField", plasmoid.configuration.hideSearchField)
 	readonly property bool searchOptionsEnabled: !searchFieldHidden
+	readonly property bool pendingUsesClassicLayout: !ConfigUtils.pendingValue(formLayout, "useDockedLayout", plasmoid.configuration.useDockedLayout)
 	readonly property bool groupedSearchResultsEnabled: formLayout.searchOptionsEnabled
 		&& !!ConfigUtils.pendingValue(formLayout, "searchResultsGrouped", plasmoid.configuration.searchResultsGrouped)
 	readonly property bool searchFieldHeightEnabled: searchOptionsEnabled
-		&& ConfigUtils.pendingValue(formLayout, "sidebarPosition", plasmoid.configuration.sidebarPosition) !== 'top'
-		&& ConfigUtils.pendingValue(formLayout, "sidebarPosition", plasmoid.configuration.sidebarPosition) !== 'bottom'
+		&& (!formLayout.pendingUsesClassicLayout
+			|| (ConfigUtils.pendingValue(formLayout, "sidebarPosition", plasmoid.configuration.sidebarPosition) !== 'top'
+				&& ConfigUtils.pendingValue(formLayout, "sidebarPosition", plasmoid.configuration.sidebarPosition) !== 'bottom'))
 
 	readonly property string plasmaStyleLabelText: {
 		var plasmaStyleText = i18nd("kcm_desktoptheme", "Plasma Style")
@@ -46,7 +48,7 @@ LibConfig.FormKCM {
 		configKey: 'searchOnTop'
 		text: i18n("Search On Top")
 		Kirigami.FormData.label: ""
-		enabled: formLayout.searchOptionsEnabled
+		enabled: formLayout.searchOptionsEnabled && formLayout.pendingUsesClassicLayout
 		opacity: enabled ? 1 : 0.45
 	}
 

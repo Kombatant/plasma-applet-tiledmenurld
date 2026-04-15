@@ -51,12 +51,14 @@ Item {
 			'systemsettings.desktop',
 		])
 		_ensureSettingInitialized('sidebarCollapsibleSearchResults', false)
+		_ensureSettingInitialized('customAvatarPath', '')
 		_ensureSettingInitialized('defaultAppListView', 'Alphabetical')
 		_ensureSettingInitialized('lastUsedAppListView', 'Alphabetical')
 		_ensureSettingInitialized('aiChatEnabled', true)
 		_ensureSettingInitialized('aiProvider', 'openai')
 		_ensureSettingInitialized('aiApiKey', '')
 		_ensureSettingInitialized('aiOllamaUrl', 'http://127.0.0.1:11434')
+		_ensureSettingInitialized('aiOpenWebUiUrl', 'http://127.0.0.1:3000')
 		_ensureSettingInitialized('aiModel', '')
 		_ensureSettingInitialized('aiDetectedModels', [])
 		_ensureSettingInitialized('aiChatHistory', '')
@@ -102,6 +104,7 @@ Item {
 		_ensureSettingInitialized('appListIconSize', 32)
 		_ensureSettingInitialized('searchFieldHeight', 48)
 		_ensureSettingInitialized('appListWidth', 350)
+		_ensureSettingInitialized('dockedSidebarWidth', 350)
 		_ensureSettingInitialized('popupHeight', 620)
 		_ensureSettingInitialized('popupWidthAlphabetical', Math.round(popupWidth / (Screen.devicePixelRatio || 1)))
 		_ensureSettingInitialized('popupHeightAlphabetical', plasmoid.configuration.popupHeight)
@@ -119,6 +122,7 @@ Item {
 		_ensureSettingInitialized('sidebarButtonSize', 48)
 		_ensureSettingInitialized('sidebarIconSize', 30)
 		_ensureSettingInitialized('sidebarPosition', 'left')
+		_ensureSettingInitialized('useDockedLayout', true)
 	}
 
 	Component.onCompleted: {
@@ -174,6 +178,19 @@ Item {
 		return ""
 	}
 
+	function listLength(value) {
+		if (!value) {
+			return 0
+		}
+		if (Array.isArray(value)) {
+			return value.length
+		}
+		if (typeof value.length === "number") {
+			return value.length
+		}
+		return 0
+	}
+
 	//--- Sizes
 	readonly property int panelIconSize: 24 * Screen.devicePixelRatio
 	readonly property int flatButtonSize: plasmoid.configuration.sidebarButtonSize * Screen.devicePixelRatio
@@ -188,15 +205,53 @@ Item {
 	readonly property bool sidebarHorizontal: sidebarOnTop || sidebarOnBottom
 	readonly property int sidebarHeight: sidebarHorizontal ? flatButtonSize : -1
 	readonly property int sidebarSeparatorThickness: Math.max(1, Math.round(Screen.devicePixelRatio))
+	readonly property bool useDockedLayout: plasmoid.configuration.useDockedLayout !== false
+	readonly property bool usesDockedSidebarLayout: useDockedLayout
+	readonly property bool usesClassicLayout: !usesDockedSidebarLayout
+	readonly property int profileIconSize: Math.round(72 * Screen.devicePixelRatio)
 	readonly property bool aiChatEnabled: plasmoid.configuration.aiChatEnabled !== false
 	readonly property int sidebarFixedHorizontalButtons: aiChatEnabled ? 8 : 7
 	readonly property int sidebarFixedVerticalButtons: aiChatEnabled ? 8 : 7
 	readonly property int sidebarFixedHorizontalWidth: (sidebarFixedHorizontalButtons * flatButtonSize) + (2 * sidebarSeparatorThickness)
 	readonly property int sidebarFixedVerticalHeight: (sidebarFixedVerticalButtons * flatButtonSize) + (2 * sidebarSeparatorThickness)
-	readonly property int appListWidth: plasmoid.configuration.appListWidth * Screen.devicePixelRatio
+	readonly property int appListWidth: Math.max(120, plasmoid.configuration.appListWidth) * Screen.devicePixelRatio
+	readonly property int dockedSidebarConfiguredWidth: Math.max(120, plasmoid.configuration.dockedSidebarWidth || 350) * Screen.devicePixelRatio
+	readonly property int dockedSidebarShortcutButtons: {
+		var configuredCount = listLength(plasmoid.configuration.sidebarShortcuts)
+		var modelCount = (typeof appsModel !== "undefined" && appsModel && appsModel.sidebarModel) ? appsModel.sidebarModel.count : 0
+		return Math.max(1, Math.max(configuredCount, modelCount) + 1)
+	}
+	readonly property int dockedSidebarPowerButtons: {
+		var visibleCount = 0
+		var sessionIcons = {
+			"system-lock-screen": true,
+			"system-log-out": true,
+			"system-save-session": true,
+			"system-switch-user": true,
+		}
+		if (typeof appsModel !== "undefined" && appsModel && appsModel.powerActionsModel && appsModel.powerActionsModel.list) {
+			for (var i = 0; i < appsModel.powerActionsModel.list.length; i++) {
+				var action = appsModel.powerActionsModel.list[i]
+				if (!action || action.disabled || sessionIcons[action.iconName]) {
+					continue
+				}
+				visibleCount += 1
+			}
+		}
+		return Math.max(4, visibleCount)
+	}
+	readonly property int dockedSidebarMinWidth: Math.max(dockedSidebarShortcutButtons, dockedSidebarPowerButtons) * flatButtonSize
+	readonly property int dockedSidebarWidth: Math.max(dockedSidebarConfiguredWidth, dockedSidebarMinWidth)
 	readonly property int tileEditorMinWidth: Math.max(350, 350 * Screen.devicePixelRatio)
-	readonly property int minimumWidth: sidebarHorizontal ? Math.max(leftSectionWidth, sidebarFixedHorizontalWidth) : leftSectionWidth
-	readonly property int minimumHeight: Math.max(flatButtonSize * 5, sidebarHorizontal ? (sidebarHeight + sidebarRightMargin) : sidebarFixedVerticalHeight) // Issue #125
+	readonly property int minimumWidth: {
+		return usesClassicLayout ? (sidebarHorizontal ? Math.max(leftSectionWidth, sidebarFixedHorizontalWidth) : leftSectionWidth) : 0
+	}
+	readonly property int minimumHeight: {
+		if (usesDockedSidebarLayout) {
+			return profileIconSize + (flatButtonSize * 4) // profile + buttons + power rows + some app list
+		}
+		return Math.max(flatButtonSize * 5, sidebarHorizontal ? (sidebarHeight + sidebarRightMargin) : sidebarFixedVerticalHeight) // Issue #125
+	}
 
 	property bool showSearch: false
 	property bool searchOverlayActive: false
@@ -221,6 +276,8 @@ Item {
 			return sidebarWidth + sidebarRightMargin + appAreaWidth
 		}
 	}
+	readonly property int popupLeftSectionWidth: usesDockedSidebarLayout ? dockedSidebarWidth : leftSectionWidth
+	readonly property int minimumPopupWidth: usesDockedSidebarLayout ? (popupLeftSectionWidth + (cellBoxSize * 3)) : minimumWidth
 
 	readonly property real tileScale: plasmoid.configuration.tileScale
 	readonly property int cellBoxUnits: 80
@@ -248,14 +305,18 @@ Item {
 
 	readonly property int searchFieldHeight: plasmoid.configuration.searchFieldHeight * Screen.devicePixelRatio
 
-	readonly property int popupWidth: leftSectionWidth + tileGridWidth
+	readonly property int popupWidth: popupLeftSectionWidth + tileGridWidth
 	readonly property int popupHeight: Math.floor((plasmoid.configuration.popupHeight || 620) * Screen.devicePixelRatio)
 	readonly property int appListIconSize: plasmoid.configuration.appListIconSize * Screen.devicePixelRatio
 	
+	readonly property int searchFilterReferenceWidth: {
+		var dpr = Screen.devicePixelRatio || 1
+		return usesDockedSidebarLayout ? Math.round(dockedSidebarWidth / dpr) : (plasmoid.configuration.appListWidth || 0)
+	}
 	readonly property int searchFilterRowHeight: {
-		if (plasmoid.configuration.appListWidth >= 310) {
+		if (searchFilterReferenceWidth >= 310) {
 			return flatButtonSize // 60px
-		} else if (plasmoid.configuration.appListWidth >= 250) {
+		} else if (searchFilterReferenceWidth >= 250) {
 			return flatButtonSize*3/4 // 45px
 		} else {
 			return flatButtonSize/2 // 30px

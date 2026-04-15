@@ -86,7 +86,7 @@ Item {
 	Component {
 		id: themedField
 		PlasmaComponents3.TextField {
-			placeholderText: i18n("Search...")
+			placeholderText: i18n("Search apps, files and settings...")
 			font.pixelSize: searchField.computedFontSize
 			leftPadding: searchField.searchIconSize + (searchField.searchIconPadding * 2)
 			rightPadding: clearButton.visible

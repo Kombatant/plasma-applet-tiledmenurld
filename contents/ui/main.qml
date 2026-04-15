@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Layouts
+import QtQuick.Dialogs as QtDialogs
 import org.kde.plasma.core as PlasmaCore
 import org.kde.kirigami as Kirigami
 import org.kde.plasma.plasma5support as Plasma5Support
@@ -15,6 +16,19 @@ PlasmoidItem {
 	property string systemTerminalApp: ""
 	property string systemFileManagerApp: ""
 	property bool suppressHideOnWindowDeactivate: false
+	readonly property url userAvatarSource: avatarResolver.avatarSource
+	readonly property bool hasUserAvatar: ("" + userAvatarSource)
+
+	function refreshAvatar() {
+		avatarResolver.refresh()
+	}
+
+	function openCustomAvatarDialog() {
+		if (customAvatarDialogLoader.active) {
+			customAvatarDialogLoader.active = false
+		}
+		customAvatarDialogLoader.active = true
+	}
 
 	// Use Plasma's standard popup background so compositor/window-rule opacity
 	// is applied to the same shell treatment as other Plasma dialogs.
@@ -61,9 +75,81 @@ PlasmoidItem {
 		// https://invent.kde.org/frameworks/kcoreaddons/-/blob/master/src/qml/kuserproxy.cpp
 		KCoreAddons.KUser {
 			id: kuser
-			// faceIconUrl is an empty QUrl 'object' when ~/.face.icon doesn't exist.
-			// Cast it to string first before checking if it's empty by casting to bool.
-			readonly property bool hasFaceIcon: (''+faceIconUrl)
+		}
+
+		QtObject {
+			id: avatarResolver
+			property string avatarPath: ""
+			readonly property url avatarSource: avatarPath ? _fileUrl(avatarPath) : ""
+			Component.onCompleted: refresh()
+
+			function _localPathFromUrl(value) {
+				if (!value) {
+					return ""
+				}
+				if (value.indexOf("file://") === 0) {
+					return decodeURIComponent(value.slice(7))
+				}
+				if (value.indexOf("/") === 0) {
+					return value
+				}
+				return ""
+			}
+
+			function _fileUrl(path) {
+				var encodedPath = encodeURI(path).replace(/#/g, "%23")
+				return "file://" + encodedPath
+			}
+
+			function _preferredPath() {
+				var customAvatarPath = _localPathFromUrl("" + plasmoid.configuration.customAvatarPath)
+				if (customAvatarPath) {
+					return customAvatarPath
+				}
+				if (kuser.loginName) {
+					return "/var/lib/AccountsService/icons/" + kuser.loginName
+				}
+				var faceIconPath = _localPathFromUrl("" + kuser.faceIconUrl)
+				if (faceIconPath) {
+					return faceIconPath
+				}
+				if (kuser.homeDir) {
+					return kuser.homeDir + "/.face.icon"
+				}
+				return ""
+			}
+
+			function refresh() {
+				var nextPath = _preferredPath()
+				if (avatarPath === nextPath) {
+					avatarPath = ""
+					Qt.callLater(function() {
+						avatarPath = nextPath
+					})
+					return
+				}
+				avatarPath = nextPath
+			}
+		}
+
+		Connections {
+			target: plasmoid.configuration
+			function onCustomAvatarPathChanged() {
+				avatarResolver.refresh()
+			}
+		}
+
+		Connections {
+			target: kuser
+			function onFaceIconUrlChanged() {
+				avatarResolver.refresh()
+			}
+			function onHomeDirChanged() {
+				avatarResolver.refresh()
+			}
+			function onLoginNameChanged() {
+				avatarResolver.refresh()
+			}
 		}
 
 		Kicker.DragHelper {
@@ -122,6 +208,29 @@ PlasmoidItem {
 	toolTipMainText: ""
 	toolTipSubText: ""
 
+	Loader {
+		id: customAvatarDialogLoader
+		active: false
+		sourceComponent: QtDialogs.FileDialog {
+			id: customAvatarDialog
+			visible: false
+			modality: Qt.WindowModal
+			title: i18n("Choose a custom avatar")
+			onAccepted: {
+				plasmoid.configuration.customAvatarPath = "" + selectedFile
+				widget.refreshAvatar()
+				customAvatarDialogLoader.active = false
+			}
+			onRejected: {
+				customAvatarDialogLoader.active = false
+			}
+			Component.onCompleted: {
+				nameFilters = [i18n("Image Files (*.png *.apng *.gif *.webp *.jpg *.jpeg *.bmp *.svg *.svgz)")]
+				open()
+			}
+		}
+	}
+
 	compactRepresentation: LauncherIcon {
 		id: panelItem
 		iconSource: plasmoid.configuration.icon || "tiled_rld"
@@ -131,6 +240,7 @@ PlasmoidItem {
 	activationTogglesExpanded: true
 	onExpandedChanged: function(expanded) {
 		if (expanded) {
+			avatarResolver.refresh()
 			search.query = ""
 			search.applyDefaultFilters()
 			fullRepresentationItem.searchView.showDefaultView()
@@ -150,7 +260,7 @@ PlasmoidItem {
 		id: popup
 		aiChatModel: aiChatService
 
-		Layout.minimumWidth: config.minimumWidth
+		Layout.minimumWidth: config.minimumPopupWidth
 		Layout.minimumHeight: config.minimumHeight
 		Layout.preferredWidth: config.popupWidth
 		Layout.preferredHeight: config.popupHeight
@@ -179,7 +289,7 @@ PlasmoidItem {
 			}
 
 			onTriggered: {
-				var favWidth = Math.max(0, widget.width - config.leftSectionWidth)
+				var favWidth = Math.max(0, widget.width - config.popupLeftSectionWidth)
 				var cols = Math.floor(favWidth / config.cellBoxSize)
 				if (plasmoid.configuration.favGridCols != cols) {
 					plasmoid.configuration.favGridCols = cols
