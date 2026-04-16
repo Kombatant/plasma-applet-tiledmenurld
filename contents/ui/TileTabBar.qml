@@ -140,6 +140,12 @@ Item {
 
 	readonly property real _borderWidth: Math.max(1, Math.round(Screen.devicePixelRatio))
 	readonly property color _borderColor: Qt.rgba(1.0, 1.0, 1.0, 0.35)
+	readonly property color _activeTopBorderColor: Kirigami.Theme.highlightColor
+	readonly property color _activeTopBorderGlowColor: Qt.rgba(
+		Kirigami.Theme.highlightColor.r,
+		Kirigami.Theme.highlightColor.g,
+		Kirigami.Theme.highlightColor.b,
+		0.25)
 
 	// Active tab edges in tabBar coordinates — reactive bindings via
 	// tabRow.x + item.x instead of imperative mapToItem calls.
@@ -221,6 +227,8 @@ Item {
 					readonly property real r: Kirigami.Units.smallSpacing * 2
 					readonly property real bw: tabBar._borderWidth
 					readonly property color bc: tabBar._borderColor
+					readonly property color topBorderColor: tabBar._activeTopBorderColor
+					readonly property color topBorderGlowColor: tabBar._activeTopBorderGlowColor
 
 					onPaint: {
 						var ctx = getContext("2d")
@@ -254,10 +262,29 @@ Item {
 						ctx.lineWidth = bw
 						ctx.strokeStyle = bc
 						ctx.stroke()
+
+						// Accent the top edge with the active KDE highlight color.
+						ctx.beginPath()
+						ctx.moveTo(r, bw * 0.5)
+						ctx.lineTo(w - r, bw * 0.5)
+						ctx.lineWidth = bw
+						ctx.strokeStyle = topBorderColor
+						ctx.stroke()
+
+						// Add a subtle glow below the top edge to match Plasma tabs.
+						ctx.beginPath()
+						ctx.moveTo(r, bw * 1.5)
+						ctx.lineTo(w - r, bw * 1.5)
+						ctx.lineWidth = bw
+						ctx.strokeStyle = topBorderGlowColor
+						ctx.stroke()
 					}
 
 					onWidthChanged: requestPaint()
 					onHeightChanged: requestPaint()
+					onBcChanged: requestPaint()
+					onTopBorderColorChanged: requestPaint()
+					onTopBorderGlowColorChanged: requestPaint()
 				}
 
 				// ── Icon + Label ─────────────────────────────────────────

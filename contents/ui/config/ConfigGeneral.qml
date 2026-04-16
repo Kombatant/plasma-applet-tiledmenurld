@@ -345,11 +345,11 @@ LibConfig.FormKCM {
 		]
 	}
 	LibConfig.ComboBox {
-		configKey: "showGroupTileNameBorder"
-		Kirigami.FormData.label: i18n("Group header style")
+		configKey: "tileGroupLayout"
+		Kirigami.FormData.label: i18n("Group Tile Layout")
 		model: [
-			{ value: false, text: i18n("Plain") },
-			{ value: true, text: i18n("Section header") },
+			{ value: "card", text: i18n("Card") },
+			{ value: "classic", text: i18n("Classic") },
 		]
 	}
 	RowLayout {

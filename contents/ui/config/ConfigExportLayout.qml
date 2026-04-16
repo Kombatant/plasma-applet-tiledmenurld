@@ -66,9 +66,8 @@ ColumnLayout {
 		sidebarFollowsTheme: "bool",
 		tileLabelAlignment: "string",
 		groupLabelAlignment: "string",
-		// Legacy bool key retained for import/export compatibility:
-		// false = Plain, true = Section header.
 		showGroupTileNameBorder: "bool",
+		tileGroupLayout: "string",
 		presetTilesFolder: "string",
 		appDescription: "string",
 		appListIconSize: "int",

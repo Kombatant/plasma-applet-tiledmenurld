@@ -6,10 +6,12 @@ import org.kde.plasma.plasmoid
 
 Rectangle {
 	id: tileItemView
-	color: appObj.backgroundColor
+	color: (appObj.isGroup || appObj.usesGroupPanelStyling) ? "transparent" : appObj.backgroundColor
 	radius: cornerRadius
+	clip: appObj.inGroup
 	readonly property real cornerRadius: (config && config.tileCornerRadius ? config.tileCornerRadius : 0)
 	property color gradientBottomColor: Qt.darker(appObj.backgroundColor, 2.0)
+	readonly property bool usesPanelBackground: !appObj.isGroup && !appObj.usesGroupPanelStyling
 
 	// Holographic hover effect properties (disabled for group tiles — the small header rectangle looks wrong with sweep/glow)
 	readonly property bool useHolographicEffect: !appObj.isGroup && plasmoid && plasmoid.configuration && plasmoid.configuration.tileHoverEffect === "holographic"
@@ -91,7 +93,7 @@ Rectangle {
 			GradientStop { position: 1.0; color: tileItemView.gradientBottomColor }
 		}
 	}
-	gradient: appObj.backgroundGradient ? tileGradient.createObject(tileItemView) : null
+	gradient: (tileItemView.usesPanelBackground && appObj.backgroundGradient) ? tileGradient.createObject(tileItemView) : null
 
 	readonly property real tilePadding: 4 * Screen.devicePixelRatio
 	readonly property real iconBaseSize: (plasmoid && plasmoid.configuration && plasmoid.configuration.tileIconSize ? plasmoid.configuration.tileIconSize : 32) * Screen.devicePixelRatio
@@ -109,7 +111,7 @@ Rectangle {
 	states: [
 		State {
 			when: modelData.w == 1 && modelData.h >= 1
-			PropertyChanges { target: icon; size: smallIconSize }
+			PropertyChanges { target: icon; size: appObj.usesGroupPanelStyling ? Math.round(mediumIconSize * 0.92) : smallIconSize }
 			PropertyChanges { target: label; visible: false }
 		},
 		State {
@@ -239,7 +241,9 @@ Rectangle {
 			source: appObj.iconSource
 			anchors.verticalCenter: parent.verticalCenter
 			anchors.horizontalCenter: parent.horizontalCenter
-			property int size: Math.min(parent.width, parent.height) / 2
+			property int size: appObj.usesGroupPanelStyling
+				? Math.min(parent.width, parent.height) * 0.50
+				: Math.min(parent.width, parent.height) / 2
 			width: appObj.showIcon ? size : 0
 			height: appObj.showIcon ? size : 0
 			anchors.fill: appObj.iconFill ? parent : null
@@ -272,7 +276,9 @@ Rectangle {
 			width: parent.width
 			renderType: Text.QtRendering // Fix pixelation when scaling. Plasma.Label uses NativeRendering.
 			style: Text.Outline
-			styleColor: appObj.backgroundGradient ? tileItemView.gradientBottomColor : appObj.backgroundColor
+			styleColor: appObj.usesGroupPanelStyling
+				? Qt.rgba(0, 0, 0, 0.42)
+				: (appObj.backgroundGradient ? tileItemView.gradientBottomColor : appObj.backgroundColor)
 		}
 
 		// Holographic sweep overlay effect

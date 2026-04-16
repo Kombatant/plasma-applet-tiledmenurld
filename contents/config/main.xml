@@ -178,6 +178,10 @@
 			<label>Whether group headers use the plain style or the section header style.</label>
 			<default>true</default>
 		</entry>
+		<entry name="tileGroupLayout" type="string">
+			<!-- enum: card, classic -->
+			<default>card</default>
+		</entry>
 		<entry name="presetTilesFolder" type="string">
 			<label>Custom directory used to store downloaded preset tile images.</label>
 			<default></default>

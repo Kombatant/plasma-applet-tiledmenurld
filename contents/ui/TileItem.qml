@@ -36,7 +36,7 @@ Item {
 	readonly property string tileTooltipText: (appObj.labelText || "").trim()
 	readonly property real descriptionSpacing: cellMargin
 	readonly property bool useOverlayLabel: !!appObj.backgroundImage
-	readonly property bool useStyledGroupHeader: appObj.isGroup && plasmoid && plasmoid.configuration && plasmoid.configuration.showGroupTileNameBorder
+	readonly property bool useStyledGroupHeader: appObj.isGroup
 	readonly property real labelPaddingX: cellMargin + (6 * Screen.devicePixelRatio)
 	readonly property real labelPaddingY: cellMargin + (4 * Screen.devicePixelRatio)
 	readonly property real labelShadowOffset: Math.max(1, Math.round(1 * Screen.devicePixelRatio))
@@ -49,6 +49,8 @@ Item {
 	readonly property color labelOutlineDarkColor: Qt.rgba(0, 0, 0, labelOutlineDarkOpacity)
 	readonly property color labelOutlineLightColor: Qt.rgba(1, 1, 1, labelOutlineLightOpacity)
 	readonly property color labelShadowColor: labelBaseIsLight ? Qt.rgba(0, 0, 0, 0.3) : Qt.rgba(1, 1, 1, 0.3)
+	readonly property color groupTileLabelColor: Qt.rgba(1, 1, 1, 0.92)
+	readonly property color groupTileLabelShadowColor: Qt.rgba(0, 0, 0, 0.45)
 	readonly property font groupLabelFont: Qt.font({
 		family: Kirigami.Theme.defaultFont.family,
 		pointSize: Kirigami.Theme.defaultFont.pointSize + 4,
@@ -72,6 +74,7 @@ Item {
 	Item {
 		id: tileContent
 		anchors.fill: parent
+		clip: appObj.inGroup
 
 		TileItemView {
 			id: tileItemView
@@ -79,10 +82,17 @@ Item {
 			anchors.right: parent.right
 			anchors.top: parent.top
 			anchors.margins: cellMargin
+			// Extra inset so edge tiles stay inside the group panel with visible padding
+			readonly property real groupEdgePad: tileGrid.groupPanelInsetX + Math.round(4 * Screen.devicePixelRatio)
+			anchors.leftMargin: appObj.atGroupLeft ? groupEdgePad : cellMargin
+			anchors.rightMargin: appObj.atGroupRight ? groupEdgePad : cellMargin
+			anchors.bottomMargin: appObj.atGroupBottom ? (tileGrid.groupPanelInsetBottom + Math.round(4 * Screen.devicePixelRatio)) : cellMargin
 			width: modelData.w * cellBoxSize
 			// Reserve bottom spacing so vertical gaps match horizontal gaps.
 			// (Horizontal gap is cellMargin from each neighbor => total tileMargin.)
-			height: Math.max(0, parent.height - (useOverlayLabel ? 0 : (descriptionLabelBelow.visible ? (descriptionLabelBelow.height + descriptionSpacing) : 0)) - (cellMargin * 2))
+			readonly property real topInset: cellMargin
+			readonly property real bottomInset: appObj.atGroupBottom ? (tileGrid.groupPanelInsetBottom + Math.round(4 * Screen.devicePixelRatio)) : cellMargin
+			height: Math.max(0, parent.height - (useOverlayLabel ? 0 : (descriptionLabelBelow.visible ? (descriptionLabelBelow.height + descriptionSpacing) : 0)) - topInset - bottomInset)
 			readonly property int minSize: Math.min(width, height)
 			readonly property int maxSize: Math.max(width, height)
 			hovered: tileMouseArea.containsMouse
@@ -199,17 +209,21 @@ Item {
 			anchors.top: tileItemView.bottom
 			anchors.left: parent.left
 			anchors.right: parent.right
+			anchors.leftMargin: appObj.inGroup ? tileItemView.anchors.leftMargin : 0
+			anchors.rightMargin: appObj.inGroup ? tileItemView.anchors.rightMargin : 0
 			anchors.topMargin: descriptionSpacing
 			height: visible ? (descriptionLabelFontMetrics.lineSpacing * maximumLineCount) : 0
 			clip: true
-			horizontalAlignment: tileItemView.labelAlignment
+			horizontalAlignment: appObj.usesGroupPanelStyling ? Text.AlignHCenter : tileItemView.labelAlignment
 			verticalAlignment: appObj.isGroup ? Text.AlignVCenter : Text.AlignTop
 			wrapMode: Text.Wrap
 			maximumLineCount: 2
 			elide: Text.ElideRight
-			opacity: 0.92
+			opacity: appObj.usesGroupPanelStyling ? 1 : 0.92
 			font: appObj.isGroup ? groupLabelFont : Qt.font({ pixelSize: Kirigami.Theme.defaultFont.pixelSize, bold: false })
-			color: Kirigami.Theme.textColor
+			style: appObj.usesGroupPanelStyling ? Text.Raised : Text.Normal
+			styleColor: appObj.usesGroupPanelStyling ? groupTileLabelShadowColor : "transparent"
+			color: appObj.usesGroupPanelStyling ? groupTileLabelColor : Kirigami.Theme.textColor
 		}
 	}
 
@@ -378,12 +392,19 @@ Item {
 			id: groupOutline
 			color: "transparent"
 			border.width: Math.max(1, Math.round(1 * Screen.devicePixelRatio))
-			border.color: "#80ffffff"
-			y: modelData.h * cellBoxSize
+			border.color: appObj.isCardLayout ? "#66ffffff" : "#80ffffff"
+			x: appObj.isCardLayout ? tileGrid.groupPanelInsetX : 0
+			y: appObj.isCardLayout ? tileGrid.groupPanelInsetTop : modelData.h * cellBoxSize
 			z: 100
-			width: appObj.groupRect.w * cellBoxSize
-			height: appObj.groupRect.h * cellBoxSize
-			radius: tileItemView.cornerRadius
+			width: appObj.isCardLayout
+				? Math.max(0, appObj.groupRect.w * cellBoxSize - (tileGrid.groupPanelInsetX * 2))
+				: appObj.groupRect.w * cellBoxSize
+			height: appObj.isCardLayout
+				? Math.max(0, (modelData.h + appObj.groupRect.h) * cellBoxSize - tileGrid.groupPanelInsetTop - tileGrid.groupPanelInsetBottom)
+				: appObj.groupRect.h * cellBoxSize
+			radius: appObj.isCardLayout
+				? Math.max(tileItemView.cornerRadius, Math.round(12 * Screen.devicePixelRatio))
+				: tileItemView.cornerRadius
 		}
 	}
 

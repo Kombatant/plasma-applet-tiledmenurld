@@ -11,6 +11,9 @@ DropArea {
 	property real cellPushedMargin: 6 * Screen.devicePixelRatio
 	property int cellBoxSize: cellMargin + cellSize + cellMargin
 	property int hoverOutlineSize: 2 * Screen.devicePixelRatio
+	readonly property real groupPanelInsetX: Math.max(cellMargin, Math.round(6 * Screen.devicePixelRatio))
+	readonly property real groupPanelInsetTop: Math.max(cellMargin, Math.round(5 * Screen.devicePixelRatio))
+	readonly property real groupPanelInsetBottom: Math.max(cellMargin, Math.round(7 * Screen.devicePixelRatio))
 	readonly property int _holoPad: {
 		if (plasmoid && plasmoid.configuration) {
 			if (plasmoid.configuration.tileHoverEffect === "holographic")
@@ -337,6 +340,8 @@ DropArea {
 	function refreshTileDelegates() {
 		// When the config system reloads tileModel, the JS array is replaced.
 		// Ensure Repeater delegates are rebuilt from the new array.
+		groupPanelRepeater.model = 0
+		groupPanelRepeater.model = tileModel
 		tileModelRepeater.model = 0
 		tileModelRepeater.model = tileModel
 		groupHeaderSeparatorRepeater.model = 0
@@ -583,6 +588,92 @@ DropArea {
 			}
 
 			Repeater {
+				id: groupPanelRepeater
+				model: 0
+				Item {
+					readonly property var tile: modelData
+					readonly property var groupArea: tile && tile.tileType === "group" ? tileGrid.getGroupAreaRect(tile) : null
+					readonly property int headerH: (tile && typeof tile.h !== "undefined") ? tile.h : 1
+					readonly property real panelRadius: Math.max(config.tileCornerRadius, Math.round(12 * Screen.devicePixelRatio))
+					readonly property bool hasCustomColor: tile && typeof tile.backgroundColor !== "undefined"
+					readonly property color tileColor: hasCustomColor ? tile.backgroundColor : "transparent"
+					readonly property real tileAlpha: hasCustomColor ? tileColor.a : 0
+					readonly property bool isCardLayout: plasmoid && plasmoid.configuration && plasmoid.configuration.tileGroupLayout === "card"
+					visible: isCardLayout && !!groupArea
+					z: -1
+					x: (tile ? tile.x : 0) * cellBoxSize + _holoPad
+					y: (tile ? tile.y : 0) * cellBoxSize + _holoPad
+					width: (tile ? tile.w : 0) * cellBoxSize
+					height: groupArea ? (headerH + groupArea.h) * cellBoxSize : 0
+
+					Rectangle {
+						anchors.fill: parent
+						anchors.leftMargin: tileGrid.groupPanelInsetX
+						anchors.rightMargin: tileGrid.groupPanelInsetX
+						anchors.topMargin: tileGrid.groupPanelInsetTop + Math.round(2 * Screen.devicePixelRatio)
+						anchors.bottomMargin: tileGrid.groupPanelInsetBottom - Math.round(1 * Screen.devicePixelRatio)
+						color: Qt.rgba(0, 0, 0, 0.10)
+						radius: parent.panelRadius
+					}
+
+					Rectangle {
+						id: panelFill
+						anchors.fill: parent
+						anchors.leftMargin: tileGrid.groupPanelInsetX
+						anchors.rightMargin: tileGrid.groupPanelInsetX
+						anchors.topMargin: tileGrid.groupPanelInsetTop
+						anchors.bottomMargin: tileGrid.groupPanelInsetBottom
+						radius: parent.panelRadius
+						border.width: Math.max(1, Math.round(1 * Screen.devicePixelRatio))
+						border.color: hasCustomColor ? Qt.rgba(tileColor.r, tileColor.g, tileColor.b, Math.min(tileAlpha, 0.25)) : Qt.rgba(1, 1, 1, 0.11)
+						gradient: Gradient {
+							GradientStop { position: 0.0; color: hasCustomColor
+								? Qt.rgba(tileColor.r, tileColor.g, tileColor.b, tileAlpha)
+								: Qt.rgba(Kirigami.Theme.backgroundColor.r, Kirigami.Theme.backgroundColor.g, Kirigami.Theme.backgroundColor.b, 0.34) }
+							GradientStop { position: 0.55; color: hasCustomColor
+								? Qt.rgba(tileColor.r * 0.95, tileColor.g * 0.95, tileColor.b * 0.95, tileAlpha * 0.85)
+								: Qt.rgba(Kirigami.Theme.backgroundColor.r * 1.02, Kirigami.Theme.backgroundColor.g * 1.02, Kirigami.Theme.backgroundColor.b * 1.02, 0.28) }
+							GradientStop { position: 1.0; color: hasCustomColor
+								? Qt.rgba(tileColor.r * 0.90, tileColor.g * 0.90, tileColor.b * 0.90, tileAlpha * 0.75)
+								: Qt.rgba(Kirigami.Theme.backgroundColor.r * 0.98, Kirigami.Theme.backgroundColor.g * 0.98, Kirigami.Theme.backgroundColor.b * 0.98, 0.24) }
+						}
+					}
+
+					Rectangle {
+						anchors.fill: panelFill
+						radius: panelFill.radius
+						color: Qt.rgba(1, 1, 1, 0.02)
+					}
+
+					Rectangle {
+						anchors.left: panelFill.left
+						anchors.right: panelFill.right
+						anchors.top: panelFill.top
+						height: Math.round(Math.max(Kirigami.Units.smallSpacing, panelFill.height * 0.28))
+						radius: panelFill.radius
+						gradient: Gradient {
+							GradientStop { position: 0.0; color: Qt.rgba(1, 1, 1, 0.08) }
+							GradientStop { position: 0.45; color: Qt.rgba(1, 1, 1, 0.035) }
+							GradientStop { position: 1.0; color: "transparent" }
+						}
+					}
+
+
+					Rectangle {
+						anchors.left: panelFill.left
+						anchors.right: panelFill.right
+						anchors.bottom: panelFill.bottom
+						height: Math.round(Math.max(1, panelFill.height * 0.22))
+						radius: panelFill.radius
+						gradient: Gradient {
+							GradientStop { position: 0.0; color: "transparent" }
+							GradientStop { position: 1.0; color: Qt.rgba(0, 0, 0, 0.08) }
+						}
+					}
+				}
+			}
+
+			Repeater {
 				id: tileModelRepeater
 				model: 0
 				
@@ -600,18 +691,24 @@ DropArea {
 				Item {
 					readonly property var tile: modelData
 					readonly property int itemCount: tileGrid.countGroupTiles(tile)
-					visible: plasmoid.configuration.showGroupTileNameBorder && tile && tile.tileType === "group"
+					readonly property bool isCardLayout: plasmoid && plasmoid.configuration && plasmoid.configuration.tileGroupLayout === "card"
+					visible: tile && tile.tileType === "group"
 					z: 10000
-					x: (tile ? tile.x : 0) * cellBoxSize + _holoPad
-					width: (tile ? tile.w : 0) * cellBoxSize
+					x: (tile ? tile.x : 0) * cellBoxSize + _holoPad + (isCardLayout ? tileGrid.groupPanelInsetX : 0)
+					width: isCardLayout
+						? Math.max(0, (tile ? tile.w : 0) * cellBoxSize - (tileGrid.groupPanelInsetX * 2))
+						: (tile ? tile.w : 0) * cellBoxSize
 					readonly property int headerH: (tile && typeof tile.h !== "undefined") ? tile.h : 1
-					height: headerH * cellBoxSize
-					y: (tile ? tile.y : 0) * cellBoxSize + _holoPad
+					height: isCardLayout
+						? Math.max(0, headerH * cellBoxSize - tileGrid.groupPanelInsetTop)
+						: headerH * cellBoxSize
+					y: (tile ? tile.y : 0) * cellBoxSize + _holoPad + (isCardLayout ? tileGrid.groupPanelInsetTop : 0)
 
-					readonly property real sidePadding: Kirigami.Units.smallSpacing
+					readonly property real sidePadding: isCardLayout
+						? Math.round(4 * Screen.devicePixelRatio) + Kirigami.Units.smallSpacing
+						: Kirigami.Units.smallSpacing
 					readonly property real rowTopPadding: Math.max(0, (height - headerRow.implicitHeight) / 2)
 					readonly property real separatorHeight: 2 / Screen.devicePixelRatio
-
 							Item {
 								id: headerRow
 								anchors.left: parent.left
@@ -627,7 +724,9 @@ DropArea {
 								readonly property real countWidth: countLabel.implicitWidth
 								readonly property real titleWidth: Math.min(
 									titleLabel.implicitWidth,
-									Math.max(0, headerRow.width - countWidth - (separatorSpacing * 2) - minimumSeparatorWidth)
+									parent.parent.isCardLayout
+										? Math.max(0, headerRow.width - countWidth - separatorSpacing)
+										: Math.max(0, headerRow.width - countWidth - (separatorSpacing * 2) - minimumSeparatorWidth)
 								)
 
 								QQC2.Label {
@@ -638,7 +737,7 @@ DropArea {
 									text: tile && tile.label ? tile.label : ""
 									font.pointSize: Kirigami.Theme.defaultFont.pointSize + 1
 									font.bold: true
-									font.capitalization: Font.AllUppercase
+									font.capitalization: parent.parent.isCardLayout ? Font.MixedCase : Font.AllUppercase
 									color: Kirigami.Theme.textColor
 									opacity: 0.72
 									horizontalAlignment: headerRow.reversed ? Text.AlignRight : Text.AlignLeft
@@ -655,19 +754,19 @@ DropArea {
 							opacity: 0.38
 						}
 
-							Rectangle {
-								id: lineRect
-								x: headerRow.reversed
-									? countLabel.x + countLabel.width + headerRow.separatorSpacing
-									: titleLabel.x + titleLabel.width + headerRow.separatorSpacing
-								y: (parent.height - height) / 2
-								width: headerRow.reversed
-									? Math.max(0, titleLabel.x - x - headerRow.separatorSpacing)
-									: Math.max(0, countLabel.x - x - headerRow.separatorSpacing)
-								height: parent.parent.separatorHeight
-								color: Kirigami.Theme.textColor
-								opacity: 0.14
-								visible: width > 0
+						Rectangle {
+							id: lineRect
+							visible: !parent.parent.isCardLayout && width > 0
+							x: headerRow.reversed
+								? countLabel.x + countLabel.width + headerRow.separatorSpacing
+								: titleLabel.x + titleLabel.width + headerRow.separatorSpacing
+							y: (parent.height - height) / 2
+							width: headerRow.reversed
+								? Math.max(0, titleLabel.x - x - headerRow.separatorSpacing)
+								: Math.max(0, countLabel.x - x - headerRow.separatorSpacing)
+							height: parent.parent.separatorHeight
+							color: Kirigami.Theme.textColor
+							opacity: 0.14
 						}
 					}
 				}

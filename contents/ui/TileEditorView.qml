@@ -170,6 +170,7 @@ ColumnLayout {
 				title: i18n("Background Colour")
 				placeholderText: config.defaultTileColor
 				key: 'backgroundColor'
+				enabled: !(appObj.isGroup && !appObj.isCardLayout)
 			}
 
 			TileEditorRectField {

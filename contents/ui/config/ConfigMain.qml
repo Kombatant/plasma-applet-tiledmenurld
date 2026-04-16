@@ -96,6 +96,8 @@ KCM.AbstractKCM {
     property var cfg_groupLabelAlignmentDefault
     property var cfg_showGroupTileNameBorder
     property var cfg_showGroupTileNameBorderDefault
+    property var cfg_tileGroupLayout
+    property var cfg_tileGroupLayoutDefault
     property var cfg_presetTilesFolder
     property var cfg_presetTilesFolderDefault
     property var cfg_appDescription
@@ -168,7 +170,7 @@ KCM.AbstractKCM {
     property var cfg_aiChatHistoryDefault
     property var cfg_aiStreamChat
     property var cfg_aiStreamChatDefault
-    readonly property var _cfgKeys: ["icon", "fixedPanelIcon", "searchResultsGrouped", "searchDefaultFilters", "showRecentApps", "recentOrdering", "numRecentApps", "sidebarShortcuts", "sidebarCollapsibleSearchResults", "customAvatarPath", "defaultAppListView", "lastUsedAppListView", "aiChatEnabled", "aiProvider", "aiApiKey", "aiOllamaUrl", "aiOpenWebUiUrl", "aiModel", "aiDetectedModels", "aiChatHistory", "aiStreamChat", "terminalApp", "taskManagerApp", "fileManagerApp", "useTileTabs", "tileTabs", "tileModel", "tileScale", "tileIconSize", "tileMargin", "tilesLocked", "tileHoverEffect", "defaultTileColor", "defaultTileGradient", "sidebarBackgroundColor", "hideSearchField", "searchOnTop", "searchFieldFollowsTheme", "sidebarFollowsTheme", "tileLabelAlignment", "groupLabelAlignment", "showGroupTileNameBorder", "presetTilesFolder", "appDescription", "appListIconSize", "searchFieldHeight", "appListWidth", "dockedSidebarWidth", "popupHeight", "popupWidthAlphabetical", "popupHeightAlphabetical", "favGridColsAlphabetical", "popupWidthCategories", "popupHeightCategories", "favGridColsCategories", "popupWidthTilesOnly", "popupHeightTilesOnly", "favGridColsTilesOnly", "popupWidthAiChat", "popupHeightAiChat", "favGridColsAiChat", "favGridCols", "sidebarButtonSize", "sidebarIconSize", "sidebarPosition", "useDockedLayout", "tileRoundedCorners", "tileCornerRadius", "tileAnimatedPlayOnHover", "showTileTooltips"]
+    readonly property var _cfgKeys: ["icon", "fixedPanelIcon", "searchResultsGrouped", "searchDefaultFilters", "showRecentApps", "recentOrdering", "numRecentApps", "sidebarShortcuts", "sidebarCollapsibleSearchResults", "customAvatarPath", "defaultAppListView", "lastUsedAppListView", "aiChatEnabled", "aiProvider", "aiApiKey", "aiOllamaUrl", "aiOpenWebUiUrl", "aiModel", "aiDetectedModels", "aiChatHistory", "aiStreamChat", "terminalApp", "taskManagerApp", "fileManagerApp", "useTileTabs", "tileTabs", "tileModel", "tileScale", "tileIconSize", "tileMargin", "tilesLocked", "tileHoverEffect", "defaultTileColor", "defaultTileGradient", "sidebarBackgroundColor", "hideSearchField", "searchOnTop", "searchFieldFollowsTheme", "sidebarFollowsTheme", "tileLabelAlignment", "groupLabelAlignment", "showGroupTileNameBorder", "tileGroupLayout", "presetTilesFolder", "appDescription", "appListIconSize", "searchFieldHeight", "appListWidth", "dockedSidebarWidth", "popupHeight", "popupWidthAlphabetical", "popupHeightAlphabetical", "favGridColsAlphabetical", "popupWidthCategories", "popupHeightCategories", "favGridColsCategories", "popupWidthTilesOnly", "popupHeightTilesOnly", "favGridColsTilesOnly", "popupWidthAiChat", "popupHeightAiChat", "favGridColsAiChat", "favGridCols", "sidebarButtonSize", "sidebarIconSize", "sidebarPosition", "useDockedLayout", "tileRoundedCorners", "tileCornerRadius", "tileAnimatedPlayOnHover", "showTileTooltips"]
     property string pendingAiApiKey: ""
     property bool pendingAiApiKeyInitialized: false
     property var _saveHookOwners: []

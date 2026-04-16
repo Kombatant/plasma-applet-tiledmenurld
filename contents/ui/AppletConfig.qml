@@ -99,6 +99,7 @@ Item {
 			plasmoid.configuration.groupLabelAlignment = 'left'
 		}
 		_ensureSettingInitialized('showGroupTileNameBorder', true)
+		_ensureSettingInitialized('tileGroupLayout', 'card')
 		_ensureSettingInitialized('presetTilesFolder', '')
 		_ensureSettingInitialized('appDescription', 'after')
 		_ensureSettingInitialized('appListIconSize', 32)
