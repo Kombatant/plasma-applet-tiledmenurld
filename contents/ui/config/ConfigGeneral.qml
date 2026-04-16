@@ -5,7 +5,7 @@ import QtQuick.Window
 import org.kde.ksvg as KSvg
 import org.kde.kirigami as Kirigami
 import org.kde.coreaddons as KCoreAddons
-import Qt.labs.platform as QtLabsPlatform
+import org.kde.plasma.private.kicker as Kicker
 
 import ".." as TiledMenu
 import "../libconfig" as LibConfig
@@ -16,28 +16,7 @@ LibConfig.FormKCM {
 	id: formLayout
 	wideMode: false
 
-	function tileScaleToAbsoluteSize(scale) {
-		return Math.round((scale || 0) * 160)
-	}
-
-	function absoluteSizeToTileScale(size) {
-		return size / 160
-	}
-
-	function absoluteSizeToPercent(size) {
-		return Math.round((size / 64) * 100)
-	}
-
-	function getRootKcm() {
-		var root = formLayout
-		while (root && root.parent) {
-			root = root.parent
-			if (root && typeof root.configurationChanged === "function") {
-				break
-			}
-		}
-		return (root && typeof root.configurationChanged === "function") ? root : null
-	}
+	readonly property bool pendingUsesClassicLayout: !ConfigUtils.pendingValue(formLayout, "useDockedLayout", plasmoid.configuration.useDockedLayout)
 
 	function normalizeDistroIconToken(token) {
 		token = (token || "").toLowerCase().trim()
@@ -108,40 +87,6 @@ LibConfig.FormKCM {
 		return candidates
 	}
 
-	readonly property real pendingTileScale: {
-		var rootKcm = getRootKcm()
-		if (rootKcm && typeof rootKcm.cfg_tileScale !== "undefined") {
-			return rootKcm.cfg_tileScale || 0
-		}
-		return plasmoid.configuration.tileScale || 0
-	}
-
-	readonly property int pendingCellBoxSize: {
-		var tileMarginUnits = ConfigUtils.pendingValue(formLayout, "tileMargin", plasmoid.configuration.tileMargin) || 0
-		var cellMarginUnits = tileMarginUnits / 2
-		var cellSizeUnits = config.cellBoxUnits - tileMarginUnits
-		var scale = pendingTileScale || 0
-		var cellSize = Math.round(cellSizeUnits * scale * Screen.devicePixelRatio)
-		var cellMargin = cellMarginUnits * scale * Screen.devicePixelRatio
-		return Math.max(1, Math.round(cellMargin + cellSize + cellMargin))
-	}
-
-	function setPendingTileScale(scale) {
-		var rootKcm = getRootKcm()
-		if (!rootKcm || typeof rootKcm.cfg_tileScale === "undefined") {
-			return
-		}
-		if (Math.abs((rootKcm.cfg_tileScale || 0) - scale) <= 0.0001) {
-			return
-		}
-		rootKcm.cfg_tileScale = scale
-		rootKcm.configurationChanged()
-	}
-
-	readonly property string plasmaStyleLabelText: {
-		var plasmaStyleText = i18nd("kcm_desktoptheme", "Plasma Style")
-		return i18n("Follow Current %1 (%2)", plasmaStyleText, KSvg.ImageSet.imageSetName)
-	}
 	readonly property var distroIconCandidateList: distroIconCandidates()
 	property string distroPresetIcon: "start-here-kde"
 	property bool distroPresetResolved: false
@@ -173,6 +118,159 @@ LibConfig.FormKCM {
 		}
 	}
 
+	// --- App autocomplete for Right Click Menu ---
+	function endsWith(a, b) {
+		return a.indexOf(b, a.length - b.length) !== -1
+	}
+
+	Kicker.RootModel {
+		id: appAutocompleteRootModel
+		appletInterface: (typeof plasmoid !== "undefined" && plasmoid) ? plasmoid : formLayout
+		flat: true
+		showSeparators: false
+		showAllApps: true
+		showRecentApps: false
+		showRecentDocs: false
+		autoPopulate: false
+
+		Component.onCompleted: {
+			appAutocompleteRefreshTimer.restart()
+		}
+
+		onCountChanged: {
+			appAutocompleteDebounce.restart()
+		}
+
+		onRefreshed: {
+			appAutocompleteDebounce.restart()
+		}
+	}
+
+	Timer {
+		id: appAutocompleteRefreshTimer
+		interval: 0
+		repeat: false
+		onTriggered: appAutocompleteRootModel.refresh()
+	}
+
+	Timer {
+		id: appAutocompleteDebounce
+		interval: 50
+		repeat: false
+		onTriggered: installedAppsModel.refresh()
+	}
+
+	TiledMenu.KickerListModel {
+		id: installedAppsModel
+
+		function refresh() {
+			refreshing()
+			var appList = []
+			var sourceModel = appAutocompleteRootModel.count > 0 ? appAutocompleteRootModel.modelForRow(0) : null
+			if (sourceModel) {
+				parseModel(appList, sourceModel)
+			}
+			appList = appList.filter(function(item) {
+				return item && item.name
+			}).sort(function(a, b) {
+				return ("" + a.name).toLowerCase().localeCompare(("" + b.name).toLowerCase())
+			})
+			list = appList
+			refreshed()
+		}
+	}
+
+	function desktopEntryIdFromUrl(url) {
+		var value = ("" + (url || "")).trim()
+		if (!value.length) {
+			return ""
+		}
+		var queryIndex = value.indexOf("?")
+		if (queryIndex >= 0) {
+			value = value.substring(0, queryIndex)
+		}
+		var fragmentIndex = value.indexOf("#")
+		if (fragmentIndex >= 0) {
+			value = value.substring(0, fragmentIndex)
+		}
+		var lastSlash = Math.max(value.lastIndexOf("/"), value.lastIndexOf(":"))
+		var entryId = lastSlash >= 0 ? value.substring(lastSlash + 1) : value
+		return endsWith(entryId, ".desktop") ? entryId : ""
+	}
+
+	function desktopEntryIdForApp(app) {
+		if (!app) {
+			return ""
+		}
+		if (app.favoriteId && endsWith(app.favoriteId, ".desktop")) {
+			return app.favoriteId
+		}
+		return desktopEntryIdFromUrl(app.url)
+	}
+
+	function appSuggestionItemsForInput(value) {
+		var query = ("" + value).trim()
+		if (!query.length) {
+			return []
+		}
+
+		var results = []
+		var seen = {}
+		for (var i = 0; i < installedAppsModel.count; i++) {
+			var app = installedAppsModel.get(i)
+			var desktopEntryId = desktopEntryIdForApp(app)
+			if (!desktopEntryId.length || seen[desktopEntryId]) {
+				continue
+			}
+			var candidate = {
+				value: desktopEntryId,
+				label: app.name || desktopEntryId,
+				description: app.description || desktopEntryId
+			}
+			var score = _suggestionScore(candidate, query)
+			if (score < 0) {
+				continue
+			}
+			candidate.score = score
+			results.push(candidate)
+			seen[desktopEntryId] = true
+		}
+
+		results.sort(function(a, b) {
+			if (a.score !== b.score) {
+				return b.score - a.score
+			}
+			return (a.label || "").toLowerCase().localeCompare((b.label || "").toLowerCase())
+		})
+
+		return results.slice(0, 10)
+	}
+
+	function _suggestionScore(candidate, query) {
+		var lowerQuery = query.toLowerCase()
+		var fields = [candidate.label || "", candidate.value || "", candidate.description || ""]
+		var bestScore = -1
+		for (var i = 0; i < fields.length; i++) {
+			var field = ("" + fields[i]).toLowerCase()
+			var index = field.indexOf(lowerQuery)
+			if (index < 0) {
+				continue
+			}
+			var score = 1000 - index - field.length
+			if (index === 0) {
+				score += 250
+			}
+			if (i === 0) {
+				score += 200
+			} else if (i === 1) {
+				score += 100
+			}
+			if (score > bestScore) {
+				bestScore = score
+			}
+		}
+		return bestScore
+	}
 
 
 	//-------------------------------------------------------
@@ -206,215 +304,119 @@ LibConfig.FormKCM {
 
 	//-------------------------------------------------------
 	LibConfig.Heading {
-		text: i18n("Tiles")
+		text: i18n("Layout")
 	}
 
-	LibConfig.CheckBox {
-		configKey: 'useTileTabs'
-		text: i18n("Tab Support")
-		Kirigami.FormData.label: i18n("Tabs")
+	LibConfig.ComboBox {
+		id: layoutModeControl
+		configKey: "useDockedLayout"
+		Kirigami.FormData.label: i18n("Layout Mode")
+		model: [
+			{ value: true, text: i18n("Docked Sidebar Layout") },
+			{ value: false, text: i18n("Classic Layout") },
+		]
 	}
 
-	RowLayout {
-		id: tileSizeRow
-		Kirigami.FormData.label: i18n("Tile Size")
+	//-------------------------------------------------------
+	LibConfig.Heading {
+		text: i18n("Application List")
+	}
 
-		LibConfig.SpinBox {
-			id: tileSizeSpinBox
-			suffix: i18n("px")
-			minimumValue: 32
-			maximumValue: 128
-			decimals: 0
-			value: formLayout.tileScaleToAbsoluteSize(formLayout.pendingTileScale)
-			onValueModified: formLayout.setPendingTileScale(formLayout.absoluteSizeToTileScale(value))
-		}
-		QQC2.Label {
-			text: '(' + formLayout.absoluteSizeToPercent(tileSizeSpinBox.value) + "%)"
-		}
-	}
-	RowLayout {
-		Kirigami.FormData.label: i18n("Tile Icon Size")
-		LibConfig.SpinBox {
-			configKey: 'tileIconSize'
-			suffix: i18n("px")
-			minimumValue: 16
-			maximumValue: 256
-			decimals: 0
-		}
-		QQC2.Label {
-			text: i18n("Base size for tile icons; small/large variants scale from this")
-		}
-	}
 	LibConfig.SpinBox {
-		configKey: 'tileMargin'
-		Kirigami.FormData.label: i18n("Tile Margin")
+		configKey: 'appListIconSize'
+		Kirigami.FormData.label: i18n("Icon Size")
 		suffix: i18n("px")
-		minimumValue: 12
-		maximumValue: config.cellBoxUnits/2
+		minimumValue: 16
+		maximumValue: 128
 	}
+
+	LibConfig.SpinBox {
+		id: appListWidthControl
+		configKey: 'appListWidth'
+		Kirigami.FormData.label: i18n("App List Area Width")
+		suffix: i18n("px")
+		minimumValue: 0
+		visible: formLayout.pendingUsesClassicLayout
+	}
+
+	LibConfig.SpinBox {
+		configKey: 'dockedSidebarWidth'
+		Kirigami.FormData.label: i18n("Docked Sidebar Width")
+		suffix: i18n("px")
+		minimumValue: 0
+		visible: !formLayout.pendingUsesClassicLayout
+	}
+
+	LibConfig.ComboBox {
+		id: defaultAppListViewControl
+		configKey: "defaultAppListView"
+		Kirigami.FormData.label: i18n("Default View")
+		model: [
+			{ value: "Alphabetical", text: i18n("Alphabetical") },
+			{ value: "Categories", text: i18n("Categories") },
+			{ value: "LastUsedView", text: i18n("Last Used View") },
+			{ value: "JumpToLetter", text: i18n("Jump To Letter") },
+			{ value: "JumpToCategory", text: i18n("Jump To Category") },
+			{ value: "TilesOnly", text: i18n("Tiles Only") },
+			{ value: "AiChat", text: i18n("AI Chat") },
+		]
+	}
+
+	LibConfig.ComboBox {
+		id: appDescriptionControl
+		configKey: "appDescription"
+		Kirigami.FormData.label: i18n("App Description")
+		model: [
+			{ value: "hidden", text: i18n("Hidden") },
+			{ value: "after", text: i18n("After") },
+			{ value: "below", text: i18n("Below") },
+		]
+	}
+
 	RowLayout {
-		Kirigami.FormData.label: i18n("Rounded Corners")
+		Kirigami.FormData.label: i18n("App History")
 		LibConfig.CheckBox {
-			id: tileRoundedCornersToggle
-			text: i18n("Enable")
-			configKey: 'tileRoundedCorners'
+			id: showRecentAppsCheckBox
+			text: i18n("Show:")
+			configKey: 'showRecentApps'
 		}
 		LibConfig.SpinBox {
-			configKey: 'tileCornerRadius'
-			suffix: i18n("px")
-			minimumValue: 0
-			maximumValue: 32
-			enabled: tileRoundedCornersToggle.checked
+			configKey: 'numRecentApps'
+			enabled: showRecentAppsCheckBox.checked
+			minimumValue: 1
+			maximumValue: 15
 		}
-		QQC2.Label {
-			text: i18n("Corner radius")
+
+		LibConfig.ComboBox {
+			configKey: 'recentOrdering'
+			model: [
+				{ value: 0, text: i18n("Recent applications") },
+				{ value: 1, text: i18n("Often used applications") },
+			]
 		}
 	}
 
-	LibConfig.RadioButtonGroup {
-		id: tilesThemeGroup
-		Kirigami.FormData.label: i18n("Tile Background Colour")
-		spacing: 0 // "Custom Color" has lots of spacings already
-		RowLayout {
-			QQC2.RadioButton {
-				id: defaultTileColorRadioButton
-				text: i18n("Custom Colour")
-				QQC2.ButtonGroup.group: tilesThemeGroup.group
-				checked: defaultTileColorColor.value !== "#00000000"
-				onClicked: {
-					// If we're currently in the Transparent state, switch back to a non-transparent
-					// value so this radio can remain selected.
-					if (defaultTileColorColor.value === "#00000000") {
-						defaultTileColorColor.text = ""
-					}
-				}
-			}
-			LibConfig.ColorField {
-				id: defaultTileColorColor
-				configKey: 'defaultTileColor'
-			}
-			LibConfig.CheckBox {
-				text: i18n("Gradient")
-				configKey: 'defaultTileGradient'
-			}
-		}
-		QQC2.RadioButton {
-			id: transparentTileColorRadioButton
-			text: i18n("Transparent")
-			QQC2.ButtonGroup.group: tilesThemeGroup.group
-			checked: defaultTileColorColor.value === "#00000000"
-			onClicked: {
-				defaultTileColorColor.text = "#00000000"
-			}
-		}
+	//-------------------------------------------------------
+	LibConfig.Heading {
+		text: i18n("Right Click Menu")
 	}
-	LibConfig.ComboBox {
-		configKey: "tileHoverEffect"
-		Kirigami.FormData.label: i18n("Hover Effect")
-		model: [
-			{ value: "classic", text: i18n("Classic") },
-			{ value: "holographic", text: i18n("Holographic") },
-		]
+	LibConfig.AutocompleteTextField {
+		configKey: 'terminalApp'
+		Kirigami.FormData.label: i18n("Terminal")
+		placeholderText: cfg_terminalAppDefault || "org.kde.konsole.desktop"
+		suggestionsProvider: formLayout.appSuggestionItemsForInput
 	}
-
-	LibConfig.CheckBox {
-		configKey: 'tileAnimatedPlayOnHover'
-		text: i18n("Play animated backgrounds only on hover")
-		Kirigami.FormData.label: i18n("")
+	LibConfig.AutocompleteTextField {
+		configKey: 'taskManagerApp'
+		Kirigami.FormData.label: i18n("Task Manager")
+		placeholderText: cfg_taskManagerAppDefault || "org.kde.plasma-systemmonitor.desktop"
+		suggestionsProvider: formLayout.appSuggestionItemsForInput
 	}
-	LibConfig.CheckBox {
-		configKey: 'showTileTooltips'
-		text: i18n("Show tooltips on hover")
-		Kirigami.FormData.label: i18n("")
-	}
-	LibConfig.ComboBox {
-		configKey: "tileLabelAlignment"
-		Kirigami.FormData.label: i18n("Text Alignment")
-		model: [
-			{ value: "left", text: i18n("Left") },
-			{ value: "center", text: i18n("Centre") },
-			{ value: "right", text: i18n("Right") },
-		]
-	}
-	LibConfig.ComboBox {
-		configKey: "groupLabelAlignment"
-		Kirigami.FormData.label: i18n("Group Text Alignment")
-		model: [
-			{ value: "left", text: i18n("Left") },
-			{ value: "right", text: i18n("Right") },
-		]
-	}
-	LibConfig.ComboBox {
-		configKey: "tileGroupLayout"
-		Kirigami.FormData.label: i18n("Group Tile Layout")
-		model: [
-			{ value: "card", text: i18n("Card") },
-			{ value: "classic", text: i18n("Classic") },
-		]
-	}
-	RowLayout {
-		id: presetTilesFolderRow
-		Kirigami.FormData.label: i18n("Preset Tile Folder")
-		Layout.fillWidth: true
-
-		function pathToUrl(path) {
-			var p = path || ""
-			if (!p) {
-				return ""
-			}
-			if (p.indexOf('://') !== -1) {
-				return p
-			}
-			if (p.indexOf('~/') === 0) {
-				var home = QtLabsPlatform.StandardPaths.writableLocation(QtLabsPlatform.StandardPaths.HomeLocation)
-				if (home) {
-					p = home + p.substr(1)
-				}
-			}
-			if (p.indexOf('/') === 0) {
-				return 'file://' + p
-			}
-			return p
-		}
-
-		function urlToPath(url) {
-			if (!url) {
-				return ''
-			}
-			var s = '' + url
-			if (s.indexOf('file://') === 0) {
-				s = s.substr('file://'.length)
-			}
-			return s
-		}
-
-		LibConfig.TextField {
-			id: presetTilesFolderField
-			Layout.fillWidth: true
-			configKey: 'presetTilesFolder'
-			placeholderText: config.defaultPresetTilesFolder
-		}
-
-		QQC2.Button {
-			text: i18n("Browse...")
-			icon.name: "folder-open"
-			onClicked: {
-				var startPath = presetTilesFolderField.text || config.defaultPresetTilesFolder
-				presetTilesFolderDialog.currentFolder = presetTilesFolderRow.pathToUrl(startPath)
-				presetTilesFolderDialog.open()
-			}
-		}
-
-		QtLabsPlatform.FolderDialog {
-			id: presetTilesFolderDialog
-			title: i18n("Select Preset Tile Folder")
-			onAccepted: {
-				var folderPath = presetTilesFolderRow.urlToPath(currentFolder)
-				if (folderPath) {
-					presetTilesFolderField.text = folderPath
-				}
-			}
-		}
+	LibConfig.AutocompleteTextField {
+		configKey: 'fileManagerApp'
+		Kirigami.FormData.label: i18n("File Manager")
+		placeholderText: cfg_fileManagerAppDefault || "org.kde.dolphin.desktop"
+		suggestionsProvider: formLayout.appSuggestionItemsForInput
 	}
 
 }

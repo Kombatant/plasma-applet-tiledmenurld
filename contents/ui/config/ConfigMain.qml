@@ -188,6 +188,12 @@ KCM.AbstractKCM {
         "source": "ConfigGeneral.qml",
         "visible": true
     }, {
+        "key": "tiles",
+        "name": i18n("Tiles"),
+        "icon": "view-grid-symbolic",
+        "source": "ConfigTiles.qml",
+        "visible": true
+    }, {
         "key": "sidebar",
         "name": i18n("Sidebar"),
         "icon": "sidebar-expand-left",
