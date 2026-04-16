@@ -27,23 +27,8 @@ LibConfig.FormKCM {
 		return Math.round((size / 64) * 100)
 	}
 
-	function getRootKcm() {
-		var root = formLayout
-		while (root && root.parent) {
-			root = root.parent
-			if (root && typeof root.configurationChanged === "function") {
-				break
-			}
-		}
-		return (root && typeof root.configurationChanged === "function") ? root : null
-	}
-
 	readonly property real pendingTileScale: {
-		var rootKcm = getRootKcm()
-		if (rootKcm && typeof rootKcm.cfg_tileScale !== "undefined") {
-			return rootKcm.cfg_tileScale || 0
-		}
-		return plasmoid.configuration.tileScale || 0
+		return ConfigUtils.pendingValue(formLayout, "tileScale", plasmoid.configuration.tileScale) || 0
 	}
 
 	readonly property int pendingCellBoxSize: {
@@ -57,15 +42,11 @@ LibConfig.FormKCM {
 	}
 
 	function setPendingTileScale(scale) {
-		var rootKcm = getRootKcm()
-		if (!rootKcm || typeof rootKcm.cfg_tileScale === "undefined") {
+		var current = ConfigUtils.pendingValue(formLayout, "tileScale", plasmoid.configuration.tileScale) || 0
+		if (Math.abs(current - scale) <= 0.0001) {
 			return
 		}
-		if (Math.abs((rootKcm.cfg_tileScale || 0) - scale) <= 0.0001) {
-			return
-		}
-		rootKcm.cfg_tileScale = scale
-		rootKcm.configurationChanged()
+		ConfigUtils.setPendingValue(formLayout, "tileScale", scale)
 	}
 
 	property var config: TiledMenu.AppletConfig {

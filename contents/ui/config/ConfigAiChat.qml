@@ -11,6 +11,15 @@ LibConfig.FormKCM {
 	id: form
 	wideMode: false
 
+	// --- Pending API key state (previously on shared ConfigMain) ---
+	property string pendingAiApiKey: ""
+	property bool pendingAiApiKeyInitialized: false
+
+	// Plasma's config dialog calls saveConfig() on each page's root item on Apply/OK.
+	function saveConfig() {
+		_applyPendingApiKey()
+	}
+
 	readonly property var providerOptions: [
 		{ value: "openai", text: "OpenAI" },
 		{ value: "openrouter", text: "OpenRouter" },
@@ -61,8 +70,7 @@ LibConfig.FormKCM {
 	}
 
 	function _apiKeyValue() {
-		var rootKcm = ConfigUtils.getRootKcm(form)
-		var pendingValue = rootKcm ? (rootKcm.pendingAiApiKey || "").trim() : (apiKeyField.text || "").trim()
+		var pendingValue = (form.pendingAiApiKey || "").trim()
 		if (pendingValue) {
 			return pendingValue
 		}
@@ -242,10 +250,9 @@ LibConfig.FormKCM {
 	KWalletSecret {
 		id: secureApiKey
 		onLoaded: function(success) {
-			var rootKcm = ConfigUtils.getRootKcm(form)
-			if (success && rootKcm && !rootKcm.pendingAiApiKeyInitialized) {
+			if (success && !form.pendingAiApiKeyInitialized) {
 				form._setPendingApiKey(secret || ((plasmoid.configuration.aiApiKey || "").trim()), false)
-				rootKcm.pendingAiApiKeyInitialized = true
+				form.pendingAiApiKeyInitialized = true
 				form._lastDetectionSignature = ""
 				if (!form.detectedModels.length && form._apiKeyValue()) {
 					form._scheduleDetection()
@@ -277,17 +284,13 @@ LibConfig.FormKCM {
 	}
 
 	function _setPendingApiKey(value, markDirty) {
-		var rootKcm = ConfigUtils.getRootKcm(form)
-		if (!rootKcm) {
-			return
-		}
 		var nextValue = value || ""
-		if (rootKcm.pendingAiApiKey === nextValue) {
+		if (form.pendingAiApiKey === nextValue) {
 			return
 		}
-		rootKcm.pendingAiApiKey = nextValue
+		form.pendingAiApiKey = nextValue
 		if (markDirty !== false) {
-			rootKcm.configurationChanged()
+			ConfigUtils.markConfigurationChanged(form)
 		}
 		form._updatingApiKeyField = true
 		apiKeyField.text = nextValue
@@ -315,26 +318,15 @@ LibConfig.FormKCM {
 	}
 
 	Component.onCompleted: {
-		var rootKcm = ConfigUtils.getRootKcm(form)
-		if (rootKcm) {
-			rootKcm.registerSaveHook(form, form._applyPendingApiKey)
-			if (!rootKcm.pendingAiApiKeyInitialized && (plasmoid.configuration.aiApiKey || "").trim()) {
-				rootKcm.pendingAiApiKey = (plasmoid.configuration.aiApiKey || "").trim()
-				rootKcm.pendingAiApiKeyInitialized = true
-			}
-			form._setPendingApiKey(rootKcm.pendingAiApiKey, false)
+		if (!form.pendingAiApiKeyInitialized && (plasmoid.configuration.aiApiKey || "").trim()) {
+			form.pendingAiApiKey = (plasmoid.configuration.aiApiKey || "").trim()
+			form.pendingAiApiKeyInitialized = true
 		}
 		secureApiKey.inspectAvailability()
 		secureApiKey.readSecret()
 		detectionStatus = detectedModels.length
 			? i18n("Detected %1 model(s).", detectedModels.length)
 			: i18n("Paste your API key to auto-detect models.")
-	}
-	Component.onDestruction: {
-		var rootKcm = ConfigUtils.getRootKcm(form)
-		if (rootKcm) {
-			rootKcm.unregisterSaveHook(form)
-		}
 	}
 
 	Kirigami.InlineMessage {

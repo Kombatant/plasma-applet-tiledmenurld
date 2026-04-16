@@ -5,6 +5,11 @@ function _propName(configKey) {
 }
 
 function getRootKcm(item) {
+	// Check the item itself first — in Plasma's native config model,
+	// the page root has configurationChanged injected directly on it.
+	if (item && typeof item.configurationChanged === "function") {
+		return item
+	}
 	var root = item
 	while (root && root.parent) {
 		root = root.parent

@@ -11,6 +11,7 @@ import ".." as TiledMenu
 ColumnLayout {
 	id: page
 	spacing: Kirigami.Units.smallSpacing
+	anchors.margins: Kirigami.Units.gridUnit * 2
 
 	// Force Window color scheme instead of inheriting Plasma theme colors
 	Kirigami.Theme.colorSet: Kirigami.Theme.Window

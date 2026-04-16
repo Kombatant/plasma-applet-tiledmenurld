@@ -1,6 +1,7 @@
-// Version 4
+// Version 5
 
 import QtQuick
+import QtQuick.Controls as QQC2
 import org.kde.kirigami as Kirigami
 
 Item {
@@ -17,10 +18,25 @@ Item {
 	Kirigami.Theme.colorSet: Kirigami.Theme.Window
 	Kirigami.Theme.inherit: false
 
-	Kirigami.FormLayout {
-		id: formLayout
+	QQC2.ScrollView {
+		id: scrollView
 		anchors.fill: parent
-		anchors.rightMargin: Kirigami.Units.gridUnit
+		clip: true
+
+		Item {
+			width: scrollView.availableWidth
+			implicitHeight: formLayout.implicitHeight + formLayout.anchors.topMargin * 2
+
+			Kirigami.FormLayout {
+				id: formLayout
+				anchors.left: parent.left
+				anchors.right: parent.right
+				anchors.top: parent.top
+				anchors.leftMargin: Kirigami.Units.gridUnit * 2
+				anchors.topMargin: Kirigami.Units.largeSpacing
+				anchors.rightMargin: Kirigami.Units.gridUnit
+			}
+		}
 	}
 
 	function _alignInternalFormLayout() {

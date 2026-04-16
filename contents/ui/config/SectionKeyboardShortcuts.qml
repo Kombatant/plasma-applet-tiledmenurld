@@ -15,9 +15,16 @@ Item {
 	Kirigami.Theme.colorSet: Kirigami.Theme.Window
 	Kirigami.Theme.inherit: false
 
-	// The parent ConfigMain.qml owns save/apply behavior and persists to Plasmoid.globalShortcut.
-	// We only edit the pending value.
-	property alias pendingShortcut: keySequenceItem.keySequence
+	// Pending shortcut state — persisted on Apply/OK via saveConfig().
+	property string _shortcutPending: "" + Plasmoid.globalShortcut
+
+	signal configurationChanged()
+
+	// Plasma's config dialog calls saveConfig() on each page's root item on Apply/OK.
+	function saveConfig() {
+		if (("" + Plasmoid.globalShortcut) !== ("" + _shortcutPending))
+			Plasmoid.globalShortcut = _shortcutPending
+	}
 
 	QQC2.ScrollView {
 		id: scrollView
@@ -46,25 +53,11 @@ Item {
 
 				KQuickControls.KeySequenceItem {
 					id: keySequenceItem
-					keySequence: (page.parent && page.parent._shortcutPending !== undefined)
-						? page.parent._shortcutPending
-						: Plasmoid.globalShortcut
+					keySequence: page._shortcutPending
 					modifierOnlyAllowed: true
 					onCaptureFinished: {
-						// bubble up to ConfigMain so Apply becomes enabled
-						var root = page
-						while (root && root.parent) {
-							root = root.parent
-							if (root && typeof root.configurationChanged === "function") {
-								break
-							}
-						}
-						if (root && typeof root._shortcutPending !== "undefined") {
-							root._shortcutPending = keySequence
-						}
-						if (root && typeof root.configurationChanged === "function") {
-							root.configurationChanged()
-						}
+						page._shortcutPending = keySequence
+						page.configurationChanged()
 					}
 				}
 
