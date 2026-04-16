@@ -25,10 +25,6 @@ ListView {
 		visible: listView.currentItem && !listView.currentItem.isSeparator
 	}
 
-	// function triggerIndex(index) {
-	// 	model.triggerIndex(index)
-	// }
-
 	function goUp() {
 		if (verticalLayoutDirection == ListView.TopToBottom) {
 			decrementCurrentIndex()

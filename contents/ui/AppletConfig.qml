@@ -98,7 +98,6 @@ Item {
 		if (plasmoid.configuration.groupLabelAlignment === 'center') {
 			plasmoid.configuration.groupLabelAlignment = 'left'
 		}
-		_ensureSettingInitialized('showGroupTileNameBorder', true)
 		_ensureSettingInitialized('tileGroupLayout', 'card')
 		_ensureSettingInitialized('presetTilesFolder', '')
 		_ensureSettingInitialized('appDescription', 'after')
@@ -205,7 +204,6 @@ Item {
 	}
 
 	//--- Sizes
-	readonly property int panelIconSize: 24 * Screen.devicePixelRatio
 	readonly property int flatButtonSize: plasmoid.configuration.sidebarButtonSize * Screen.devicePixelRatio
 	readonly property int flatButtonIconSize: plasmoid.configuration.sidebarIconSize * Screen.devicePixelRatio
 	readonly property int sidebarWidth: flatButtonSize
@@ -307,15 +305,6 @@ Item {
 	readonly property int tileGridWidth: plasmoid.configuration.favGridCols * cellBoxSize
 	readonly property int tileCornerRadius: Math.max(0, Math.round((plasmoid.configuration.tileRoundedCorners ? plasmoid.configuration.tileCornerRadius : 0) * Screen.devicePixelRatio))
 
-	readonly property int favCellWidth: 60 * Screen.devicePixelRatio
-	readonly property int favCellPushedMargin: 5 * Screen.devicePixelRatio
-	readonly property int favCellPadding: 3 * Screen.devicePixelRatio
-	readonly property int favColWidth: ((favCellWidth + favCellPadding * 2) * 2) // = 132 (Medium Size)
-	readonly property int favViewDefaultWidth: (favColWidth * 3) * Screen.devicePixelRatio
-	readonly property int favSmallIconSize: 32 * Screen.devicePixelRatio
-	readonly property int favMediumIconSize: 72 * Screen.devicePixelRatio
-	readonly property int favGridWidth: (plasmoid.configuration.favGridCols/2) * favColWidth
-
 	readonly property int searchFieldHeight: plasmoid.configuration.searchFieldHeight * Screen.devicePixelRatio
 
 	readonly property int popupWidth: popupLeftSectionWidth + tileGridWidth
@@ -358,7 +347,6 @@ Item {
 	readonly property bool defaultTileGradient: plasmoid.configuration.defaultTileGradient
 	readonly property color sidebarBackgroundColor: plasmoid.configuration.sidebarBackgroundColor || Kirigami.Theme.backgroundColor
 	readonly property color menuItemTextColor2: setAlpha(Kirigami.Theme.textColor, 0.6)
-	readonly property color favHoverOutlineColor: setAlpha(Kirigami.Theme.textColor, 0.8)
 	readonly property color flatButtonBgHoverColor: themeButtonBgColor
 	readonly property color flatButtonBgColor: Qt.rgba(flatButtonBgHoverColor.r, flatButtonBgHoverColor.g, flatButtonBgHoverColor.b, 0)
 	readonly property color flatButtonBgPressedColor: Kirigami.Theme.highlightColor
@@ -400,31 +388,5 @@ Item {
 	property var tileModel: Base64XmlString {
 		configKey: 'tileModel'
 		defaultValue: []
-
-		// defaultValue: [
-		// 	{
-		// 		"x": 0,
-		// 		"y": 0,
-		// 		"w": 2,
-		// 		"h": 2,
-		// 		"url": "org.kde.dolphin.desktop",
-		// 		"label": "Files",
-		// 	},
-		// 	{
-		// 		"x": 2,
-		// 		"y": 1,
-		// 		"w": 1,
-		// 		"h": 1,
-		// 		"url": "virtualbox.desktop",
-		// 		"iconFill": true,
-		// 	},
-		// 	{
-		// 		"x": 2,
-		// 		"y": 0,
-		// 		"w": 1,
-		// 		"h": 1,
-		// 		"url": "org.kde.ark.desktop",
-		// 	},
-		// ]
 	}
 }

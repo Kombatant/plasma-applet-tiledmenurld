@@ -84,8 +84,6 @@ TileEditorGroupBox {
 		}
 	}
 
-	// readonly property int xLeft: tileGrid.columns - (appObj.tileX + appObj.tileW)
-
 	RowLayout {
 		anchors.fill: parent
 

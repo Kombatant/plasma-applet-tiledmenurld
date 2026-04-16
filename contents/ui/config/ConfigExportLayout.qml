@@ -67,7 +67,6 @@ ColumnLayout {
 		sidebarFollowsTheme: "bool",
 		tileLabelAlignment: "string",
 		groupLabelAlignment: "string",
-		showGroupTileNameBorder: "bool",
 		tileGroupLayout: "string",
 		presetTilesFolder: "string",
 		appDescription: "string",

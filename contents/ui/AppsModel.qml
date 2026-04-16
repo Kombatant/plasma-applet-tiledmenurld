@@ -94,25 +94,17 @@ Item {
 
 	Kicker.RootModel {
 		id: rootModel
-		appNameFormat: 0 // plasmoid.configuration.appNameFormat
-		flat: true // isDash ? true : plasmoid.configuration.limitDepth
-		// sorted: Plasmoid.configuration.alphaSort
-
-		showSeparators: false // !isDash
+		appNameFormat: 0
+		flat: true
+		showSeparators: false
 		appletInterface: (typeof widget !== "undefined" && widget) ? widget : ((typeof plasmoid !== "undefined" && plasmoid) ? plasmoid : null)
 
-		// showAllSubtree: true //isDash (KDE 5.8 and below)
-		showAllApps: true //isDash (KDE 5.9+)
-		// showAllAppsCategorized: false
-		showRecentApps: true //plasmoid.configuration.showRecentApps
-		showRecentDocs: false //plasmoid.configuration.showRecentDocs
-		// showRecentContacts: false //plasmoid.configuration.showRecentContacts
-		// showPowerSession: false
-		// showFavoritesPlaceholder: true
+		showAllApps: true
+		showRecentApps: true
+		showRecentDocs: false
 		recentOrdering: appsModel.hasConfiguration ? plasmoid.configuration.recentOrdering : 1
 
-		autoPopulate: false // (KDE 5.9+) defaulted to true
-		// paginate: false // (KDE 5.9+)
+		autoPopulate: false
 
 		readonly property int recentAppsIndex: 0
 		readonly property int recentDocsIndex: {

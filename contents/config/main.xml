@@ -174,10 +174,6 @@
 			<!-- enum: left, right -->
 			<default>left</default>
 		</entry>
-		<entry name="showGroupTileNameBorder" type="bool">
-			<label>Whether group headers use the plain style or the section header style.</label>
-			<default>true</default>
-		</entry>
 		<entry name="tileGroupLayout" type="string">
 			<!-- enum: card, classic -->
 			<default>card</default>

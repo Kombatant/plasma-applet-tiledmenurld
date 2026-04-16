@@ -1,8 +1,6 @@
 import QtQuick
 import QtQuick.Layouts
 
-import "lib/Requests.js" as Requests
-
 // Note: This references a global KCoreAddons.KUser { id: kuser }
 
 TileEditorGroupBox {

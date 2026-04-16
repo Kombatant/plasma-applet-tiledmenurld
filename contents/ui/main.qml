@@ -265,11 +265,6 @@ PlasmoidItem {
 		Layout.preferredWidth: config.popupWidth
 		Layout.preferredHeight: config.popupHeight
 
-		 //Layout.minimumHeight: 900 // For quickly testing as a desktop widget
-		// Layout.minimumWidth: 800
-
-
-
 		// Make popup resizeable like default Kickoff widget.
 		// The FullRepresentation must have an appletInterface property.
 		// https://invent.kde.org/plasma/plasma-desktop/-/commit/23c4e82cdcb6c7f251c27c6eefa643415c8c5927
