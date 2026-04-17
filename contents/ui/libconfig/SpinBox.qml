@@ -38,14 +38,27 @@ QQC2.SpinBox {
 	property Item sizingRoot: findSizingRoot()
 
 	property string configKey: ''
-	readonly property var configValue: configKey ? ConfigUtils.pendingValue(spinBox, configKey, plasmoid.configuration[configKey]) : 0
+	property var configValue: 0
 	property var _boundContentItem: null
 	property bool _editingText: false
+	property bool _initialized: false
+	property var _disconnectConfig: null
+
+	function _refreshConfigValue() {
+		if (!configKey) {
+			return
+		}
+		configValue = ConfigUtils.pendingValue(spinBox, configKey, plasmoid.configuration[configKey])
+	}
 
 	readonly property real factor: Math.pow(10, decimals)
 	readonly property real valueReal: value / factor
 	value: Math.round(configValue * factor)
-	onValueRealChanged: serializeTimer.start()
+	onValueRealChanged: {
+		if (_initialized) {
+			serializeTimer.start()
+		}
+	}
 	onValueChanged: {
 		if (!_editingText) {
 			syncDisplayedText()
@@ -245,6 +258,14 @@ QQC2.SpinBox {
 			}
 		}
 		bindContentItem()
+		_refreshConfigValue()
+		_disconnectConfig = ConfigUtils.connectConfigChange(spinBox, configKey, _refreshConfigValue)
+		Qt.callLater(function() { _initialized = true })
+	}
+	Component.onDestruction: {
+		if (_disconnectConfig) {
+			_disconnectConfig()
+		}
 	}
 
 	function findSizingRoot() {

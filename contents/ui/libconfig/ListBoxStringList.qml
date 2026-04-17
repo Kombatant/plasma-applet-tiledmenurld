@@ -8,7 +8,17 @@ Item {
 	id: root
 
 	property string configKey: ""
-	readonly property var configValue: configKey ? ConfigUtils.pendingValue(root, configKey, plasmoid.configuration[configKey]) : []
+	property var configValue: []
+
+	function _refreshConfigValue() {
+		if (!configKey) {
+			configValue = []
+			return
+		}
+		configValue = ConfigUtils.pendingValue(root, configKey, plasmoid.configuration[configKey]) || []
+	}
+
+	property var _disconnectConfig: null
 	property alias inputText: entryField.text
 	readonly property int currentIndex: listView.currentIndex
 	readonly property string currentValue: (currentIndex >= 0 && currentIndex < listModel.count) ? listModel.get(currentIndex).value : ""
@@ -615,5 +625,14 @@ Item {
 		}
 	}
 
-	Component.onCompleted: deserialize()
+	Component.onCompleted: {
+		_refreshConfigValue()
+		deserialize()
+		_disconnectConfig = ConfigUtils.connectConfigChange(root, configKey, _refreshConfigValue)
+	}
+	Component.onDestruction: {
+		if (_disconnectConfig) {
+			_disconnectConfig()
+		}
+	}
 }

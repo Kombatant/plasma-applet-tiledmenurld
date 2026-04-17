@@ -203,7 +203,12 @@ ColumnLayout {
 		if (key === "tileModel") {
 			return configTileModel.value
 		}
-		return ConfigUtils.pendingValue(page, key, plasmoid.configuration[key])
+		var cfgName = "cfg_" + key
+		var cfgVal = page[cfgName]
+		if (typeof cfgVal !== "undefined") {
+			return cfgVal
+		}
+		return plasmoid.configuration[key]
 	}
 
 	function _stringListToArray(value) {
@@ -684,14 +689,6 @@ ColumnLayout {
 		}
 	}
 
-	Component.onDestruction: {
-		// If the user hits OK immediately after editing, the debounce timer may not fire.
-		// Flush pending XML->config changes before this page is torn down.
-		if (_xmlEditedByUser) {
-			_flushPendingXmlApply()
-		}
-	}
-
 	function saveExportToFilePath(filePath) {
 		var text = xmlEditor ? ("" + xmlEditor.text) : ""
 		var b64 = Qt.btoa(text)
@@ -777,7 +774,9 @@ ColumnLayout {
 		onTriggered: page.rebuildXmlFromConfig()
 	}
 
-	readonly property string configDigest: {
+	property string configDigest: ""
+
+	function _computeConfigDigest() {
 		var parts = []
 		var keys = _sortedSchemaKeys()
 		for (var i = 0; i < keys.length; i++) {
@@ -799,6 +798,13 @@ ColumnLayout {
 		return parts.join("\u001f")
 	}
 
+	function _refreshConfigDigest() {
+		var next = _computeConfigDigest()
+		if (next !== configDigest) {
+			configDigest = next
+		}
+	}
+
 	onConfigDigestChanged: {
 		if (_applyingXmlToConfig) {
 			return
@@ -806,5 +812,29 @@ ColumnLayout {
 		rebuildXmlDebounced.restart()
 	}
 
-	Component.onCompleted: rebuildXmlFromConfig()
+	property var _configChangeDisconnects: []
+	function _wireConfigChangeListeners() {
+		var keys = _sortedSchemaKeys()
+		for (var i = 0; i < keys.length; i++) {
+			var disconnect = ConfigUtils.connectConfigChange(page, keys[i], _refreshConfigDigest)
+			_configChangeDisconnects.push(disconnect)
+		}
+	}
+
+	Component.onCompleted: {
+		_wireConfigChangeListeners()
+		_refreshConfigDigest()
+		rebuildXmlFromConfig()
+	}
+
+	Component.onDestruction: {
+		for (var i = 0; i < _configChangeDisconnects.length; i++) {
+			_configChangeDisconnects[i]()
+		}
+		// If the user hits OK immediately after editing, the debounce timer may not fire.
+		// Flush pending XML->config changes before this page is torn down.
+		if (_xmlEditedByUser) {
+			_flushPendingXmlApply()
+		}
+	}
 }

@@ -37,12 +37,21 @@ QQC2.ComboBox {
 	property Item sizingRoot: findSizingRoot()
 
 	property string configKey: ''
-	readonly property var configValue: configKey ? ConfigUtils.pendingValue(configComboBox, configKey, plasmoid.configuration[configKey]) : ""
+	property var configValue: undefined
 	onConfigValueChanged: {
 		if (!focus && value != configValue) {
 			selectValue(configValue)
 		}
 	}
+
+	function _refreshConfigValue() {
+		if (!configKey) {
+			return
+		}
+		configValue = ConfigUtils.pendingValue(configComboBox, configKey, plasmoid.configuration[configKey])
+	}
+
+	property var _disconnectConfig: null
 
 	readonly property var currentItem: currentIndex >= 0 ? model[currentIndex] : null
 
@@ -62,7 +71,14 @@ QQC2.ComboBox {
 
 	Component.onCompleted: {
 		populate()
+		_refreshConfigValue()
 		selectValue(configValue)
+		_disconnectConfig = ConfigUtils.connectConfigChange(configComboBox, configKey, _refreshConfigValue)
+	}
+	Component.onDestruction: {
+		if (_disconnectConfig) {
+			_disconnectConfig()
+		}
 	}
 
 	onCurrentIndexChanged: {

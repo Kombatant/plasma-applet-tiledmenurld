@@ -12,15 +12,15 @@ import "../libconfig/ConfigUtils.js" as ConfigUtils
 LibConfig.FormKCM {
 	id: formLayout
 	wideMode: false
-	readonly property bool searchFieldHidden: !!ConfigUtils.pendingValue(formLayout, "hideSearchField", plasmoid.configuration.hideSearchField)
+	readonly property bool searchFieldHidden: !!(formLayout.cfg_hideSearchField !== undefined ? formLayout.cfg_hideSearchField : plasmoid.configuration.hideSearchField)
 	readonly property bool searchOptionsEnabled: !searchFieldHidden
-	readonly property bool pendingUsesClassicLayout: !ConfigUtils.pendingValue(formLayout, "useDockedLayout", plasmoid.configuration.useDockedLayout)
+	readonly property bool pendingUsesClassicLayout: !(formLayout.cfg_useDockedLayout !== undefined ? formLayout.cfg_useDockedLayout : plasmoid.configuration.useDockedLayout)
 	readonly property bool groupedSearchResultsEnabled: formLayout.searchOptionsEnabled
-		&& !!ConfigUtils.pendingValue(formLayout, "searchResultsGrouped", plasmoid.configuration.searchResultsGrouped)
+		&& !!(formLayout.cfg_searchResultsGrouped !== undefined ? formLayout.cfg_searchResultsGrouped : plasmoid.configuration.searchResultsGrouped)
+	readonly property string pendingSidebarPosition: formLayout.cfg_sidebarPosition !== undefined ? formLayout.cfg_sidebarPosition : plasmoid.configuration.sidebarPosition
 	readonly property bool searchFieldHeightEnabled: searchOptionsEnabled
 		&& (!formLayout.pendingUsesClassicLayout
-			|| (ConfigUtils.pendingValue(formLayout, "sidebarPosition", plasmoid.configuration.sidebarPosition) !== 'top'
-				&& ConfigUtils.pendingValue(formLayout, "sidebarPosition", plasmoid.configuration.sidebarPosition) !== 'bottom'))
+			|| (pendingSidebarPosition !== 'top' && pendingSidebarPosition !== 'bottom'))
 
 	readonly property string plasmaStyleLabelText: {
 		var plasmaStyleText = i18nd("kcm_desktoptheme", "Plasma Style")
@@ -65,14 +65,28 @@ LibConfig.FormKCM {
 		Kirigami.FormData.label: i18n("Search Box Theme")
 		enabled: formLayout.searchOptionsEnabled
 		opacity: enabled ? 1 : 0.45
+
+		property bool searchFieldFollowsThemeValue: !!plasmoid.configuration.searchFieldFollowsTheme
+		function _refreshSearchFieldFollowsTheme() {
+			searchFieldFollowsThemeValue = !!(formLayout.cfg_searchFieldFollowsTheme !== undefined ? formLayout.cfg_searchFieldFollowsTheme : plasmoid.configuration.searchFieldFollowsTheme)
+		}
+		property var _disconnectSearchFieldFollowsTheme: null
+		Component.onCompleted: {
+			_refreshSearchFieldFollowsTheme()
+			_disconnectSearchFieldFollowsTheme = ConfigUtils.connectConfigChange(formLayout, "searchFieldFollowsTheme", _refreshSearchFieldFollowsTheme)
+		}
+		Component.onDestruction: {
+			if (_disconnectSearchFieldFollowsTheme) _disconnectSearchFieldFollowsTheme()
+		}
+
 		QQC2.RadioButton {
 			text: plasmaStyleLabelText
-			checked: !!ConfigUtils.pendingValue(formLayout, "searchFieldFollowsTheme", plasmoid.configuration.searchFieldFollowsTheme)
+			checked: parent.searchFieldFollowsThemeValue
 			onClicked: ConfigUtils.setPendingValue(formLayout, "searchFieldFollowsTheme", true)
 		}
 		QQC2.RadioButton {
 			text: i18n("Windows (White)")
-			checked: !ConfigUtils.pendingValue(formLayout, "searchFieldFollowsTheme", plasmoid.configuration.searchFieldFollowsTheme)
+			checked: !parent.searchFieldFollowsThemeValue
 			onClicked: ConfigUtils.setPendingValue(formLayout, "searchFieldFollowsTheme", false)
 		}
 	}

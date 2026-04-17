@@ -30,11 +30,24 @@ QQC2.TextField {
 
 	property string configKey: ''
 	property string defaultColor: ''
-	property string value: {
-		if (configKey) {
-			return ConfigUtils.pendingValue(colorField, configKey, plasmoid.configuration[configKey])
-		} else {
-			return "#000"
+	property string value: "#000"
+
+	function _refreshConfigValue() {
+		if (!configKey) {
+			value = "#000"
+			return
+		}
+		value = ConfigUtils.pendingValue(colorField, configKey, plasmoid.configuration[configKey]) || ""
+	}
+
+	property var _disconnectConfig: null
+	Component.onCompleted: {
+		_refreshConfigValue()
+		_disconnectConfig = ConfigUtils.connectConfigChange(colorField, configKey, _refreshConfigValue)
+	}
+	Component.onDestruction: {
+		if (_disconnectConfig) {
+			_disconnectConfig()
 		}
 	}
 

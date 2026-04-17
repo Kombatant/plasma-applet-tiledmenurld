@@ -28,11 +28,13 @@ LibConfig.FormKCM {
 	}
 
 	readonly property real pendingTileScale: {
-		return ConfigUtils.pendingValue(formLayout, "tileScale", plasmoid.configuration.tileScale) || 0
+		var raw = formLayout.cfg_tileScale !== undefined ? formLayout.cfg_tileScale : plasmoid.configuration.tileScale
+		return raw || 0
 	}
 
 	readonly property int pendingCellBoxSize: {
-		var tileMarginUnits = ConfigUtils.pendingValue(formLayout, "tileMargin", plasmoid.configuration.tileMargin) || 0
+		var rawMargin = formLayout.cfg_tileMargin !== undefined ? formLayout.cfg_tileMargin : plasmoid.configuration.tileMargin
+		var tileMarginUnits = rawMargin || 0
 		var cellMarginUnits = tileMarginUnits / 2
 		var cellSizeUnits = config.cellBoxUnits - tileMarginUnits
 		var scale = pendingTileScale || 0
@@ -42,7 +44,7 @@ LibConfig.FormKCM {
 	}
 
 	function setPendingTileScale(scale) {
-		var current = ConfigUtils.pendingValue(formLayout, "tileScale", plasmoid.configuration.tileScale) || 0
+		var current = formLayout.pendingTileScale
 		if (Math.abs(current - scale) <= 0.0001) {
 			return
 		}

@@ -9,8 +9,26 @@ import "ConfigUtils.js" as ConfigUtils
 QQC2.TextField {
 	id: textField
 	property string configKey: ''
-	readonly property var configValue: configKey ? ConfigUtils.pendingValue(textField, configKey, plasmoid.configuration[configKey]) : ""
+	property var configValue: ""
 	onConfigValueChanged: deserialize()
+
+	function _refreshConfigValue() {
+		if (!configKey) {
+			return
+		}
+		configValue = ConfigUtils.pendingValue(textField, configKey, plasmoid.configuration[configKey])
+	}
+
+	property var _disconnectConfig: null
+	Component.onCompleted: {
+		_refreshConfigValue()
+		_disconnectConfig = ConfigUtils.connectConfigChange(textField, configKey, _refreshConfigValue)
+	}
+	Component.onDestruction: {
+		if (_disconnectConfig) {
+			_disconnectConfig()
+		}
+	}
 
 	onTextChanged: serializeTimer.restart()
 

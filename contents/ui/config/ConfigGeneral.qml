@@ -16,7 +16,7 @@ LibConfig.FormKCM {
 	id: formLayout
 	wideMode: false
 
-	readonly property bool pendingUsesClassicLayout: !ConfigUtils.pendingValue(formLayout, "useDockedLayout", plasmoid.configuration.useDockedLayout)
+	readonly property bool pendingUsesClassicLayout: !(formLayout.cfg_useDockedLayout !== undefined ? formLayout.cfg_useDockedLayout : plasmoid.configuration.useDockedLayout)
 
 	function normalizeDistroIconToken(token) {
 		token = (token || "").toLowerCase().trim()

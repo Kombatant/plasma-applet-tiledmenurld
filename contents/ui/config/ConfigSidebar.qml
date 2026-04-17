@@ -15,9 +15,9 @@ import "../libconfig/ConfigUtils.js" as ConfigUtils
 LibConfig.FormKCM {
 	id: formLayout
 	wideMode: false
-	readonly property string pendingSidebarPosition: ConfigUtils.pendingValue(formLayout, "sidebarPosition", plasmoid.configuration.sidebarPosition)
-	readonly property bool pendingSidebarFollowsTheme: !!ConfigUtils.pendingValue(formLayout, "sidebarFollowsTheme", plasmoid.configuration.sidebarFollowsTheme)
-	readonly property bool pendingUsesClassicLayout: !ConfigUtils.pendingValue(formLayout, "useDockedLayout", plasmoid.configuration.useDockedLayout)
+	readonly property string pendingSidebarPosition: formLayout.cfg_sidebarPosition !== undefined ? formLayout.cfg_sidebarPosition : plasmoid.configuration.sidebarPosition
+	readonly property bool pendingSidebarFollowsTheme: !!(formLayout.cfg_sidebarFollowsTheme !== undefined ? formLayout.cfg_sidebarFollowsTheme : plasmoid.configuration.sidebarFollowsTheme)
+	readonly property bool pendingUsesClassicLayout: !(formLayout.cfg_useDockedLayout !== undefined ? formLayout.cfg_useDockedLayout : plasmoid.configuration.useDockedLayout)
 
 	readonly property string plasmaStyleLabelText: {
 		var plasmaStyleText = i18nd("kcm_desktoptheme", "Plasma Style")

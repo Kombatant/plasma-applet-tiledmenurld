@@ -16,10 +16,29 @@ RowLayout {
 
 	property string configKey: ''
 	property alias value: textField.text
-	readonly property string configValue: configKey ? ConfigUtils.pendingValue(iconField, configKey, plasmoid.configuration[configKey]) : ""
+	property string configValue: ""
 	onConfigValueChanged: {
 		if (!textField.focus && value != configValue) {
 			value = configValue
+		}
+	}
+
+	function _refreshConfigValue() {
+		if (!configKey) {
+			configValue = ""
+			return
+		}
+		configValue = ConfigUtils.pendingValue(iconField, configKey, plasmoid.configuration[configKey]) || ""
+	}
+
+	property var _disconnectConfig: null
+	Component.onCompleted: {
+		_refreshConfigValue()
+		_disconnectConfig = ConfigUtils.connectConfigChange(iconField, configKey, _refreshConfigValue)
+	}
+	Component.onDestruction: {
+		if (_disconnectConfig) {
+			_disconnectConfig()
 		}
 	}
 	property int previewIconSize: Kirigami.Units.iconSizes.medium

@@ -30,12 +30,16 @@ LibConfig.FormKCM {
 		{ value: "ollama", text: "Ollama (Local)" },
 	]
 
-	readonly property bool keyVisible: _providerValue() !== "ollama"
-	readonly property bool keyRequired: _providerValue() !== "ollama" && _providerValue() !== "openwebui"
-	readonly property bool usesOllamaUrl: _providerValue() === "ollama"
-	readonly property bool usesOpenWebUiUrl: _providerValue() === "openwebui"
-	readonly property bool aiChatEnabled: ConfigUtils.pendingValue(form, "aiChatEnabled", plasmoid.configuration.aiChatEnabled) !== false
-	readonly property var detectedModels: ConfigUtils.pendingValue(form, "aiDetectedModels", plasmoid.configuration.aiDetectedModels) || []
+	property string providerValueCached: "openai"
+	function _refreshProviderValueCached() {
+		providerValueCached = ((providerCombo.value) || (form.cfg_aiProvider !== undefined ? form.cfg_aiProvider : plasmoid.configuration.aiProvider) || "openai").toString().toLowerCase()
+	}
+	readonly property bool keyVisible: providerValueCached !== "ollama"
+	readonly property bool keyRequired: providerValueCached !== "ollama" && providerValueCached !== "openwebui"
+	readonly property bool usesOllamaUrl: providerValueCached === "ollama"
+	readonly property bool usesOpenWebUiUrl: providerValueCached === "openwebui"
+	readonly property bool aiChatEnabled: (form.cfg_aiChatEnabled !== undefined ? form.cfg_aiChatEnabled : plasmoid.configuration.aiChatEnabled) !== false
+	readonly property var detectedModels: (form.cfg_aiDetectedModels !== undefined ? form.cfg_aiDetectedModels : plasmoid.configuration.aiDetectedModels) || []
 	readonly property bool hasStoredApiKey: !!((secureApiKey.secret || "").trim())
 	property bool isDetectingModels: false
 	property string detectionStatus: ""
@@ -66,7 +70,7 @@ LibConfig.FormKCM {
 	}
 
 	function _providerValue() {
-		return (providerCombo.value || ConfigUtils.pendingValue(form, "aiProvider", plasmoid.configuration.aiProvider) || "openai").toLowerCase()
+		return providerValueCached
 	}
 
 	function _apiKeyValue() {
@@ -317,6 +321,7 @@ LibConfig.FormKCM {
 		secureApiKey.saveSecret(draft)
 	}
 
+	property var _disconnectProviderChange: null
 	Component.onCompleted: {
 		if (!form.pendingAiApiKeyInitialized && (plasmoid.configuration.aiApiKey || "").trim()) {
 			form.pendingAiApiKey = (plasmoid.configuration.aiApiKey || "").trim()
@@ -324,9 +329,14 @@ LibConfig.FormKCM {
 		}
 		secureApiKey.inspectAvailability()
 		secureApiKey.readSecret()
+		_refreshProviderValueCached()
+		_disconnectProviderChange = ConfigUtils.connectConfigChange(form, "aiProvider", _refreshProviderValueCached)
 		detectionStatus = detectedModels.length
 			? i18n("Detected %1 model(s).", detectedModels.length)
 			: i18n("Paste your API key to auto-detect models.")
+	}
+	Component.onDestruction: {
+		if (_disconnectProviderChange) _disconnectProviderChange()
 	}
 
 	Kirigami.InlineMessage {
@@ -360,6 +370,7 @@ LibConfig.FormKCM {
 		property bool _initialized: false
 		Component.onCompleted: Qt.callLater(function() { _initialized = true })
 		onValueChanged: {
+			form._refreshProviderValueCached()
 			if (!_initialized) {
 				return
 			}
