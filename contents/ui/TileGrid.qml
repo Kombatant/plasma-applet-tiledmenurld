@@ -739,7 +739,7 @@ DropArea {
 									font.bold: true
 									font.capitalization: parent.parent.isCardLayout ? Font.MixedCase : Font.AllUppercase
 									color: Kirigami.Theme.textColor
-									opacity: 0.72
+									opacity: 0.92
 									horizontalAlignment: headerRow.reversed ? Text.AlignRight : Text.AlignLeft
 									elide: headerRow.reversed ? Text.ElideLeft : Text.ElideRight
 								}

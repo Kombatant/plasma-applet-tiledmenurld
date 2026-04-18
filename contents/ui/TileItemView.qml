@@ -275,9 +275,10 @@ Rectangle {
 			verticalAlignment: Text.AlignBottom
 			width: parent.width
 			renderType: Text.QtRendering // Fix pixelation when scaling. Plasma.Label uses NativeRendering.
-			style: Text.Outline
+			color: appObj.usesGroupPanelStyling ? tileItem.groupTileLabelColor : Kirigami.Theme.textColor
+			style: appObj.usesGroupPanelStyling ? Text.Raised : Text.Outline
 			styleColor: appObj.usesGroupPanelStyling
-				? Qt.rgba(0, 0, 0, 0.42)
+				? tileItem.groupTileLabelShadowColor
 				: (appObj.backgroundGradient ? tileItemView.gradientBottomColor : appObj.backgroundColor)
 		}
 

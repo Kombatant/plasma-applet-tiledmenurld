@@ -49,8 +49,10 @@ Item {
 	readonly property color labelOutlineDarkColor: Qt.rgba(0, 0, 0, labelOutlineDarkOpacity)
 	readonly property color labelOutlineLightColor: Qt.rgba(1, 1, 1, labelOutlineLightOpacity)
 	readonly property color labelShadowColor: labelBaseIsLight ? Qt.rgba(0, 0, 0, 0.3) : Qt.rgba(1, 1, 1, 0.3)
-	readonly property color groupTileLabelColor: Qt.rgba(1, 1, 1, 0.92)
-	readonly property color groupTileLabelShadowColor: Qt.rgba(0, 0, 0, 0.45)
+	readonly property real groupTileLabelBgLuma: _relativeLuminance(Kirigami.Theme.backgroundColor)
+	readonly property bool groupTileLabelBgIsLight: groupTileLabelBgLuma >= 0.5
+	readonly property color groupTileLabelColor: Qt.rgba(Kirigami.Theme.textColor.r, Kirigami.Theme.textColor.g, Kirigami.Theme.textColor.b, 0.92)
+	readonly property color groupTileLabelShadowColor: groupTileLabelBgIsLight ? Qt.rgba(1, 1, 1, 0.9) : Qt.rgba(0, 0, 0, 0.75)
 	readonly property font groupLabelFont: Qt.font({
 		family: Kirigami.Theme.defaultFont.family,
 		pointSize: Kirigami.Theme.defaultFont.pointSize + 4,
