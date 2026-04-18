@@ -51,6 +51,7 @@ QQC2.ComboBox {
 		configValue = ConfigUtils.pendingValue(configComboBox, configKey, plasmoid.configuration[configKey])
 	}
 
+	property bool _initialized: false
 	property var _disconnectConfig: null
 
 	readonly property var currentItem: currentIndex >= 0 ? model[currentIndex] : null
@@ -74,6 +75,7 @@ QQC2.ComboBox {
 		_refreshConfigValue()
 		selectValue(configValue)
 		_disconnectConfig = ConfigUtils.connectConfigChange(configComboBox, configKey, _refreshConfigValue)
+		Qt.callLater(function() { _initialized = true })
 	}
 	Component.onDestruction: {
 		if (_disconnectConfig) {
@@ -86,7 +88,7 @@ QQC2.ComboBox {
 			var item = model[currentIndex]
 			if (typeof item !== "undefined") {
 				var val = item[_valueRole]
-				if (configKey && (typeof val !== "undefined") && populated) {
+				if (configKey && (typeof val !== "undefined") && populated && _initialized) {
 					ConfigUtils.setPendingValue(configComboBox, configKey, val)
 				}
 			}
