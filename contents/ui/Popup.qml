@@ -67,8 +67,7 @@ MouseArea {
 	property bool _tabsWriting: false  // suppress config-change reload during save
 	property int _tabIdCounter: 0   // monotonic counter for unique tab IDs
 
-	// Keyword → icon mapping (mirrors TileTabBar.inferIconForName).
-	// Defined here so it's available before TileTabBar is instantiated.
+	// Keyword → icon mapping for tab name → symbolic icon.
 	function inferTabIcon(name) {
 		var n = (name || "").toLowerCase()
 		var map = [

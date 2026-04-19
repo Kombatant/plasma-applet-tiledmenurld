@@ -29,41 +29,6 @@ Item {
 	// Emitted when the tab icon changes (index, newIcon).
 	signal tabIconChanged(int index, string newIcon)
 
-	// ── Keyword → icon mapping ─────────────────────────────────────────────
-	// Returns a symbolic icon name that best matches the given tab name,
-	// or "" if no keyword matched (caller decides the fallback).
-	function inferIconForName(name) {
-		var n = (name || "").toLowerCase()
-		var map = [
-			[["game", "gaming", "steam", "play"], "applications-games"],
-			[["music", "audio", "sound", "spotify"], "applications-multimedia"],
-			[["video", "movie", "film", "stream", "youtube", "vlc"], "camera-video"],
-			[["work", "office", "productivity", "business"], "applications-office"],
-			[["dev", "code", "programming", "develop", "terminal", "ide"], "applications-development"],
-			[["web", "browser", "internet", "firefox", "chrome", "chromium"], "applications-internet"],
-			[["social", "chat", "message", "discord", "telegram", "signal"], "applications-chat"],
-			[["mail", "email", "e-mail"], "mail-message"],
-			[["photo", "image", "picture", "graphic", "design", "art", "gimp", "inkscape"], "applications-graphics"],
-			[["tool", "utility", "utilities", "system", "settings", "config"], "applications-utilities"],
-			[["science", "math", "education", "learn"], "applications-science"],
-			[["file", "folder", "document", "documents", "files", "dolphin"], "system-file-manager"],
-			[["download", "torrent", "transfer"], "folder-download"],
-			[["security", "privacy", "password", "vault", "encrypt"], "security-high"],
-			[["network", "vpn", "server", "remote", "ssh"], "network-workgroup"],
-			[["favorite", "favourite", "starred", "pinned", "bookmark"], "starred"],
-			[["main", "home", "start", "all", "general", "default", "application"], "go-home"],
-			[["new", "recent", "latest"], "document-new"],
-		]
-		for (var i = 0; i < map.length; i++) {
-			var keywords = map[i][0]
-			var icon = map[i][1]
-			for (var j = 0; j < keywords.length; j++) {
-				if (n.indexOf(keywords[j]) >= 0) return icon
-			}
-		}
-		return ""
-	}
-
 	// ── Internal drag state ─────────────────────────────────────────────────
 	property int _dragSourceIndex: -1
 	property int _dropSlot: -1
@@ -208,12 +173,9 @@ Item {
 
 				function finishEditing() {
 					var trimmed = tabInput.text.trim()
-					if (trimmed.length > 0) {
+					var original = modelData.name || ""
+					if (trimmed.length > 0 && trimmed !== original) {
 						tabBar.tabRenamed(index, trimmed)
-						var inferred = tabBar.inferIconForName(trimmed)
-						if (inferred) {
-							tabBar.tabIconChanged(index, inferred)
-						}
 					}
 					tabDelegate.isEditing = false
 				}
