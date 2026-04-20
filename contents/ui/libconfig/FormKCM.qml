@@ -189,6 +189,30 @@ Item {
 	Kirigami.Theme.colorSet: Kirigami.Theme.Window
 	Kirigami.Theme.inherit: false
 
+	// Kirigami.Theme only drives Kirigami-aware colors; QQC2 controls still read
+	// Qt's palette, which otherwise stays tied to the Plasma theme (often dark).
+	// Bind palette to Kirigami.Theme so QQC2 Buttons, ComboBox items, RadioButton
+	// indicators, and the dialog's Apply button render with matching light colors.
+	palette.window: Kirigami.Theme.backgroundColor
+	palette.windowText: Kirigami.Theme.textColor
+	palette.base: Kirigami.Theme.backgroundColor
+	palette.alternateBase: Kirigami.Theme.alternateBackgroundColor
+	palette.text: Kirigami.Theme.textColor
+	palette.button: Kirigami.Theme.backgroundColor
+	palette.buttonText: Kirigami.Theme.textColor
+	palette.highlight: Kirigami.Theme.highlightColor
+	palette.highlightedText: Kirigami.Theme.highlightedTextColor
+	palette.toolTipBase: Kirigami.Theme.backgroundColor
+	palette.toolTipText: Kirigami.Theme.textColor
+	palette.placeholderText: Kirigami.Theme.disabledTextColor
+	palette.mid: Kirigami.Theme.disabledTextColor
+	palette.midlight: Kirigami.Theme.alternateBackgroundColor
+	palette.dark: Kirigami.Theme.disabledTextColor
+	palette.light: Kirigami.Theme.backgroundColor
+	palette.shadow: Kirigami.Theme.disabledTextColor
+	palette.link: Kirigami.Theme.linkColor
+	palette.linkVisited: Kirigami.Theme.visitedLinkColor
+
 	QQC2.ScrollView {
 		id: scrollView
 		anchors.fill: parent
