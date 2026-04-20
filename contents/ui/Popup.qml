@@ -1031,8 +1031,11 @@ MouseArea {
 				Item {
 					id: searchViewSlot
 					Layout.fillHeight: true
+					Layout.preferredWidth: config.appAreaWidth
+					Layout.minimumWidth: 0
+					Layout.maximumWidth: config.appAreaWidth > 0 ? -1 : 0
 					implicitWidth: config.appAreaWidth
-					visible: config.usesClassicLayout
+					visible: config.usesClassicLayout && config.appAreaWidth > 0
 				}
 
 				// Drag handle for resizing the app area width

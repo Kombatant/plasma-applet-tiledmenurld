@@ -73,6 +73,7 @@ ColumnLayout {
 		appDescription: "string",
 		appListIconSize: "int",
 		searchFieldHeight: "int",
+		dockedSearchFieldWidth: "int",
 		appListWidth: "int",
 		dockedSidebarWidth: "int",
 		useDockedLayout: "bool",
@@ -89,6 +90,18 @@ ColumnLayout {
 		popupWidthAiChat: "int",
 		popupHeightAiChat: "int",
 		favGridColsAiChat: "int",
+		popupWidthDockedAlphabetical: "int",
+		popupHeightDockedAlphabetical: "int",
+		favGridColsDockedAlphabetical: "int",
+		popupWidthDockedCategories: "int",
+		popupHeightDockedCategories: "int",
+		favGridColsDockedCategories: "int",
+		popupWidthDockedTilesOnly: "int",
+		popupHeightDockedTilesOnly: "int",
+		favGridColsDockedTilesOnly: "int",
+		popupWidthDockedAiChat: "int",
+		popupHeightDockedAiChat: "int",
+		favGridColsDockedAiChat: "int",
 		favGridCols: "int",
 		sidebarButtonSize: "int",
 		sidebarIconSize: "int",
@@ -188,7 +201,7 @@ ColumnLayout {
 		if (configKey.indexOf("sidebar") === 0 || configKey === "dockedSidebarWidth") {
 			return "Sidebar"
 		}
-		if (configKey.indexOf("search") === 0 || configKey === "hideSearchField") {
+		if (configKey.indexOf("search") === 0 || configKey === "hideSearchField" || configKey === "dockedSearchFieldWidth") {
 			return "Search"
 		}
 		if (configKey.indexOf("appList") === 0 || configKey === "appDescription" || configKey === "defaultAppListView" || configKey === "lastUsedAppListView" || configKey === "showRecentApps" || configKey === "recentOrdering" || configKey === "numRecentApps") {
