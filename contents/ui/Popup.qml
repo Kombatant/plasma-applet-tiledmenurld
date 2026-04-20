@@ -135,10 +135,11 @@ MouseArea {
 					tileTabsData = [{id: '1', name: i18n('Main'), icon: 'go-home', tiles: []}]
 				} else {
 					tileTabsData = parsed
-					// Backfill icons for tabs saved before icon support was added
+					// Backfill icons for tabs saved before icon support was added.
+					// Preserve icon: "" because that is the user's explicit "Clear Icon" state.
 					var dirty = false
 					for (var i = 0; i < tileTabsData.length; i++) {
-						if (!tileTabsData[i].icon) {
+						if (typeof tileTabsData[i].icon === "undefined") {
 							var inferred = popup.inferTabIcon(tileTabsData[i].name)
 							if (inferred) {
 								tileTabsData[i].icon = inferred
