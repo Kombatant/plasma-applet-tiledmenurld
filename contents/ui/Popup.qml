@@ -1046,21 +1046,31 @@ MouseArea {
 		spacing: 0
 
 		// === Docked Sidebar layout: Left pane ===
-		LeftPaneView {
-			id: leftPaneView
+		Item {
+			id: leftPaneSlot
 			visible: config.usesDockedSidebarLayout
-			Layout.preferredWidth: config.usesDockedSidebarLayout ? config.dockedSidebarWidth : 0
-			Layout.minimumWidth: config.usesDockedSidebarLayout ? config.dockedSidebarWidth : 0
-			Layout.maximumWidth: config.usesDockedSidebarLayout ? config.dockedSidebarWidth : 0
+			Layout.preferredWidth: config.usesDockedSidebarLayout ? config.dockedSidebarSlotWidth : 0
+			Layout.minimumWidth: config.usesDockedSidebarLayout ? config.dockedSidebarSlotWidth : 0
+			Layout.maximumWidth: config.usesDockedSidebarLayout ? config.dockedSidebarSlotWidth : 0
 			Layout.fillHeight: true
+
+			SidebarGlassCard {
+				anchors.fill: parent
+				anchors.margins: config.sidebarCardInset
+
+				LeftPaneView {
+					id: leftPaneView
+					anchors.fill: parent
+				}
+			}
 		}
 
 		// === Classic layout: sidebar placeholder ===
 		Item {
 			id: sidebarPlaceholder
-			Layout.preferredWidth: config.sidebarWidth + config.sidebarRightMargin
-			Layout.minimumWidth: config.sidebarWidth + config.sidebarRightMargin
-			Layout.maximumWidth: config.sidebarWidth + config.sidebarRightMargin
+			Layout.preferredWidth: config.classicLeftSidebarSlotWidth
+			Layout.minimumWidth: config.classicLeftSidebarSlotWidth
+			Layout.maximumWidth: config.classicLeftSidebarSlotWidth
 			Layout.fillHeight: true
 			visible: config.usesClassicLayout && config.sidebarOnLeft
 		}
@@ -1409,7 +1419,7 @@ MouseArea {
 		anchors.bottom: parent.bottom
 		anchors.topMargin: config.sidebarOnTop ? (config.sidebarHeight + config.sidebarRightMargin) : 0
 		anchors.bottomMargin: config.sidebarOnBottom ? (config.sidebarHeight + config.sidebarRightMargin) : 0
-		x: config.sidebarOnLeft ? (config.sidebarWidth + config.sidebarRightMargin) : 0
+		x: config.sidebarOnLeft ? config.classicLeftSidebarSlotWidth : 0
 		width: config.appListWidth
 
 		Rectangle {

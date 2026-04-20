@@ -1,6 +1,5 @@
 import QtQuick
 import QtQuick.Layouts
-import QtQuick.Effects
 import org.kde.plasma.core as PlasmaCore
 import org.kde.plasma.extras as PlasmaExtras
 import org.kde.kirigami as Kirigami
@@ -241,46 +240,10 @@ Item {
 				contentItem: Item {
 					anchors.fill: parent
 
-					Item {
+					SunkenAvatar {
 						anchors.centerIn: parent
 						width: config.flatButtonIconSize
 						height: config.flatButtonIconSize
-
-						Rectangle {
-							id: userAvatarMask
-							anchors.fill: parent
-							radius: width / 2
-							visible: false
-							layer.enabled: true
-						}
-
-						Item {
-							anchors.fill: parent
-							layer.enabled: true
-							layer.live: true
-							layer.effect: MultiEffect {
-								maskEnabled: true
-								maskSource: userAvatarMask
-							}
-
-							AnimatedImage {
-								anchors.fill: parent
-								source: widget.hasUserAvatar ? widget.userAvatarSource : ""
-								cache: false
-								asynchronous: true
-								fillMode: Image.PreserveAspectCrop
-								sourceSize.width: width
-								sourceSize.height: height
-								playing: visible
-								visible: widget.hasUserAvatar
-							}
-
-							Kirigami.Icon {
-								anchors.fill: parent
-								source: "user-identity"
-								visible: !widget.hasUserAvatar
-							}
-						}
 					}
 				}
 				onClicked: {
@@ -426,46 +389,10 @@ Item {
 				contentItem: Item {
 					anchors.fill: parent
 
-					Item {
+					SunkenAvatar {
 						anchors.centerIn: parent
 						width: config.flatButtonIconSize
 						height: config.flatButtonIconSize
-
-						Rectangle {
-							id: userAvatarMaskHoriz
-							anchors.fill: parent
-							radius: width / 2
-							visible: false
-							layer.enabled: true
-						}
-
-						Item {
-							anchors.fill: parent
-							layer.enabled: true
-							layer.live: true
-							layer.effect: MultiEffect {
-								maskEnabled: true
-								maskSource: userAvatarMaskHoriz
-							}
-
-							AnimatedImage {
-								anchors.fill: parent
-								source: widget.hasUserAvatar ? widget.userAvatarSource : ""
-								cache: false
-								asynchronous: true
-								fillMode: Image.PreserveAspectCrop
-								sourceSize.width: width
-								sourceSize.height: height
-								playing: visible
-								visible: widget.hasUserAvatar
-							}
-
-							Kirigami.Icon {
-								anchors.fill: parent
-								source: "user-identity"
-								visible: !widget.hasUserAvatar
-							}
-						}
 					}
 				}
 				onClicked: {

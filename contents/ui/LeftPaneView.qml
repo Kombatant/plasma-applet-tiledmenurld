@@ -1,5 +1,4 @@
 import QtQuick
-import QtQuick.Effects
 import QtQuick.Layouts
 import org.kde.plasma.extras as PlasmaExtras
 import org.kde.kirigami as Kirigami
@@ -41,7 +40,8 @@ ColumnLayout {
 		}
 		return (0.2126 * channel(color.r)) + (0.7152 * channel(color.g)) + (0.0722 * channel(color.b))
 	}
-	readonly property bool _bgIsLight: _relativeLuminance(Kirigami.Theme.backgroundColor) > 0.6
+	readonly property color _sidebarIconBackdrop: plasmoid.configuration.sidebarFollowsTheme ? Kirigami.Theme.backgroundColor : config.sidebarBackgroundColor
+	readonly property bool _bgIsLight: _relativeLuminance(_sidebarIconBackdrop) > 0.6
 	readonly property url settingsIconSource: Qt.resolvedUrl(_bgIsLight ? "assets/tiled-settings-light.png" : "assets/tiled-settings-dark.png")
 
 	// ──────────────────────────────────────────────
@@ -55,41 +55,8 @@ ColumnLayout {
 		Layout.topMargin: Kirigami.Units.largeSpacing
 		Layout.bottomMargin: Kirigami.Units.smallSpacing
 
-		Rectangle {
-			id: profileMask
+		SunkenAvatar {
 			anchors.fill: parent
-			radius: width / 2
-			visible: false
-			layer.enabled: true
-		}
-
-		Item {
-			id: profileIcon
-			anchors.fill: parent
-			layer.enabled: true
-			layer.live: true
-			layer.effect: MultiEffect {
-				maskEnabled: true
-				maskSource: profileMask
-			}
-
-			AnimatedImage {
-				anchors.fill: parent
-				source: widget.hasUserAvatar ? widget.userAvatarSource : ""
-				cache: false
-				asynchronous: true
-				fillMode: Image.PreserveAspectCrop
-				sourceSize.width: width
-				sourceSize.height: height
-				playing: visible
-				visible: widget.hasUserAvatar
-			}
-
-			Kirigami.Icon {
-				anchors.fill: parent
-				source: "user-identity"
-				visible: !widget.hasUserAvatar
-			}
 		}
 
 		MouseArea {

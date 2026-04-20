@@ -210,6 +210,9 @@ Item {
 	readonly property int sidebarWidth: flatButtonSize
 	readonly property int sidebarMinOpenWidth: 200 * Screen.devicePixelRatio
 	readonly property int sidebarRightMargin: 4 * Screen.devicePixelRatio
+	readonly property int sidebarCardInset: Math.max(Kirigami.Units.smallSpacing, Math.round(6 * Screen.devicePixelRatio))
+	readonly property int sidebarCardContentPadding: Math.max(Kirigami.Units.smallSpacing, Math.round(5 * Screen.devicePixelRatio))
+	readonly property int sidebarPaneGap: Kirigami.Units.smallSpacing
 	readonly property string sidebarPosition: plasmoid.configuration.sidebarPosition || 'left'
 	readonly property bool sidebarOnLeft: sidebarPosition === 'left'
 	readonly property bool sidebarOnTop: sidebarPosition === 'top'
@@ -254,6 +257,8 @@ Item {
 	}
 	readonly property int dockedSidebarMinWidth: Math.max(dockedSidebarShortcutButtons, dockedSidebarPowerButtons) * flatButtonSize
 	readonly property int dockedSidebarWidth: Math.max(dockedSidebarConfiguredWidth, dockedSidebarMinWidth)
+	readonly property int dockedSidebarSlotWidth: dockedSidebarWidth + (sidebarCardInset * 2) + (sidebarCardContentPadding * 2)
+	readonly property int classicLeftSidebarSlotWidth: sidebarWidth + (sidebarCardInset * 2) + (sidebarCardContentPadding * 2) + sidebarPaneGap
 	readonly property int tileEditorMinWidth: Math.max(350, 350 * Screen.devicePixelRatio)
 	readonly property int minimumWidth: {
 		return usesClassicLayout ? (sidebarHorizontal ? Math.max(leftSectionWidth, sidebarFixedHorizontalWidth) : leftSectionWidth) : 0
@@ -285,10 +290,10 @@ Item {
 		if (sidebarHorizontal) {
 			return appAreaWidth
 		} else {
-			return sidebarWidth + sidebarRightMargin + appAreaWidth
+			return classicLeftSidebarSlotWidth + appAreaWidth
 		}
 	}
-	readonly property int popupLeftSectionWidth: usesDockedSidebarLayout ? dockedSidebarWidth : leftSectionWidth
+	readonly property int popupLeftSectionWidth: usesDockedSidebarLayout ? dockedSidebarSlotWidth : leftSectionWidth
 	readonly property int minimumPopupWidth: usesDockedSidebarLayout ? (popupLeftSectionWidth + (cellBoxSize * 3)) : minimumWidth
 
 	readonly property real tileScale: plasmoid.configuration.tileScale
