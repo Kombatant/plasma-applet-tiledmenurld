@@ -70,6 +70,7 @@ Item {
 
 		// Tile tabs
 		_ensureSettingInitialized('useTileTabs', false)
+		_ensureSettingInitialized('tileTabStyle', 'tabs')
 		_ensureSettingInitialized('tileTabs', '')
 
 		// Base64 encoded XML string; empty string means "use default".

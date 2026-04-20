@@ -67,6 +67,8 @@ Item {
 	property var cfg_fileManagerAppDefault
 	property var cfg_useTileTabs
 	property var cfg_useTileTabsDefault
+	property var cfg_tileTabStyle
+	property var cfg_tileTabStyleDefault
 	property var cfg_tileTabs
 	property var cfg_tileTabsDefault
 	property var cfg_tileModel

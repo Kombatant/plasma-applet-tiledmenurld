@@ -50,6 +50,7 @@ ColumnLayout {
 		taskManagerApp: "string",
 		fileManagerApp: "string",
 		useTileTabs: "bool",
+		tileTabStyle: "string",
 		tileTabs: "string",
 		tileModel: "tilemodel",
 		tileScale: "double",

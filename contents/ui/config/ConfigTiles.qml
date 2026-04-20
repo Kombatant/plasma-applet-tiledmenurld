@@ -66,6 +66,15 @@ LibConfig.FormKCM {
 		Kirigami.FormData.label: i18n("Tabs")
 	}
 
+	LibConfig.ComboBox {
+		configKey: "tileTabStyle"
+		Kirigami.FormData.label: i18n("Tab Style")
+		model: [
+			{ value: "tabs", text: i18n("Tabs") },
+			{ value: "pills", text: i18n("Pills") },
+		]
+	}
+
 	//-------------------------------------------------------
 	LibConfig.Heading {
 		text: i18n("Size & Spacing")

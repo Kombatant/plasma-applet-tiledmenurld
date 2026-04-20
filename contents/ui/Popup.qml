@@ -1243,6 +1243,7 @@ MouseArea {
 									? Math.max(0, parent.width - rightPaneSearchField.width - rightPaneTopRow._gap)
 									: parent.width
 								visible: config.useTileTabs
+								style: plasmoid.configuration.tileTabStyle || "tabs"
 								activeTab: popup.activeTabIndex
 								tabs: popup.tileTabsData.map(function(t) {
 									return {id: t.id, name: t.name, icon: t.icon || ""}

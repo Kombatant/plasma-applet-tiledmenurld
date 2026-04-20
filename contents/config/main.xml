@@ -94,6 +94,11 @@
 			<label>Whether to use a tabbed tile grid instead of a single tile area.</label>
 			<default>false</default>
 		</entry>
+		<entry name="tileTabStyle" type="string">
+			<!-- enum: tabs, pills -->
+			<label>Visual style for the tile tab bar.</label>
+			<default>tabs</default>
+		</entry>
 		<entry name="tileTabs" type="string">
 			<!-- Base64-encoded JSON array:
 			     [{id: string, name: string, tiles: [{x,y,w,h,url,...}]}] -->
