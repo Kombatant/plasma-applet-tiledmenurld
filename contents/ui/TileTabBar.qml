@@ -382,60 +382,187 @@ Item {
 		readonly property bool _activeTabReady: {
 			if (tabsRepeater.count <= 0) return false
 			var item = tabsRepeater.itemAt(tabBar.activeTab)
-			return item !== null && item.width > 0
+			if (!item || item.width <= 0) return false
+			// Hide split line when active tab scrolled out of view
+			var left = item.x - tabsFlickable.contentX
+			var right = left + item.width
+			return right > 0 && left < tabsFlickable.width
 		}
 		readonly property real _activeTabLeft: {
 			void(tabsRepeater.count)
 			var item = tabsRepeater.itemAt(tabBar.activeTab)
 			if (!item) return 0
-			return tabsRow.x + item.x
+			return tabsFlickable.x + item.x - tabsFlickable.contentX
 		}
 		readonly property real _activeTabRight: {
 			void(tabsRepeater.count)
 			var item = tabsRepeater.itemAt(tabBar.activeTab)
 			if (!item) return 0
-			return tabsRow.x + item.x + item.width
+			return tabsFlickable.x + item.x + item.width - tabsFlickable.contentX
 		}
 
-		Row {
-			id: tabsRow
+		Flickable {
+			id: tabsFlickable
 			anchors.left: parent.left
+			anchors.right: tabsTrailing.left
 			anchors.bottom: parent.bottom
 			height: parent.height
-			spacing: 0
+			contentWidth: tabsRow.width
+			contentHeight: height
+			clip: true
+			boundsBehavior: Flickable.StopAtBounds
+			flickableDirection: Flickable.HorizontalFlick
+			interactive: tabsTrailing._overflow
 
-			Repeater {
-				id: tabsRepeater
-				model: tabBar.tabs
-				delegate: TabDelegate {
-					pillsMode: false
-					rowRef: tabsRow
+			function ensureIndexVisible(idx) {
+				if (idx < 0 || idx >= tabsRepeater.count) return
+				var item = tabsRepeater.itemAt(idx)
+				if (!item) return
+				var left = item.x
+				var right = left + item.width
+				if (left < contentX) {
+					contentX = Math.max(0, left)
+				} else if (right > contentX + width) {
+					contentX = Math.min(Math.max(0, contentWidth - width), right - width)
+				}
+			}
+
+			onWidthChanged: {
+				var maxX = Math.max(0, contentWidth - width)
+				if (contentX > maxX) contentX = maxX
+			}
+
+			Connections {
+				target: tabBar
+				function onActiveTabChanged() {
+					if (!tabBar._pillsMode) tabsFlickable.ensureIndexVisible(tabBar.activeTab)
+				}
+			}
+
+			MouseArea {
+				anchors.fill: parent
+				acceptedButtons: Qt.NoButton
+				onWheel: function(wheel) {
+					if (!tabsFlickable.interactive) { wheel.accepted = false; return }
+					var step = Kirigami.Units.gridUnit * 2
+					var dy = wheel.angleDelta.y
+					var dx = wheel.angleDelta.x
+					var delta = (Math.abs(dx) > Math.abs(dy)) ? dx : dy
+					var maxX = Math.max(0, tabsFlickable.contentWidth - tabsFlickable.width)
+					var raw = tabsFlickable.contentX - delta / 120 * step
+					tabsFlickable.contentX = Math.max(0, Math.min(maxX, raw))
+					wheel.accepted = true
+				}
+			}
+
+			Row {
+				id: tabsRow
+				height: tabsFlickable.height
+				spacing: 0
+
+				Repeater {
+					id: tabsRepeater
+					model: tabBar.tabs
+					delegate: TabDelegate {
+						pillsMode: false
+						rowRef: tabsRow
+					}
 				}
 			}
 		}
 
-		// ── "+" Add Tab button ────────────────────────────────────────────
-		Item {
-			id: tabsAddBtn
-			anchors.left: tabsRow.right
+		// ── Trailing controls: scroll chevrons + "+" ──
+		Row {
+			id: tabsTrailing
+			anchors.right: parent.right
 			anchors.bottom: parent.bottom
-			width: tabBar.tabHeight
 			height: tabBar.tabHeight
+			spacing: 0
 
-			QQC2.Label {
-				anchors.centerIn: parent
-				text: "+"
-				font.pixelSize: Kirigami.Units.gridUnit
-				color: Kirigami.Theme.textColor
-				opacity: tabsAddMA.containsMouse ? 0.9 : 0.55
+			readonly property real _availableWidth: tabBar.width - tabsAddBtn.width
+			readonly property bool _overflow: tabsRow.width > _availableWidth
+			readonly property real _maxContentX: Math.max(0, tabsFlickable.contentWidth - tabsFlickable.width)
+
+			Item {
+				id: tabsScrollLeft
+				visible: tabsTrailing._overflow
+				width: visible ? tabBar.tabHeight : 0
+				height: tabBar.tabHeight
+				enabled: tabsFlickable.contentX > 0
+
+				QQC2.Label {
+					anchors.centerIn: parent
+					text: "‹"
+					font.pixelSize: Kirigami.Units.gridUnit * 1.2
+					color: Kirigami.Theme.textColor
+					opacity: !tabsScrollLeft.enabled ? 0.25
+						: tabsScrollLeftMA.containsMouse ? 0.9 : 0.55
+				}
+
+				MouseArea {
+					id: tabsScrollLeftMA
+					anchors.fill: parent
+					hoverEnabled: true
+					cursorShape: Qt.PointingHandCursor
+					enabled: tabsScrollLeft.enabled
+					onClicked: {
+						var step = tabsFlickable.width * 0.8
+						var maxX = tabsTrailing._maxContentX
+						tabsFlickable.contentX = Math.max(0, Math.min(maxX, tabsFlickable.contentX - step))
+					}
+				}
 			}
 
-			MouseArea {
-				id: tabsAddMA
-				anchors.fill: parent
-				hoverEnabled: true
-				cursorShape: Qt.PointingHandCursor
-				onClicked: tabBar.tabAdded()
+			Item {
+				id: tabsScrollRight
+				visible: tabsTrailing._overflow
+				width: visible ? tabBar.tabHeight : 0
+				height: tabBar.tabHeight
+				enabled: tabsFlickable.contentX < tabsTrailing._maxContentX
+
+				QQC2.Label {
+					anchors.centerIn: parent
+					text: "›"
+					font.pixelSize: Kirigami.Units.gridUnit * 1.2
+					color: Kirigami.Theme.textColor
+					opacity: !tabsScrollRight.enabled ? 0.25
+						: tabsScrollRightMA.containsMouse ? 0.9 : 0.55
+				}
+
+				MouseArea {
+					id: tabsScrollRightMA
+					anchors.fill: parent
+					hoverEnabled: true
+					cursorShape: Qt.PointingHandCursor
+					enabled: tabsScrollRight.enabled
+					onClicked: {
+						var step = tabsFlickable.width * 0.8
+						var maxX = tabsTrailing._maxContentX
+						tabsFlickable.contentX = Math.max(0, Math.min(maxX, tabsFlickable.contentX + step))
+					}
+				}
+			}
+
+			Item {
+				id: tabsAddBtn
+				width: tabBar.tabHeight
+				height: tabBar.tabHeight
+
+				QQC2.Label {
+					anchors.centerIn: parent
+					text: "+"
+					font.pixelSize: Kirigami.Units.gridUnit
+					color: Kirigami.Theme.textColor
+					opacity: tabsAddMA.containsMouse ? 0.9 : 0.55
+				}
+
+				MouseArea {
+					id: tabsAddMA
+					anchors.fill: parent
+					hoverEnabled: true
+					cursorShape: Qt.PointingHandCursor
+					onClicked: tabBar.tabAdded()
+				}
 			}
 		}
 
@@ -454,16 +581,16 @@ Item {
 			visible: tabsBranch._activeTabReady
 			anchors.left: parent.left
 			anchors.bottom: parent.bottom
-			width: tabsBranch._activeTabLeft
+			width: Math.max(0, Math.min(tabsBranch._activeTabLeft, tabsFlickable.x + tabsFlickable.width))
 			height: tabBar._borderWidth
 			color: tabBar._borderColor
 		}
 		Rectangle {
 			id: bottomLineRight
 			visible: tabsBranch._activeTabReady
-			x: tabsBranch._activeTabRight
+			x: Math.max(tabsFlickable.x, Math.min(tabsBranch._activeTabRight, tabsFlickable.x + tabsFlickable.width))
 			anchors.bottom: parent.bottom
-			width: parent.width - tabsBranch._activeTabRight
+			width: parent.width - x
 			height: tabBar._borderWidth
 			color: tabBar._borderColor
 		}

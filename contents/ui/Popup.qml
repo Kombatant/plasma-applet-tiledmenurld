@@ -64,6 +64,7 @@ MouseArea {
 
 	// ── Tile Tabs ─────────────────────────────────────────────────────────────
 	property int activeTabIndex: 0
+	property int _previousTabIndex: -1
 	property var tileTabsData: []   // [{id: string, name: string, tiles: [tileObj]}]
 	property bool _tabsWriting: false  // suppress config-change reload during save
 	property int _tabIdCounter: 0   // monotonic counter for unique tab IDs
@@ -180,6 +181,7 @@ MouseArea {
 			tileEditorViewLoader.active = false
 		}
 		var direction = (index > activeTabIndex) ? 1 : -1
+		_previousTabIndex = activeTabIndex
 		if (typeof tileGridSlideContainer !== "undefined" && tileGridSlideContainer) {
 			tileGridSlideContainer.runSlide(direction, index)
 		} else {
@@ -195,8 +197,8 @@ MouseArea {
 		var newTabIcon = popup.inferTabIcon(newTabName)
 		newTabs.push({id: newId, name: newTabName, icon: newTabIcon, tiles: []})
 		tileTabsData = newTabs
-		activeTabIndex = newTabs.length - 1
 		popup.saveTileTabs()
+		selectTab(newTabs.length - 1)
 	}
 
 	function deleteTab(index) {
@@ -233,10 +235,23 @@ MouseArea {
 			var freshName = i18n('Tiles')
 			newTabs.push({id: 'tab_' + _tabIdCounter, name: freshName, icon: popup.inferTabIcon(freshName), tiles: []})
 		}
-		tileTabsData = newTabs
-		if (activeTabIndex >= newTabs.length) {
-			activeTabIndex = newTabs.length - 1
+		var wasDeletingActive = (index === activeTabIndex)
+		var prev = _previousTabIndex
+		if (prev === index) {
+			prev = -1
+		} else if (prev > index) {
+			prev = prev - 1
 		}
+		var curAdjusted = activeTabIndex
+		if (curAdjusted > index) curAdjusted = curAdjusted - 1
+		var target = wasDeletingActive
+			? ((prev >= 0 && prev < newTabs.length) ? prev : Math.min(index, newTabs.length - 1))
+			: curAdjusted
+		if (target < 0) target = 0
+		if (target >= newTabs.length) target = newTabs.length - 1
+		_previousTabIndex = -1
+		activeTabIndex = target
+		tileTabsData = newTabs
 		popup.saveTileTabs()
 	}
 
