@@ -192,6 +192,9 @@
 		<entry name="searchFieldHeight" type="int">
 			<default>48</default>
 		</entry>
+		<entry name="dockedSearchFieldWidth" type="int">
+			<default>0</default>
+		</entry>
 		<entry name="appListWidth" type="int">
 			<default>350</default>
 		</entry>

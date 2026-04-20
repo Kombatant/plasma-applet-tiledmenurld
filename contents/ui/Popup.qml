@@ -178,7 +178,12 @@ MouseArea {
 		if (tileEditorViewLoader && tileEditorViewLoader.active) {
 			tileEditorViewLoader.active = false
 		}
-		activeTabIndex = index
+		var direction = (index > activeTabIndex) ? 1 : -1
+		if (typeof tileGridSlideContainer !== "undefined" && tileGridSlideContainer) {
+			tileGridSlideContainer.runSlide(direction, index)
+		} else {
+			activeTabIndex = index
+		}
 	}
 
 	function addTab() {
@@ -632,17 +637,18 @@ MouseArea {
 		var sidebarExtraHeight = (config.sidebarOnTop || config.sidebarOnBottom)
 			? (config.sidebarHeight + config.sidebarRightMargin)
 			: 0
-		// Include the tab bar's Layout.topMargin (Kirigami.Units.smallSpacing)
-		// so the popup is tall enough for the grid not to scroll.
-		var tabBarExtraHeight = (config.useTileTabs && tileTabBar)
-			? tileTabBar.implicitHeight + Kirigami.Units.smallSpacing
-			: 0
-		// In integrated layout, the right pane has a search field above the tile grid.
-		// Include its Layout.topMargin and Layout.bottomMargin as well.
+		// Top row hosts search field + tab bar side-by-side in docked layout.
+		// Reserve max of the two, plus the RowLayout's top/bottom margins.
 		var dpr = Screen.devicePixelRatio || 1
-		var searchFieldExtraHeight = (config.usesDockedSidebarLayout && rightPaneSearchField && rightPaneSearchField.visible)
-			? config.searchFieldHeight + Math.round(10 * dpr) + Math.round(6 * dpr)
+		var tabRowTabsHeight = (config.useTileTabs && tileTabBar) ? tileTabBar.implicitHeight : 0
+		var tabRowSearchHeight = (config.usesDockedSidebarLayout && rightPaneSearchField && rightPaneSearchField.visible)
+			? config.searchFieldHeight
 			: 0
+		var tabRowContentHeight = Math.max(tabRowTabsHeight, tabRowSearchHeight)
+		var tabBarExtraHeight = tabRowContentHeight > 0
+			? tabRowContentHeight + Kirigami.Units.largeSpacing + Kirigami.Units.smallSpacing
+			: 0
+		var searchFieldExtraHeight = 0
 		var targetGridHeight = rows * cellBox + 2 * holoPad
 		var targetWidth = Math.max(popup.minimumPopupWidth, popup.popupLeftSectionWidth + targetGridWidth)
 		var targetHeight = Math.max(config.minimumHeight, targetGridHeight + sidebarExtraHeight + tabBarExtraHeight + searchFieldExtraHeight)
@@ -1014,19 +1020,6 @@ MouseArea {
 				visible: config.usesClassicLayout && config.sidebarOnTop
 			}
 
-			// Docked Sidebar layout: search field in right pane
-			SearchField {
-				id: rightPaneSearchField
-				visible: config.usesDockedSidebarLayout && !config.isEditingTile && searchView.showSearchField
-				Layout.fillWidth: true
-				Layout.preferredHeight: config.searchFieldHeight
-				Layout.topMargin: Math.round(10 * (Screen.devicePixelRatio || 1))
-				Layout.bottomMargin: Math.round(6 * (Screen.devicePixelRatio || 1))
-				Layout.leftMargin: Kirigami.Units.largeSpacing
-				Layout.rightMargin: Kirigami.Units.largeSpacing
-				listView: searchView.stackView && searchView.stackView.currentItem && searchView.stackView.currentItem.listView ? searchView.stackView.currentItem.listView : []
-			}
-
 			RowLayout {
 				id: contentRowLayout
 				Layout.fillWidth: true
@@ -1106,58 +1099,224 @@ MouseArea {
 					Layout.fillHeight: true
 					spacing: 0
 
-					TileTabBar {
-						id: tileTabBar
+					Item {
+						id: rightPaneTopRow
 						Layout.fillWidth: true
-						Layout.topMargin: Kirigami.Units.smallSpacing
-						visible: config.useTileTabs
-						activeTab: popup.activeTabIndex
-						tabs: popup.tileTabsData.map(function(t) {
-							return {id: t.id, name: t.name, icon: t.icon || ""}
-						})
+						Layout.topMargin: Kirigami.Units.largeSpacing
+						Layout.leftMargin: Kirigami.Units.largeSpacing
+						Layout.rightMargin: Kirigami.Units.largeSpacing
+						Layout.bottomMargin: Kirigami.Units.smallSpacing
+						visible: rightPaneSearchField.visible || tileTabBar.visible
+						implicitHeight: Math.max(
+							rightPaneSearchField.visible ? rightPaneSearchField.implicitHeight : 0,
+							tileTabBar.visible ? tileTabBar.implicitHeight : 0)
 
-						onTabSelected: function(index) { popup.selectTab(index) }
-						onTabAdded: popup.addTab()
-						onTabDeleted: function(index) { popup.deleteTab(index) }
-						onTabRenamed: function(index, newName) { popup.renameTab(index, newName) }
-						onTabIconChanged: function(index, newIcon) { popup.changeTabIcon(index, newIcon) }
-						onTabMoved: function(fromIndex, toIndex) { popup.moveTab(fromIndex, toIndex) }
-					}
+						readonly property real _gap: Kirigami.Units.largeSpacing * 2
+						readonly property real _minSearchWidth: Kirigami.Units.gridUnit * 8
+						readonly property real _minTabsWidth: Kirigami.Units.gridUnit * 6
+						readonly property real _handleWidth: Kirigami.Units.smallSpacing * 2
+						readonly property bool _bothVisible: rightPaneSearchField.visible && tileTabBar.visible
+						readonly property real _effectiveSearchWidth: {
+							if (!rightPaneSearchField.visible) return 0
+							if (!tileTabBar.visible) return width
+							var saved = plasmoid.configuration.dockedSearchFieldWidth || 0
+							var desired = saved > 0 ? saved : Math.round(width * 0.35)
+							var maxW = Math.max(_minSearchWidth, width - _minTabsWidth - _gap)
+							return Math.max(_minSearchWidth, Math.min(desired, maxW))
+						}
 
-					TileGrid {
-						id: tileGrid
-						Layout.fillWidth: true
-						Layout.fillHeight: true
-
-						cellSize: config.cellSize
-						cellMargin: config.cellMargin
-						cellPushedMargin: config.cellPushedMargin
-
-						tileModel: config.useTileTabs ? popup.activeTabTiles : config.tileModel.value
-
-						onEditTile: function(tile) { tileEditorViewLoader.open(tile) }
-						onMoveTileToTab: function(tileIndex, tabId) { popup.moveTileToTab(tileIndex, tabId) }
-
-						onTileModelChanged: {
-							if (config.useTileTabs) {
-								saveActiveTabTilesDebounced.restart()
-							} else {
-								saveTileModel.restart()
+							SearchField {
+								id: rightPaneSearchField
+								visible: config.usesDockedSidebarLayout && !config.isEditingTile && searchView.showSearchField
+								anchors.left: parent.left
+								anchors.verticalCenter: parent.verticalCenter
+								width: tileTabBar.visible ? rightPaneTopRow._effectiveSearchWidth : parent.width
+								height: config.searchFieldHeight
+								implicitHeight: config.searchFieldHeight
+								listView: searchView.stackView && searchView.stackView.currentItem && searchView.stackView.currentItem.listView ? searchView.stackView.currentItem.listView : []
 							}
-						}
-						Timer {
-							id: saveTileModel
-							interval: 2000
-							onTriggered: config.tileModel.save()
-						}
-						Timer {
-							id: saveActiveTabTilesDebounced
-							interval: 2000
-							onTriggered: {
-								if (config.useTileTabs) {
-									popup.saveTileTabs()
+
+							Item {
+								id: topRowResizeHandle
+								visible: rightPaneTopRow._bothVisible
+								width: rightPaneTopRow._handleWidth
+								height: parent.height
+								x: rightPaneSearchField.x + rightPaneSearchField.width + (rightPaneTopRow._gap - width) / 2
+								z: 2
+
+								Rectangle {
+									anchors.centerIn: parent
+									width: Math.max(2, Math.round(1 * Screen.devicePixelRatio))
+									height: Math.min(parent.height * 0.5, 24 * Screen.devicePixelRatio)
+									radius: width / 2
+									color: Kirigami.Theme.textColor
+									opacity: topRowResizeMA.containsMouse || topRowResizeMA.pressed ? 0.6 : 0.2
+									Behavior on opacity { NumberAnimation { duration: 150 } }
+								}
+
+								MouseArea {
+									id: topRowResizeMA
+									anchors.fill: parent
+									anchors.leftMargin: -Kirigami.Units.smallSpacing
+									anchors.rightMargin: -Kirigami.Units.smallSpacing
+									cursorShape: Qt.SplitHCursor
+									hoverEnabled: true
+									preventStealing: true
+
+									property real dragStartX: 0
+									property int dragStartWidth: 0
+
+									onPressed: function(mouse) {
+										dragStartX = mapToItem(rightPaneTopRow, mouse.x, 0).x
+										dragStartWidth = rightPaneSearchField.width
+									}
+
+									onPositionChanged: function(mouse) {
+										if (!pressed) return
+										var currentX = mapToItem(rightPaneTopRow, mouse.x, 0).x
+										var delta = currentX - dragStartX
+										var maxW = Math.max(rightPaneTopRow._minSearchWidth,
+											rightPaneTopRow.width - rightPaneTopRow._minTabsWidth - rightPaneTopRow._gap)
+										var newWidth = Math.max(rightPaneTopRow._minSearchWidth,
+											Math.min(maxW, Math.round(dragStartWidth + delta)))
+										if (plasmoid.configuration.dockedSearchFieldWidth !== newWidth) {
+											plasmoid.configuration.dockedSearchFieldWidth = newWidth
+										}
+									}
 								}
 							}
+
+							TileTabBar {
+								id: tileTabBar
+								anchors.right: parent.right
+								anchors.verticalCenter: parent.verticalCenter
+								width: rightPaneSearchField.visible
+									? Math.max(0, parent.width - rightPaneSearchField.width - rightPaneTopRow._gap)
+									: parent.width
+								visible: config.useTileTabs
+								activeTab: popup.activeTabIndex
+								tabs: popup.tileTabsData.map(function(t) {
+									return {id: t.id, name: t.name, icon: t.icon || ""}
+								})
+
+								onTabSelected: function(index) { popup.selectTab(index) }
+								onTabAdded: popup.addTab()
+								onTabDeleted: function(index) { popup.deleteTab(index) }
+								onTabRenamed: function(index, newName) { popup.renameTab(index, newName) }
+								onTabIconChanged: function(index, newIcon) { popup.changeTabIcon(index, newIcon) }
+								onTabMoved: function(fromIndex, toIndex) { popup.moveTab(fromIndex, toIndex) }
+							}
+
+					}
+
+					Item {
+						id: tileGridSlideContainer
+						Layout.fillWidth: true
+						Layout.fillHeight: true
+						clip: true
+
+						property int slideDirection: 0
+						property bool slideActive: false
+
+						function runSlide(direction, newIndex) {
+							if (!config.useTileTabs) {
+								popup.activeTabIndex = newIndex
+								return
+							}
+							if (slideActive) {
+								snapshotSlideAnim.stop()
+								gridSlideAnim.stop()
+								tileGrid.x = 0
+								slideSnapshot.visible = false
+								slideActive = false
+							}
+							var dpr = Screen.devicePixelRatio || 1
+							var grabW = Math.max(1, Math.round(tileGrid.width * dpr))
+							var grabH = Math.max(1, Math.round(tileGrid.height * dpr))
+							tileGrid.grabToImage(function(result) {
+								slideSnapshot.source = result.url
+								slideSnapshot.width = tileGrid.width
+								slideSnapshot.height = tileGrid.height
+								slideSnapshot.x = 0
+								slideSnapshot.y = 0
+								slideSnapshot.visible = true
+								tileGridSlideContainer.slideDirection = direction
+								tileGridSlideContainer.slideActive = true
+								popup.activeTabIndex = newIndex
+								tileGrid.x = direction * tileGridSlideContainer.width
+								snapshotSlideAnim.to = -direction * tileGridSlideContainer.width
+								snapshotSlideAnim.start()
+								gridSlideAnim.to = 0
+								gridSlideAnim.start()
+							}, Qt.size(grabW, grabH))
+						}
+
+						NumberAnimation {
+							id: snapshotSlideAnim
+							target: slideSnapshot
+							property: "x"
+							duration: 280
+							easing.type: Easing.OutCubic
+							onStopped: {
+								slideSnapshot.visible = false
+								slideSnapshot.source = ""
+								tileGridSlideContainer.slideActive = false
+							}
+						}
+
+						NumberAnimation {
+							id: gridSlideAnim
+							target: tileGrid
+							property: "x"
+							duration: 280
+							easing.type: Easing.OutCubic
+						}
+
+						TileGrid {
+							id: tileGrid
+							width: tileGridSlideContainer.width
+							height: tileGridSlideContainer.height
+
+							cellSize: config.cellSize
+							cellMargin: config.cellMargin
+							cellPushedMargin: config.cellPushedMargin
+
+							tileModel: config.useTileTabs ? popup.activeTabTiles : config.tileModel.value
+
+							onEditTile: function(tile) { tileEditorViewLoader.open(tile) }
+							onMoveTileToTab: function(tileIndex, tabId) { popup.moveTileToTab(tileIndex, tabId) }
+
+							onTileModelChanged: {
+								if (config.useTileTabs) {
+									saveActiveTabTilesDebounced.restart()
+								} else {
+									saveTileModel.restart()
+								}
+							}
+							Timer {
+								id: saveTileModel
+								interval: 2000
+								onTriggered: config.tileModel.save()
+							}
+							Timer {
+								id: saveActiveTabTilesDebounced
+								interval: 2000
+								onTriggered: {
+									if (config.useTileTabs) {
+										popup.saveTileTabs()
+									}
+								}
+							}
+						}
+
+						Image {
+							id: slideSnapshot
+							visible: false
+							smooth: true
+							cache: false
+							fillMode: Image.Stretch
+							y: 0
+							z: 1
 						}
 					}
 				}
