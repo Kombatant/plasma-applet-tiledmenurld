@@ -17,7 +17,7 @@ Rectangle {
 	readonly property bool useHolographicEffect: !appObj.isGroup && plasmoid && plasmoid.configuration && plasmoid.configuration.tileHoverEffect === "holographic"
 	readonly property color holographicColor: "#00ffff" // Cyan
 	readonly property real holographicGlowOpacity: 0.5
-	scale: (useHolographicEffect && hovered) ? 1.05 : 1.0
+	scale: (useHolographicEffect && hovered) ? tileGrid.holographicHoverScale : 1.0
 	Behavior on scale {
 		NumberAnimation {
 			duration: 300

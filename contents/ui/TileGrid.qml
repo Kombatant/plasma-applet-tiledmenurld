@@ -11,18 +11,28 @@ DropArea {
 	property real cellPushedMargin: 6 * Screen.devicePixelRatio
 	property int cellBoxSize: cellMargin + cellSize + cellMargin
 	property int hoverOutlineSize: 2 * Screen.devicePixelRatio
+	readonly property real holographicHoverScale: 1.05
+	property int maxHoverWidth: 1
+	property int maxHoverHeight: 1
 	readonly property real groupPanelInsetX: Math.max(cellMargin, Math.round(6 * Screen.devicePixelRatio))
 	readonly property real groupPanelInsetTop: Math.max(cellMargin, Math.round(5 * Screen.devicePixelRatio))
-	readonly property real groupPanelInsetBottom: Math.max(cellMargin, Math.round(7 * Screen.devicePixelRatio))
-	readonly property int _holoPad: {
+	readonly property real groupPanelInsetBottom: groupPanelInsetX
+	function holographicPaddingFor(hoverWidth, hoverHeight) {
 		if (plasmoid && plasmoid.configuration) {
-			if (plasmoid.configuration.tileHoverEffect === "holographic")
-				return Math.ceil(cellBoxSize * 0.3)
+			if (plasmoid.configuration.tileHoverEffect === "holographic") {
+				var maxHoverCells = Math.max(1, hoverWidth || 1, hoverHeight || 1)
+				// Each edge can grow by half the hover scale delta. Add the outline
+				// width as a small glow allowance instead of reserving a fixed
+				// percentage of every cell on all sides.
+				var scaleOverflow = cellBoxSize * maxHoverCells * ((holographicHoverScale - 1) / 2)
+				return Math.ceil(scaleOverflow + hoverOutlineSize)
+			}
 			// Classic outline can clip at scroll edges; reserve enough for the border stroke.
 			return Math.ceil(hoverOutlineSize)
 		}
 		return 0
 	}
+	readonly property int _holoPad: holographicPaddingFor(maxHoverWidth, maxHoverHeight)
 
 	property int minColumns: Math.floor((width - 2 * _holoPad) / cellBoxSize)
 	property int minRows: Math.floor((height - 2 * _holoPad) / cellBoxSize)
@@ -279,6 +289,8 @@ DropArea {
 		var r = 0;
 		var w = 1;
 		var h = 1;
+		var hoverW = 1;
+		var hoverH = 1;
 		var draggedGroupArea = null
 		if (draggedItem && draggedItem.tileType == "group") {
 			draggedGroupArea = getGroupAreaRect(draggedItem)
@@ -286,9 +298,17 @@ DropArea {
 		for (var i = 0; i < tileModel.length; i++) {
 			var tile = tileModel[i]
 			c = Math.max(c, tile.x + tile.w)
-			r = Math.max(r, tile.y + tile.h)
+			if (tile.tileType === "group") {
+				r = Math.max(r, getGroupAreaRect(tile).y2 + 1)
+			} else {
+				r = Math.max(r, tile.y + tile.h)
+			}
 			w = Math.max(w, tile.w)
 			h = Math.max(h, tile.h)
+			if (tile.tileType !== "group") {
+				hoverW = Math.max(hoverW, tile.w)
+				hoverH = Math.max(hoverH, tile.h)
+			}
 		}
 		// Add extra rows when dragging so we can drop scrolled down
 		if (draggedItem) {
@@ -324,6 +344,8 @@ DropArea {
 		maxRow = r
 		maxWidth = w
 		maxHeight = h
+		maxHoverWidth = hoverW
+		maxHoverHeight = hoverH
 	}
 	function update() {
 		var urlList = []

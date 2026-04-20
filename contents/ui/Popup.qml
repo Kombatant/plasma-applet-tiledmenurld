@@ -588,8 +588,48 @@ MouseArea {
 
 	// Compute effective tile bounds for a single tile model, excluding
 	// group headers that can be wider than their actual child content.
+	function tileWithinBounds(tile, x1, y1, x2, y2) {
+		var tileX2 = tile.x + tile.w - 1
+		var tileY2 = tile.y + tile.h - 1
+		return (x1 <= tileX2
+			&& tile.x <= x2
+			&& y1 <= tileY2
+			&& tile.y <= y2)
+	}
+
+	function groupBottomRow(model, groupTile) {
+		var x1 = groupTile.x
+		var x2 = groupTile.x + groupTile.w - 1
+		var headerH = (typeof groupTile.h !== "undefined" ? groupTile.h : 1)
+		var y1 = groupTile.y + headerH
+		var y2 = 2000000
+
+		for (var i = 0; i < model.length; i++) {
+			var t = model[i]
+			if (t && t !== groupTile && t.tileType === "group" && tileWithinBounds(t, x1, y1, x2, y2)) {
+				y2 = t.y - 1
+			}
+		}
+
+		var lowestTileY = y1
+		for (var j = 0; j < model.length; j++) {
+			var tile = model[j]
+			if (tile && tile !== groupTile && tileWithinBounds(tile, x1, y1, x2, y2)) {
+				lowestTileY = Math.max(lowestTileY, tile.y + tile.h - 1)
+			}
+		}
+
+		var minAreaH = (typeof groupTile.groupAreaH !== "undefined") ? Math.max(0, groupTile.groupAreaH) : 0
+		if (minAreaH > 0) {
+			lowestTileY = Math.max(lowestTileY, y1 + minAreaH - 1)
+		}
+
+		return Math.min(lowestTileY, y2)
+	}
+
 	function modelBounds(model) {
 		var c = 0, r = 0
+		var hoverW = 1, hoverH = 1
 		if (model) {
 			for (var i = 0; i < model.length; i++) {
 				var t = model[i]
@@ -597,14 +637,16 @@ MouseArea {
 				if (t.tileType === "group") {
 					// Group headers only drive row count (h is typically 1),
 					// not column count — their w may exceed child content.
-					r = Math.max(r, t.y + t.h)
+					r = Math.max(r, groupBottomRow(model, t) + 1)
 					continue
 				}
 				c = Math.max(c, t.x + t.w)
 				r = Math.max(r, t.y + t.h)
+				hoverW = Math.max(hoverW, t.w)
+				hoverH = Math.max(hoverH, t.h)
 			}
 		}
-		return { cols: Math.max(1, c), rows: Math.max(1, r) }
+		return { cols: Math.max(1, c), rows: Math.max(1, r), hoverW: hoverW, hoverH: hoverH }
 	}
 
 	// When tabs are enabled, return the maximum bounds across all tabs
@@ -612,12 +654,15 @@ MouseArea {
 	function contentBounds() {
 		if (config.useTileTabs && tileTabsData.length > 0) {
 			var c = 0, r = 0
+			var hoverW = 1, hoverH = 1
 			for (var ti = 0; ti < tileTabsData.length; ti++) {
 				var b = modelBounds(tileTabsData[ti].tiles)
 				c = Math.max(c, b.cols)
 				r = Math.max(r, b.rows)
+				hoverW = Math.max(hoverW, b.hoverW)
+				hoverH = Math.max(hoverH, b.hoverH)
 			}
-			return { cols: Math.max(1, c), rows: Math.max(1, r) }
+			return { cols: Math.max(1, c), rows: Math.max(1, r), hoverW: hoverW, hoverH: hoverH }
 		}
 		return modelBounds(tileGrid.tileModel)
 	}
@@ -633,7 +678,7 @@ MouseArea {
 		var cols = bounds.cols
 		var rows = bounds.rows
 		var cellBox = tileGrid.cellBoxSize
-		var holoPad = tileGrid._holoPad || 0
+		var holoPad = tileGrid.holographicPaddingFor ? tileGrid.holographicPaddingFor(bounds.hoverW, bounds.hoverH) : (tileGrid._holoPad || 0)
 		var targetGridWidth = cols * cellBox + 2 * holoPad
 		var sidebarExtraHeight = (config.sidebarOnTop || config.sidebarOnBottom)
 			? (config.sidebarHeight + config.sidebarRightMargin)
@@ -709,7 +754,7 @@ MouseArea {
 		var bounds = contentBounds()
 		var cols = bounds.cols
 		var cellBox = tileGrid.cellBoxSize
-		var holoPad = tileGrid._holoPad || 0
+		var holoPad = tileGrid.holographicPaddingFor ? tileGrid.holographicPaddingFor(bounds.hoverW, bounds.hoverH) : (tileGrid._holoPad || 0)
 		var targetGridWidth = cols * cellBox + 2 * holoPad
 		var targetWidth = Math.max(popup.minimumPopupWidth, popup.popupLeftSectionWidth + targetGridWidth)
 
