@@ -5,6 +5,7 @@ import org.kde.plasma.plasma5support as Plasma5Support
 import org.kde.kirigami as Kirigami
 import Qt.labs.platform as QtLabsPlatform
 import "../libconfig/ConfigUtils.js" as ConfigUtils
+import "../lib/Base64.js" as Base64
 
 import ".." as TiledMenu
 
@@ -519,9 +520,9 @@ ColumnLayout {
 						// Extract the <tiles>...</tiles> fragment
 						var m = /<tiles[\s\S]*<\/tiles>/.exec(joined)
 						var tilesFragment = m && m.length >= 0 ? m[0] : "<tiles></tiles>"
-						encoded = Qt.btoa(tilesFragment)
+						encoded = Base64.encodeString(tilesFragment)
 					} catch (e) {
-						encoded = Qt.btoa("<tiles></tiles>")
+						encoded = Base64.encodeString("<tiles></tiles>")
 					}
 					rootKcm[propName] = encoded
 				} else {
@@ -625,7 +626,7 @@ ColumnLayout {
 			}
 			var text = ""
 			try {
-				text = Qt.atob(out)
+				text = Base64.decodeString(out)
 			} catch (e) {
 				if (typeof showPassiveNotification === "function") {
 					showPassiveNotification(i18n("Failed to decode imported file"))
@@ -691,7 +692,7 @@ ColumnLayout {
 
 	function saveExportToFilePath(filePath) {
 		var text = xmlEditor ? ("" + xmlEditor.text) : ""
-		var b64 = Qt.btoa(text)
+		var b64 = Base64.encodeString(text)
 		var py = "import sys,base64,pathlib; pathlib.Path(sys.argv[1]).write_bytes(base64.b64decode(sys.argv[2].encode('ascii')))"
 		var cmd = "python3 -c " + _shellSingleQuote(py) + " " + _shellSingleQuote(filePath) + " " + _shellSingleQuote(b64)
 		exec.connectSource(cmd)

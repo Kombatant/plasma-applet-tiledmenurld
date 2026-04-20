@@ -3,6 +3,7 @@
 // This component remains for backwards compatibility with any data that
 // is still stored as Base64 JSON. New code should use `Base64XmlString`.
 import QtQuick
+import "lib/Base64.js" as Base64
 
 QtObject {
 	property string configKey
@@ -33,14 +34,14 @@ QtObject {
 		if (configValue === '') {
 			return defaultValue
 		}
-		var val = Qt.atob(configValue) // decode base64
+		var val = Base64.decodeString(configValue)
 		val = JSON.parse(val)
 		return val
 	}
 
 	function setBase64Json(key, data) {
 		var val = JSON.stringify(data)
-		val = Qt.btoa(val)
+		val = Base64.encodeString(val)
 		writing = true
 		plasmoid.configuration[key] = val
 		writing = false

@@ -144,9 +144,6 @@ PlasmoidItem {
 			function onFaceIconUrlChanged() {
 				avatarResolver.refresh()
 			}
-			function onHomeDirChanged() {
-				avatarResolver.refresh()
-			}
 			function onLoginNameChanged() {
 				avatarResolver.refresh()
 			}

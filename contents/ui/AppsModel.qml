@@ -24,6 +24,10 @@ Item {
 		}
 	}
 
+	function rootRowAvailable(row) {
+		return row >= 0 && rootModel.count > row
+	}
+
 	function stringListToArray(value) {
 		if (!value) {
 			return []
@@ -366,13 +370,9 @@ Item {
 			var recentAppList = [];
 
 			//--- populate
-			var model = rootModel.modelForRow(rootModel.recentAppsIndex)
+			var model = appsModel.rootRowAvailable(rootModel.recentAppsIndex) ? rootModel.modelForRow(rootModel.recentAppsIndex) : null
 			if (model) {
 				parseModel(recentAppList, model)
-			} else {
-				if (typeof logger !== "undefined" && logger) {
-					appsModel.logWarn('AppsModel.getRecentApps(): recent apps model is null')
-				}
 			}
 
 			//--- filter
@@ -455,13 +455,9 @@ Item {
 		function getAllApps() {
 			//--- populate list
 			var appList = [];
-			var model = rootModel.modelForRow(rootModel.allAppsIndex)
+			var model = appsModel.rootRowAvailable(rootModel.allAppsIndex) ? rootModel.modelForRow(rootModel.allAppsIndex) : null
 			if (model) {
 				parseModel(appList, model)
-			} else {
-				if (typeof logger !== "undefined" && logger) {
-					appsModel.logWarn('AppsModel.getAllApps(): all apps model is null')
-				}
 			}
 
 			//---

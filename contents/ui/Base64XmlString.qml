@@ -2,19 +2,32 @@
 
 import QtQuick
 import "libconfig/ConfigUtils.js" as ConfigUtils
+import "lib/Base64.js" as Base64
 
 QtObject {
     id: base64XmlString
     property string configKey
-    readonly property string configValue: configKey ? ConfigUtils.pendingValue(base64XmlString, configKey, plasmoid.configuration[configKey]) : ""
+    property string configValue: ""
     property variant value: { return {} }
     property variant defaultValue: { return {} }
     property bool writing: false
     property bool loadOnConfigChange: true
+    property var _disconnectConfigChange: null
     signal loaded()
 
     Component.onCompleted: {
+        refreshConfigValue()
+        connectConfigValue()
         load()
+    }
+
+    Component.onDestruction: {
+        disconnectConfigValue()
+    }
+
+    onConfigKeyChanged: {
+        connectConfigValue()
+        refreshConfigValue()
     }
 
     onConfigValueChanged: {
@@ -26,6 +39,30 @@ QtObject {
     onDefaultValueChanged: {
         if (configValue === '') { // Optimization
             load()
+        }
+    }
+
+    function disconnectConfigValue() {
+        if (_disconnectConfigChange) {
+            _disconnectConfigChange()
+            _disconnectConfigChange = null
+        }
+    }
+
+    function connectConfigValue() {
+        disconnectConfigValue()
+        _disconnectConfigChange = ConfigUtils.connectConfigChange(base64XmlString, configKey, function() {
+            refreshConfigValue()
+        })
+    }
+
+    function refreshConfigValue() {
+        var nextValue = ""
+        if (configKey) {
+            nextValue = ConfigUtils.pendingValue(base64XmlString, configKey, plasmoid.configuration[configKey]) || ""
+        }
+        if (configValue !== nextValue) {
+            configValue = nextValue
         }
     }
 
@@ -158,7 +195,7 @@ QtObject {
         if (configValue === '') {
             return defaultValue
         }
-        var val = Qt.atob(configValue) // decode base64
+        var val = Base64.decodeString(configValue)
         // If it looks like XML, parse tiles
         var trimmed = ("" + val).trim()
         if (trimmed.indexOf('<') === 0) {
@@ -176,9 +213,10 @@ QtObject {
     function setBase64Xml(key, data) {
         // Serialize to an XML <tiles> fragment then base64 encode
         var xml = _buildTilesXmlFragment(data)
-        var val = Qt.btoa(xml)
+        var val = Base64.encodeString(xml)
         writing = true
         ConfigUtils.setPendingValue(base64XmlString, key, val)
+        configValue = val
         writing = false
     }
 

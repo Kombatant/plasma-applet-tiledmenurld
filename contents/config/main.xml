@@ -95,7 +95,7 @@
 			<default>false</default>
 		</entry>
 		<entry name="tileTabs" type="string">
-			<!-- Base64-encoded JSON array (encoded/decoded in JS via Qt.btoa/Qt.atob):
+			<!-- Base64-encoded JSON array:
 			     [{id: string, name: string, tiles: [{x,y,w,h,url,...}]}] -->
 			<default></default>
 		</entry>

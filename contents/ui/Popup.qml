@@ -3,6 +3,7 @@ import QtQuick.Layouts
 import QtQuick.Dialogs as QtDialogs
 import org.kde.kirigami as Kirigami
 import org.kde.plasma.core as PlasmaCore
+import "lib/Base64.js" as Base64
 
 MouseArea {
 	id: popup
@@ -127,7 +128,7 @@ MouseArea {
 			popup.saveTileTabs()
 		} else {
 			try {
-				var decoded = Qt.atob(raw)
+				var decoded = Base64.decodeString(raw)
 				var parsed = JSON.parse(decoded)
 				if (!Array.isArray(parsed) || parsed.length === 0) {
 					tileTabsData = [{id: '1', name: i18n('Main'), icon: 'go-home', tiles: []}]
@@ -161,7 +162,7 @@ MouseArea {
 		try {
 			var json = JSON.stringify(tileTabsData)
 			_tabsWriting = true
-			plasmoid.configuration.tileTabs = Qt.btoa(json)
+			plasmoid.configuration.tileTabs = Base64.encodeString(json)
 			_tabsWriting = false
 		} catch (e) {
 			_tabsWriting = false

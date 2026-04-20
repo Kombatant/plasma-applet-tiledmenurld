@@ -136,12 +136,19 @@ function connectConfigChange(item, configKey, handler) {
 function setPendingValue(item, configKey, value, markDirty) {
 	var rootKcm = getRootKcm(item)
 	var propName = _propName(configKey)
+	var nextValue = cloneValue(value)
 	if (!rootKcm || !propName || typeof rootKcm[propName] === "undefined") {
+		var cfg = (typeof plasmoid !== "undefined" && plasmoid) ? plasmoid.configuration : null
+		if (cfg && configKey && typeof cfg[configKey] !== "undefined") {
+			if (!valuesEqual(cfg[configKey], nextValue)) {
+				cfg[configKey] = nextValue
+			}
+			return
+		}
 		console.warn("[ConfigUtils] cfg_" + configKey + " not available on KCM root; skip write")
 		return
 	}
 
-	var nextValue = cloneValue(value)
 	if (valuesEqual(rootKcm[propName], nextValue)) {
 		return
 	}
