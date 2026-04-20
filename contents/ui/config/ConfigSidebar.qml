@@ -30,6 +30,21 @@ LibConfig.FormKCM {
 		id: config
 	}
 
+	//-------------------------------------------------------
+	LibConfig.Heading {
+		text: i18n("Layout")
+	}
+
+	LibConfig.ComboBox {
+		id: layoutModeControl
+		configKey: "useDockedLayout"
+		Kirigami.FormData.label: i18n("Layout Mode")
+		model: [
+			{ value: true, text: i18n("Docked Sidebar Layout") },
+			{ value: false, text: i18n("Classic Layout") },
+		]
+	}
+
 	function endsWith(a, b) {
 		return a.indexOf(b, a.length - b.length) !== -1
 	}

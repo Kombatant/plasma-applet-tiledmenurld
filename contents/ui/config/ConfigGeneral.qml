@@ -304,21 +304,6 @@ LibConfig.FormKCM {
 
 	//-------------------------------------------------------
 	LibConfig.Heading {
-		text: i18n("Layout")
-	}
-
-	LibConfig.ComboBox {
-		id: layoutModeControl
-		configKey: "useDockedLayout"
-		Kirigami.FormData.label: i18n("Layout Mode")
-		model: [
-			{ value: true, text: i18n("Docked Sidebar Layout") },
-			{ value: false, text: i18n("Classic Layout") },
-		]
-	}
-
-	//-------------------------------------------------------
-	LibConfig.Heading {
 		text: i18n("Application List")
 	}
 
