@@ -1202,7 +1202,7 @@ MouseArea {
 
 							SearchField {
 								id: rightPaneSearchField
-								visible: config.usesDockedSidebarLayout && !config.isEditingTile && searchView.showSearchField
+								visible: config.usesDockedSidebarLayout && !config.isEditingTile && (!config.hideSearchField || search.query.length > 0)
 								anchors.left: parent.left
 								anchors.verticalCenter: parent.verticalCenter
 								width: tileTabBar.visible ? rightPaneTopRow._effectiveSearchWidth : parent.width

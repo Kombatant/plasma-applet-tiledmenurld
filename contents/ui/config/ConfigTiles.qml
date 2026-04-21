@@ -31,6 +31,7 @@ LibConfig.FormKCM {
 		var raw = formLayout.cfg_tileScale !== undefined ? formLayout.cfg_tileScale : plasmoid.configuration.tileScale
 		return raw || 0
 	}
+	readonly property bool pendingUseTileTabs: !!(formLayout.cfg_useTileTabs !== undefined ? formLayout.cfg_useTileTabs : plasmoid.configuration.useTileTabs)
 
 	readonly property int pendingCellBoxSize: {
 		var rawMargin = formLayout.cfg_tileMargin !== undefined ? formLayout.cfg_tileMargin : plasmoid.configuration.tileMargin
@@ -69,6 +70,8 @@ LibConfig.FormKCM {
 	LibConfig.ComboBox {
 		configKey: "tileTabStyle"
 		Kirigami.FormData.label: i18n("Tab Style")
+		enabled: formLayout.pendingUseTileTabs
+		opacity: enabled ? 1 : 0.45
 		model: [
 			{ value: "tabs", text: i18n("Tabs") },
 			{ value: "pills", text: i18n("Pills") },
