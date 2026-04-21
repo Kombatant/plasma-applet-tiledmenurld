@@ -105,6 +105,8 @@ Item {
 	property var cfg_searchFieldFollowsThemeDefault
 	property var cfg_sidebarFollowsTheme
 	property var cfg_sidebarFollowsThemeDefault
+	property var cfg_sidebarHideBorder
+	property var cfg_sidebarHideBorderDefault
 	property var cfg_tileLabelAlignment
 	property var cfg_tileLabelAlignmentDefault
 	property var cfg_groupLabelAlignment

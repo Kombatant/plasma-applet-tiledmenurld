@@ -67,6 +67,7 @@ ColumnLayout {
 		searchOnTop: "bool",
 		searchFieldFollowsTheme: "bool",
 		sidebarFollowsTheme: "bool",
+		sidebarHideBorder: "bool",
 		tileLabelAlignment: "string",
 		groupLabelAlignment: "string",
 		tileGroupLayout: "string",

@@ -171,6 +171,10 @@
 		<entry name="sidebarFollowsTheme" type="bool">
 			<default>false</default>
 		</entry>
+		<entry name="sidebarHideBorder" type="bool">
+			<label>Remove the sidebar card border for a flat look.</label>
+			<default>false</default>
+		</entry>
 		<entry name="tileLabelAlignment" type="string">
 			<!-- enum: left, center, right -->
 			<default>left</default>

@@ -79,6 +79,11 @@ LibConfig.FormKCM {
 		}
 	}
 
+	LibConfig.CheckBox {
+		text: i18n("Remove sidebar border")
+		configKey: 'sidebarHideBorder'
+	}
+
 	function endsWith(a, b) {
 		return a.indexOf(b, a.length - b.length) !== -1
 	}

@@ -38,7 +38,7 @@ Item {
 		radius: cardRoot.radius
 
 		border {
-			width: Math.max(1, Math.round(Screen.devicePixelRatio))
+			width: plasmoid.configuration.sidebarHideBorder ? 0 : Math.max(1, Math.round(Screen.devicePixelRatio))
 			color: cardRoot.rimColor
 		}
 
