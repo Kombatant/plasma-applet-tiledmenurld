@@ -45,6 +45,40 @@ LibConfig.FormKCM {
 		]
 	}
 
+	LibConfig.SpinBox {
+		id: sidebarIconSize
+		configKey: 'sidebarIconSize'
+		Kirigami.FormData.label: i18n("Icon Size")
+		suffix: i18n("px")
+		minimumValue: 16
+		maximumValue: sidebarButtonSize.configValue
+		stepSize: 2
+	}
+
+	LibConfig.RadioButtonGroup {
+		id: sidebarThemeGroup
+		spacing: 0
+		Kirigami.FormData.label: i18n("Theme")
+
+		QQC2.RadioButton {
+			text: plasmaStyleLabelText
+			QQC2.ButtonGroup.group: sidebarThemeGroup.group
+			checked: formLayout.pendingSidebarFollowsTheme
+			onClicked: ConfigUtils.setPendingValue(formLayout, "sidebarFollowsTheme", true)
+		}
+		RowLayout {
+			QQC2.RadioButton {
+				text: i18n("Custom Colour")
+				QQC2.ButtonGroup.group: sidebarThemeGroup.group
+				checked: !formLayout.pendingSidebarFollowsTheme
+				onClicked: ConfigUtils.setPendingValue(formLayout, "sidebarFollowsTheme", false)
+			}
+			LibConfig.ColorField {
+				configKey: 'sidebarBackgroundColor'
+			}
+		}
+	}
+
 	function endsWith(a, b) {
 		return a.indexOf(b, a.length - b.length) !== -1
 	}
@@ -446,43 +480,5 @@ LibConfig.FormKCM {
 		stepSize: 2
 		enabled: formLayout.pendingUsesClassicLayout
 		opacity: enabled ? 1 : 0.45
-	}
-
-	LibConfig.SpinBox {
-		id: sidebarIconSize
-		configKey: 'sidebarIconSize'
-		Kirigami.FormData.label: i18n("Icon Size")
-		suffix: i18n("px")
-		minimumValue: 16
-		maximumValue: sidebarButtonSize.configValue
-		stepSize: 2
-		enabled: formLayout.pendingUsesClassicLayout
-		opacity: enabled ? 1 : 0.45
-	}
-
-	LibConfig.RadioButtonGroup {
-		id: sidebarThemeGroup
-		spacing: 0
-		Kirigami.FormData.label: i18n("Theme")
-		enabled: formLayout.pendingUsesClassicLayout
-		opacity: enabled ? 1 : 0.45
-
-		QQC2.RadioButton {
-			text: plasmaStyleLabelText
-			QQC2.ButtonGroup.group: sidebarThemeGroup.group
-			checked: formLayout.pendingSidebarFollowsTheme
-			onClicked: ConfigUtils.setPendingValue(formLayout, "sidebarFollowsTheme", true)
-		}
-		RowLayout {
-			QQC2.RadioButton {
-				text: i18n("Custom Colour")
-				QQC2.ButtonGroup.group: sidebarThemeGroup.group
-				checked: !formLayout.pendingSidebarFollowsTheme
-				onClicked: ConfigUtils.setPendingValue(formLayout, "sidebarFollowsTheme", false)
-			}
-			LibConfig.ColorField {
-				configKey: 'sidebarBackgroundColor'
-			}
-		}
 	}
 }
