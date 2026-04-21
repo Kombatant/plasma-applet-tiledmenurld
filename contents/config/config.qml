@@ -9,7 +9,7 @@ ConfigModel {
 	}
 	ConfigCategory {
 		name: i18n("Appearance")
-		icon: "preferences-desktop-theme"
+		icon: "appearance-symbolic"
 		source: "config/ConfigAppearance.qml"
 	}
 	ConfigCategory {
