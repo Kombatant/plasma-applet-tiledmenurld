@@ -49,6 +49,7 @@ Item {
 	}
 
 	readonly property bool searchOnTop: config.searchOnTop
+	readonly property int searchFieldEdgeInset: (config.usesClassicLayout && config.sidebarOnLeft) ? config.sidebarCardInset : 0
 	property bool _escapeClearingQuery: false
 	property bool _viewSwitchClearingQuery: false
 
@@ -248,7 +249,7 @@ Item {
 			when: !_useExternalSearch && !searchOnTop
 			PropertyChanges {
 				target: stackViewContainer
-				anchors.bottomMargin: searchField.visible ? searchField.height : 0
+				anchors.bottomMargin: searchField.visible ? searchField.height + searchView.searchFieldEdgeInset : 0
 				anchors.topMargin: 0
 			}
 			AnchorChanges {
@@ -427,6 +428,7 @@ Item {
 		implicitHeight: config.searchFieldHeight
 		
 		anchors.left: parent.left
+		anchors.bottomMargin: searchView.searchFieldEdgeInset
 		readonly property var _targetListView: (listView && typeof listView.width === 'number') ? listView : null
 		width: _targetListView ? _targetListView.width : parent.width
 

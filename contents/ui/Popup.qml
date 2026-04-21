@@ -1137,7 +1137,7 @@ MouseArea {
 					MouseArea {
 						id: appAreaResizeMouseArea
 						anchors.fill: parent
-						anchors.leftMargin: config.usesDockedSidebarLayout ? 0 : -Kirigami.Units.smallSpacing * 2
+						anchors.leftMargin: 0
 						anchors.rightMargin: -Kirigami.Units.smallSpacing * 2
 						cursorShape: Qt.SplitHCursor
 						hoverEnabled: true
