@@ -107,7 +107,7 @@ Item {
 	}
 
 	// ── Styling — Pills ─────────────────────────────────────────────────────
-	readonly property real _pillRadius: Kirigami.Units.smallSpacing * 1.5
+	readonly property real _pillRadius: config.tileCornerRadius
 	readonly property real _listPadding: Math.round(Kirigami.Units.smallSpacing * 0.5)
 	readonly property color _listBgColor: Qt.rgba(
 		Kirigami.Theme.textColor.r,
@@ -126,6 +126,17 @@ Item {
 		Kirigami.Theme.textColor.g,
 		Kirigami.Theme.textColor.b,
 		0.72)
+	readonly property color _listBorderBaseColor: plasmoid.configuration.sidebarFollowsTheme ? Kirigami.Theme.backgroundColor : config.sidebarBackgroundColor
+	readonly property bool _listBorderBaseIsLight: _relativeLuminance(_listBorderBaseColor) > 0.6
+	readonly property real _listBorderWidth: plasmoid.configuration.sidebarHideBorder ? 0 : Math.max(1, Math.round(Screen.devicePixelRatio))
+	readonly property color _listBorderColor: _listBorderBaseIsLight ? Qt.rgba(1, 1, 1, 0.62) : Qt.rgba(1, 1, 1, 0.18)
+
+	function _relativeLuminance(color) {
+		function channel(c) {
+			return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4)
+		}
+		return (0.2126 * channel(color.r)) + (0.7152 * channel(color.g)) + (0.0722 * channel(color.b))
+	}
 
 	// ── Styling — Tabs (classic) ────────────────────────────────────────────
 	readonly property real _borderWidth: Math.max(1, Math.round(Screen.devicePixelRatio))
@@ -150,8 +161,10 @@ Item {
 		Rectangle {
 			id: listBackground
 			anchors.fill: tabFlickable
-			radius: Kirigami.Units.smallSpacing * 2
+			radius: config.tileCornerRadius
 			color: tabBar._listBgColor
+			border.width: tabBar._listBorderWidth
+			border.color: tabBar._listBorderColor
 			z: -1
 		}
 

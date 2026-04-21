@@ -404,9 +404,7 @@ Item {
 			height: appObj.isCardLayout
 				? Math.max(0, (modelData.h + appObj.groupRect.h) * cellBoxSize - tileGrid.groupPanelInsetTop - tileGrid.groupPanelInsetBottom)
 				: appObj.groupRect.h * cellBoxSize
-			radius: appObj.isCardLayout
-				? Math.max(tileItemView.cornerRadius, Math.round(12 * Screen.devicePixelRatio))
-				: tileItemView.cornerRadius
+			radius: tileItemView.cornerRadius
 		}
 	}
 

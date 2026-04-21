@@ -122,11 +122,11 @@
 		<default>12</default>
 		</entry>
 		<entry name="tileRoundedCorners" type="bool">
-			<label>Whether tiles and hover highlights use rounded corners.</label>
+			<label>Whether shared surfaces use rounded corners.</label>
 			<default>true</default>
 		</entry>
 		<entry name="tileCornerRadius" type="int">
-			<label>Corner radius in logical pixels for tiles and hover highlights.</label>
+			<label>Corner radius in logical pixels for shared surfaces and hover highlights.</label>
 			<default>6</default>
 		</entry>
 		<entry name="tilesLocked" type="bool">
@@ -155,6 +155,7 @@
 			<default>false</default>
 		</entry>
 		<entry name="sidebarBackgroundColor" type="string">
+			<label>Custom colour used by shared glass surfaces.</label>
 			<default></default>
 		</entry>
 
@@ -169,10 +170,11 @@
 			<default>false</default>
 		</entry>
 		<entry name="sidebarFollowsTheme" type="bool">
+			<label>Whether shared glass surfaces use the current Plasma style background colour.</label>
 			<default>false</default>
 		</entry>
 		<entry name="sidebarHideBorder" type="bool">
-			<label>Remove the sidebar card border for a flat look.</label>
+			<label>Remove the shared glass surface borders for a flat look.</label>
 			<default>false</default>
 		</entry>
 		<entry name="tileLabelAlignment" type="string">

@@ -11,7 +11,7 @@ Item {
 	property color baseColor: plasmoid.configuration.sidebarFollowsTheme ? Kirigami.Theme.backgroundColor : config.sidebarBackgroundColor
 	property int contentMargins: config.sidebarCardContentPadding
 	property real fillOpacity: 0.33
-	property real radius: Math.max(Kirigami.Units.cornerRadius, Math.round(10 * Screen.devicePixelRatio))
+	property real radius: config.tileCornerRadius
 
 	function relativeLuminance(color) {
 		function channel(c) {

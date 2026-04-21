@@ -616,10 +616,8 @@ DropArea {
 					readonly property var tile: modelData
 					readonly property var groupArea: tile && tile.tileType === "group" ? tileGrid.getGroupAreaRect(tile) : null
 					readonly property int headerH: (tile && typeof tile.h !== "undefined") ? tile.h : 1
-					readonly property real panelRadius: Math.max(config.tileCornerRadius, Math.round(12 * Screen.devicePixelRatio))
 					readonly property bool hasCustomColor: tile && typeof tile.backgroundColor !== "undefined"
 					readonly property color tileColor: hasCustomColor ? tile.backgroundColor : "transparent"
-					readonly property real tileAlpha: hasCustomColor ? tileColor.a : 0
 					readonly property bool isCardLayout: plasmoid && plasmoid.configuration && plasmoid.configuration.tileGroupLayout === "card"
 					visible: isCardLayout && !!groupArea
 					z: -1
@@ -628,69 +626,16 @@ DropArea {
 					width: (tile ? tile.w : 0) * cellBoxSize
 					height: groupArea ? (headerH + groupArea.h) * cellBoxSize : 0
 
-					Rectangle {
-						anchors.fill: parent
-						anchors.leftMargin: tileGrid.groupPanelInsetX
-						anchors.rightMargin: tileGrid.groupPanelInsetX
-						anchors.topMargin: tileGrid.groupPanelInsetTop + Math.round(2 * Screen.devicePixelRatio)
-						anchors.bottomMargin: tileGrid.groupPanelInsetBottom - Math.round(1 * Screen.devicePixelRatio)
-						color: Qt.rgba(0, 0, 0, 0.10)
-						radius: parent.panelRadius
-					}
-
-					Rectangle {
-						id: panelFill
+					SidebarGlassCard {
 						anchors.fill: parent
 						anchors.leftMargin: tileGrid.groupPanelInsetX
 						anchors.rightMargin: tileGrid.groupPanelInsetX
 						anchors.topMargin: tileGrid.groupPanelInsetTop
 						anchors.bottomMargin: tileGrid.groupPanelInsetBottom
-						radius: parent.panelRadius
-						border.width: Math.max(1, Math.round(1 * Screen.devicePixelRatio))
-						border.color: hasCustomColor ? Qt.rgba(tileColor.r, tileColor.g, tileColor.b, Math.min(tileAlpha, 0.25)) : Qt.rgba(1, 1, 1, 0.11)
-						gradient: Gradient {
-							GradientStop { position: 0.0; color: hasCustomColor
-								? Qt.rgba(tileColor.r, tileColor.g, tileColor.b, tileAlpha)
-								: Qt.rgba(Kirigami.Theme.backgroundColor.r, Kirigami.Theme.backgroundColor.g, Kirigami.Theme.backgroundColor.b, 0.34) }
-							GradientStop { position: 0.55; color: hasCustomColor
-								? Qt.rgba(tileColor.r * 0.95, tileColor.g * 0.95, tileColor.b * 0.95, tileAlpha * 0.85)
-								: Qt.rgba(Kirigami.Theme.backgroundColor.r * 1.02, Kirigami.Theme.backgroundColor.g * 1.02, Kirigami.Theme.backgroundColor.b * 1.02, 0.28) }
-							GradientStop { position: 1.0; color: hasCustomColor
-								? Qt.rgba(tileColor.r * 0.90, tileColor.g * 0.90, tileColor.b * 0.90, tileAlpha * 0.75)
-								: Qt.rgba(Kirigami.Theme.backgroundColor.r * 0.98, Kirigami.Theme.backgroundColor.g * 0.98, Kirigami.Theme.backgroundColor.b * 0.98, 0.24) }
-						}
-					}
-
-					Rectangle {
-						anchors.fill: panelFill
-						radius: panelFill.radius
-						color: Qt.rgba(1, 1, 1, 0.02)
-					}
-
-					Rectangle {
-						anchors.left: panelFill.left
-						anchors.right: panelFill.right
-						anchors.top: panelFill.top
-						height: Math.round(Math.max(Kirigami.Units.smallSpacing, panelFill.height * 0.28))
-						radius: panelFill.radius
-						gradient: Gradient {
-							GradientStop { position: 0.0; color: Qt.rgba(1, 1, 1, 0.08) }
-							GradientStop { position: 0.45; color: Qt.rgba(1, 1, 1, 0.035) }
-							GradientStop { position: 1.0; color: "transparent" }
-						}
-					}
-
-
-					Rectangle {
-						anchors.left: panelFill.left
-						anchors.right: panelFill.right
-						anchors.bottom: panelFill.bottom
-						height: Math.round(Math.max(1, panelFill.height * 0.22))
-						radius: panelFill.radius
-						gradient: Gradient {
-							GradientStop { position: 0.0; color: "transparent" }
-							GradientStop { position: 1.0; color: Qt.rgba(0, 0, 0, 0.08) }
-						}
+						baseColor: parent.hasCustomColor
+							? parent.tileColor
+							: (plasmoid.configuration.sidebarFollowsTheme ? Kirigami.Theme.backgroundColor : config.sidebarBackgroundColor)
+						contentMargins: 0
 					}
 				}
 			}

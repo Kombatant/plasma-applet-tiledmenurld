@@ -1,6 +1,4 @@
 import QtQuick
-import org.kde.kirigami as Kirigami
-import org.kde.ksvg as KSvg
 
 MouseArea {
 	id: sidebarMenu
@@ -31,37 +29,17 @@ MouseArea {
 		id: sidebarCard
 		anchors.fill: parent
 		anchors.margins: sidebarMenu.floatingInset
-		visible: config.sidebarOnLeft
 		open: sidebarMenu.open
 		contentMargins: 0
-	}
-
-	Rectangle {
-		anchors.fill: parent
-		visible: !config.sidebarOnLeft && !plasmoid.configuration.sidebarFollowsTheme
-		color: config.sidebarBackgroundColor
-	}
-
-	Rectangle {
-		anchors.fill: parent
-		visible: !config.sidebarOnLeft && plasmoid.configuration.sidebarFollowsTheme
-		color: Kirigami.Theme.backgroundColor
-	}
-
-	KSvg.FrameSvgItem {
-		anchors.fill: parent
-		visible: !config.sidebarOnLeft && plasmoid.configuration.sidebarFollowsTheme
-		imagePath: "widgets/frame"
-		prefix: "raised"
 	}
 
 	Item {
 		id: contentHost
 		property alias open: sidebarMenu.open
-		anchors.left: config.sidebarOnLeft ? sidebarCard.left : parent.left
-		anchors.right: config.sidebarOnLeft ? sidebarCard.right : parent.right
-		anchors.top: config.sidebarOnLeft ? sidebarCard.top : parent.top
-		anchors.bottom: config.sidebarOnLeft ? sidebarCard.bottom : parent.bottom
+		anchors.left: sidebarCard.left
+		anchors.right: sidebarCard.right
+		anchors.top: sidebarCard.top
+		anchors.bottom: sidebarCard.bottom
 		anchors.margins: config.sidebarOnLeft ? config.sidebarCardContentPadding : 0
 	}
 
@@ -69,6 +47,6 @@ MouseArea {
 	SidebarMenuShadows {
 		id: sidebarMenuShadows
 		anchors.fill: parent
-		visible: !config.sidebarOnLeft && !plasmoid.configuration.sidebarFollowsTheme
+		visible: false
 	}
 }

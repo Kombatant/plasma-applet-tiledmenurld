@@ -197,6 +197,9 @@ ColumnLayout {
 		if (configKey.indexOf("ai") === 0) {
 			return "AI Chat"
 		}
+		if (configKey === "tileRoundedCorners" || configKey === "tileCornerRadius" || configKey === "sidebarHideBorder" || configKey === "sidebarFollowsTheme" || configKey === "sidebarBackgroundColor") {
+			return "Appearance"
+		}
 		if (configKey.indexOf("tile") === 0 || configKey.indexOf("favGridCols") === 0 || configKey === "tilesLocked" || configKey === "showTileTooltips" || configKey.indexOf("defaultTile") === 0) {
 			return "Tiles"
 		}

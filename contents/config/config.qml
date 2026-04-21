@@ -8,6 +8,11 @@ ConfigModel {
 		source: "config/ConfigGeneral.qml"
 	}
 	ConfigCategory {
+		name: i18n("Appearance")
+		icon: "preferences-desktop-theme"
+		source: "config/ConfigAppearance.qml"
+	}
+	ConfigCategory {
 		name: i18n("Tiles")
 		icon: "view-grid-symbolic"
 		source: "config/ConfigTiles.qml"

@@ -4,7 +4,6 @@ import QtQuick.Layouts
 import org.kde.kirigami as Kirigami
 import org.kde.plasma.core as PlasmaCore
 import org.kde.plasma.private.kicker as Kicker
-import org.kde.ksvg as KSvg
 import org.kde.coreaddons as KCoreAddons
 import Qt.labs.platform as QtLabsPlatform
 
@@ -16,13 +15,7 @@ LibConfig.FormKCM {
 	id: formLayout
 	wideMode: false
 	readonly property string pendingSidebarPosition: formLayout.cfg_sidebarPosition !== undefined ? formLayout.cfg_sidebarPosition : plasmoid.configuration.sidebarPosition
-	readonly property bool pendingSidebarFollowsTheme: !!(formLayout.cfg_sidebarFollowsTheme !== undefined ? formLayout.cfg_sidebarFollowsTheme : plasmoid.configuration.sidebarFollowsTheme)
 	readonly property bool pendingUsesClassicLayout: !(formLayout.cfg_useDockedLayout !== undefined ? formLayout.cfg_useDockedLayout : plasmoid.configuration.useDockedLayout)
-
-	readonly property string plasmaStyleLabelText: {
-		var plasmaStyleText = i18nd("kcm_desktoptheme", "Plasma Style")
-		return i18n("Follow Current %1 (%2)", plasmaStyleText, KSvg.ImageSet.imageSetName)
-	}
 
 	// Keyboard shortcuts are handled by the main settings shell.
 
@@ -53,35 +46,6 @@ LibConfig.FormKCM {
 		minimumValue: 16
 		maximumValue: sidebarButtonSize.configValue
 		stepSize: 2
-	}
-
-	LibConfig.RadioButtonGroup {
-		id: sidebarThemeGroup
-		spacing: 0
-		Kirigami.FormData.label: i18n("Theme")
-
-		QQC2.RadioButton {
-			text: plasmaStyleLabelText
-			QQC2.ButtonGroup.group: sidebarThemeGroup.group
-			checked: formLayout.pendingSidebarFollowsTheme
-			onClicked: ConfigUtils.setPendingValue(formLayout, "sidebarFollowsTheme", true)
-		}
-		RowLayout {
-			QQC2.RadioButton {
-				text: i18n("Custom Colour")
-				QQC2.ButtonGroup.group: sidebarThemeGroup.group
-				checked: !formLayout.pendingSidebarFollowsTheme
-				onClicked: ConfigUtils.setPendingValue(formLayout, "sidebarFollowsTheme", false)
-			}
-			LibConfig.ColorField {
-				configKey: 'sidebarBackgroundColor'
-			}
-		}
-	}
-
-	LibConfig.CheckBox {
-		text: i18n("Remove sidebar border")
-		configKey: 'sidebarHideBorder'
 	}
 
 	function endsWith(a, b) {

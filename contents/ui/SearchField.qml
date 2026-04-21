@@ -25,6 +25,23 @@ Item {
 	property var listView: searchResultsView.listView
 	property string text: search.query
 	readonly property bool followsTheme: !!plasmoid.configuration.searchFieldFollowsTheme
+	readonly property color glassBaseColor: followsTheme ? Kirigami.Theme.backgroundColor : config.sidebarBackgroundColor
+	readonly property bool glassBaseIsLight: relativeLuminance(glassBaseColor) > 0.6
+	readonly property color foregroundColor: followsTheme
+		? Kirigami.Theme.textColor
+		: (glassBaseIsLight ? Qt.rgba(0, 0, 0, 0.88) : Qt.rgba(1, 1, 1, 0.92))
+	readonly property color mutedForegroundColor: colorWithAlpha(foregroundColor, glassBaseIsLight ? 0.58 : 0.66)
+
+	function relativeLuminance(color) {
+		function channel(c) {
+			return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4)
+		}
+		return (0.2126 * channel(color.r)) + (0.7152 * channel(color.g)) + (0.0722 * channel(color.b))
+	}
+
+	function colorWithAlpha(color, alpha) {
+		return Qt.rgba(color.r, color.g, color.b, alpha)
+	}
 
 	function onTextChangedInternal(newText) {
 		if (text !== newText) {
@@ -92,6 +109,12 @@ Item {
 			rightPadding: clearButton.visible
 				? searchField.searchIconSize + (searchField.searchIconPadding * 2)
 				: searchField.searchIconPadding
+			background: SidebarGlassCard {
+				baseColor: searchField.glassBaseColor
+				contentMargins: 0
+			}
+			color: searchField.foregroundColor
+			placeholderTextColor: searchField.mutedForegroundColor
 			onTextChanged: searchField.onTextChangedInternal(text)
 
 			Kirigami.Icon {
@@ -101,7 +124,7 @@ Item {
 				width: searchField.searchIconSize
 				height: searchField.searchIconSize
 				source: "search-symbolic"
-				color: Kirigami.Theme.textColor
+				color: searchField.foregroundColor
 				opacity: 0.6
 				enabled: false
 			}
@@ -119,7 +142,7 @@ Item {
 				Kirigami.Icon {
 					anchors.fill: parent
 					source: "edit-clear"
-					color: Kirigami.Theme.textColor
+					color: searchField.foregroundColor
 					opacity: 0.7
 				}
 
@@ -168,8 +191,10 @@ Item {
 			rightPadding: clearButton.visible
 				? searchField.searchIconSize + (searchField.searchIconPadding * 2)
 				: searchField.searchIconPadding
-			background: Rectangle {
-				color: "#eee"
+			background: SidebarGlassCard {
+				baseColor: "#ffffff"
+				contentMargins: 0
+				fillOpacity: 1.0
 			}
 			color: "#111"
 			placeholderTextColor: "#777"
