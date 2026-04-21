@@ -123,6 +123,90 @@ ColumnLayout {
 	property bool _xmlEditedByUser: false
 	property string _lastImportError: ""
 	property string _lastTileModelError: ""
+	property var _defaultsCache: null
+
+	function _loadDefaults() {
+		if (_defaultsCache) {
+			return _defaultsCache
+		}
+		var defaults = {}
+		var url = Qt.resolvedUrl("../../config/main.xml")
+		var xhr = new XMLHttpRequest()
+		try {
+			xhr.open("GET", url, false)
+			xhr.send(null)
+		} catch (e) {
+			_defaultsCache = defaults
+			return defaults
+		}
+		var xml = xhr.responseText || ""
+		var reEntry = /<entry\s+[^>]*name=\"([^\"]+)\"[^>]*>([\s\S]*?)<\/entry>/g
+		var match
+		while ((match = reEntry.exec(xml)) !== null) {
+			var name = _unescapeXml(match[1])
+			if (typeof settingsSchema[name] === "undefined") {
+				continue
+			}
+			var inner = match[2]
+			var defMatch = /<default[^>]*>([\s\S]*?)<\/default>/.exec(inner)
+			var raw = defMatch && defMatch.length >= 2 ? _unescapeXml(defMatch[1].trim()) : ""
+			var typeName = settingsSchema[name]
+			if (typeName === "stringlist") {
+				defaults[name] = raw ? raw.split(",") : []
+			} else {
+				defaults[name] = _normalizeValueForType(raw, typeName)
+			}
+		}
+		if (typeof defaults["tileModel"] === "undefined") {
+			defaults["tileModel"] = []
+		}
+		_defaultsCache = defaults
+		return defaults
+	}
+
+	function resetToDefaults() {
+		var defaults = _loadDefaults()
+		var rootKcm = ConfigUtils.getRootKcm(page)
+		if (!rootKcm) {
+			return false
+		}
+		var keys = _sortedSchemaKeys()
+		var changed = false
+		_applyingXmlToConfig = true
+		try {
+			for (var i = 0; i < keys.length; i++) {
+				var key = keys[i]
+				var typeName = settingsSchema[key]
+				var def = typeof defaults[key] !== "undefined" ? defaults[key] : _normalizeValueForType("", typeName)
+				if (key === "tileModel") {
+					if (!ConfigUtils.valuesEqual(_readConfigValue(key), def)) {
+						configTileModel.value = def
+						var encoded = Base64.encodeString("<tiles></tiles>")
+						var propName = "cfg_tileModel"
+						if (typeof rootKcm[propName] !== "undefined") {
+							rootKcm[propName] = encoded
+						}
+						changed = true
+					}
+				} else {
+					var propName2 = "cfg_" + key
+					if (typeof rootKcm[propName2] === "undefined") {
+						continue
+					}
+					if (!ConfigUtils.valuesEqual(_readConfigValue(key), def)) {
+						rootKcm[propName2] = ConfigUtils.cloneValue(def)
+						changed = true
+					}
+				}
+			}
+			if (changed) {
+				rootKcm.configurationChanged()
+			}
+		} finally {
+			_applyingXmlToConfig = false
+		}
+		return changed
+	}
 
 	function _flushPendingXmlApply() {
 		if (!xmlEditor) {
@@ -656,6 +740,7 @@ ColumnLayout {
 			}
 			try {
 				page._xmlEditedByUser = false
+				page.resetToDefaults()
 				applyXmlToConfig(text)
 				if (typeof showPassiveNotification === "function") {
 					showPassiveNotification(i18n("Imported from %1", pendingImportPath || ""))
