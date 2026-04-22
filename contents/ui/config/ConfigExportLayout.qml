@@ -1106,20 +1106,17 @@ Item {
 		anchors.margins: Kirigami.Units.gridUnit * 2
 		spacing: Kirigami.Units.smallSpacing
 
-		RowLayout {
+		Kirigami.Heading {
 			Layout.fillWidth: true
-			spacing: Kirigami.Units.smallSpacing
-			Item { Layout.fillWidth: true }
-			Button {
-				text: i18n("Import XML")
-				icon.name: "document-open"
-				onClicked: importDialog.open()
-			}
-			Button {
-				text: i18n("Export XML")
-				icon.name: "document-save"
-				onClicked: saveDialog.open()
-			}
+			level: 2
+			font.weight: Font.Bold
+			text: i18n("Application Launcher XML layout")
+		}
+
+		Label {
+			Layout.fillWidth: true
+			wrapMode: Text.WordWrap
+			text: i18n("These are all the settings and variables for this application launcher. Be careful when changing things by hand, because mistakes here can break the layout or configuration.")
 		}
 
 		ScrollView {
@@ -1150,6 +1147,22 @@ Item {
 						page._flushPendingXmlApply()
 					}
 				}
+			}
+		}
+
+		RowLayout {
+			Layout.fillWidth: true
+			spacing: Kirigami.Units.smallSpacing
+			Item { Layout.fillWidth: true }
+			Button {
+				text: i18n("Import XML")
+				icon.name: "document-open"
+				onClicked: importDialog.open()
+			}
+			Button {
+				text: i18n("Export XML")
+				icon.name: "document-save"
+				onClicked: saveDialog.open()
 			}
 		}
 	}
