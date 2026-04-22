@@ -3,6 +3,7 @@
 import QtQuick
 import "libconfig/ConfigUtils.js" as ConfigUtils
 import "lib/Base64.js" as Base64
+import "Utils.js" as Utils
 
 QtObject {
     id: base64XmlString
@@ -128,6 +129,92 @@ QtObject {
         return (typeof value === "undefined" || value === null) ? "" : ("" + value)
     }
 
+    function _tilePropertyOrder() {
+        return [
+            "backgroundColor",
+            "backgroundImage",
+            "description",
+            "favoriteId",
+            "gradient",
+            "groupAreaH",
+            "h",
+            "icon",
+            "iconFill",
+            "label",
+            "launchUrl",
+            "showIcon",
+            "showLabel",
+            "tileType",
+            "url",
+            "w",
+            "x",
+            "y",
+        ]
+    }
+
+    function _normalizeTileForXml(tile) {
+        var out = {}
+        if (!tile || typeof tile !== "object") {
+            return out
+        }
+
+        var keys = Object.keys(tile)
+        var seen = {}
+        var isGroup = tile.tileType === "group"
+        var launchUrl = ""
+        if (!isGroup) {
+            if (typeof tile.launchUrl !== "undefined" && tile.launchUrl !== null && ("" + tile.launchUrl) !== "") {
+                launchUrl = "" + tile.launchUrl
+            } else if (typeof tile.url !== "undefined" && tile.url !== null && ("" + tile.url) !== "") {
+                launchUrl = "" + tile.url
+            }
+        }
+        var favoriteId = ""
+        if (!isGroup) {
+            if (typeof tile.favoriteId !== "undefined" && tile.favoriteId !== null && ("" + tile.favoriteId) !== "") {
+                favoriteId = "" + tile.favoriteId
+            } else if (launchUrl) {
+                favoriteId = Utils.parseDropUrl(launchUrl)
+            }
+        }
+
+        var preferredKeys = _tilePropertyOrder()
+        for (var i = 0; i < preferredKeys.length; i++) {
+            var preferredKey = preferredKeys[i]
+            if (typeof tile[preferredKey] !== "undefined") {
+                out[preferredKey] = tile[preferredKey]
+                seen[preferredKey] = true
+                continue
+            }
+            if (preferredKey === "favoriteId" && favoriteId) {
+                out.favoriteId = favoriteId
+                seen.favoriteId = true
+                continue
+            }
+            if (preferredKey === "launchUrl" && launchUrl) {
+                out.launchUrl = launchUrl
+                seen.launchUrl = true
+                continue
+            }
+            if (preferredKey === "url" && !isGroup && favoriteId) {
+                out.url = favoriteId
+                seen.url = true
+                continue
+            }
+        }
+
+        keys.sort()
+        for (var ki = 0; ki < keys.length; ki++) {
+            var key = keys[ki]
+            if (seen[key]) {
+                continue
+            }
+            out[key] = tile[key]
+        }
+
+        return out
+    }
+
     function _parseTileModelXml(xml) {
         var out = []
         var reTile = /<tile\b[^>]*>([\s\S]*?)<\/tile>/g
@@ -162,7 +249,7 @@ QtObject {
         var lines = []
         lines.push("<tiles>")
         for (var i = 0; i < tiles.length; i++) {
-            var tile = tiles[i]
+            var tile = _normalizeTileForXml(tiles[i])
             if (!tile || typeof tile !== "object") {
                 continue
             }
