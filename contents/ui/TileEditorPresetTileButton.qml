@@ -57,6 +57,44 @@ Item {
 		return path
 	}
 
+	function standardPathForToken(token) {
+		if (token === "%PICTURES%") {
+			return QtLabsPlatform.StandardPaths.writableLocation(QtLabsPlatform.StandardPaths.PicturesLocation)
+		}
+		if (token === "%DOCUMENTS%") {
+			return QtLabsPlatform.StandardPaths.writableLocation(QtLabsPlatform.StandardPaths.DocumentsLocation)
+		}
+		if (token === "%MUSIC%") {
+			return QtLabsPlatform.StandardPaths.writableLocation(QtLabsPlatform.StandardPaths.MusicLocation)
+		}
+		if (token === "%DOWNLOADS%") {
+			return QtLabsPlatform.StandardPaths.writableLocation(QtLabsPlatform.StandardPaths.DownloadLocation)
+		}
+		if (token === "%VIDEOS%") {
+			return QtLabsPlatform.StandardPaths.writableLocation(QtLabsPlatform.StandardPaths.MoviesLocation)
+		}
+		if (token === "%DESKTOP%") {
+			return QtLabsPlatform.StandardPaths.writableLocation(QtLabsPlatform.StandardPaths.DesktopLocation)
+		}
+		if (token === "%HOME%") {
+			return QtLabsPlatform.StandardPaths.writableLocation(QtLabsPlatform.StandardPaths.HomeLocation)
+		}
+		return ""
+	}
+
+	function expandStandardPathToken(path) {
+		var p = path || ""
+		if (!p) {
+			return ""
+		}
+		var match = /^(%[A-Z]+%)(\/.*)?$/.exec(p)
+		if (!match || match.length < 2) {
+			return p
+		}
+		var root = standardPathForToken(match[1])
+		return root ? root + (match[2] || "") : p
+	}
+
 	function normalizeLocation(loc) {
 		if (loc === null || typeof loc === 'undefined') {
 			return ""
@@ -69,6 +107,7 @@ Item {
 		if (s.indexOf('file://') === 0) {
 			s = s.substr('file://'.length)
 		}
+		s = expandStandardPathToken(s)
 		if (s.indexOf('~/') === 0) {
 			var home = QtLabsPlatform.StandardPaths.writableLocation(QtLabsPlatform.StandardPaths.HomeLocation)
 			if (home) {

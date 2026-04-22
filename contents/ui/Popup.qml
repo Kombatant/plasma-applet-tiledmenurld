@@ -134,10 +134,15 @@ MouseArea {
 				if (!Array.isArray(parsed) || parsed.length === 0) {
 					tileTabsData = [{id: '1', name: i18n('Main'), icon: 'go-home', tiles: []}]
 				} else {
-					tileTabsData = parsed
+					var normalizedParsed = config.normalizeImportedValue(parsed)
+					var normalizedPaths = config.lastPathNormalizationCount
+					tileTabsData = normalizedParsed
+					if (normalizedPaths > 0) {
+						console.warn("[TiledMenu] normalized", normalizedPaths, "legacy path(s) in tileTabs")
+					}
 					// Backfill icons for tabs saved before icon support was added.
 					// Preserve icon: "" because that is the user's explicit "Clear Icon" state.
-					var dirty = false
+					var dirty = normalizedPaths > 0
 					for (var i = 0; i < tileTabsData.length; i++) {
 						if (typeof tileTabsData[i].icon === "undefined") {
 							var inferred = popup.inferTabIcon(tileTabsData[i].name)
@@ -688,7 +693,7 @@ MouseArea {
 			return
 		}
 
-		tileGrid.update() // refresh cached bounds & favorites
+		tileGrid.update() // refresh cached bounds
 
 		var bounds = contentBounds()
 		var cols = bounds.cols

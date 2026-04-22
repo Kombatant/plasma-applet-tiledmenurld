@@ -3,6 +3,7 @@ import QtQuick.Controls as QQC2
 import org.kde.plasma.core as PlasmaCore
 import org.kde.plasma.private.kicker as Kicker
 import org.kde.kirigami as Kirigami
+import "Utils.js" as Utils
 
 
 Item {
@@ -300,7 +301,8 @@ Item {
 				} else if (modelData.url) {
 					var favoriteId = modelData.favoriteId || modelData.url
 					var launchUrl = modelData.launchUrl || modelData.url
-					var ran = appsModel.tileGridModel.runApp(favoriteId)
+					var kickerFavoriteId = Utils.kickerFavoriteId(favoriteId)
+					var ran = kickerFavoriteId ? appsModel.runTileApp(kickerFavoriteId) : false
 					if (!ran && launchUrl) {
 						// Try deep link to systemsettings modules if runner provided a kcm id.
 						var opened = false

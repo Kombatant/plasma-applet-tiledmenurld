@@ -334,6 +334,122 @@ Item {
 		return s
 	}
 
+	function _homePath() {
+		var home = _toLocalPath(QtLabsPlatform.StandardPaths.writableLocation(QtLabsPlatform.StandardPaths.HomeLocation))
+		while (home.length > 1 && home.charAt(home.length - 1) === "/") {
+			home = home.substring(0, home.length - 1)
+		}
+		return home
+	}
+
+	function _encodeFilePath(path) {
+		return encodeURI(path).replace(/#/g, "%23")
+	}
+
+	function _hasPathBoundary(s, prefix) {
+		return s.length === prefix.length || s.charAt(prefix.length) === "/"
+	}
+
+	function _standardPathRoots() {
+		var home = _homePath()
+		var roots = [
+			{ token: "%PICTURES%", path: _toLocalPath(QtLabsPlatform.StandardPaths.writableLocation(QtLabsPlatform.StandardPaths.PicturesLocation)) },
+			{ token: "%DOCUMENTS%", path: _toLocalPath(QtLabsPlatform.StandardPaths.writableLocation(QtLabsPlatform.StandardPaths.DocumentsLocation)) },
+			{ token: "%MUSIC%", path: _toLocalPath(QtLabsPlatform.StandardPaths.writableLocation(QtLabsPlatform.StandardPaths.MusicLocation)) },
+			{ token: "%DOWNLOADS%", path: _toLocalPath(QtLabsPlatform.StandardPaths.writableLocation(QtLabsPlatform.StandardPaths.DownloadLocation)) },
+			{ token: "%VIDEOS%", path: _toLocalPath(QtLabsPlatform.StandardPaths.writableLocation(QtLabsPlatform.StandardPaths.MoviesLocation)) },
+			{ token: "%DESKTOP%", path: _toLocalPath(QtLabsPlatform.StandardPaths.writableLocation(QtLabsPlatform.StandardPaths.DesktopLocation)) },
+			{ token: "%HOME%", path: home },
+		]
+		var out = []
+		var seen = {}
+		for (var i = 0; i < roots.length; i++) {
+			var path = roots[i].path || ""
+			while (path.length > 1 && path.charAt(path.length - 1) === "/") {
+				path = path.substring(0, path.length - 1)
+			}
+			if (!path || path === "/" || seen[path]) {
+				continue
+			}
+			if (roots[i].token !== "%HOME%" && home && path === home) {
+				continue
+			}
+			seen[path] = true
+			out.push({ token: roots[i].token, path: path })
+		}
+		out.sort(function(a, b) {
+			return b.path.length - a.path.length
+		})
+		return out
+	}
+
+	function _compactHomePath(value) {
+		var s = (typeof value === "undefined" || value === null) ? "" : ("" + value)
+		if (!s) {
+			return s
+		}
+
+		var roots = _standardPathRoots()
+		for (var i = 0; i < roots.length; i++) {
+			var root = roots[i]
+			var encodedRoot = _encodeFilePath(root.path)
+			var fileUrlPrefix = "file://" + encodedRoot
+			if (s.indexOf(fileUrlPrefix) === 0 && _hasPathBoundary(s, fileUrlPrefix)) {
+				return "file://" + root.token + s.substring(fileUrlPrefix.length)
+			}
+			if (s.indexOf(root.path) === 0 && _hasPathBoundary(s, root.path)) {
+				return root.token + s.substring(root.path.length)
+			}
+		}
+
+		return s
+	}
+
+	function _pathForToken(token) {
+		var roots = _standardPathRoots()
+		for (var i = 0; i < roots.length; i++) {
+			if (roots[i].token === token) {
+				return roots[i].path
+			}
+		}
+		return ""
+	}
+
+	function _expandHomePath(value) {
+		return _configInit.normalizeImportedPathString(value)
+	}
+
+	function _mapValueDeep(value, stringMapper) {
+		if (typeof value === "string") {
+			return stringMapper(value)
+		}
+		if (Array.isArray(value)) {
+			var arr = []
+			for (var i = 0; i < value.length; i++) {
+				arr.push(_mapValueDeep(value[i], stringMapper))
+			}
+			return arr
+		}
+		if (value && typeof value === "object") {
+			var obj = {}
+			var keys = Object.keys(value)
+			for (var ki = 0; ki < keys.length; ki++) {
+				var key = keys[ki]
+				obj[key] = _mapValueDeep(value[key], stringMapper)
+			}
+			return obj
+		}
+		return value
+	}
+
+	function _prepareValueForExport(value) {
+		return _mapValueDeep(value, _compactHomePath)
+	}
+
+	function _prepareValueForImport(value) {
+		return _configInit.normalizeImportedValue(value)
+	}
+
 	function _escapeXml(s) {
 		s = (typeof s === "undefined" || s === null) ? "" : ("" + s)
 		return s
@@ -760,7 +876,7 @@ Item {
 			var key = keys[i]
 			var typeName = settingsSchema[key]
 			var raw = _readConfigValue(key)
-			var value = _normalizeValueForType(raw, typeName)
+			var value = _prepareValueForExport(_normalizeValueForType(raw, typeName))
 			var sectionName = _sectionForKey(key)
 			if (!grouped[sectionName]) {
 				sectionName = "Other"
@@ -930,7 +1046,10 @@ Item {
 					continue
 				}
 				var typeName = settingsSchema[key]
-				var normalized = _normalizeValueForType(imported[key], typeName)
+				var normalized = _prepareValueForImport(_normalizeValueForType(imported[key], typeName))
+				if (_configInit.lastPathNormalizationCount > 0) {
+					console.warn("[TiledMenu] import normalized", _configInit.lastPathNormalizationCount, "legacy path(s) for", key)
+				}
 				var current = _normalizeValueForType(_readConfigValue(key), typeName)
 				if (key === "tileModel") {
 					var tileModelChanged = !ConfigUtils.valuesEqual(current, normalized)

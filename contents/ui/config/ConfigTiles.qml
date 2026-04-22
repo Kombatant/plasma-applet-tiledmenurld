@@ -229,8 +229,110 @@ LibConfig.FormKCM {
 		Kirigami.FormData.label: i18n("Preset Tile Folder")
 		Layout.fillWidth: true
 
-		function pathToUrl(path) {
+		function toLocalPath(path) {
+			var p = (typeof path === "undefined" || path === null) ? "" : ("" + path)
+			while (p.indexOf("file://") === 0) {
+				p = p.substr("file://".length)
+				if (p.length >= 2 && p.charAt(0) === "/" && p.charAt(1) === "/") {
+					p = p.substring(1)
+				}
+				if (p.indexOf("file///") === 0) {
+					p = "/" + p.substring("file///".length)
+				} else if (p.indexOf("file/") === 0) {
+					p = "/" + p.substring("file/".length)
+				}
+			}
+			try {
+				p = decodeURIComponent(p)
+			} catch (e) {
+				// Keep the original path if percent decoding fails.
+			}
+			return p
+		}
+
+		function standardPathForToken(token) {
+			var value = ""
+			if (token === "%PICTURES%") {
+				value = QtLabsPlatform.StandardPaths.writableLocation(QtLabsPlatform.StandardPaths.PicturesLocation)
+			} else if (token === "%DOCUMENTS%") {
+				value = QtLabsPlatform.StandardPaths.writableLocation(QtLabsPlatform.StandardPaths.DocumentsLocation)
+			} else if (token === "%MUSIC%") {
+				value = QtLabsPlatform.StandardPaths.writableLocation(QtLabsPlatform.StandardPaths.MusicLocation)
+			} else if (token === "%DOWNLOADS%") {
+				value = QtLabsPlatform.StandardPaths.writableLocation(QtLabsPlatform.StandardPaths.DownloadLocation)
+			} else if (token === "%VIDEOS%") {
+				value = QtLabsPlatform.StandardPaths.writableLocation(QtLabsPlatform.StandardPaths.MoviesLocation)
+			} else if (token === "%DESKTOP%") {
+				value = QtLabsPlatform.StandardPaths.writableLocation(QtLabsPlatform.StandardPaths.DesktopLocation)
+			} else if (token === "%HOME%") {
+				value = QtLabsPlatform.StandardPaths.writableLocation(QtLabsPlatform.StandardPaths.HomeLocation)
+			}
+			return toLocalPath(value)
+		}
+
+		function expandStandardPathToken(path) {
+			var p = (typeof path === "undefined" || path === null) ? "" : ("" + path)
+			if (!p) {
+				return ""
+			}
+			if (p.length >= 2 && p.charAt(0) === "/" && p.charAt(1) === "%") {
+				p = p.substring(1)
+			}
+			var match = /^(%[A-Z]+%)(\/.*)?$/.exec(p)
+			if (!match || match.length < 2) {
+				return p
+			}
+			var root = standardPathForToken(match[1])
+			return root ? root + (match[2] || "") : p
+		}
+
+		function standardPathRoots() {
+			var roots = [
+				{ token: "%PICTURES%", path: standardPathForToken("%PICTURES%") },
+				{ token: "%DOCUMENTS%", path: standardPathForToken("%DOCUMENTS%") },
+				{ token: "%MUSIC%", path: standardPathForToken("%MUSIC%") },
+				{ token: "%DOWNLOADS%", path: standardPathForToken("%DOWNLOADS%") },
+				{ token: "%VIDEOS%", path: standardPathForToken("%VIDEOS%") },
+				{ token: "%DESKTOP%", path: standardPathForToken("%DESKTOP%") },
+				{ token: "%HOME%", path: standardPathForToken("%HOME%") },
+			]
+			var out = []
+			for (var i = 0; i < roots.length; i++) {
+				var path = roots[i].path || ""
+				while (path.length > 1 && path.charAt(path.length - 1) === "/") {
+					path = path.substring(0, path.length - 1)
+				}
+				if (path && path !== "/") {
+					out.push({ token: roots[i].token, path: path })
+				}
+			}
+			out.sort(function(a, b) {
+				return b.path.length - a.path.length
+			})
+			return out
+		}
+
+		function hasPathBoundary(path, prefix) {
+			return path.length === prefix.length || path.charAt(prefix.length) === "/"
+		}
+
+		function compactStandardPath(path) {
 			var p = path || ""
+			if (!p) {
+				return ""
+			}
+			var roots = standardPathRoots()
+			for (var i = 0; i < roots.length; i++) {
+				var root = roots[i]
+				if (p.indexOf(root.path) === 0 && hasPathBoundary(p, root.path)) {
+					return root.token + p.substring(root.path.length)
+				}
+			}
+			return p
+		}
+
+		function pathToUrl(path) {
+			var p = toLocalPath(path)
 			if (!p) {
 				return ""
 			}
@@ -238,11 +340,12 @@ LibConfig.FormKCM {
 				return p
 			}
 			if (p.indexOf('~/') === 0) {
-				var home = QtLabsPlatform.StandardPaths.writableLocation(QtLabsPlatform.StandardPaths.HomeLocation)
+				var home = standardPathForToken("%HOME%")
 				if (home) {
 					p = home + p.substr(1)
 				}
 			}
+			p = expandStandardPathToken(p)
 			if (p.indexOf('/') === 0) {
 				return 'file://' + p
 			}
@@ -253,11 +356,8 @@ LibConfig.FormKCM {
 			if (!url) {
 				return ''
 			}
-			var s = '' + url
-			if (s.indexOf('file://') === 0) {
-				s = s.substr('file://'.length)
-			}
-			return s
+			var s = toLocalPath(url)
+			return compactStandardPath(s)
 		}
 
 		LibConfig.TextField {

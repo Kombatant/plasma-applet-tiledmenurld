@@ -191,7 +191,7 @@
 		</entry>
 		<entry name="presetTilesFolder" type="string">
 			<label>Custom directory used to store downloaded preset tile images.</label>
-			<default></default>
+			<default>%PICTURES%/TiledMenuReloaded</default>
 		</entry>
 		<entry name="appDescription" type="string">
 			<!-- enum: hidden, after, below -->

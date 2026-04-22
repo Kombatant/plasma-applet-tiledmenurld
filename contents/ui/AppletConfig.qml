@@ -6,6 +6,8 @@ import org.kde.ksvg as KSvg
 import Qt.labs.platform as QtLabsPlatform
 
 Item {
+	readonly property string defaultPresetTilesFolderToken: "%PICTURES%/TiledMenuReloaded"
+
 	function _ensureSettingInitialized(key, defaultValue) {
 		var cur = plasmoid.configuration[key]
 		if (typeof cur === 'undefined' || cur === null) {
@@ -100,7 +102,10 @@ Item {
 			plasmoid.configuration.groupLabelAlignment = 'left'
 		}
 		_ensureSettingInitialized('tileGroupLayout', 'card')
-		_ensureSettingInitialized('presetTilesFolder', '')
+		_ensureSettingInitialized('presetTilesFolder', defaultPresetTilesFolderToken)
+		if (plasmoid.configuration.presetTilesFolder === '') {
+			plasmoid.configuration.presetTilesFolder = defaultPresetTilesFolderToken
+		}
 		_ensureSettingInitialized('appDescription', 'after')
 		_ensureSettingInitialized('appListIconSize', 32)
 		_ensureSettingInitialized('searchFieldHeight', 48)
@@ -155,6 +160,213 @@ Item {
 		return path.charAt(path.length - 1) === '/' ? path : path + '/'
 	}
 
+	function standardPathForToken(token) {
+		var value = ""
+		if (token === "%PICTURES%") {
+			value = QtLabsPlatform.StandardPaths.writableLocation(QtLabsPlatform.StandardPaths.PicturesLocation)
+		} else if (token === "%DOCUMENTS%") {
+			value = QtLabsPlatform.StandardPaths.writableLocation(QtLabsPlatform.StandardPaths.DocumentsLocation)
+		} else if (token === "%MUSIC%") {
+			value = QtLabsPlatform.StandardPaths.writableLocation(QtLabsPlatform.StandardPaths.MusicLocation)
+		} else if (token === "%DOWNLOADS%") {
+			value = QtLabsPlatform.StandardPaths.writableLocation(QtLabsPlatform.StandardPaths.DownloadLocation)
+		} else if (token === "%VIDEOS%") {
+			value = QtLabsPlatform.StandardPaths.writableLocation(QtLabsPlatform.StandardPaths.MoviesLocation)
+		} else if (token === "%DESKTOP%") {
+			value = QtLabsPlatform.StandardPaths.writableLocation(QtLabsPlatform.StandardPaths.DesktopLocation)
+		} else if (token === "%HOME%") {
+			value = QtLabsPlatform.StandardPaths.writableLocation(QtLabsPlatform.StandardPaths.HomeLocation)
+		}
+		return _trimTrailingSlash(_fileUrlToLocalPath(value))
+	}
+
+	function _trimTrailingSlash(path) {
+		var p = (typeof path === "undefined" || path === null) ? "" : ("" + path)
+		while (p.length > 1 && p.charAt(p.length - 1) === "/") {
+			p = p.substring(0, p.length - 1)
+		}
+		return p
+	}
+
+	function _fileUrlToLocalPath(value) {
+		var p = (typeof value === "undefined" || value === null) ? "" : ("" + value)
+		while (p.indexOf("file://") === 0) {
+			p = p.substring("file://".length)
+			if (p.length >= 2 && p.charAt(0) === "/" && p.charAt(1) === "/") {
+				p = p.substring(1)
+			}
+			if (p.indexOf("file///") === 0) {
+				p = "/" + p.substring("file///".length)
+			} else if (p.indexOf("file/") === 0) {
+				p = "/" + p.substring("file/".length)
+			}
+		}
+		try {
+			p = decodeURIComponent(p)
+		} catch (e) {
+			// Keep the original path if percent decoding fails.
+		}
+		return p
+	}
+
+	function _fileUrlFromLocalPath(path) {
+		var localPath = _fileUrlToLocalPath(path || "")
+		var encodedPath = encodeURI(localPath).replace(/#/g, "%23")
+		return "file://" + encodedPath
+	}
+
+	function expandStandardPathToken(path) {
+		var p = (typeof path === "undefined" || path === null) ? "" : ("" + path)
+		if (!p) {
+			return ""
+		}
+		var asFileUrl = p.indexOf("file://") === 0
+		if (asFileUrl) {
+			p = _fileUrlToLocalPath(p)
+		}
+		if (p.length >= 2 && p.charAt(0) === "/" && p.charAt(1) === "%") {
+			p = p.substring(1)
+		}
+		var match = /^(%[A-Z]+%)(\/.*)?$/.exec(p)
+		if (!match || match.length < 2) {
+			return path
+		}
+		var root = standardPathForToken(match[1])
+		if (!root) {
+			return path
+		}
+		var expanded = _trimTrailingSlash(root) + (match[2] || "")
+		return asFileUrl ? _fileUrlFromLocalPath(expanded) : expanded
+	}
+
+	function _standardPathForLocalizedHomeDir(name) {
+		var n = (name || "").toLowerCase()
+		var token = ""
+		if (n === "pictures" || n === "afbeeldingen") {
+			token = "%PICTURES%"
+		} else if (n === "documents" || n === "documenten") {
+			token = "%DOCUMENTS%"
+		} else if (n === "music" || n === "muziek") {
+			token = "%MUSIC%"
+		} else if (n === "downloads") {
+			token = "%DOWNLOADS%"
+		} else if (n === "videos" || n === "video's" || n === "video") {
+			token = "%VIDEOS%"
+		} else if (n === "desktop" || n === "bureaublad") {
+			token = "%DESKTOP%"
+		}
+		return token ? _trimTrailingSlash(standardPathForToken(token)) : ""
+	}
+
+	function _rewriteForeignHomePath(path) {
+		var p = path || ""
+		if (p.indexOf("/home/") !== 0) {
+			return p
+		}
+
+		var home = _trimTrailingSlash(standardPathForToken("%HOME%"))
+		if (!home || p === home || p.indexOf(home + "/") === 0) {
+			return p
+		}
+
+		var restStart = p.indexOf("/", "/home/".length)
+		if (restStart < 0) {
+			return p
+		}
+
+		var rest = p.substring(restStart)
+		var firstEnd = rest.indexOf("/", 1)
+		var firstDir = firstEnd >= 0 ? rest.substring(1, firstEnd) : rest.substring(1)
+		var mappedRoot = _standardPathForLocalizedHomeDir(firstDir)
+		if (mappedRoot) {
+			return mappedRoot + (firstEnd >= 0 ? rest.substring(firstEnd) : "")
+		}
+		return home + rest
+	}
+
+	function normalizeImportedPathString(value) {
+		var s = (typeof value === "undefined" || value === null) ? "" : ("" + value)
+		if (!s) {
+			return s
+		}
+
+		var expanded = expandStandardPathToken(s)
+		if (expanded !== s) {
+			return expanded
+		}
+
+		var asFileUrl = s.indexOf("file://") === 0
+		var localPath = asFileUrl ? _fileUrlToLocalPath(s) : s
+		if (asFileUrl && localPath !== s.substring("file://".length) && localPath.indexOf("/") === 0) {
+			return _fileUrlFromLocalPath(localPath)
+		}
+		if (localPath.indexOf("~/") === 0) {
+			var home = _trimTrailingSlash(standardPathForToken("%HOME%"))
+			if (home) {
+				localPath = home + localPath.substring(1)
+			}
+		}
+
+		var rewritten = _rewriteForeignHomePath(localPath)
+		if (rewritten !== localPath) {
+			return asFileUrl ? _fileUrlFromLocalPath(rewritten) : rewritten
+		}
+
+		return s
+	}
+
+	property int lastPathNormalizationCount: 0
+	function normalizeImportedValue(value) {
+		lastPathNormalizationCount = 0
+		return _normalizeImportedValue(value)
+	}
+
+	function _normalizeImportedValue(value) {
+		if (typeof value === "string") {
+			var normalizedString = normalizeImportedPathString(value)
+			if (normalizedString !== value) {
+				lastPathNormalizationCount++
+			}
+			return normalizedString
+		}
+		if (Array.isArray(value)) {
+			var arr = []
+			for (var i = 0; i < value.length; i++) {
+				arr.push(_normalizeImportedValue(value[i]))
+			}
+			return arr
+		}
+		if (value && typeof value === "object") {
+			var obj = {}
+			var keys = Object.keys(value)
+			for (var ki = 0; ki < keys.length; ki++) {
+				var key = keys[ki]
+				obj[key] = _normalizeImportedValue(value[key])
+			}
+			return obj
+		}
+		return value
+	}
+
+	property bool _normalizingTileModelPaths: false
+	function normalizeTileModelPaths() {
+		if (_normalizingTileModelPaths || !tileModel || !Array.isArray(tileModel.value)) {
+			return
+		}
+		var normalized = normalizeImportedValue(tileModel.value)
+		if (lastPathNormalizationCount <= 0) {
+			return
+		}
+		_normalizingTileModelPaths = true
+		try {
+			console.warn("[TiledMenu] normalized", lastPathNormalizationCount, "legacy path(s) in tileModel")
+			tileModel.value = normalized
+			tileModel.save()
+		} finally {
+			_normalizingTileModelPaths = false
+		}
+	}
+
 	function resolvePresetPath(path) {
 		var p = path || ""
 		if (!p) {
@@ -170,6 +382,7 @@ Item {
 		if (p.indexOf('file://') === 0) {
 			p = p.substr('file://'.length)
 		}
+		p = expandStandardPathToken(p)
 		if (p.indexOf('~/') === 0) {
 			var home = QtLabsPlatform.StandardPaths.writableLocation(QtLabsPlatform.StandardPaths.HomeLocation)
 			if (home) {
@@ -180,15 +393,7 @@ Item {
 	}
 
 	function resolveDefaultPresetTilesFolder() {
-		var pictures = QtLabsPlatform.StandardPaths.writableLocation(QtLabsPlatform.StandardPaths.PicturesLocation)
-		if (pictures) {
-			return pictures + '/TiledMenuReloaded'
-		}
-		var downloads = QtLabsPlatform.StandardPaths.writableLocation(QtLabsPlatform.StandardPaths.DownloadLocation)
-		if (downloads) {
-			return downloads
-		}
-		return ""
+		return defaultPresetTilesFolderToken
 	}
 
 	function listLength(value) {
@@ -394,5 +599,12 @@ Item {
 	property var tileModel: Base64XmlString {
 		configKey: 'tileModel'
 		defaultValue: []
+	}
+
+	Connections {
+		target: tileModel
+		function onLoaded() {
+			normalizeTileModelPaths()
+		}
 	}
 }

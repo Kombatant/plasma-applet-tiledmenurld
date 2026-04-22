@@ -1,4 +1,5 @@
 import QtQuick
+import "Utils.js" as Utils
 
 QtObject {
 	id: appObj
@@ -15,13 +16,14 @@ QtObject {
 	readonly property int defaultTileH: isGroup ? 1 : 2
 
 	readonly property string favoriteId: tile && (tile.favoriteId || tile.url) || ''
-	readonly property var app: favoriteId ? appsModel.tileGridModel.getApp(favoriteId) : null
+	readonly property string kickerFavoriteId: Utils.kickerFavoriteId(favoriteId)
+	readonly property var app: kickerFavoriteId ? appsModel.getTileApp(kickerFavoriteId) : null
 	readonly property string appLabel: app ? app.display : ""
 	readonly property string appUrl: app ? app.url : ""
 	readonly property var appIcon: app ? app.decoration : null
 	readonly property string descriptionText: tile && typeof tile.description !== "undefined" ? tile.description : (app && app.description ? app.description : "")
 	readonly property string labelText: tile && tile.label || appLabel || favoriteId || appUrl || (tile && tile.launchUrl) || ""
-	readonly property var iconSource: tile && tile.icon || appIcon || favoriteId
+	readonly property var iconSource: tile && tile.icon || appIcon || kickerFavoriteId
 	readonly property bool iconFill: tile && typeof tile.iconFill !== "undefined" ? tile.iconFill : false
 	readonly property bool showIcon: tile && typeof tile.showIcon !== "undefined" ? tile.showIcon : defaultShowIcon
 	readonly property bool showLabel: tile && typeof tile.showLabel !== "undefined" ? tile.showLabel : true
@@ -38,17 +40,31 @@ QtObject {
 	readonly property int tileH: tile && typeof tile.h !== "undefined" ? tile.h : defaultTileH
 
 	function hasActionList() {
-		return app ? appsModel.tileGridModel.indexHasActionList(app.indexInModel) : false
+		if (!app || !app.actionListModel) {
+			return false
+		}
+		try {
+			return app.actionListModel.hasActionList(app.indexInModel)
+		} catch (e) {
+			return false
+		}
 	}
 
 	function getActionList() {
-		return app ? appsModel.tileGridModel.getActionListAtIndex(app.indexInModel) : []
+		if (!app || !app.actionListModel) {
+			return []
+		}
+		try {
+			return app.actionListModel.getActionList(app.indexInModel)
+		} catch (e) {
+			return []
+		}
 	}
 
 	function addActionList(menu) {
 		if (hasActionList()) {
 			var actionList = getActionList()
-			menu.addActionList(actionList, appsModel.tileGridModel, appObj.app.indexInModel)
+			menu.addActionList(actionList, appObj.app.actionListModel, appObj.app.indexInModel)
 		}
 	}
 

@@ -1,6 +1,9 @@
 .pragma library
 
 function parseDropUrl(url) {
+	if (typeof url === "undefined" || url === null) {
+		return ""
+	}
 	url = "" + url
 	if (!url) {
 		return url
@@ -28,4 +31,23 @@ function parseDropUrl(url) {
 	} else {
 		return url
 	}
+}
+
+function isKickerFavoriteId(url) {
+	var favoriteId = parseDropUrl(url)
+	if (!favoriteId) {
+		return false
+	}
+
+	favoriteId = "" + favoriteId
+	if (favoriteId.indexOf("://") >= 0 || favoriteId.indexOf("/") >= 0 || favoriteId.indexOf("\\") >= 0) {
+		return false
+	}
+
+	return favoriteId.indexOf(".desktop") === favoriteId.length - ".desktop".length
+}
+
+function kickerFavoriteId(url) {
+	var favoriteId = parseDropUrl(url)
+	return isKickerFavoriteId(favoriteId) ? ("" + favoriteId) : ""
 }

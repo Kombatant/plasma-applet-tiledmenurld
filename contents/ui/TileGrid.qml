@@ -348,15 +348,6 @@ DropArea {
 		maxHoverHeight = hoverH
 	}
 	function update() {
-		var urlList = []
-		for (var i = 0; i < tileModel.length; i++) {
-			var tile = tileModel[i]
-			if (tile.url) {
-				urlList.push(tile.url)
-			}
-		}
-		appsModel.tileGridModel.favorites = urlList
-		appsModel.syncTileFavorites(urlList)
 		updateSize()
 	}
 	function refreshTileDelegates() {
@@ -420,8 +411,9 @@ DropArea {
 
 	function getTileLabel(tile) {
 		if (tile.url) {
-			var app = appsModel.tileGridModel.getApp(tile.url)
-			var labelText = tile.label || app.display || app.url || ""
+			var favoriteId = Utils.kickerFavoriteId(tile.favoriteId || tile.url)
+			var app = favoriteId ? appsModel.getTileApp(favoriteId) : null
+			var labelText = tile.label || (app ? app.display : "") || (app ? app.url : "") || tile.url || ""
 			return labelText
 		} else {
 			return ""

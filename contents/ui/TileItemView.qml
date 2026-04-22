@@ -59,14 +59,56 @@ Rectangle {
 		return s.substring(dot + 1)
 	}
 
+	function _fileUrlToLocalPath(value) {
+		var p = (typeof value === "undefined" || value === null) ? "" : ("" + value)
+		while (p.indexOf("file://") === 0) {
+			p = p.substring("file://".length)
+			if (p.length >= 2 && p.charAt(0) === "/" && p.charAt(1) === "/") {
+				p = p.substring(1)
+			}
+			if (p.indexOf("file///") === 0) {
+				p = "/" + p.substring("file///".length)
+			} else if (p.indexOf("file/") === 0) {
+				p = "/" + p.substring("file/".length)
+			}
+		}
+		try {
+			p = decodeURIComponent(p)
+		} catch (e) {
+			// Keep the original path if percent decoding fails.
+		}
+		return p
+	}
+
+	function _fileUrlFromLocalPath(path) {
+		var encodedPath = encodeURI(_fileUrlToLocalPath(path || "")).replace(/#/g, "%23")
+		return "file://" + encodedPath
+	}
+
+	function normalizedBackgroundSource(source) {
+		var s = (typeof source === "undefined" || source === null) ? "" : ("" + source)
+		if (!s) {
+			return ""
+		}
+		if (config && config.normalizeImportedPathString) {
+			return config.normalizeImportedPathString(s)
+		}
+		if (s.indexOf("file://file") === 0) {
+			return _fileUrlFromLocalPath(_fileUrlToLocalPath(s))
+		}
+		return s
+	}
+
 	// Clear image sources when the plasmoid is closed to release cached frames/textures.
 	// Use a short delay to avoid thrash when toggling quickly.
 	property bool expandedActive: true
-	readonly property string activeBackgroundSource: expandedActive ? appObj.backgroundImage : ""
+	readonly property string activeBackgroundSource: expandedActive ? normalizedBackgroundSource(appObj.backgroundImage) : ""
+	property string failedBackgroundSource: ""
+	readonly property string safeBackgroundSource: activeBackgroundSource && activeBackgroundSource !== failedBackgroundSource ? activeBackgroundSource : ""
 	property int animatedReloadToken: 0
-	readonly property string animatedBackgroundSource: activeBackgroundSource ? (activeBackgroundSource + "#reload=" + animatedReloadToken) : ""
+	readonly property string animatedBackgroundSource: safeBackgroundSource ? (safeBackgroundSource + "#reload=" + animatedReloadToken) : ""
 	readonly property bool backgroundIsAnimated: {
-		var ext = _fileExtFromUrl(activeBackgroundSource)
+		var ext = _fileExtFromUrl(safeBackgroundSource)
 		return ext === "gif" || ext === "apng" || ext === "webp"
 	}
 	// When the animated renderer is created via the Loader, check its status
@@ -80,10 +122,14 @@ Rectangle {
 	}
 
 	function bumpAnimatedReload() {
-		if (!backgroundIsAnimated || !activeBackgroundSource) {
+		if (!backgroundIsAnimated || !safeBackgroundSource) {
 			return
 		}
 		animatedReloadToken = (animatedReloadToken + 1) % 1000000
+	}
+
+	onActiveBackgroundSourceChanged: {
+		failedBackgroundSource = ""
 	}
 
 	Component {
@@ -185,7 +231,7 @@ Rectangle {
 			// Also unload when the plasmoid is closed so decoded frames are released.
 			readonly property bool plasmoidExpanded: (plasmoid && typeof plasmoid.expanded !== "undefined") ? plasmoid.expanded : true
 			active: tileItemView.backgroundUseAnimatedRenderer
-				&& !!activeBackgroundSource
+				&& !!safeBackgroundSource
 				&& plasmoidExpanded
 				&& (tileItemView.animatedPlayOnHoverEnabled ? tileItemView.hovered : true)
 			sourceComponent: animatedBackgroundComponent
@@ -196,13 +242,19 @@ Rectangle {
 			anchors.fill: parent
 			// Show a static fallback (first frame) whenever there's a background image
 			// but the animated renderer is not active, or the animated load failed.
-			visible: !!activeBackgroundSource && (
+			visible: !!safeBackgroundSource && (
 				!tileItemView.backgroundIsAnimated || tileItemView.backgroundAnimatedLoadFailed || !animatedLoader.active
 			)
-			source: activeBackgroundSource
+			source: safeBackgroundSource
 			fillMode: Image.PreserveAspectCrop
 			asynchronous: true
 			cache: false
+			onStatusChanged: {
+				if (status === Image.Error && tileItemView.safeBackgroundSource) {
+					console.warn("[TiledMenu] skipping failed tile background image", tileItemView.safeBackgroundSource)
+					tileItemView.failedBackgroundSource = tileItemView.safeBackgroundSource
+				}
+			}
 		}
 
 		Timer {

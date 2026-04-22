@@ -1,5 +1,6 @@
 import QtQuick
 import org.kde.plasma.private.kicker as Kicker
+import "Utils.js" as Utils
 
 Item {
 	id: appsModel
@@ -73,6 +74,102 @@ Item {
 			}
 		}
 		return true
+	}
+
+	function _launcherBasename(value) {
+		value = (typeof value === "undefined" || value === null) ? "" : ("" + value)
+		if (!value) {
+			return ""
+		}
+		var hash = value.indexOf("#")
+		if (hash >= 0) {
+			value = value.substring(0, hash)
+		}
+		var query = value.indexOf("?")
+		if (query >= 0) {
+			value = value.substring(0, query)
+		}
+		var slash = value.lastIndexOf("/")
+		return slash >= 0 ? value.substring(slash + 1) : value
+	}
+
+	function _launcherMatches(item, favoriteId) {
+		if (!item || !favoriteId) {
+			return false
+		}
+		if (item.favoriteId === favoriteId || _launcherBasename(item.favoriteId) === favoriteId) {
+			return true
+		}
+		return _launcherBasename(item.url) === favoriteId
+	}
+
+	function getTileApp(favoriteId) {
+		favoriteId = Utils.kickerFavoriteId(favoriteId)
+		if (!favoriteId || !allAppsModel || !allAppsModel.list) {
+			return null
+		}
+		var list = allAppsModel.list
+		for (var i = 0; i < list.length; i++) {
+			var item = list[i]
+			if (!_launcherMatches(item, favoriteId)) {
+				continue
+			}
+			return {
+				indexInModel: i,
+				actionListModel: allAppsModel,
+				favoriteId: favoriteId,
+				display: item.name || favoriteId,
+				decoration: item.icon || item.iconName || favoriteId,
+				description: item.description || "",
+				group: item.parentName || "",
+				url: item.url || ""
+			}
+		}
+		return null
+	}
+
+	function _launcherListContains(list, favoriteId) {
+		if (!Array.isArray(list)) {
+			return false
+		}
+		for (var i = 0; i < list.length; i++) {
+			if (_launcherMatches(list[i], favoriteId)) {
+				return true
+			}
+		}
+		return false
+	}
+
+	function isInstalledLauncherFavorite(favoriteId) {
+		favoriteId = Utils.kickerFavoriteId(favoriteId)
+		if (!favoriteId) {
+			return false
+		}
+		if (getTileApp(favoriteId)) {
+			return true
+		}
+		if (allAppsModel && typeof allAppsModel.getAllApps === "function") {
+			try {
+				return _launcherListContains(allAppsModel.getAllApps(), favoriteId)
+			} catch (e) {
+				appsModel.logWarn("AppsModel.isInstalledLauncherFavorite failed", favoriteId, e)
+			}
+		}
+		return false
+	}
+
+	function runTileApp(favoriteId) {
+		var app = getTileApp(favoriteId)
+		if (!app || !app.actionListModel || typeof app.actionListModel.triggerIndex !== "function") {
+			return false
+		}
+		try {
+			app.actionListModel.triggerIndex(app.indexInModel)
+			return true
+		} catch (e) {
+			appsModel.logWarn("AppsModel.runTileApp failed", favoriteId, e)
+			return false
+		}
 	}
 
 
@@ -212,8 +309,18 @@ Item {
 					pendingConfigSync = false
 					return
 				}
+				var rawConfiguredFavorites = appsModel.uniqueStringList(plasmoid.configuration.sidebarShortcuts)
+				var configuredFavorites = []
+				for (var configuredIndex = 0; configuredIndex < rawConfiguredFavorites.length; configuredIndex++) {
+					var configuredFavorite = rawConfiguredFavorites[configuredIndex]
+					var launcherFavorite = Utils.kickerFavoriteId(configuredFavorite)
+					if (launcherFavorite && !appsModel.isInstalledLauncherFavorite(launcherFavorite)) {
+						appsModel.logWarn("[TiledMenu] skipping missing sidebar launcher", launcherFavorite)
+						continue
+					}
+					configuredFavorites.push(configuredFavorite)
+				}
 				pendingConfigSync = false
-				var configuredFavorites = appsModel.uniqueStringList(plasmoid.configuration.sidebarShortcuts)
 				var existingFavorites = appsModel.stringListToArray(favorites)
 				syncingFromConfiguration = true
 				for (var i = 0; i < existingFavorites.length; i++) {
