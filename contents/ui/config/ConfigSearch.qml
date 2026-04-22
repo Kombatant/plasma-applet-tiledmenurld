@@ -18,6 +18,9 @@ LibConfig.FormKCM {
 	readonly property bool groupedSearchResultsEnabled: formLayout.searchOptionsEnabled
 		&& !!(formLayout.cfg_searchResultsGrouped !== undefined ? formLayout.cfg_searchResultsGrouped : plasmoid.configuration.searchResultsGrouped)
 	readonly property string pendingSidebarPosition: formLayout.cfg_sidebarPosition !== undefined ? formLayout.cfg_sidebarPosition : plasmoid.configuration.sidebarPosition
+	readonly property bool searchOnTopEnabled: formLayout.searchOptionsEnabled
+		&& formLayout.pendingUsesClassicLayout
+		&& formLayout.pendingSidebarPosition === 'left'
 	readonly property bool searchFieldHeightEnabled: searchOptionsEnabled
 		&& (!formLayout.pendingUsesClassicLayout
 			|| (pendingSidebarPosition !== 'top' && pendingSidebarPosition !== 'bottom'))
@@ -48,7 +51,7 @@ LibConfig.FormKCM {
 		configKey: 'searchOnTop'
 		text: i18n("Search On Top")
 		Kirigami.FormData.label: ""
-		enabled: formLayout.searchOptionsEnabled && formLayout.pendingUsesClassicLayout
+		enabled: formLayout.searchOnTopEnabled
 		opacity: enabled ? 1 : 0.45
 	}
 

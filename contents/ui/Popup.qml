@@ -707,8 +707,11 @@ MouseArea {
 			? config.searchFieldHeight
 			: 0
 		var tabRowContentHeight = Math.max(tabRowTabsHeight, tabRowSearchHeight)
+		var tabRowTopMargin = (config.usesDockedSidebarLayout || (config.usesClassicLayout && config.sidebarOnLeft))
+			? config.sidebarCardInset
+			: Kirigami.Units.largeSpacing
 		var tabBarExtraHeight = tabRowContentHeight > 0
-			? tabRowContentHeight + Kirigami.Units.largeSpacing + Kirigami.Units.smallSpacing
+			? tabRowContentHeight + tabRowTopMargin + Kirigami.Units.smallSpacing
 			: 0
 		var searchFieldExtraHeight = 0
 		var targetGridHeight = rows * cellBox + 2 * holoPad
@@ -1177,7 +1180,7 @@ MouseArea {
 					Item {
 						id: rightPaneTopRow
 						Layout.fillWidth: true
-						Layout.topMargin: Kirigami.Units.largeSpacing
+						Layout.topMargin: _alignTopSurfaces ? config.sidebarCardInset : Kirigami.Units.largeSpacing
 						Layout.leftMargin: Kirigami.Units.largeSpacing
 						Layout.rightMargin: Kirigami.Units.largeSpacing
 						Layout.bottomMargin: Kirigami.Units.smallSpacing
@@ -1195,6 +1198,8 @@ MouseArea {
 						readonly property real _minTabsWidth: Kirigami.Units.gridUnit * 6
 						readonly property real _handleWidth: Kirigami.Units.smallSpacing * 2
 						readonly property bool _bothVisible: _showDockedSearchField && _showTileTabs
+						readonly property bool _alignTopSurfaces: config.usesDockedSidebarLayout
+							|| (config.usesClassicLayout && config.sidebarOnLeft)
 						readonly property real _effectiveSearchWidth: {
 							if (!_showDockedSearchField) return 0
 							if (!_showTileTabs) return width
@@ -1208,7 +1213,7 @@ MouseArea {
 								id: rightPaneSearchField
 								visible: rightPaneTopRow._showDockedSearchField
 								anchors.left: parent.left
-								anchors.verticalCenter: parent.verticalCenter
+								y: rightPaneTopRow._alignTopSurfaces ? 0 : Math.round((parent.height - height) / 2)
 								width: rightPaneTopRow._showTileTabs ? rightPaneTopRow._effectiveSearchWidth : parent.width
 								height: config.searchFieldHeight
 								implicitHeight: config.searchFieldHeight
@@ -1274,6 +1279,7 @@ MouseArea {
 									: parent.width
 								visible: rightPaneTopRow._showTileTabs
 								style: plasmoid.configuration.tileTabStyle || "tabs"
+								alignSurfaceToTop: rightPaneTopRow._alignTopSurfaces
 								activeTab: popup.activeTabIndex
 								tabs: popup.tileTabsData.map(function(t) {
 									return {id: t.id, name: t.name, icon: t.icon || ""}

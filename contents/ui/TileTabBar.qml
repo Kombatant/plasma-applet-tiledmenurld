@@ -18,6 +18,7 @@ Item {
 
 	// Visual style: "tabs" (classic curved tabs) or "pills".
 	property string style: "tabs"
+	property bool alignSurfaceToTop: false
 	readonly property bool _pillsMode: style === "pills"
 
 	// Emitted when the user selects a different tab.
@@ -173,7 +174,7 @@ Item {
 			anchors.left: parent.left
 			anchors.right: pillsTrailing.left
 			anchors.rightMargin: Kirigami.Units.smallSpacing
-			anchors.verticalCenter: parent.verticalCenter
+			y: tabBar.alignSurfaceToTop ? 0 : Math.round((parent.height - height) / 2)
 			height: Math.round(parent.height * 0.85)
 			contentWidth: pillsRow.width + tabBar._listPadding * 2
 			contentHeight: height
