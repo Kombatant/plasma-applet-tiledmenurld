@@ -289,7 +289,7 @@ Item {
 			}
 		}
 
-		// ── Trailing controls for pills: scroll chevrons + "+" ──
+		// ── Trailing controls for pills: scroll chevrons + add tab ──
 		Row {
 			id: pillsTrailing
 			anchors.right: parent.right
@@ -364,10 +364,16 @@ Item {
 				width: tabBar.tabHeight
 				height: tabBar.tabHeight
 
-				QQC2.Label {
+				Accessible.name: i18n("Add Tab")
+				Accessible.role: Accessible.Button
+				QQC2.ToolTip.visible: pillsAddMA.containsMouse
+				QQC2.ToolTip.text: i18n("Add Tab")
+
+				Kirigami.Icon {
 					anchors.centerIn: parent
-					text: "+"
-					font.pixelSize: Kirigami.Units.gridUnit
+					source: "tab-new-symbolic"
+					width: Kirigami.Units.iconSizes.smallMedium
+					height: width
 					color: Kirigami.Theme.textColor
 					opacity: pillsAddMA.containsMouse ? 0.9 : 0.55
 				}
@@ -485,7 +491,7 @@ Item {
 			}
 		}
 
-		// ── Trailing controls: scroll chevrons + "+" ──
+		// ── Trailing controls: scroll chevrons + add tab ──
 		Row {
 			id: tabsTrailing
 			anchors.right: parent.right
@@ -562,10 +568,16 @@ Item {
 				width: tabBar.tabHeight
 				height: tabBar.tabHeight
 
-				QQC2.Label {
+				Accessible.name: i18n("Add Tab")
+				Accessible.role: Accessible.Button
+				QQC2.ToolTip.visible: tabsAddMA.containsMouse
+				QQC2.ToolTip.text: i18n("Add Tab")
+
+				Kirigami.Icon {
 					anchors.centerIn: parent
-					text: "+"
-					font.pixelSize: Kirigami.Units.gridUnit
+					source: "tab-new-symbolic"
+					width: Kirigami.Units.iconSizes.smallMedium
+					height: width
 					color: Kirigami.Theme.textColor
 					opacity: tabsAddMA.containsMouse ? 0.9 : 0.55
 				}
