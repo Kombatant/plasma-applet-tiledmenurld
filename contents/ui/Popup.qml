@@ -1181,19 +1181,23 @@ MouseArea {
 						Layout.leftMargin: Kirigami.Units.largeSpacing
 						Layout.rightMargin: Kirigami.Units.largeSpacing
 						Layout.bottomMargin: Kirigami.Units.smallSpacing
-						visible: rightPaneSearchField.visible || tileTabBar.visible
+						visible: _showDockedSearchField || _showTileTabs
 						implicitHeight: Math.max(
-							rightPaneSearchField.visible ? rightPaneSearchField.implicitHeight : 0,
-							tileTabBar.visible ? tileTabBar.implicitHeight : 0)
+							_showDockedSearchField ? rightPaneSearchField.implicitHeight : 0,
+							_showTileTabs ? tileTabBar.implicitHeight : 0)
 
+						readonly property bool _showDockedSearchField: config.usesDockedSidebarLayout
+							&& !config.isEditingTile
+							&& (!config.hideSearchField || search.query.length > 0)
+						readonly property bool _showTileTabs: config.useTileTabs
 						readonly property real _gap: Kirigami.Units.largeSpacing * 2
 						readonly property real _minSearchWidth: Kirigami.Units.gridUnit * 8
 						readonly property real _minTabsWidth: Kirigami.Units.gridUnit * 6
 						readonly property real _handleWidth: Kirigami.Units.smallSpacing * 2
-						readonly property bool _bothVisible: rightPaneSearchField.visible && tileTabBar.visible
+						readonly property bool _bothVisible: _showDockedSearchField && _showTileTabs
 						readonly property real _effectiveSearchWidth: {
-							if (!rightPaneSearchField.visible) return 0
-							if (!tileTabBar.visible) return width
+							if (!_showDockedSearchField) return 0
+							if (!_showTileTabs) return width
 							var saved = plasmoid.configuration.dockedSearchFieldWidth || 0
 							var desired = saved > 0 ? saved : Math.round(width * 0.35)
 							var maxW = Math.max(_minSearchWidth, width - _minTabsWidth - _gap)
@@ -1202,10 +1206,10 @@ MouseArea {
 
 							SearchField {
 								id: rightPaneSearchField
-								visible: config.usesDockedSidebarLayout && !config.isEditingTile && (!config.hideSearchField || search.query.length > 0)
+								visible: rightPaneTopRow._showDockedSearchField
 								anchors.left: parent.left
 								anchors.verticalCenter: parent.verticalCenter
-								width: tileTabBar.visible ? rightPaneTopRow._effectiveSearchWidth : parent.width
+								width: rightPaneTopRow._showTileTabs ? rightPaneTopRow._effectiveSearchWidth : parent.width
 								height: config.searchFieldHeight
 								implicitHeight: config.searchFieldHeight
 								listView: searchView.stackView && searchView.stackView.currentItem && searchView.stackView.currentItem.listView ? searchView.stackView.currentItem.listView : []
@@ -1265,10 +1269,10 @@ MouseArea {
 								id: tileTabBar
 								anchors.right: parent.right
 								anchors.verticalCenter: parent.verticalCenter
-								width: rightPaneSearchField.visible
+								width: rightPaneTopRow._showDockedSearchField
 									? Math.max(0, parent.width - rightPaneSearchField.width - rightPaneTopRow._gap)
 									: parent.width
-								visible: config.useTileTabs
+								visible: rightPaneTopRow._showTileTabs
 								style: plasmoid.configuration.tileTabStyle || "tabs"
 								activeTab: popup.activeTabIndex
 								tabs: popup.tileTabsData.map(function(t) {
