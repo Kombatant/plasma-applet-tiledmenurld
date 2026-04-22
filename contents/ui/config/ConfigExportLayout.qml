@@ -9,10 +9,184 @@ import "../lib/Base64.js" as Base64
 
 import ".." as TiledMenu
 
-ColumnLayout {
+Item {
 	id: page
-	spacing: Kirigami.Units.smallSpacing
-	anchors.margins: Kirigami.Units.gridUnit * 2
+	implicitWidth: contentLayout.implicitWidth + Kirigami.Units.gridUnit * 4
+	implicitHeight: contentLayout.implicitHeight + Kirigami.Units.gridUnit * 4
+
+	// Plasma's config dialog sets these initial properties on each page root.
+	// This page does not use FormKCM, so it declares them directly.
+	property string title: ""
+	property var cfg_icon
+	property var cfg_iconDefault
+	property var cfg_fixedPanelIcon
+	property var cfg_fixedPanelIconDefault
+	property var cfg_searchResultsGrouped
+	property var cfg_searchResultsGroupedDefault
+	property var cfg_searchDefaultFilters
+	property var cfg_searchDefaultFiltersDefault
+	property var cfg_showRecentApps
+	property var cfg_showRecentAppsDefault
+	property var cfg_recentOrdering
+	property var cfg_recentOrderingDefault
+	property var cfg_numRecentApps
+	property var cfg_numRecentAppsDefault
+	property var cfg_sidebarShortcuts
+	property var cfg_sidebarShortcutsDefault
+	property var cfg_sidebarCollapsibleSearchResults
+	property var cfg_sidebarCollapsibleSearchResultsDefault
+	property var cfg_customAvatarPath
+	property var cfg_customAvatarPathDefault
+	property var cfg_defaultAppListView
+	property var cfg_defaultAppListViewDefault
+	property var cfg_lastUsedAppListView
+	property var cfg_lastUsedAppListViewDefault
+	property var cfg_aiChatEnabled
+	property var cfg_aiChatEnabledDefault
+	property var cfg_aiProvider
+	property var cfg_aiProviderDefault
+	property var cfg_aiApiKey
+	property var cfg_aiApiKeyDefault
+	property var cfg_aiOllamaUrl
+	property var cfg_aiOllamaUrlDefault
+	property var cfg_aiOpenWebUiUrl
+	property var cfg_aiOpenWebUiUrlDefault
+	property var cfg_aiModel
+	property var cfg_aiModelDefault
+	property var cfg_aiDetectedModels
+	property var cfg_aiDetectedModelsDefault
+	property var cfg_aiChatHistory
+	property var cfg_aiChatHistoryDefault
+	property var cfg_aiStreamChat
+	property var cfg_aiStreamChatDefault
+	property var cfg_terminalApp
+	property var cfg_terminalAppDefault
+	property var cfg_taskManagerApp
+	property var cfg_taskManagerAppDefault
+	property var cfg_fileManagerApp
+	property var cfg_fileManagerAppDefault
+	property var cfg_useTileTabs
+	property var cfg_useTileTabsDefault
+	property var cfg_tileTabStyle
+	property var cfg_tileTabStyleDefault
+	property var cfg_tileTabs
+	property var cfg_tileTabsDefault
+	property var cfg_tileModel
+	property var cfg_tileModelDefault
+	property var cfg_tileScale
+	property var cfg_tileScaleDefault
+	property var cfg_tileIconSize
+	property var cfg_tileIconSizeDefault
+	property var cfg_tileMargin
+	property var cfg_tileMarginDefault
+	property var cfg_tileRoundedCorners
+	property var cfg_tileRoundedCornersDefault
+	property var cfg_tileCornerRadius
+	property var cfg_tileCornerRadiusDefault
+	property var cfg_tilesLocked
+	property var cfg_tilesLockedDefault
+	property var cfg_tileHoverEffect
+	property var cfg_tileHoverEffectDefault
+	property var cfg_tileAnimatedPlayOnHover
+	property var cfg_tileAnimatedPlayOnHoverDefault
+	property var cfg_showTileTooltips
+	property var cfg_showTileTooltipsDefault
+	property var cfg_defaultTileColor
+	property var cfg_defaultTileColorDefault
+	property var cfg_defaultTileGradient
+	property var cfg_defaultTileGradientDefault
+	property var cfg_sidebarBackgroundColor
+	property var cfg_sidebarBackgroundColorDefault
+	property var cfg_hideSearchField
+	property var cfg_hideSearchFieldDefault
+	property var cfg_searchOnTop
+	property var cfg_searchOnTopDefault
+	property var cfg_searchFieldFollowsTheme
+	property var cfg_searchFieldFollowsThemeDefault
+	property var cfg_sidebarFollowsTheme
+	property var cfg_sidebarFollowsThemeDefault
+	property var cfg_sidebarHideBorder
+	property var cfg_sidebarHideBorderDefault
+	property var cfg_tileLabelAlignment
+	property var cfg_tileLabelAlignmentDefault
+	property var cfg_groupLabelAlignment
+	property var cfg_groupLabelAlignmentDefault
+	property var cfg_tileGroupLayout
+	property var cfg_tileGroupLayoutDefault
+	property var cfg_presetTilesFolder
+	property var cfg_presetTilesFolderDefault
+	property var cfg_appDescription
+	property var cfg_appDescriptionDefault
+	property var cfg_appListIconSize
+	property var cfg_appListIconSizeDefault
+	property var cfg_searchFieldHeight
+	property var cfg_searchFieldHeightDefault
+	property var cfg_dockedSearchFieldWidth
+	property var cfg_dockedSearchFieldWidthDefault
+	property var cfg_appListWidth
+	property var cfg_appListWidthDefault
+	property var cfg_dockedSidebarWidth
+	property var cfg_dockedSidebarWidthDefault
+	property var cfg_popupHeight
+	property var cfg_popupHeightDefault
+	property var cfg_popupHeightAlphabetical
+	property var cfg_popupHeightAlphabeticalDefault
+	property var cfg_popupWidthAlphabetical
+	property var cfg_popupWidthAlphabeticalDefault
+	property var cfg_favGridColsAlphabetical
+	property var cfg_favGridColsAlphabeticalDefault
+	property var cfg_popupHeightCategories
+	property var cfg_popupHeightCategoriesDefault
+	property var cfg_popupWidthCategories
+	property var cfg_popupWidthCategoriesDefault
+	property var cfg_favGridColsCategories
+	property var cfg_favGridColsCategoriesDefault
+	property var cfg_popupHeightTilesOnly
+	property var cfg_popupHeightTilesOnlyDefault
+	property var cfg_popupWidthTilesOnly
+	property var cfg_popupWidthTilesOnlyDefault
+	property var cfg_favGridColsTilesOnly
+	property var cfg_favGridColsTilesOnlyDefault
+	property var cfg_popupHeightAiChat
+	property var cfg_popupHeightAiChatDefault
+	property var cfg_popupWidthAiChat
+	property var cfg_popupWidthAiChatDefault
+	property var cfg_favGridColsAiChat
+	property var cfg_favGridColsAiChatDefault
+	property var cfg_popupHeightDockedAlphabetical
+	property var cfg_popupHeightDockedAlphabeticalDefault
+	property var cfg_popupWidthDockedAlphabetical
+	property var cfg_popupWidthDockedAlphabeticalDefault
+	property var cfg_favGridColsDockedAlphabetical
+	property var cfg_favGridColsDockedAlphabeticalDefault
+	property var cfg_popupHeightDockedCategories
+	property var cfg_popupHeightDockedCategoriesDefault
+	property var cfg_popupWidthDockedCategories
+	property var cfg_popupWidthDockedCategoriesDefault
+	property var cfg_favGridColsDockedCategories
+	property var cfg_favGridColsDockedCategoriesDefault
+	property var cfg_popupHeightDockedTilesOnly
+	property var cfg_popupHeightDockedTilesOnlyDefault
+	property var cfg_popupWidthDockedTilesOnly
+	property var cfg_popupWidthDockedTilesOnlyDefault
+	property var cfg_favGridColsDockedTilesOnly
+	property var cfg_favGridColsDockedTilesOnlyDefault
+	property var cfg_popupHeightDockedAiChat
+	property var cfg_popupHeightDockedAiChatDefault
+	property var cfg_popupWidthDockedAiChat
+	property var cfg_popupWidthDockedAiChatDefault
+	property var cfg_favGridColsDockedAiChat
+	property var cfg_favGridColsDockedAiChatDefault
+	property var cfg_favGridCols
+	property var cfg_favGridColsDefault
+	property var cfg_sidebarButtonSize
+	property var cfg_sidebarButtonSizeDefault
+	property var cfg_sidebarIconSize
+	property var cfg_sidebarIconSizeDefault
+	property var cfg_sidebarPosition
+	property var cfg_sidebarPositionDefault
+	property var cfg_useDockedLayout
+	property var cfg_useDockedLayoutDefault
 
 	// Force Window color scheme instead of inheriting Plasma theme colors
 	Kirigami.Theme.colorSet: Kirigami.Theme.Window
@@ -51,7 +225,7 @@ ColumnLayout {
 		fileManagerApp: "string",
 		useTileTabs: "bool",
 		tileTabStyle: "string",
-		tileTabs: "string",
+		tileTabs: "tiletabs",
 		tileModel: "tilemodel",
 		tileScale: "double",
 		tileIconSize: "int",
@@ -273,7 +447,50 @@ ColumnLayout {
 		if (typeName === "tilemodel") {
 			return Array.isArray(value) ? value : []
 		}
+		if (typeName === "tiletabs") {
+			return _normalizeTileTabs(value)
+		}
 		return (typeof value === "undefined" || value === null) ? "" : ("" + value)
+	}
+
+	function _normalizeTileTabs(value) {
+		var tabs = []
+		if (Array.isArray(value)) {
+			tabs = value
+		} else if (typeof value === "string" && value) {
+			try {
+				var decoded = Base64.decodeString(value)
+				var parsed = JSON.parse(decoded)
+				if (Array.isArray(parsed)) {
+					tabs = parsed
+				}
+			} catch (e) {
+				tabs = []
+			}
+		}
+
+		var out = []
+		for (var i = 0; i < tabs.length; i++) {
+			var tab = tabs[i]
+			if (!tab || typeof tab !== "object") {
+				continue
+			}
+			out.push({
+				id: (typeof tab.id === "undefined" || tab.id === null) ? "" : ("" + tab.id),
+				name: (typeof tab.name === "undefined" || tab.name === null) ? "" : ("" + tab.name),
+				icon: (typeof tab.icon === "undefined" || tab.icon === null) ? "" : ("" + tab.icon),
+				tiles: Array.isArray(tab.tiles) ? tab.tiles : [],
+			})
+		}
+		return out
+	}
+
+	function _encodeTileTabs(tabs) {
+		var normalized = _normalizeTileTabs(tabs)
+		if (normalized.length === 0) {
+			return ""
+		}
+		return Base64.encodeString(JSON.stringify(normalized))
 	}
 
 	function _propTypeForValue(v) {
@@ -320,17 +537,16 @@ ColumnLayout {
 		return (typeof value === "undefined" || value === null) ? "" : ("" + value)
 	}
 
-	function _buildTileModelXml(tileModelArray) {
+	function _buildTilesXmlLines(tileModelArray, indent) {
 		var tiles = Array.isArray(tileModelArray) ? tileModelArray : []
 		var lines = []
-		lines.push("    <entry key=\"tileModel\" type=\"tilemodel\">")
-		lines.push("      <tiles>")
+		lines.push(indent + "<tiles>")
 		for (var i = 0; i < tiles.length; i++) {
 			var tile = tiles[i]
 			if (!tile || typeof tile !== "object") {
 				continue
 			}
-			lines.push("        <tile>")
+			lines.push(indent + "  <tile>")
 			var keys = Object.keys(tile)
 			keys.sort()
 			for (var ki = 0; ki < keys.length; ki++) {
@@ -344,16 +560,51 @@ ColumnLayout {
 					} catch (e) {
 						jsonText = "null"
 					}
-					lines.push("          <prop name=\"" + _escapeXml(k) + "\" type=\"json\"><![CDATA[" + jsonText + "]]></prop>")
+					lines.push(indent + "    <prop name=\"" + _escapeXml(k) + "\" type=\"json\"><![CDATA[" + jsonText + "]]></prop>")
 				} else {
-					lines.push("          <prop name=\"" + _escapeXml(k) + "\" type=\"" + t + "\">" + _escapeXml(v) + "</prop>")
+					lines.push(indent + "    <prop name=\"" + _escapeXml(k) + "\" type=\"" + t + "\">" + _escapeXml(v) + "</prop>")
 				}
 			}
-			lines.push("        </tile>")
+			lines.push(indent + "  </tile>")
 		}
-		lines.push("      </tiles>")
+		lines.push(indent + "</tiles>")
+		return lines
+	}
+
+	function _buildTileModelXml(tileModelArray) {
+		var lines = []
+		lines.push("    <entry key=\"tileModel\" type=\"tilemodel\">")
+		var tileLines = _buildTilesXmlLines(tileModelArray, "      ")
+		for (var i = 0; i < tileLines.length; i++) {
+			lines.push(tileLines[i])
+		}
 		lines.push("    </entry>")
 		return lines
+	}
+
+	function _buildTileTabsXml(tileTabsArray) {
+		var tabs = _normalizeTileTabs(tileTabsArray)
+		var lines = []
+		lines.push("    <entry key=\"tileTabs\" type=\"tiletabs\">")
+		lines.push("      <tabs>")
+		for (var i = 0; i < tabs.length; i++) {
+			var tab = tabs[i]
+			lines.push("        <tab id=\"" + _escapeXml(tab.id) + "\" name=\"" + _escapeXml(tab.name) + "\" icon=\"" + _escapeXml(tab.icon) + "\">")
+			var tileLines = _buildTilesXmlLines(tab.tiles, "          ")
+			for (var ti = 0; ti < tileLines.length; ti++) {
+				lines.push(tileLines[ti])
+			}
+			lines.push("        </tab>")
+		}
+		lines.push("      </tabs>")
+		lines.push("    </entry>")
+		return lines
+	}
+
+	function _xmlAttribute(tagText, attrName, defaultValue) {
+		var re = new RegExp(attrName + "=\"([^\"]*)\"")
+		var m = re.exec(tagText || "")
+		return m && m.length >= 2 ? _unescapeXml(m[1]) : defaultValue
 	}
 
 	function _parseTileModelXml(inner) {
@@ -387,10 +638,30 @@ ColumnLayout {
 		return out
 	}
 
+	function _parseTileTabsXml(inner) {
+		var out = []
+		var xml = inner || ""
+		var reTab = /<tab\b([^>]*)>([\s\S]*?)<\/tab>/g
+		var tabMatch
+		while ((tabMatch = reTab.exec(xml)) !== null) {
+			var attrs = tabMatch[1] || ""
+			var tabInner = tabMatch[2] || ""
+			var tilesMatch = /<tiles\b[^>]*>([\s\S]*?)<\/tiles>/.exec(tabInner)
+			out.push({
+				id: _xmlAttribute(attrs, "id", ""),
+				name: _xmlAttribute(attrs, "name", ""),
+				icon: _xmlAttribute(attrs, "icon", ""),
+				tiles: tilesMatch ? _parseTileModelXml(tilesMatch[0]) : [],
+			})
+		}
+		return out
+	}
+
 	function buildExportXml() {
 		var grouped = {
 			"General": [],
 			"Application List": [],
+			"Appearance": [],
 			"Search": [],
 			"AI Chat": [],
 			"Sidebar": [],
@@ -403,13 +674,17 @@ ColumnLayout {
 			var typeName = settingsSchema[key]
 			var raw = _readConfigValue(key)
 			var value = _normalizeValueForType(raw, typeName)
-			grouped[_sectionForKey(key)].push({ key: key, type: typeName, value: value })
+			var sectionName = _sectionForKey(key)
+			if (!grouped[sectionName]) {
+				sectionName = "Other"
+			}
+			grouped[sectionName].push({ key: key, type: typeName, value: value })
 		}
 
 		var lines = []
 		lines.push("<?xml version=\"1.0\" encoding=\"UTF-8\"?>")
 		lines.push("<tiledmenu format=\"tiled_rld\" version=\"2\">")
-		var sectionOrder = ["General", "Application List", "Search", "AI Chat", "Sidebar", "Tiles", "Other"]
+		var sectionOrder = ["General", "Application List", "Appearance", "Search", "AI Chat", "Sidebar", "Tiles", "Other"]
 		for (var si = 0; si < sectionOrder.length; si++) {
 			var sectionName = sectionOrder[si]
 			lines.push("  <section name=\"" + _escapeXml(sectionName) + "\">")
@@ -422,6 +697,13 @@ ColumnLayout {
 					var tileLines = _buildTileModelXml(item.value)
 					for (var tl = 0; tl < tileLines.length; tl++) {
 						lines.push(tileLines[tl])
+					}
+					continue
+				}
+				if (k === "tileTabs" && t === "tiletabs") {
+					var tabLines = _buildTileTabsXml(item.value)
+					for (var tbl = 0; tbl < tabLines.length; tbl++) {
+						lines.push(tabLines[tbl])
 					}
 					continue
 				}
@@ -484,6 +766,11 @@ ColumnLayout {
 				if (_lastTileModelError) {
 					_lastImportError = _lastTileModelError
 				}
+			} else if (typeName === "tiletabs") {
+				out[key] = _parseTileTabsXml(inner)
+				if (_lastTileModelError) {
+					_lastImportError = _lastTileModelError
+				}
 			} else {
 				var value = _extractCdataOrText(inner)
 				if (key === "tileScale" && importVersion >= 2) {
@@ -512,10 +799,7 @@ ColumnLayout {
 				// Plasma's configuration dialog only persists changes on OK/Apply when
 				// the KCM is marked dirty. Since we edit settings programmatically from
 				// the XML editor, explicitly notify the root KCM.
-				var rootKcm = getRootKcm()
-				if (rootKcm) {
-					rootKcm.configurationChanged()
-				}
+				ConfigUtils.markConfigurationChanged(page)
 			}
 
 			function setCfgValue(configKey, normalizedValue, typeName) {
@@ -524,7 +808,7 @@ ColumnLayout {
 					return
 				}
 				var propName = "cfg_" + configKey
-				if (typeof rootKcm[propName] === "undefined") {
+				if (typeof rootKcm[propName] === "undefined" && typeof rootKcm[propName + "Changed"] === "undefined") {
 					return
 				}
 				if (typeName === "tilemodel") {
@@ -543,6 +827,8 @@ ColumnLayout {
 						encoded = Base64.encodeString("<tiles></tiles>")
 					}
 					rootKcm[propName] = encoded
+				} else if (typeName === "tiletabs") {
+					rootKcm[propName] = _encodeTileTabs(normalizedValue)
 				} else {
 					rootKcm[propName] = ConfigUtils.cloneValue(normalizedValue)
 				}
@@ -558,8 +844,9 @@ ColumnLayout {
 				}
 				var typeName = settingsSchema[key]
 				var normalized = _normalizeValueForType(imported[key], typeName)
+				var current = _normalizeValueForType(_readConfigValue(key), typeName)
 				if (key === "tileModel") {
-					var tileModelChanged = !ConfigUtils.valuesEqual(_readConfigValue(key), normalized)
+					var tileModelChanged = !ConfigUtils.valuesEqual(current, normalized)
 					if (tileModelChanged) {
 						// Ensure the config page's own Base64XmlString mirrors the new value.
 						configTileModel.value = normalized
@@ -569,7 +856,7 @@ ColumnLayout {
 						changedSomething = true
 					}
 				} else {
-					if (!ConfigUtils.valuesEqual(_readConfigValue(key), normalized)) {
+					if (!ConfigUtils.valuesEqual(current, normalized)) {
 						setCfgValue(key, normalized, typeName)
 						changedSomething = true
 					}
@@ -726,48 +1013,55 @@ ColumnLayout {
 		execRead.connectSource(cmd)
 	}
 
-	RowLayout {
-		Layout.fillWidth: true
+	ColumnLayout {
+		id: contentLayout
+		anchors.fill: parent
+		anchors.margins: Kirigami.Units.gridUnit * 2
 		spacing: Kirigami.Units.smallSpacing
-		Item { Layout.fillWidth: true }
-		Button {
-			text: i18n("Import XML")
-			icon.name: "document-open"
-			onClicked: importDialog.open()
-		}
-		Button {
-			text: i18n("Export XML")
-			icon.name: "document-save"
-			onClicked: saveDialog.open()
-		}
-	}
 
-	ScrollView {
-		id: xmlScrollView
-		Layout.fillWidth: true
-		Layout.fillHeight: true
-		clip: true
-
-		TextArea {
-			id: xmlEditor
-			// Avoid anchoring inside ScrollView (can produce anchor-loop warnings).
-			width: xmlScrollView.availableWidth
-			height: Math.max(xmlScrollView.availableHeight, implicitHeight)
-			font.family: "monospace"
-			wrapMode: TextEdit.NoWrap
-			selectByMouse: true
-			onTextChanged: {
-				if (page._updatingTextFromConfig) {
-					return
-				}
-				page._xmlEditedByUser = true
-				applyXmlDebounced.restart()
+		RowLayout {
+			Layout.fillWidth: true
+			spacing: Kirigami.Units.smallSpacing
+			Item { Layout.fillWidth: true }
+			Button {
+				text: i18n("Import XML")
+				icon.name: "document-open"
+				onClicked: importDialog.open()
 			}
-			onActiveFocusChanged: {
-				// When the user clicks OK, focus moves away from the editor.
-				// Flush any pending debounced apply so changes are not lost.
-				if (!activeFocus) {
-					page._flushPendingXmlApply()
+			Button {
+				text: i18n("Export XML")
+				icon.name: "document-save"
+				onClicked: saveDialog.open()
+			}
+		}
+
+		ScrollView {
+			id: xmlScrollView
+			Layout.fillWidth: true
+			Layout.fillHeight: true
+			clip: true
+
+			TextArea {
+				id: xmlEditor
+				// Avoid anchoring inside ScrollView (can produce anchor-loop warnings).
+				width: xmlScrollView.availableWidth
+				height: Math.max(xmlScrollView.availableHeight, implicitHeight)
+				font.family: "monospace"
+				wrapMode: TextEdit.NoWrap
+				selectByMouse: true
+				onTextChanged: {
+					if (page._updatingTextFromConfig) {
+						return
+					}
+					page._xmlEditedByUser = true
+					applyXmlDebounced.restart()
+				}
+				onActiveFocusChanged: {
+					// When the user clicks OK, focus moves away from the editor.
+					// Flush any pending debounced apply so changes are not lost.
+					if (!activeFocus) {
+						page._flushPendingXmlApply()
+					}
 				}
 			}
 		}
