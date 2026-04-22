@@ -1224,7 +1224,8 @@ MouseArea {
 								id: topRowResizeHandle
 								visible: rightPaneTopRow._bothVisible
 								width: rightPaneTopRow._handleWidth
-								height: parent.height
+								height: rightPaneTopRow._alignTopSurfaces ? rightPaneSearchField.height : parent.height
+								y: rightPaneTopRow._alignTopSurfaces ? 0 : Math.round((parent.height - height) / 2)
 								x: rightPaneSearchField.x + rightPaneSearchField.width + (rightPaneTopRow._gap - width) / 2
 								z: 2
 
@@ -1273,10 +1274,11 @@ MouseArea {
 							TileTabBar {
 								id: tileTabBar
 								anchors.right: parent.right
-								anchors.verticalCenter: parent.verticalCenter
+								y: rightPaneTopRow._alignTopSurfaces ? 0 : Math.round((parent.height - height) / 2)
 								width: rightPaneTopRow._showDockedSearchField
 									? Math.max(0, parent.width - rightPaneSearchField.width - rightPaneTopRow._gap)
 									: parent.width
+								height: implicitHeight
 								visible: rightPaneTopRow._showTileTabs
 								style: plasmoid.configuration.tileTabStyle || "tabs"
 								alignSurfaceToTop: rightPaneTopRow._alignTopSurfaces

@@ -49,6 +49,7 @@ Item {
 	}
 
 	readonly property int tabHeight: Kirigami.Units.gridUnit * 2.5
+	readonly property int surfaceHeight: _pillsMode ? Math.round(tabHeight * 0.85) : tabHeight
 	implicitHeight: tabHeight
 
 	// ── Shared context menu ─────────────────────────────────────────────────
@@ -175,7 +176,7 @@ Item {
 			anchors.right: pillsTrailing.left
 			anchors.rightMargin: Kirigami.Units.smallSpacing
 			y: tabBar.alignSurfaceToTop ? 0 : Math.round((parent.height - height) / 2)
-			height: Math.round(parent.height * 0.85)
+			height: tabBar.surfaceHeight
 			contentWidth: pillsRow.width + tabBar._listPadding * 2
 			contentHeight: height
 			clip: true
@@ -293,9 +294,11 @@ Item {
 		Row {
 			id: pillsTrailing
 			anchors.right: parent.right
-			anchors.verticalCenter: parent.verticalCenter
+			y: tabBar.alignSurfaceToTop ? 0 : Math.round((parent.height - height) / 2)
+			height: _controlHeight
 			spacing: 0
 
+			readonly property real _controlHeight: tabBar.alignSurfaceToTop ? tabBar.surfaceHeight : tabBar.tabHeight
 			readonly property real _availableWidth: tabBar.width - pillsAddBtn.width - Kirigami.Units.smallSpacing
 			readonly property real _tabsContentWidth: pillsRow.width + tabBar._listPadding * 2
 			readonly property bool _overflow: _tabsContentWidth > _availableWidth
@@ -304,8 +307,8 @@ Item {
 			Item {
 				id: pillsScrollLeft
 				visible: pillsTrailing._overflow
-				width: visible ? tabBar.tabHeight : 0
-				height: tabBar.tabHeight
+				width: visible ? pillsTrailing._controlHeight : 0
+				height: pillsTrailing._controlHeight
 				enabled: tabFlickable.contentX > 0
 
 				QQC2.Label {
@@ -333,8 +336,8 @@ Item {
 			Item {
 				id: pillsScrollRight
 				visible: pillsTrailing._overflow
-				width: visible ? tabBar.tabHeight : 0
-				height: tabBar.tabHeight
+				width: visible ? pillsTrailing._controlHeight : 0
+				height: pillsTrailing._controlHeight
 				enabled: tabFlickable.contentX < pillsTrailing._maxContentX
 
 				QQC2.Label {
@@ -361,8 +364,8 @@ Item {
 
 			Item {
 				id: pillsAddBtn
-				width: tabBar.tabHeight
-				height: tabBar.tabHeight
+				width: pillsTrailing._controlHeight
+				height: pillsTrailing._controlHeight
 
 				Accessible.name: i18n("Add Tab")
 				Accessible.role: Accessible.Button
