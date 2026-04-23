@@ -163,6 +163,16 @@
 			<label>Visual treatment used by shared surfaces.</label>
 			<default></default>
 		</entry>
+		<entry name="surfaceShadowDarkness" type="string">
+			<!-- enum: normal, dark, darker -->
+			<label>Shadow darkness used by shared surfaces.</label>
+			<default>normal</default>
+		</entry>
+		<entry name="surfaceShadowSize" type="string">
+			<!-- enum: normal, large, extraLarge -->
+			<label>Shadow size used by shared surfaces.</label>
+			<default>normal</default>
+		</entry>
 
 		<!-- Style -->
 		<entry name="hideSearchField" type="bool">

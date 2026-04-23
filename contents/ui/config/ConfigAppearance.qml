@@ -97,6 +97,28 @@ LibConfig.FormKCM {
 		configKey: 'sidebarHideBorder'
 	}
 
+	RowLayout {
+		Kirigami.FormData.label: i18n("Surface Shadows")
+
+		LibConfig.ComboBox {
+			configKey: "surfaceShadowDarkness"
+			model: [
+				{ value: "normal", text: i18n("Normal") },
+				{ value: "dark", text: i18n("Dark") },
+				{ value: "darker", text: i18n("Darker") },
+			]
+		}
+
+		LibConfig.ComboBox {
+			configKey: "surfaceShadowSize"
+			model: [
+				{ value: "normal", text: i18n("Normal") },
+				{ value: "large", text: i18n("Large") },
+				{ value: "extraLarge", text: i18n("Extra Large") },
+			]
+		}
+	}
+
 	QQC2.Label {
 		Kirigami.FormData.label: ""
 		text: i18n("Applies to tiles, group panels, sidebar cards, search box, and pill tab bar surfaces.")

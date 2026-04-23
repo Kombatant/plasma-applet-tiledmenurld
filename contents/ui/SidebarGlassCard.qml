@@ -41,6 +41,12 @@ Item {
 	readonly property color bottomRimColor: useFrostedSurface
 		? (baseIsLight ? Qt.rgba(0, 0, 0, 0.08) : Qt.rgba(0, 0, 0, 0.18))
 		: "transparent"
+	readonly property real shadowSizeMultiplier: (typeof config !== "undefined" && config) ? config.surfaceShadowSizeMultiplier : 1.0
+	readonly property real shadowOpacityMultiplier: (typeof config !== "undefined" && config) ? config.surfaceShadowOpacityMultiplier : 1.0
+	readonly property real baseShadowOpacity: baseIsLight ? 0.13 : (useFrostedSurface ? 0.18 : 0.32)
+	readonly property int shadowSize: Math.round(Kirigami.Units.gridUnit * (useFrostedSurface ? 1.1 : 1.25) * shadowSizeMultiplier)
+	readonly property color shadowColor: Qt.rgba(0, 0, 0, Math.min(1, baseShadowOpacity * shadowOpacityMultiplier))
+	readonly property int shadowYOffset: Math.round(2 * Screen.devicePixelRatio)
 
 	Kirigami.ShadowedRectangle {
 		id: surface
@@ -54,9 +60,9 @@ Item {
 		}
 
 		shadow {
-			size: Math.round(Kirigami.Units.gridUnit * (cardRoot.useFrostedSurface ? 1.1 : 1.25))
-			color: Qt.rgba(0, 0, 0, cardRoot.baseIsLight ? 0.13 : (cardRoot.useFrostedSurface ? 0.18 : 0.32))
-			yOffset: Math.round(2 * Screen.devicePixelRatio)
+			size: cardRoot.shadowSize
+			color: cardRoot.shadowColor
+			yOffset: cardRoot.shadowYOffset
 		}
 	}
 

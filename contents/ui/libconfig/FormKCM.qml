@@ -99,6 +99,10 @@ Item {
 	property var cfg_sidebarBackgroundColorDefault
 	property var cfg_surfaceStyle
 	property var cfg_surfaceStyleDefault
+	property var cfg_surfaceShadowDarkness
+	property var cfg_surfaceShadowDarknessDefault
+	property var cfg_surfaceShadowSize
+	property var cfg_surfaceShadowSizeDefault
 	property var cfg_hideSearchField
 	property var cfg_hideSearchFieldDefault
 	property var cfg_searchOnTop

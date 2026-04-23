@@ -47,6 +47,8 @@ MouseArea {
 	SidebarMenuShadows {
 		id: sidebarMenuShadows
 		anchors.fill: parent
+		shadowSize: sidebarCard.shadowSize
+		shadowColor: sidebarCard.shadowColor
 		visible: false
 	}
 }

@@ -100,6 +100,10 @@ Item {
 	property var cfg_sidebarBackgroundColorDefault
 	property var cfg_surfaceStyle
 	property var cfg_surfaceStyleDefault
+	property var cfg_surfaceShadowDarkness
+	property var cfg_surfaceShadowDarknessDefault
+	property var cfg_surfaceShadowSize
+	property var cfg_surfaceShadowSizeDefault
 	property var cfg_hideSearchField
 	property var cfg_hideSearchFieldDefault
 	property var cfg_searchOnTop
@@ -241,6 +245,8 @@ Item {
 		defaultTileGradient: "bool",
 		sidebarBackgroundColor: "string",
 		surfaceStyle: "string",
+		surfaceShadowDarkness: "string",
+		surfaceShadowSize: "string",
 		hideSearchField: "bool",
 		searchOnTop: "bool",
 		searchFieldFollowsTheme: "bool",
@@ -491,7 +497,7 @@ Item {
 		if (configKey.indexOf("ai") === 0) {
 			return "AI Chat"
 		}
-		if (configKey === "tileRoundedCorners" || configKey === "tileCornerRadius" || configKey === "sidebarHideBorder" || configKey === "sidebarFollowsTheme" || configKey === "sidebarBackgroundColor" || configKey === "surfaceStyle") {
+		if (configKey === "tileRoundedCorners" || configKey === "tileCornerRadius" || configKey === "sidebarHideBorder" || configKey === "sidebarFollowsTheme" || configKey === "sidebarBackgroundColor" || configKey === "surfaceStyle" || configKey === "surfaceShadowDarkness" || configKey === "surfaceShadowSize") {
 			return "Appearance"
 		}
 		if (configKey.indexOf("tile") === 0 || configKey.indexOf("favGridCols") === 0 || configKey === "tilesLocked" || configKey === "showTileTooltips" || configKey.indexOf("defaultTile") === 0) {

@@ -568,6 +568,38 @@ Item {
 	readonly property bool surfaceUsesFrostedGlass: surfaceStyle === "frosted"
 	readonly property bool surfaceUsesThemeBase: surfaceStyle === "theme" || surfaceStyle === "frosted"
 	readonly property color surfaceBaseColor: surfaceUsesThemeBase ? Kirigami.Theme.backgroundColor : sidebarBackgroundColor
+	readonly property string surfaceShadowDarkness: {
+		var value = typeof plasmoid.configuration.surfaceShadowDarkness !== "undefined" ? ("" + plasmoid.configuration.surfaceShadowDarkness) : "normal"
+		if (value === "normal" || value === "dark" || value === "darker") {
+			return value
+		}
+		return "normal"
+	}
+	readonly property real surfaceShadowOpacityMultiplier: {
+		if (surfaceShadowDarkness === "dark") {
+			return 1.45
+		}
+		if (surfaceShadowDarkness === "darker") {
+			return 1.9
+		}
+		return 1.0
+	}
+	readonly property string surfaceShadowSize: {
+		var value = typeof plasmoid.configuration.surfaceShadowSize !== "undefined" ? ("" + plasmoid.configuration.surfaceShadowSize) : "normal"
+		if (value === "normal" || value === "large" || value === "extraLarge") {
+			return value
+		}
+		return "normal"
+	}
+	readonly property real surfaceShadowSizeMultiplier: {
+		if (surfaceShadowSize === "large") {
+			return 1.5
+		}
+		if (surfaceShadowSize === "extraLarge") {
+			return 2.0
+		}
+		return 1.0
+	}
 	readonly property color menuItemTextColor2: setAlpha(Kirigami.Theme.textColor, 0.6)
 	readonly property color flatButtonBgHoverColor: themeButtonBgColor
 	readonly property color flatButtonBgColor: Qt.rgba(flatButtonBgHoverColor.r, flatButtonBgHoverColor.g, flatButtonBgHoverColor.b, 0)
