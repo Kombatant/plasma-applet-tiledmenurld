@@ -61,6 +61,7 @@ ColumnLayout {
 
 		MouseArea {
 			anchors.fill: parent
+			acceptedButtons: Qt.RightButton
 			cursorShape: Qt.PointingHandCursor
 			hoverEnabled: true
 			onClicked: {

@@ -245,9 +245,23 @@ Item {
 						width: config.flatButtonIconSize
 						height: config.flatButtonIconSize
 					}
-				}
-				onClicked: {
-					userMenu.toggleOpen()
+
+					MouseArea {
+						anchors.fill: parent
+						acceptedButtons: Qt.RightButton
+						cursorShape: Qt.PointingHandCursor
+						hoverEnabled: false
+						onPressed: function(mouse) {
+							mouse.accepted = true
+						}
+						onReleased: function(mouse) {
+							mouse.accepted = true
+						}
+						onClicked: function(mouse) {
+							mouse.accepted = true
+							userMenu.toggleOpen()
+						}
+					}
 				}
 				ProfileContextMenu {
 					id: userMenu
@@ -394,9 +408,23 @@ Item {
 						width: config.flatButtonIconSize
 						height: config.flatButtonIconSize
 					}
-				}
-				onClicked: {
-					userMenuHoriz.toggleOpen()
+
+					MouseArea {
+						anchors.fill: parent
+						acceptedButtons: Qt.RightButton
+						cursorShape: Qt.PointingHandCursor
+						hoverEnabled: false
+						onPressed: function(mouse) {
+							mouse.accepted = true
+						}
+						onReleased: function(mouse) {
+							mouse.accepted = true
+						}
+						onClicked: function(mouse) {
+							mouse.accepted = true
+							userMenuHoriz.toggleOpen()
+						}
+					}
 				}
 				ProfileContextMenu {
 					id: userMenuHoriz
