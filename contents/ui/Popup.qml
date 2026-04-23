@@ -709,7 +709,7 @@ MouseArea {
 		var dpr = Screen.devicePixelRatio || 1
 		var tabRowTabsHeight = (config.useTileTabs && tileTabBar) ? tileTabBar.implicitHeight : 0
 		var tabRowSearchHeight = (config.usesDockedSidebarLayout && rightPaneSearchField && rightPaneSearchField.visible)
-			? config.searchFieldHeight
+			? rightPaneSearchField.implicitHeight
 			: 0
 		var tabRowContentHeight = Math.max(tabRowTabsHeight, tabRowSearchHeight)
 		var tabRowTopMargin = (config.usesDockedSidebarLayout || (config.usesClassicLayout && config.sidebarOnLeft))
@@ -1205,6 +1205,7 @@ MouseArea {
 						readonly property bool _bothVisible: _showDockedSearchField && _showTileTabs
 						readonly property bool _alignTopSurfaces: config.usesDockedSidebarLayout
 							|| (config.usesClassicLayout && config.sidebarOnLeft)
+						readonly property real _dockedSearchFieldHeight: tileTabBar.surfaceHeight
 						readonly property real _effectiveSearchWidth: {
 							if (!_showDockedSearchField) return 0
 							if (!_showTileTabs) return width
@@ -1220,8 +1221,8 @@ MouseArea {
 								anchors.left: parent.left
 								y: rightPaneTopRow._alignTopSurfaces ? 0 : Math.round((parent.height - height) / 2)
 								width: rightPaneTopRow._showTileTabs ? rightPaneTopRow._effectiveSearchWidth : parent.width
-								height: config.searchFieldHeight
-								implicitHeight: config.searchFieldHeight
+								height: rightPaneTopRow._dockedSearchFieldHeight
+								implicitHeight: rightPaneTopRow._dockedSearchFieldHeight
 								listView: searchView.stackView && searchView.stackView.currentItem && searchView.stackView.currentItem.listView ? searchView.stackView.currentItem.listView : []
 							}
 

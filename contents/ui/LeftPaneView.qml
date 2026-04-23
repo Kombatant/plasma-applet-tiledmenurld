@@ -62,7 +62,7 @@ ColumnLayout {
 		MouseArea {
 			anchors.fill: parent
 			acceptedButtons: Qt.RightButton
-			cursorShape: Qt.PointingHandCursor
+			cursorShape: Qt.ArrowCursor
 			hoverEnabled: true
 			onClicked: {
 				userMenu.toggleOpen()

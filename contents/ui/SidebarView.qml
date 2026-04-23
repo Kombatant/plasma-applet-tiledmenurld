@@ -249,7 +249,7 @@ Item {
 					MouseArea {
 						anchors.fill: parent
 						acceptedButtons: Qt.RightButton
-						cursorShape: Qt.PointingHandCursor
+						cursorShape: Qt.ArrowCursor
 						hoverEnabled: false
 						onPressed: function(mouse) {
 							mouse.accepted = true
@@ -412,7 +412,7 @@ Item {
 					MouseArea {
 						anchors.fill: parent
 						acceptedButtons: Qt.RightButton
-						cursorShape: Qt.PointingHandCursor
+						cursorShape: Qt.ArrowCursor
 						hoverEnabled: false
 						onPressed: function(mouse) {
 							mouse.accepted = true
