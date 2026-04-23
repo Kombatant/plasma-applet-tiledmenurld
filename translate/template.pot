@@ -971,20 +971,19 @@ msgstr ""
 msgid "Height"
 msgstr ""
 
-#: contents/ui/config/ConfigTiles.qml:61 contents/ui/config/ConfigTiles.qml:67
-#: contents/ui/config/ConfigTiles.qml:76
+#: contents/ui/config/ConfigTiles.qml:70 contents/ui/config/ConfigTiles.qml:71
 msgid "Tabs"
 msgstr ""
 
-#: contents/ui/config/ConfigTiles.qml:66
-msgid "Tab Support"
+#: contents/ui/config/ConfigTiles.qml:69
+msgid "Disable Tabs"
 msgstr ""
 
-#: contents/ui/config/ConfigTiles.qml:72
+#: contents/ui/config/ConfigTiles.qml:67
 msgid "Tab Style"
 msgstr ""
 
-#: contents/ui/config/ConfigTiles.qml:77
+#: contents/ui/config/ConfigTiles.qml:72
 msgid "Pills"
 msgstr ""
 

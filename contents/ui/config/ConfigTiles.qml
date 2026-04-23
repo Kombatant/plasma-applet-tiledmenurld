@@ -32,6 +32,11 @@ LibConfig.FormKCM {
 		return raw || 0
 	}
 	readonly property bool pendingUseTileTabs: !!(formLayout.cfg_useTileTabs !== undefined ? formLayout.cfg_useTileTabs : plasmoid.configuration.useTileTabs)
+	readonly property string pendingTileTabStyle: {
+		var raw = formLayout.cfg_tileTabStyle !== undefined ? formLayout.cfg_tileTabStyle : plasmoid.configuration.tileTabStyle
+		return raw === "pills" ? "pills" : "tabs"
+	}
+	readonly property string pendingTileTabMode: pendingUseTileTabs ? pendingTileTabStyle : "disabled"
 
 	readonly property int pendingCellBoxSize: {
 		var rawMargin = formLayout.cfg_tileMargin !== undefined ? formLayout.cfg_tileMargin : plasmoid.configuration.tileMargin
@@ -52,6 +57,14 @@ LibConfig.FormKCM {
 		ConfigUtils.setPendingValue(formLayout, "tileScale", scale)
 	}
 
+	function setPendingTileTabMode(mode) {
+		var enabled = mode !== "disabled"
+		ConfigUtils.setPendingValue(formLayout, "useTileTabs", enabled)
+		if (enabled) {
+			ConfigUtils.setPendingValue(formLayout, "tileTabStyle", mode === "pills" ? "pills" : "tabs")
+		}
+	}
+
 	property var config: TiledMenu.AppletConfig {
 		id: config
 	}
@@ -61,18 +74,12 @@ LibConfig.FormKCM {
 		text: i18n("Tabs")
 	}
 
-	LibConfig.CheckBox {
-		configKey: 'useTileTabs'
-		text: i18n("Tab Support")
-		Kirigami.FormData.label: i18n("Tabs")
-	}
-
 	LibConfig.ComboBox {
-		configKey: "tileTabStyle"
+		configValue: formLayout.pendingTileTabMode
 		Kirigami.FormData.label: i18n("Tab Style")
-		enabled: formLayout.pendingUseTileTabs
-		opacity: enabled ? 1 : 0.45
+		onActivated: formLayout.setPendingTileTabMode(currentItem.value)
 		model: [
+			{ value: "disabled", text: i18n("Disable Tabs") },
 			{ value: "tabs", text: i18n("Tabs") },
 			{ value: "pills", text: i18n("Pills") },
 		]
