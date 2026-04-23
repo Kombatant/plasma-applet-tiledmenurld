@@ -167,233 +167,237 @@ Item {
 
 		property alias tabRepeater: pillsRepeater
 
-		Rectangle {
-			id: listBackground
-			anchors.fill: tabFlickable
-			radius: config.tileCornerRadius
-			color: tabBar._listBgColor
-			border.width: tabBar._listBorderWidth
-			border.color: tabBar._listBorderColor
-			z: -1
-		}
-
-		Flickable {
-			id: tabFlickable
+		Item {
+			id: pillsSurface
 			anchors.left: parent.left
-			anchors.right: pillsTrailing.left
-			anchors.rightMargin: Kirigami.Units.smallSpacing
+			anchors.right: parent.right
 			y: tabBar.alignSurfaceToTop ? 0 : Math.round((parent.height - height) / 2)
 			height: tabBar.surfaceHeight
-			contentWidth: pillsRow.width + tabBar._listPadding * 2
-			contentHeight: height
-			clip: true
-			boundsBehavior: Flickable.StopAtBounds
-			flickableDirection: Flickable.HorizontalFlick
-			interactive: pillsTrailing._overflow
 
-			function ensureIndexVisible(idx) {
-				if (idx < 0 || idx >= pillsRepeater.count) return
-				var item = pillsRepeater.itemAt(idx)
-				if (!item) return
-				var left = pillsRow.x + item.x
-				var right = left + item.width
-				if (left < contentX + tabBar._listPadding) {
-					contentX = Math.max(0, left - tabBar._listPadding)
-				} else if (right > contentX + width - tabBar._listPadding) {
-					contentX = Math.min(Math.max(0, contentWidth - width), right - width + tabBar._listPadding)
-				}
+			Rectangle {
+				id: listBackground
+				anchors.fill: parent
+				radius: config.tileCornerRadius
+				color: tabBar._listBgColor
+				border.width: tabBar._listBorderWidth
+				border.color: tabBar._listBorderColor
 			}
 
-			function snapContentX(target) {
-				var maxX = Math.max(0, contentWidth - width)
-				var desired = Math.max(0, Math.min(maxX, target))
-				if (pillsRepeater.count === 0 || desired <= 0 || desired >= maxX) {
-					return desired
+			Flickable {
+				id: tabFlickable
+				anchors.left: parent.left
+				anchors.right: pillsTrailing.left
+				height: parent.height
+				contentWidth: pillsRow.width + tabBar._listPadding * 2
+				contentHeight: height
+				clip: true
+				boundsBehavior: Flickable.StopAtBounds
+				flickableDirection: Flickable.HorizontalFlick
+				interactive: pillsTrailing._overflow
+
+				function ensureIndexVisible(idx) {
+					if (idx < 0 || idx >= pillsRepeater.count) return
+					var item = pillsRepeater.itemAt(idx)
+					if (!item) return
+					var left = pillsRow.x + item.x
+					var right = left + item.width
+					if (left < contentX + tabBar._listPadding) {
+						contentX = Math.max(0, left - tabBar._listPadding)
+					} else if (right > contentX + width - tabBar._listPadding) {
+						contentX = Math.min(Math.max(0, contentWidth - width), right - width + tabBar._listPadding)
+					}
 				}
-				var best = desired
-				var bestDist = Number.POSITIVE_INFINITY
-				for (var i = 0; i < pillsRepeater.count; i++) {
-					var item = pillsRepeater.itemAt(i)
-					if (!item) continue
-					var leftBoundary = pillsRow.x + item.x - tabBar._listPadding
-					var rightBoundary = pillsRow.x + item.x + item.width - width + tabBar._listPadding
-					var candidates = [leftBoundary, rightBoundary]
-					for (var c = 0; c < candidates.length; c++) {
-						var cand = Math.max(0, Math.min(maxX, candidates[c]))
-						var d = Math.abs(cand - desired)
-						if (d < bestDist) {
-							bestDist = d
-							best = cand
+
+				function snapContentX(target) {
+					var maxX = Math.max(0, contentWidth - width)
+					var desired = Math.max(0, Math.min(maxX, target))
+					if (pillsRepeater.count === 0 || desired <= 0 || desired >= maxX) {
+						return desired
+					}
+					var best = desired
+					var bestDist = Number.POSITIVE_INFINITY
+					for (var i = 0; i < pillsRepeater.count; i++) {
+						var item = pillsRepeater.itemAt(i)
+						if (!item) continue
+						var leftBoundary = pillsRow.x + item.x - tabBar._listPadding
+						var rightBoundary = pillsRow.x + item.x + item.width - width + tabBar._listPadding
+						var candidates = [leftBoundary, rightBoundary]
+						for (var c = 0; c < candidates.length; c++) {
+							var cand = Math.max(0, Math.min(maxX, candidates[c]))
+							var d = Math.abs(cand - desired)
+							if (d < bestDist) {
+								bestDist = d
+								best = cand
+							}
+						}
+					}
+					return best
+				}
+
+				onWidthChanged: {
+					var maxX = Math.max(0, contentWidth - width)
+					if (contentX > maxX) contentX = maxX
+					contentX = snapContentX(contentX)
+				}
+
+				onMovementEnded: contentX = snapContentX(contentX)
+
+				Connections {
+					target: tabBar
+					function onActiveTabChanged() {
+						if (tabBar._pillsMode) tabFlickable.ensureIndexVisible(tabBar.activeTab)
+					}
+				}
+
+				MouseArea {
+					anchors.fill: parent
+					acceptedButtons: Qt.NoButton
+					onWheel: function(wheel) {
+						if (!tabFlickable.interactive) { wheel.accepted = false; return }
+						var step = Kirigami.Units.gridUnit * 2
+						var dy = wheel.angleDelta.y
+						var dx = wheel.angleDelta.x
+						var delta = (Math.abs(dx) > Math.abs(dy)) ? dx : dy
+						var raw = tabFlickable.contentX - delta / 120 * step
+						tabFlickable.contentX = tabFlickable.snapContentX(raw)
+						wheel.accepted = true
+					}
+				}
+
+				Rectangle {
+					id: activeIndicator
+					z: 0
+					visible: pillsRepeater.count > 0
+					readonly property var _activeItem: {
+						void(pillsRepeater.count)
+						return pillsRepeater.itemAt(tabBar.activeTab)
+					}
+					x: _activeItem ? pillsRow.x + _activeItem.x : 0
+					y: _activeItem ? pillsRow.y + _activeItem.y + 2 : 0
+					width: _activeItem ? _activeItem.width : 0
+					height: _activeItem ? _activeItem.height - 4 : 0
+					radius: tabBar._pillRadius
+					color: tabBar._indicatorColor
+					border.width: 1
+					border.color: Qt.rgba(0, 0, 0, 0.08)
+					Behavior on x { NumberAnimation { duration: 180; easing.type: Easing.InOutQuad } }
+					Behavior on width { NumberAnimation { duration: 180; easing.type: Easing.InOutQuad } }
+				}
+
+				Row {
+					id: pillsRow
+					x: tabBar._listPadding
+					height: tabFlickable.height
+					spacing: Kirigami.Units.smallSpacing
+
+					Repeater {
+						id: pillsRepeater
+						model: tabBar.tabs
+						delegate: TabDelegate {
+							pillsMode: true
+							rowRef: pillsRow
 						}
 					}
 				}
-				return best
 			}
 
-			onWidthChanged: {
-				var maxX = Math.max(0, contentWidth - width)
-				if (contentX > maxX) contentX = maxX
-				contentX = snapContentX(contentX)
-			}
-
-			onMovementEnded: contentX = snapContentX(contentX)
-
-			Connections {
-				target: tabBar
-				function onActiveTabChanged() {
-					if (tabBar._pillsMode) tabFlickable.ensureIndexVisible(tabBar.activeTab)
-				}
-			}
-
-			MouseArea {
-				anchors.fill: parent
-				acceptedButtons: Qt.NoButton
-				onWheel: function(wheel) {
-					if (!tabFlickable.interactive) { wheel.accepted = false; return }
-					var step = Kirigami.Units.gridUnit * 2
-					var dy = wheel.angleDelta.y
-					var dx = wheel.angleDelta.x
-					var delta = (Math.abs(dx) > Math.abs(dy)) ? dx : dy
-					var raw = tabFlickable.contentX - delta / 120 * step
-					tabFlickable.contentX = tabFlickable.snapContentX(raw)
-					wheel.accepted = true
-				}
-			}
-
-			Rectangle {
-				id: activeIndicator
-				z: 0
-				visible: pillsRepeater.count > 0
-				readonly property var _activeItem: {
-					void(pillsRepeater.count)
-					return pillsRepeater.itemAt(tabBar.activeTab)
-				}
-				x: _activeItem ? pillsRow.x + _activeItem.x : 0
-				y: _activeItem ? pillsRow.y + _activeItem.y + 2 : 0
-				width: _activeItem ? _activeItem.width : 0
-				height: _activeItem ? _activeItem.height - 4 : 0
-				radius: tabBar._pillRadius
-				color: tabBar._indicatorColor
-				border.width: 1
-				border.color: Qt.rgba(0, 0, 0, 0.08)
-				Behavior on x { NumberAnimation { duration: 180; easing.type: Easing.InOutQuad } }
-				Behavior on width { NumberAnimation { duration: 180; easing.type: Easing.InOutQuad } }
-			}
-
+			// ── Trailing controls for pills: scroll chevrons + add tab ──
 			Row {
-				id: pillsRow
-				x: tabBar._listPadding
-				height: tabFlickable.height
-				spacing: Kirigami.Units.smallSpacing
+				id: pillsTrailing
+				anchors.right: parent.right
+				height: parent.height
+				spacing: 0
 
-				Repeater {
-					id: pillsRepeater
-					model: tabBar.tabs
-					delegate: TabDelegate {
-						pillsMode: true
-						rowRef: pillsRow
+				readonly property real _controlHeight: parent.height
+				readonly property real _availableWidth: Math.max(0, pillsSurface.width - pillsAddBtn.width - Kirigami.Units.smallSpacing)
+				readonly property real _tabsContentWidth: pillsRow.width + tabBar._listPadding * 2
+				readonly property bool _overflow: _tabsContentWidth > _availableWidth
+				readonly property real _maxContentX: Math.max(0, tabFlickable.contentWidth - tabFlickable.width)
+
+				Item {
+					id: pillsScrollLeft
+					visible: pillsTrailing._overflow
+					width: visible ? pillsTrailing._controlHeight : 0
+					height: pillsTrailing._controlHeight
+					enabled: tabFlickable.contentX > 0
+
+					QQC2.Label {
+						anchors.centerIn: parent
+						text: "‹"
+						font.pixelSize: Kirigami.Units.gridUnit * 1.2
+						color: Kirigami.Theme.textColor
+						opacity: !pillsScrollLeft.enabled ? 0.25
+							: pillsScrollLeftMA.containsMouse ? 0.9 : 0.55
+					}
+
+					MouseArea {
+						id: pillsScrollLeftMA
+						anchors.fill: parent
+						hoverEnabled: true
+						cursorShape: Qt.PointingHandCursor
+						enabled: pillsScrollLeft.enabled
+						onClicked: {
+							var step = tabFlickable.width * 0.8
+							tabFlickable.contentX = tabFlickable.snapContentX(tabFlickable.contentX - step)
+						}
 					}
 				}
-			}
-		}
 
-		// ── Trailing controls for pills: scroll chevrons + add tab ──
-		Row {
-			id: pillsTrailing
-			anchors.right: parent.right
-			y: tabBar.alignSurfaceToTop ? 0 : Math.round((parent.height - height) / 2)
-			height: _controlHeight
-			spacing: 0
+				Item {
+					id: pillsScrollRight
+					visible: pillsTrailing._overflow
+					width: visible ? pillsTrailing._controlHeight : 0
+					height: pillsTrailing._controlHeight
+					enabled: tabFlickable.contentX < pillsTrailing._maxContentX
 
-			readonly property real _controlHeight: tabBar.alignSurfaceToTop ? tabBar.surfaceHeight : tabBar.tabHeight
-			readonly property real _availableWidth: tabBar.width - pillsAddBtn.width - Kirigami.Units.smallSpacing
-			readonly property real _tabsContentWidth: pillsRow.width + tabBar._listPadding * 2
-			readonly property bool _overflow: _tabsContentWidth > _availableWidth
-			readonly property real _maxContentX: Math.max(0, tabFlickable.contentWidth - tabFlickable.width)
+					QQC2.Label {
+						anchors.centerIn: parent
+						text: "›"
+						font.pixelSize: Kirigami.Units.gridUnit * 1.2
+						color: Kirigami.Theme.textColor
+						opacity: !pillsScrollRight.enabled ? 0.25
+							: pillsScrollRightMA.containsMouse ? 0.9 : 0.55
+					}
 
-			Item {
-				id: pillsScrollLeft
-				visible: pillsTrailing._overflow
-				width: visible ? pillsTrailing._controlHeight : 0
-				height: pillsTrailing._controlHeight
-				enabled: tabFlickable.contentX > 0
-
-				QQC2.Label {
-					anchors.centerIn: parent
-					text: "‹"
-					font.pixelSize: Kirigami.Units.gridUnit * 1.2
-					color: Kirigami.Theme.textColor
-					opacity: !pillsScrollLeft.enabled ? 0.25
-						: pillsScrollLeftMA.containsMouse ? 0.9 : 0.55
-				}
-
-				MouseArea {
-					id: pillsScrollLeftMA
-					anchors.fill: parent
-					hoverEnabled: true
-					cursorShape: Qt.PointingHandCursor
-					enabled: pillsScrollLeft.enabled
-					onClicked: {
-						var step = tabFlickable.width * 0.8
-						tabFlickable.contentX = tabFlickable.snapContentX(tabFlickable.contentX - step)
+					MouseArea {
+						id: pillsScrollRightMA
+						anchors.fill: parent
+						hoverEnabled: true
+						cursorShape: Qt.PointingHandCursor
+						enabled: pillsScrollRight.enabled
+						onClicked: {
+							var step = tabFlickable.width * 0.8
+							tabFlickable.contentX = tabFlickable.snapContentX(tabFlickable.contentX + step)
+						}
 					}
 				}
-			}
 
-			Item {
-				id: pillsScrollRight
-				visible: pillsTrailing._overflow
-				width: visible ? pillsTrailing._controlHeight : 0
-				height: pillsTrailing._controlHeight
-				enabled: tabFlickable.contentX < pillsTrailing._maxContentX
+				Item {
+					id: pillsAddBtn
+					width: pillsTrailing._controlHeight
+					height: pillsTrailing._controlHeight
 
-				QQC2.Label {
-					anchors.centerIn: parent
-					text: "›"
-					font.pixelSize: Kirigami.Units.gridUnit * 1.2
-					color: Kirigami.Theme.textColor
-					opacity: !pillsScrollRight.enabled ? 0.25
-						: pillsScrollRightMA.containsMouse ? 0.9 : 0.55
-				}
+					Accessible.name: i18n("Add Tab")
+					Accessible.role: Accessible.Button
+					QQC2.ToolTip.visible: pillsAddMA.containsMouse
+					QQC2.ToolTip.text: i18n("Add Tab")
 
-				MouseArea {
-					id: pillsScrollRightMA
-					anchors.fill: parent
-					hoverEnabled: true
-					cursorShape: Qt.PointingHandCursor
-					enabled: pillsScrollRight.enabled
-					onClicked: {
-						var step = tabFlickable.width * 0.8
-						tabFlickable.contentX = tabFlickable.snapContentX(tabFlickable.contentX + step)
+					Kirigami.Icon {
+						anchors.centerIn: parent
+						source: "tab-new-symbolic"
+						width: Kirigami.Units.iconSizes.smallMedium
+						height: width
+						color: Kirigami.Theme.textColor
+						opacity: pillsAddMA.containsMouse ? 0.9 : 0.55
 					}
-				}
-			}
 
-			Item {
-				id: pillsAddBtn
-				width: pillsTrailing._controlHeight
-				height: pillsTrailing._controlHeight
-
-				Accessible.name: i18n("Add Tab")
-				Accessible.role: Accessible.Button
-				QQC2.ToolTip.visible: pillsAddMA.containsMouse
-				QQC2.ToolTip.text: i18n("Add Tab")
-
-				Kirigami.Icon {
-					anchors.centerIn: parent
-					source: "tab-new-symbolic"
-					width: Kirigami.Units.iconSizes.smallMedium
-					height: width
-					color: Kirigami.Theme.textColor
-					opacity: pillsAddMA.containsMouse ? 0.9 : 0.55
-				}
-
-				MouseArea {
-					id: pillsAddMA
-					anchors.fill: parent
-					hoverEnabled: true
-					cursorShape: Qt.PointingHandCursor
-					onClicked: tabBar.tabAdded()
+					MouseArea {
+						id: pillsAddMA
+						anchors.fill: parent
+						hoverEnabled: true
+						cursorShape: Qt.PointingHandCursor
+						onClicked: tabBar.tabAdded()
+					}
 				}
 			}
 		}
