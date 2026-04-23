@@ -103,6 +103,7 @@ Item {
 	Component {
 		id: themedField
 		PlasmaComponents3.TextField {
+			id: themedTextField
 			placeholderText: i18n("Search apps, files and settings...")
 			font.pixelSize: searchField.computedFontSize
 			leftPadding: searchField.searchIconSize + (searchField.searchIconPadding * 2)
@@ -136,21 +137,22 @@ Item {
 				anchors.verticalCenter: parent.verticalCenter
 				width: searchField.searchIconSize
 				height: searchField.searchIconSize
-				visible: text && text.length > 0
+				visible: themedTextField.text && themedTextField.text.length > 0
 				z: 2
 
 				Kirigami.Icon {
 					anchors.fill: parent
 					source: "edit-clear"
 					color: searchField.foregroundColor
-					opacity: 0.7
+					opacity: clearMouseArea.containsMouse ? 0.9 : 0.7
 				}
 
 				MouseArea {
+					id: clearMouseArea
 					anchors.fill: parent
 					onClicked: {
-						text = ""
-						forceActiveFocus()
+						themedTextField.text = ""
+						themedTextField.forceActiveFocus()
 					}
 					cursorShape: Qt.PointingHandCursor
 					hoverEnabled: true
@@ -185,6 +187,7 @@ Item {
 	Component {
 		id: windowsField
 		PlasmaComponents3.TextField {
+			id: windowsTextField
 			placeholderText: i18n("Search...")
 			font.pixelSize: searchField.computedFontSize
 			leftPadding: searchField.searchIconSize + (searchField.searchIconPadding * 2)
@@ -218,21 +221,22 @@ Item {
 				anchors.verticalCenter: parent.verticalCenter
 				width: searchField.searchIconSize
 				height: searchField.searchIconSize
-				visible: text && text.length > 0
+				visible: windowsTextField.text && windowsTextField.text.length > 0
 				z: 2
 
 				Kirigami.Icon {
 					anchors.fill: parent
 					source: "edit-clear"
 					color: "#777"
-					opacity: 0.9
+					opacity: clearMouseArea.containsMouse ? 1.0 : 0.9
 				}
 
 				MouseArea {
+					id: clearMouseArea
 					anchors.fill: parent
 					onClicked: {
-						text = ""
-						forceActiveFocus()
+						windowsTextField.text = ""
+						windowsTextField.forceActiveFocus()
 					}
 					cursorShape: Qt.PointingHandCursor
 					hoverEnabled: true

@@ -47,6 +47,8 @@ PlasmaComponents3.TextField {
 			return value
 		}
 	}
+	readonly property int sideControlMargin: Math.max(2 * Screen.devicePixelRatio, Math.round(Kirigami.Units.smallSpacing / 2))
+	readonly property int sideControlSize: Math.max(0, height - topPadding - bottomPadding)
 
 	onValueChanged: {
 		if (!activeFocus) {
@@ -61,7 +63,8 @@ PlasmaComponents3.TextField {
 		}
 	}
 
-	leftPadding: rightPadding + mouseArea.height + rightPadding
+	leftPadding: sideControlMargin + mouseArea.width + sideControlMargin
+	rightPadding: clearButton.visible ? (sideControlMargin + clearButton.width + sideControlMargin) : sideControlMargin
 
 	FontMetrics {
 		id: fontMetrics
@@ -76,7 +79,7 @@ PlasmaComponents3.TextField {
 
 	MouseArea {
 		id: mouseArea
-		anchors.leftMargin: parent.rightPadding
+		anchors.leftMargin: colorField.sideControlMargin
 		anchors.topMargin: parent.topPadding
 		anchors.bottomMargin: parent.bottomPadding
 		anchors.left: parent.left
@@ -126,6 +129,39 @@ PlasmaComponents3.TextField {
 			border.width: 1 * Kirigami.Units.devicePixelRatio
 			border.color: Kirigami.ColorUtils.linearInterpolation(color, Kirigami.Theme.textColor, 0.5)
 			radius: width / 2
+		}
+	}
+
+	Item {
+		id: clearButton
+		anchors.right: parent.right
+		anchors.rightMargin: colorField.sideControlMargin
+		anchors.top: parent.top
+		anchors.topMargin: parent.topPadding
+		anchors.bottom: parent.bottom
+		anchors.bottomMargin: parent.bottomPadding
+		width: colorField.sideControlSize
+		visible: colorField.text.length > 0
+		z: 1
+
+		Kirigami.Icon {
+			anchors.centerIn: parent
+			width: Math.max(0, parent.width - (2 * colorField.sideControlMargin))
+			height: width
+			source: "edit-clear"
+			color: Kirigami.Theme.textColor
+			opacity: clearMouseArea.containsMouse ? 0.9 : 0.65
+		}
+
+		MouseArea {
+			id: clearMouseArea
+			anchors.fill: parent
+			hoverEnabled: true
+			cursorShape: Qt.PointingHandCursor
+			onClicked: {
+				colorField.text = ""
+				colorField.forceActiveFocus()
+			}
 		}
 	}
 
