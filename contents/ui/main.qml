@@ -305,22 +305,17 @@ PlasmoidItem {
 			onTriggered: appsModel.launch('org.kde.kinfocenter')
 		},
 		PlasmaCore.Action {
+			isSeparator: true
+		},
+		PlasmaCore.Action {
 			text: i18n("Terminal")
 			icon.name: "utilities-terminal"
 			onTriggered: appsModel.launch(widget.resolveTerminalLauncher())
 		},
 		PlasmaCore.Action {
-			isSeparator: true
-		},
-		PlasmaCore.Action {
 			text: i18n("Task Manager")
 			icon.name: "utilities-system-monitor"
 			onTriggered: appsModel.launch(plasmoid.configuration.taskManagerApp)
-		},
-		PlasmaCore.Action {
-			text: i18n("System Settings")
-			icon.name: "systemsettings"
-			onTriggered: appsModel.launch('systemsettings')
 		},
 		PlasmaCore.Action {
 			text: i18n("File Manager")
@@ -329,6 +324,11 @@ PlasmoidItem {
 		},
 		PlasmaCore.Action {
 			isSeparator: true
+		},
+		PlasmaCore.Action {
+			text: i18n("System Settings")
+			icon.name: "systemsettings"
+			onTriggered: appsModel.launch('systemsettings')
 		},
 		PlasmaCore.Action {
 			text: i18n("Edit Applications...")
