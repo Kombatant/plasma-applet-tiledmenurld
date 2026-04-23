@@ -19,23 +19,23 @@ msgstr ""
 
 #: ../contents/ui/config/ConfigGeneral.qml
 msgid "Group header style"
-msgstr ""
+msgstr "组标题样式"
 
 #: ../contents/ui/config/ConfigGeneral.qml
 msgid "Plain"
-msgstr ""
+msgstr "普通"
 
 #: ../contents/ui/config/ConfigGeneral.qml
 msgid "Section header"
-msgstr ""
+msgstr "分节标题"
 
 #: ../metadata.json
 msgid "Tiled Menu"
-msgstr ""
+msgstr "平铺菜单"
 
 #: ../metadata.json
 msgid "A menu based on Windows 10's Start Menu."
-msgstr ""
+msgstr "基于 Windows 10 开始菜单的菜单。"
 
 #: ../contents/config/config.qml
 msgid "General"
@@ -43,7 +43,7 @@ msgstr "一般"
 
 #: ../contents/config/config.qml
 msgid "Import/Export Layout"
-msgstr ""
+msgstr "导入/导出布局"
 
 #: ../contents/config/config.qml
 msgid "Advanced"
@@ -63,11 +63,11 @@ msgstr "添加到任务栏"
 
 #: ../contents/ui/AppsModel.qml
 msgid "Recent Apps"
-msgstr ""
+msgstr "最近应用"
 
 #: ../contents/ui/AppsModel.qml
 msgid "Most Used"
-msgstr ""
+msgstr "最常用"
 
 #: ../contents/ui/config/ConfigGeneral.qml
 msgid "Popup"
@@ -79,7 +79,7 @@ msgstr "全屏"
 
 #: ../contents/ui/config/ConfigGeneral.qml
 msgid "Grid Columns"
-msgstr ""
+msgstr "网格列"
 
 #: ../contents/ui/config/ConfigGeneral.qml
 msgid "px"
@@ -115,7 +115,7 @@ msgstr "自定义颜色"
 
 #: ../contents/ui/config/ConfigGeneral.qml
 msgid "Gradient"
-msgstr ""
+msgstr "渐变"
 
 #: ../contents/ui/config/ConfigGeneral.qml
 msgid "Transparent"
@@ -139,7 +139,7 @@ msgstr "右"
 
 #: ../contents/ui/config/ConfigGeneral.qml
 msgid "Group Text Alignment"
-msgstr ""
+msgstr "组文本对齐"
 
 #: ../contents/ui/config/ConfigGeneral.qml
 msgid "Sidebar"
@@ -147,7 +147,7 @@ msgstr "侧栏"
 
 #: ../contents/ui/config/ConfigGeneral.qml
 msgid "Width"
-msgstr ""
+msgstr "宽度"
 
 #: ../contents/ui/config/ConfigGeneral.qml
 msgid "Icon Size"
@@ -155,11 +155,11 @@ msgstr "图标大小"
 
 #: ../contents/ui/config/ConfigGeneral.qml
 msgid "Popup Button Height"
-msgstr ""
+msgstr "弹出按钮高度"
 
 #: ../contents/ui/config/ConfigGeneral.qml
 msgid "Theme"
-msgstr ""
+msgstr "主题"
 
 #: ../contents/ui/config/ConfigGeneral.qml
 msgid "Sidebar Shortcuts"
@@ -179,7 +179,7 @@ msgstr "搜索框"
 
 #: ../contents/ui/config/ConfigGeneral.qml
 msgid "Hide Search Field"
-msgstr ""
+msgstr "隐藏搜索字段"
 
 #: ../contents/ui/config/ConfigGeneral.qml
 msgid "Search Field Height"
@@ -187,7 +187,7 @@ msgstr "搜索区域高度"
 
 #: ../contents/ui/config/ConfigGeneral.qml
 msgid "Search Box Theme"
-msgstr ""
+msgstr "搜索框主题"
 
 #: ../contents/ui/config/ConfigGeneral.qml
 msgid "Windows (White)"
@@ -203,7 +203,7 @@ msgstr "应用列表区域宽度"
 
 #: ../contents/ui/config/ConfigGeneral.qml
 msgid "Default View"
-msgstr ""
+msgstr "默认视图"
 
 #: ../contents/ui/config/ConfigGeneral.qml ../contents/ui/SidebarView.qml
 msgid "Alphabetical"
@@ -215,15 +215,15 @@ msgstr "分组"
 
 #: ../contents/ui/config/ConfigGeneral.qml
 msgid "Jump To Letter"
-msgstr ""
+msgstr "跳转到字母"
 
 #: ../contents/ui/config/ConfigGeneral.qml
 msgid "Jump To Category"
-msgstr ""
+msgstr "跳转到类别"
 
 #: ../contents/ui/config/ConfigGeneral.qml ../contents/ui/SidebarView.qml
 msgid "Tiles Only"
-msgstr ""
+msgstr "仅显示磁贴"
 
 #: ../contents/ui/config/ConfigGeneral.qml
 msgid "App Description"
@@ -243,7 +243,7 @@ msgstr "下方"
 
 #: ../contents/ui/config/ConfigGeneral.qml
 msgid "App History"
-msgstr ""
+msgstr "应用历史"
 
 #: ../contents/ui/config/ConfigGeneral.qml
 msgid "Show:"
@@ -271,7 +271,7 @@ msgstr "分类（应用菜单/仪表板）"
 
 #: ../contents/ui/config/ConfigGeneral.qml
 msgid "Right Click Menu"
-msgstr ""
+msgstr "右键菜单"
 
 #: ../contents/ui/config/ConfigGeneral.qml ../contents/ui/main.qml
 msgid "Terminal"
@@ -289,7 +289,7 @@ msgstr "文件管理器"
 msgid ""
 "When this widget has a global shortcut set, like 'Alt+F1', Plasma will open "
 "this menu with just the ⊞ Windows / Meta key."
-msgstr ""
+msgstr "当此小部件设置了全局快捷键（如 'Alt+F1'）时，Plasma 只需按 ⊞ Windows / Meta 键即可打开此菜单。"
 
 #: ../contents/ui/main.qml
 msgid "System Info"
@@ -448,7 +448,7 @@ msgstr "图片文件 (*.png *.apng *.gif *.webp *.jpg *.jpeg *.bmp *.svg *.svgz)
 
 #: ../contents/ui/TileEditorView.qml
 msgid "Preset Tiles"
-msgstr ""
+msgstr "Preset Tiles"
 
 #: ../contents/ui/TileEditorView.qml
 msgid "Position / Size"
@@ -472,19 +472,19 @@ msgstr "h:"
 
 #: ../contents/ui/TileGridPresets.qml
 msgid "Add Preset"
-msgstr ""
+msgstr "Add Preset"
 
 #: ../contents/ui/TileGridPresets.qml
 msgid "Productivity"
-msgstr ""
+msgstr "生产力"
 
 #: ../contents/ui/TileGridPresets.qml
 msgid "Explore"
-msgstr ""
+msgstr "Explore"
 
 #: ../contents/ui/TileGridPresets.qml
 msgid "Gmail"
-msgstr ""
+msgstr "Gmail"
 
 #: ../contents/ui/TileGridPresets.qml
 msgid "Software Center"
@@ -509,27 +509,27 @@ msgstr "群组"
 
 #: ../contents/ui/TileGridSplash.qml
 msgid "Getting Started"
-msgstr ""
+msgstr "新手入门"
 
 #: ../contents/ui/TileGridSplash.qml
 msgid "Drag apps onto the grid."
-msgstr ""
+msgstr "Drag apps onto the grid."
 
 #: ../contents/ui/TileGridSplash.qml
 msgid "Drag folders from the file manager here."
-msgstr ""
+msgstr "Drag folders from the file manager here."
 
 #: ../contents/ui/TileGridSplash.qml
 msgid "Use Default Tile Layout"
-msgstr ""
+msgstr "Use Default Tile Layout"
 
 #: ../contents/ui/TileItem.qml
 msgid "Sort Tiles"
-msgstr ""
+msgstr "Sort Tiles"
 
 #: ../contents/ui/SidebarView.qml
 msgid "Tiled Menu Reloaded Settings"
-msgstr ""
+msgstr "Tiled Menu Reloaded 设置"
 
 #: ../contents/ui/config/ConfigMain.qml
 msgid "AI Chat"
@@ -684,9 +684,410 @@ msgid ""
 "OpenAI, OpenRouter, Google, Perplexity and Anthropic require network access "
 "and an API key. Ollama connects to a local server (default: http://"
 "127.0.0.1:11434)."
-msgstr ""
-"OpenAI、OpenRouter、Google、Perplexity 和 Anthropic 需要网络访问权限和 API 密"
-"钥。 Ollama 连接到本地服务器（默认：http://127.0.0.1:11434）。"
+msgstr "OpenAI、OpenRouter、Google、Perplexity 和 Anthropic 需要网络访问权限和 API 密钥。 Ollama 连接到本地服务器（默认：http://127.0.0.1:11434）。"
+
+#: contents/ui/config/ConfigAppearance.qml:24
+#: contents/ui/config/ConfigSearch.qml:30
+msgid "Follow Current %1 (%2)"
+msgstr "跟随当前 %1 (%2)"
+
+#: contents/ui/config/ConfigAppearance.qml:34
+msgid "Shared Surfaces"
+msgstr "共享表面"
+
+#: contents/ui/config/ConfigAppearance.qml:40
+msgid "Surface Style"
+msgstr "表面样式"
+
+#: contents/ui/config/ConfigAppearance.qml:51
+#: contents/ui/config/ConfigTiles.qml:135
+msgid "Custom Colour"
+msgstr "自定义颜色"
+
+#: contents/ui/config/ConfigAppearance.qml:65
+msgid "Frosted Glass"
+msgstr "磨砂玻璃"
+
+#: contents/ui/config/ConfigAppearance.qml:73
+msgid "Surface Corners"
+msgstr "表面边角"
+
+#: contents/ui/config/ConfigAppearance.qml:77
+msgid "Rounded corners"
+msgstr "圆角"
+
+#: contents/ui/config/ConfigAppearance.qml:90
+msgid "Corner radius"
+msgstr "圆角半径"
+
+#: contents/ui/config/ConfigAppearance.qml:95
+msgid "Surface Borders"
+msgstr "表面边框"
+
+#: contents/ui/config/ConfigAppearance.qml:96
+msgid "Hide surface borders"
+msgstr "隐藏表面边框"
+
+#: contents/ui/config/ConfigAppearance.qml:102
+msgid ""
+"Applies to tiles, group panels, sidebar cards, search box, and pill tab bar "
+"surfaces."
+msgstr "Applies to tiles, group panels, sidebar cards, search box, and pill tab bar surfaces."
+
+#: contents/config/config.qml:11 contents/ui/config/ConfigTiles.qml:125
+msgid "Appearance"
+msgstr "外观"
+
+#: contents/ui/config/ConfigAiChat.qml:24
+msgid "OpenAI"
+msgstr "OpenAI"
+
+#: contents/ui/config/ConfigAiChat.qml:25
+msgid "OpenRouter"
+msgstr "OpenRouter"
+
+#: contents/ui/config/ConfigAiChat.qml:26
+msgid "Google (Gemini API)"
+msgstr "Google (Gemini API)"
+
+#: contents/ui/config/ConfigAiChat.qml:27
+msgid "Perplexity"
+msgstr "Perplexity"
+
+#: contents/ui/config/ConfigAiChat.qml:28
+msgid "Anthropic"
+msgstr "Anthropic"
+
+#: contents/ui/config/ConfigAiChat.qml:29
+msgid "Open WebUI"
+msgstr "Open WebUI"
+
+#: contents/ui/config/ConfigAiChat.qml:30
+msgid "Ollama (Local)"
+msgstr "Ollama (Local)"
+
+#: contents/ui/config/ConfigAiChat.qml:273
+msgid "Failed to save API key to KWallet."
+msgstr "Failed to save API key to KWallet."
+
+#: contents/ui/config/ConfigAiChat.qml:285
+msgid "Failed to remove API key from KWallet."
+msgstr "Failed to remove API key from KWallet."
+
+#: contents/ui/config/ConfigAiChat.qml:354
+msgid "Enabled"
+msgstr "已启用"
+
+#: contents/ui/config/ConfigAiChat.qml:355
+msgid "Disabled"
+msgstr "禁止"
+
+#: contents/ui/config/ConfigAiChat.qml:388
+msgid "API Key (Optional)"
+msgstr "API Key (Optional)"
+
+#: contents/ui/config/ConfigAiChat.qml:391
+msgid "Required for this provider (stored in KWallet)"
+msgstr "Required for this provider (stored in KWallet)"
+
+#: contents/ui/config/ConfigAiChat.qml:392
+msgid "Optional bearer token (stored in KWallet)"
+msgstr "Optional bearer token (stored in KWallet)"
+
+#: contents/ui/config/ConfigAiChat.qml:440
+msgid ""
+"An API key is already stored in KWallet. Enter a new key here to replace it."
+msgstr "An API key is already stored in KWallet. Enter a new key here to replace it."
+
+#: contents/ui/config/ConfigAiChat.qml:463
+msgid "Open WebUI Server"
+msgstr "Open WebUI Server"
+
+#: contents/ui/config/ConfigAiChat.qml:538
+msgid ""
+"<ul><li>OpenAI, OpenRouter, Google, Perplexity and Anthropic require network "
+"access and an API key.</li><li>Open WebUI uses its OpenAI-compatible API at "
+"your configured server URL and can optionally use a bearer token; both the "
+"server root and an /api URL are accepted.</li><li>Ollama connects to a local "
+"server (default: http://127.0.0.1:11434).</li></ul>"
+msgstr "<ul><li>OpenAI, OpenRouter, Google, Perplexity and Anthropic require network access and an API key.</li><li>Open WebUI uses its OpenAI-compatible API at your configured server URL and can optionally use a bearer token; both the server root and an /api URL are accepted.</li><li>Ollama connects to a local server (default: http://127.0.0.1:11434).</li></ul>"
+
+#: contents/ui/config/ConfigExportLayout.qml:652
+msgid "Invalid tile property JSON"
+msgstr "Invalid tile property JSON"
+
+#: contents/ui/config/ConfigExportLayout.qml:1075
+msgid "Applied tile model (%1 tiles)"
+msgstr "Applied tile model (%1 tiles)"
+
+#: contents/ui/config/ConfigExportLayout.qml:1110
+msgid "Failed to save file"
+msgstr "Failed to save file"
+
+#: contents/ui/config/ConfigExportLayout.qml:1128
+msgid "Failed to import file"
+msgstr "Failed to import file"
+
+#: contents/ui/config/ConfigExportLayout.qml:1137
+msgid "Import produced no data"
+msgstr "Import produced no data"
+
+#: contents/ui/config/ConfigExportLayout.qml:1146
+msgid "Failed to decode imported file"
+msgstr "Failed to decode imported file"
+
+#: contents/ui/config/ConfigExportLayout.qml:1160
+msgid "Imported from %1"
+msgstr "Imported from %1"
+
+#: contents/ui/config/ConfigExportLayout.qml:1164
+msgid "Failed to import settings"
+msgstr "Failed to import settings"
+
+#: contents/ui/config/ConfigExportLayout.qml:1172
+msgid "Save Layout"
+msgstr "Save Layout"
+
+#: contents/ui/config/ConfigExportLayout.qml:1175
+#: contents/ui/config/ConfigExportLayout.qml:1194
+msgid "Layout Files (*.xml)"
+msgstr "Layout Files (*.xml)"
+
+#: contents/ui/config/ConfigExportLayout.qml:1176
+#: contents/ui/config/ConfigExportLayout.qml:1195
+msgid "All Files (*)"
+msgstr "所有文件 (*)"
+
+#: contents/ui/config/ConfigExportLayout.qml:1191
+msgid "Import Layout"
+msgstr "Import Layout"
+
+#: contents/ui/config/ConfigExportLayout.qml:1214
+msgid "Saved to %1"
+msgstr "Saved to %1"
+
+#: contents/ui/config/ConfigExportLayout.qml:1235
+msgid "Application Launcher XML layout"
+msgstr "Application Launcher XML layout"
+
+#: contents/ui/config/ConfigExportLayout.qml:1241
+msgid ""
+"These are all the settings and variables for this application launcher. Be "
+"careful when changing things by hand, because mistakes here can break the "
+"layout or configuration."
+msgstr "These are all the settings and variables for this application launcher. Be careful when changing things by hand, because mistakes here can break the layout or configuration."
+
+#: contents/ui/config/ConfigExportLayout.qml:1280
+msgid "Import XML"
+msgstr "Import XML"
+
+#: contents/ui/config/ConfigExportLayout.qml:1285
+msgid "Export XML"
+msgstr "Export XML"
+
+#: contents/ui/config/ConfigGeneral.qml:307
+msgid "Application List"
+msgstr "应用列表"
+
+#: contents/ui/config/ConfigGeneral.qml:329
+msgid "Docked Sidebar Width"
+msgstr "Docked Sidebar Width"
+
+#: contents/ui/config/ConfigGeneral.qml:342
+msgid "Last Used View"
+msgstr "Last Used View"
+
+#: contents/ui/config/ConfigSearch.qml:52
+msgid "Search On Top"
+msgstr "Search On Top"
+
+#: contents/ui/config/ConfigSearch.qml:105
+msgid "Group search results"
+msgstr "Group search results"
+
+#: contents/ui/config/ConfigSidebar.qml:28
+msgid "Layout"
+msgstr "布局"
+
+#: contents/ui/config/ConfigSidebar.qml:34
+msgid "Layout Mode"
+msgstr "Layout Mode"
+
+#: contents/ui/config/ConfigSidebar.qml:36
+msgid "Docked Sidebar Layout"
+msgstr "Docked Sidebar Layout"
+
+#: contents/ui/config/ConfigSidebar.qml:37
+msgid "Classic Layout"
+msgstr "Classic Layout"
+
+#: contents/ui/config/ConfigSidebar.qml:305
+#: contents/ui/libconfig/ListBoxStringList.qml:62
+#: contents/ui/libconfig/ListBoxStringList.qml:100
+#: contents/ui/libconfig/ListBoxStringList.qml:309
+msgid "Shortcut cannot be empty."
+msgstr "Shortcut cannot be empty."
+
+#: contents/ui/config/ConfigSidebar.qml:316
+msgid ""
+"Unsupported XDG shortcut. Use DOCUMENTS, DOWNLOAD, MUSIC, PICTURES, or "
+"VIDEOS."
+msgstr "Unsupported XDG shortcut. Use DOCUMENTS, DOWNLOAD, MUSIC, PICTURES, or VIDEOS."
+
+#: contents/ui/config/ConfigSidebar.qml:329
+msgid "Desktop launcher not found."
+msgstr "Desktop launcher not found."
+
+#: contents/ui/config/ConfigSidebar.qml:334
+msgid ""
+"Use an installed .desktop launcher, an xdg: shortcut, or a filesystem path."
+msgstr "Use an installed .desktop launcher, an xdg: shortcut, or a filesystem path."
+
+#: contents/ui/config/ConfigSidebar.qml:354
+msgid "Shortcut Presets"
+msgstr "Shortcut Presets"
+
+#: contents/ui/config/ConfigSidebar.qml:360
+msgid "Add common folders and apps to the sidebar."
+msgstr "Add common folders and apps to the sidebar."
+
+#: contents/ui/config/ConfigSidebar.qml:426
+msgid "Classic Sidebar"
+msgstr "Classic Sidebar"
+
+#: contents/ui/config/ConfigSidebar.qml:435
+msgid "Position"
+msgstr "位置"
+
+#: contents/ui/config/ConfigSidebar.qml:438
+msgid "Top"
+msgstr "顶部"
+
+#: contents/ui/config/ConfigSidebar.qml:439
+msgid "Bottom"
+msgstr "底部"
+
+#: contents/ui/config/ConfigSidebar.qml:446
+msgid "Height"
+msgstr "高度"
+
+#: contents/ui/config/ConfigTiles.qml:61 contents/ui/config/ConfigTiles.qml:67
+#: contents/ui/config/ConfigTiles.qml:76
+msgid "Tabs"
+msgstr "标签页"
+
+#: contents/ui/config/ConfigTiles.qml:66
+msgid "Tab Support"
+msgstr "Tab Support"
+
+#: contents/ui/config/ConfigTiles.qml:72
+msgid "Tab Style"
+msgstr "Tab Style"
+
+#: contents/ui/config/ConfigTiles.qml:77
+msgid "Pills"
+msgstr "胶囊"
+
+#: contents/ui/config/ConfigTiles.qml:83
+msgid "Size & Spacing"
+msgstr "Size & Spacing"
+
+#: contents/ui/config/ConfigTiles.qml:104
+msgid "Tile Icon Size"
+msgstr "Tile Icon Size"
+
+#: contents/ui/config/ConfigTiles.qml:113
+msgid "Base size for tile icons; small/large variants scale from this"
+msgstr "Base size for tile icons; small/large variants scale from this"
+
+#: contents/ui/config/ConfigTiles.qml:130
+msgid "Tile Background Colour"
+msgstr "Tile Background Colour"
+
+#: contents/ui/config/ConfigTiles.qml:167
+msgid "Hover Effect"
+msgstr "Hover Effect"
+
+#: contents/ui/config/ConfigTiles.qml:169
+#: contents/ui/config/ConfigTiles.qml:218
+msgid "Classic"
+msgstr "经典"
+
+#: contents/ui/config/ConfigTiles.qml:170
+msgid "Holographic"
+msgstr "Holographic"
+
+#: contents/ui/config/ConfigTiles.qml:176
+msgid "Play animated backgrounds only on hover"
+msgstr "Play animated backgrounds only on hover"
+
+#: contents/ui/config/ConfigTiles.qml:181
+msgid "Show tooltips on hover"
+msgstr "Show tooltips on hover"
+
+#: contents/ui/config/ConfigTiles.qml:187
+msgid "Labels"
+msgstr "标签"
+
+#: contents/ui/config/ConfigTiles.qml:195
+msgid "Centre"
+msgstr "居中"
+
+#: contents/ui/config/ConfigTiles.qml:210
+msgid "Groups"
+msgstr "组"
+
+#: contents/ui/config/ConfigTiles.qml:215
+msgid "Group Tile Layout"
+msgstr "Group Tile Layout"
+
+#: contents/ui/config/ConfigTiles.qml:217
+msgid "Card"
+msgstr "卡片"
+
+#: contents/ui/config/ConfigTiles.qml:229
+msgid "Preset Tile Folder"
+msgstr "Preset Tile Folder"
+
+#: contents/ui/config/ConfigTiles.qml:371
+msgid "Browse..."
+msgstr "浏览..."
+
+#: contents/ui/config/ConfigTiles.qml:382
+msgid "Select Preset Tile Folder"
+msgstr "Select Preset Tile Folder"
+
+#: contents/ui/libconfig/ListBoxStringList.qml:348
+msgid "That shortcut already exists."
+msgstr "That shortcut already exists."
+
+#: contents/ui/libconfig/ListBoxStringList.qml:482
+msgid "Enter a desktop file, URL, or path"
+msgstr "Enter a desktop file, URL, or path"
+
+#: contents/ui/libconfig/ListBoxStringList.qml:598
+msgid "Add"
+msgstr "添加"
+
+#: contents/ui/libconfig/ListBoxStringList.qml:603
+msgid "Save"
+msgstr "保存"
+
+#: contents/ui/libconfig/ListBoxStringList.qml:603
+msgid "Update"
+msgstr "更新"
+
+#: contents/ui/libconfig/ListBoxStringList.qml:609
+msgid "Remove"
+msgstr "移除"
+
+#: contents/ui/libconfig/ListBoxStringList.qml:615
+msgid "Up"
+msgstr "上移"
+
+#: contents/ui/libconfig/ListBoxStringList.qml:621
+msgid "Down"
+msgstr "下移"
 
 #~ msgid "<b>Version:</b> %1"
 #~ msgstr "<b>版本：</b> %1"

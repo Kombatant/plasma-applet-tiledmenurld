@@ -8,7 +8,8 @@ Item {
 	property alias contentItem: contentLayer
 
 	property bool open: false
-	property color baseColor: plasmoid.configuration.sidebarFollowsTheme ? Kirigami.Theme.backgroundColor : config.sidebarBackgroundColor
+	property string surfaceStyle: (typeof config !== "undefined" && config) ? config.surfaceStyle : "theme"
+	property color baseColor: (typeof config !== "undefined" && config) ? config.surfaceBaseColor : Kirigami.Theme.backgroundColor
 	property int contentMargins: config.sidebarCardContentPadding
 	property real fillOpacity: 0.33
 	property real radius: config.tileCornerRadius
@@ -25,11 +26,21 @@ Item {
 	}
 
 	readonly property bool baseIsLight: relativeLuminance(baseColor) > 0.6
-	readonly property color glassColor: {
+	readonly property bool useFrostedSurface: surfaceStyle === "frosted"
+	readonly property color normalGlassColor: {
 		var darkened = Qt.darker(baseColor, baseIsLight ? 1.08 : 1.18)
 		return colorWithAlpha(darkened, fillOpacity)
 	}
-	readonly property color rimColor: baseIsLight ? Qt.rgba(1, 1, 1, 0.62) : Qt.rgba(1, 1, 1, 0.18)
+	readonly property color frostedGlassColor: baseIsLight
+		? Qt.rgba(1, 1, 1, 0.24)
+		: Qt.rgba(0.12, 0.14, 0.16, 0.46)
+	readonly property color glassColor: useFrostedSurface ? frostedGlassColor : normalGlassColor
+	readonly property color rimColor: useFrostedSurface
+		? (baseIsLight ? Qt.rgba(1, 1, 1, 0.44) : Qt.rgba(1, 1, 1, 0.18))
+		: (baseIsLight ? Qt.rgba(1, 1, 1, 0.62) : Qt.rgba(1, 1, 1, 0.18))
+	readonly property color bottomRimColor: useFrostedSurface
+		? (baseIsLight ? Qt.rgba(0, 0, 0, 0.08) : Qt.rgba(0, 0, 0, 0.18))
+		: "transparent"
 
 	Kirigami.ShadowedRectangle {
 		id: surface
@@ -43,10 +54,33 @@ Item {
 		}
 
 		shadow {
-			size: Math.round(Kirigami.Units.gridUnit * 1.25)
-			color: Qt.rgba(0, 0, 0, cardRoot.baseIsLight ? 0.18 : 0.32)
+			size: Math.round(Kirigami.Units.gridUnit * (cardRoot.useFrostedSurface ? 1.1 : 1.25))
+			color: Qt.rgba(0, 0, 0, cardRoot.baseIsLight ? 0.13 : (cardRoot.useFrostedSurface ? 0.18 : 0.32))
 			yOffset: Math.round(2 * Screen.devicePixelRatio)
 		}
+	}
+
+	Rectangle {
+		anchors.fill: surface
+		visible: cardRoot.useFrostedSurface
+		radius: cardRoot.radius
+		gradient: Gradient {
+			GradientStop { position: 0.0; color: Qt.rgba(1, 1, 1, cardRoot.baseIsLight ? 0.14 : 0.10) }
+			GradientStop { position: 0.42; color: Qt.rgba(1, 1, 1, cardRoot.baseIsLight ? 0.04 : 0.03) }
+			GradientStop { position: 1.0; color: Qt.rgba(0, 0, 0, cardRoot.baseIsLight ? 0.02 : 0.08) }
+		}
+	}
+
+	Rectangle {
+		anchors.left: surface.left
+		anchors.right: surface.right
+		anchors.bottom: surface.bottom
+		anchors.leftMargin: cardRoot.radius
+		anchors.rightMargin: cardRoot.radius
+		visible: cardRoot.useFrostedSurface && !plasmoid.configuration.sidebarHideBorder
+		height: Math.max(1, Math.round(Screen.devicePixelRatio))
+		color: cardRoot.bottomRimColor
+		opacity: 0.55
 	}
 
 	Item {

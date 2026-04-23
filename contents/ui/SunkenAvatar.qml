@@ -8,7 +8,7 @@ Item {
 	property url source: widget.hasUserAvatar ? widget.userAvatarSource : ""
 	property bool hasAvatar: widget.hasUserAvatar
 	property real inset: Math.max(2, Math.round(width * 0.035))
-	property color baseColor: plasmoid.configuration.sidebarFollowsTheme ? Kirigami.Theme.backgroundColor : config.sidebarBackgroundColor
+	property color baseColor: config.surfaceBaseColor
 
 	function relativeLuminance(color) {
 		function channel(c) {

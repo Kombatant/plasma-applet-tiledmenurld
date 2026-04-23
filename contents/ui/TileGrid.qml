@@ -626,7 +626,7 @@ DropArea {
 						anchors.bottomMargin: tileGrid.groupPanelInsetBottom
 						baseColor: parent.hasCustomColor
 							? parent.tileColor
-							: (plasmoid.configuration.sidebarFollowsTheme ? Kirigami.Theme.backgroundColor : config.sidebarBackgroundColor)
+							: config.surfaceBaseColor
 						contentMargins: 0
 					}
 				}

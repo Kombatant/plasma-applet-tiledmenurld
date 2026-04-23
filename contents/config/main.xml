@@ -155,7 +155,12 @@
 			<default>false</default>
 		</entry>
 		<entry name="sidebarBackgroundColor" type="string">
-			<label>Custom colour used by shared glass surfaces.</label>
+			<label>Custom colour used by shared surfaces.</label>
+			<default></default>
+		</entry>
+		<entry name="surfaceStyle" type="string">
+			<!-- enum: empty legacy value, theme, custom, frosted -->
+			<label>Visual treatment used by shared surfaces.</label>
 			<default></default>
 		</entry>
 
@@ -170,11 +175,11 @@
 			<default>false</default>
 		</entry>
 		<entry name="sidebarFollowsTheme" type="bool">
-			<label>Whether shared glass surfaces use the current Plasma style background colour.</label>
+			<label>Whether shared surfaces use the current Plasma style background colour.</label>
 			<default>false</default>
 		</entry>
 		<entry name="sidebarHideBorder" type="bool">
-			<label>Remove the shared glass surface borders for a flat look.</label>
+			<label>Remove the shared surface borders for a flat look.</label>
 			<default>false</default>
 		</entry>
 		<entry name="tileLabelAlignment" type="string">

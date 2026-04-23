@@ -174,12 +174,12 @@ LibConfig.FormKCM {
 	LibConfig.CheckBox {
 		configKey: 'tileAnimatedPlayOnHover'
 		text: i18n("Play animated backgrounds only on hover")
-		Kirigami.FormData.label: i18n("")
+		Kirigami.FormData.label: ""
 	}
 	LibConfig.CheckBox {
 		configKey: 'showTileTooltips'
 		text: i18n("Show tooltips on hover")
-		Kirigami.FormData.label: i18n("")
+		Kirigami.FormData.label: ""
 	}
 
 	//-------------------------------------------------------

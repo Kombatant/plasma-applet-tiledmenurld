@@ -21,13 +21,13 @@ LibConfig.FormKCM {
 	}
 
 	readonly property var providerOptions: [
-		{ value: "openai", text: "OpenAI" },
-		{ value: "openrouter", text: "OpenRouter" },
-		{ value: "google", text: "Google (Gemini API)" },
-		{ value: "perplexity", text: "Perplexity" },
-		{ value: "anthropic", text: "Anthropic" },
-		{ value: "openwebui", text: "Open WebUI" },
-		{ value: "ollama", text: "Ollama (Local)" },
+		{ value: "openai", text: i18n("OpenAI") },
+		{ value: "openrouter", text: i18n("OpenRouter") },
+		{ value: "google", text: i18n("Google (Gemini API)") },
+		{ value: "perplexity", text: i18n("Perplexity") },
+		{ value: "anthropic", text: i18n("Anthropic") },
+		{ value: "openwebui", text: i18n("Open WebUI") },
+		{ value: "ollama", text: i18n("Ollama (Local)") },
 	]
 
 	property string providerValueCached: "openai"

@@ -694,3 +694,406 @@ msgstr ""
 "Τα OpenAI, OpenRouter, Google, Perplexity και Anthropic απαιτούν πρόσβαση "
 "στο δίκτυο και ένα κλειδί API. Ο Ollama συνδέεται με έναν τοπικό διακομιστή "
 "(προεπιλογή: http://127.0.0.1:11434)."
+
+#: contents/ui/config/ConfigAppearance.qml:24
+#: contents/ui/config/ConfigSearch.qml:30
+msgid "Follow Current %1 (%2)"
+msgstr "Ακολούθηση τρέχοντος %1 (%2)"
+
+#: contents/ui/config/ConfigAppearance.qml:34
+msgid "Shared Surfaces"
+msgstr "Κοινές επιφάνειες"
+
+#: contents/ui/config/ConfigAppearance.qml:40
+msgid "Surface Style"
+msgstr "Στυλ επιφάνειας"
+
+#: contents/ui/config/ConfigAppearance.qml:51
+#: contents/ui/config/ConfigTiles.qml:135
+msgid "Custom Colour"
+msgstr "Προσαρμοσμένο χρώμα"
+
+#: contents/ui/config/ConfigAppearance.qml:65
+msgid "Frosted Glass"
+msgstr "Θολό γυαλί"
+
+#: contents/ui/config/ConfigAppearance.qml:73
+msgid "Surface Corners"
+msgstr "Γωνίες επιφανειών"
+
+#: contents/ui/config/ConfigAppearance.qml:77
+msgid "Rounded corners"
+msgstr "Στρογγυλεμένες γωνίες"
+
+#: contents/ui/config/ConfigAppearance.qml:90
+msgid "Corner radius"
+msgstr "Ακτίνα γωνιών"
+
+#: contents/ui/config/ConfigAppearance.qml:95
+msgid "Surface Borders"
+msgstr "Περιγράμματα επιφανειών"
+
+#: contents/ui/config/ConfigAppearance.qml:96
+msgid "Hide surface borders"
+msgstr "Απόκρυψη περιγραμμάτων επιφανειών"
+
+#: contents/ui/config/ConfigAppearance.qml:102
+msgid ""
+"Applies to tiles, group panels, sidebar cards, search box, and pill tab bar "
+"surfaces."
+msgstr "Εφαρμόζεται σε πλακίδια, πάνελ ομάδων, κάρτες πλευρικής μπάρας, πλαίσιο αναζήτησης και επιφάνειες γραμμής καρτελών τύπου pill."
+
+#: contents/config/config.qml:11 contents/ui/config/ConfigTiles.qml:125
+msgid "Appearance"
+msgstr "Εμφάνιση"
+
+#: contents/ui/config/ConfigAiChat.qml:24
+msgid "OpenAI"
+msgstr "OpenAI"
+
+#: contents/ui/config/ConfigAiChat.qml:25
+msgid "OpenRouter"
+msgstr "OpenRouter"
+
+#: contents/ui/config/ConfigAiChat.qml:26
+msgid "Google (Gemini API)"
+msgstr "Google (Gemini API)"
+
+#: contents/ui/config/ConfigAiChat.qml:27
+msgid "Perplexity"
+msgstr "Perplexity"
+
+#: contents/ui/config/ConfigAiChat.qml:28
+msgid "Anthropic"
+msgstr "Anthropic"
+
+#: contents/ui/config/ConfigAiChat.qml:29
+msgid "Open WebUI"
+msgstr "Open WebUI"
+
+#: contents/ui/config/ConfigAiChat.qml:30
+msgid "Ollama (Local)"
+msgstr "Ollama (Τοπικά)"
+
+#: contents/ui/config/ConfigAiChat.qml:273
+msgid "Failed to save API key to KWallet."
+msgstr "Αποτυχία αποθήκευσης του κλειδιού API στο KWallet."
+
+#: contents/ui/config/ConfigAiChat.qml:285
+msgid "Failed to remove API key from KWallet."
+msgstr "Αποτυχία αφαίρεσης του κλειδιού API από το KWallet."
+
+#: contents/ui/config/ConfigAiChat.qml:354
+msgid "Enabled"
+msgstr "Ενεργοποιημένο"
+
+#: contents/ui/config/ConfigAiChat.qml:355
+msgid "Disabled"
+msgstr "Απενεργοποιημένο"
+
+#: contents/ui/config/ConfigAiChat.qml:388
+msgid "API Key (Optional)"
+msgstr "Κλειδί API (προαιρετικό)"
+
+#: contents/ui/config/ConfigAiChat.qml:391
+msgid "Required for this provider (stored in KWallet)"
+msgstr "Απαιτείται για αυτόν τον πάροχο (αποθηκεύεται στο KWallet)"
+
+#: contents/ui/config/ConfigAiChat.qml:392
+msgid "Optional bearer token (stored in KWallet)"
+msgstr "Προαιρετικό διακριτικό bearer (αποθηκεύεται στο KWallet)"
+
+#: contents/ui/config/ConfigAiChat.qml:440
+msgid ""
+"An API key is already stored in KWallet. Enter a new key here to replace it."
+msgstr "Ένα κλειδί API είναι ήδη αποθηκευμένο στο KWallet. Πληκτρολογήστε νέο κλειδί εδώ για να το αντικαταστήσετε."
+
+#: contents/ui/config/ConfigAiChat.qml:463
+msgid "Open WebUI Server"
+msgstr "Διακομιστής Open WebUI"
+
+#: contents/ui/config/ConfigAiChat.qml:538
+msgid ""
+"<ul><li>OpenAI, OpenRouter, Google, Perplexity and Anthropic require network "
+"access and an API key.</li><li>Open WebUI uses its OpenAI-compatible API at "
+"your configured server URL and can optionally use a bearer token; both the "
+"server root and an /api URL are accepted.</li><li>Ollama connects to a local "
+"server (default: http://127.0.0.1:11434).</li></ul>"
+msgstr "<ul><li>Τα OpenAI, OpenRouter, Google, Perplexity και Anthropic απαιτούν πρόσβαση στο δίκτυο και κλειδί API.</li><li>Το Open WebUI χρησιμοποιεί το συμβατό με OpenAI API στη διαμορφωμένη διεύθυνση URL του διακομιστή σας και μπορεί προαιρετικά να χρησιμοποιήσει διακριτικό bearer· γίνονται δεκτές τόσο η ρίζα του διακομιστή όσο και μια διεύθυνση URL /api.</li><li>Το Ollama συνδέεται σε τοπικό διακομιστή (προεπιλογή: http://127.0.0.1:11434).</li></ul>"
+
+#: contents/ui/config/ConfigExportLayout.qml:652
+msgid "Invalid tile property JSON"
+msgstr "Μη έγκυρο JSON ιδιοτήτων πλακιδίου"
+
+#: contents/ui/config/ConfigExportLayout.qml:1075
+msgid "Applied tile model (%1 tiles)"
+msgstr "Εφαρμόστηκε το μοντέλο πλακιδίων (%1 πλακίδια)"
+
+#: contents/ui/config/ConfigExportLayout.qml:1110
+msgid "Failed to save file"
+msgstr "Αποτυχία αποθήκευσης αρχείου"
+
+#: contents/ui/config/ConfigExportLayout.qml:1128
+msgid "Failed to import file"
+msgstr "Αποτυχία εισαγωγής αρχείου"
+
+#: contents/ui/config/ConfigExportLayout.qml:1137
+msgid "Import produced no data"
+msgstr "Η εισαγωγή δεν παρήγαγε δεδομένα"
+
+#: contents/ui/config/ConfigExportLayout.qml:1146
+msgid "Failed to decode imported file"
+msgstr "Αποτυχία αποκωδικοποίησης του εισαγόμενου αρχείου"
+
+#: contents/ui/config/ConfigExportLayout.qml:1160
+msgid "Imported from %1"
+msgstr "Έγινε εισαγωγή από %1"
+
+#: contents/ui/config/ConfigExportLayout.qml:1164
+msgid "Failed to import settings"
+msgstr "Αποτυχία εισαγωγής ρυθμίσεων"
+
+#: contents/ui/config/ConfigExportLayout.qml:1172
+msgid "Save Layout"
+msgstr "Αποθήκευση διάταξης"
+
+#: contents/ui/config/ConfigExportLayout.qml:1175
+#: contents/ui/config/ConfigExportLayout.qml:1194
+msgid "Layout Files (*.xml)"
+msgstr "Αρχεία διάταξης (*.xml)"
+
+#: contents/ui/config/ConfigExportLayout.qml:1176
+#: contents/ui/config/ConfigExportLayout.qml:1195
+msgid "All Files (*)"
+msgstr "Όλα τα αρχεία (*)"
+
+#: contents/ui/config/ConfigExportLayout.qml:1191
+msgid "Import Layout"
+msgstr "Εισαγωγή διάταξης"
+
+#: contents/ui/config/ConfigExportLayout.qml:1214
+msgid "Saved to %1"
+msgstr "Αποθηκεύτηκε στο %1"
+
+#: contents/ui/config/ConfigExportLayout.qml:1235
+msgid "Application Launcher XML layout"
+msgstr "Διάταξη XML εκκινητή εφαρμογών"
+
+#: contents/ui/config/ConfigExportLayout.qml:1241
+msgid ""
+"These are all the settings and variables for this application launcher. Be "
+"careful when changing things by hand, because mistakes here can break the "
+"layout or configuration."
+msgstr "Αυτές είναι όλες οι ρυθμίσεις και οι μεταβλητές για αυτόν τον εκκινητή εφαρμογών. Να είστε προσεκτικοί όταν αλλάζετε πράγματα με το χέρι, επειδή τα λάθη εδώ μπορούν να χαλάσουν τη διάταξη ή τη διαμόρφωση."
+
+#: contents/ui/config/ConfigExportLayout.qml:1280
+msgid "Import XML"
+msgstr "Εισαγωγή XML"
+
+#: contents/ui/config/ConfigExportLayout.qml:1285
+msgid "Export XML"
+msgstr "Εξαγωγή XML"
+
+#: contents/ui/config/ConfigGeneral.qml:307
+msgid "Application List"
+msgstr "Λίστα εφαρμογών"
+
+#: contents/ui/config/ConfigGeneral.qml:329
+msgid "Docked Sidebar Width"
+msgstr "Πλάτος προσαρτημένης πλευρικής μπάρας"
+
+#: contents/ui/config/ConfigGeneral.qml:342
+msgid "Last Used View"
+msgstr "Τελευταία χρησιμοποιημένη προβολή"
+
+#: contents/ui/config/ConfigSearch.qml:52
+msgid "Search On Top"
+msgstr "Αναζήτηση στην κορυφή"
+
+#: contents/ui/config/ConfigSearch.qml:105
+msgid "Group search results"
+msgstr "Ομαδοποίηση αποτελεσμάτων αναζήτησης"
+
+#: contents/ui/config/ConfigSidebar.qml:28
+msgid "Layout"
+msgstr "Διάταξη"
+
+#: contents/ui/config/ConfigSidebar.qml:34
+msgid "Layout Mode"
+msgstr "Λειτουργία διάταξης"
+
+#: contents/ui/config/ConfigSidebar.qml:36
+msgid "Docked Sidebar Layout"
+msgstr "Διάταξη προσαρτημένης πλευρικής μπάρας"
+
+#: contents/ui/config/ConfigSidebar.qml:37
+msgid "Classic Layout"
+msgstr "Κλασική διάταξη"
+
+#: contents/ui/config/ConfigSidebar.qml:305
+#: contents/ui/libconfig/ListBoxStringList.qml:62
+#: contents/ui/libconfig/ListBoxStringList.qml:100
+#: contents/ui/libconfig/ListBoxStringList.qml:309
+msgid "Shortcut cannot be empty."
+msgstr "Η συντόμευση δεν μπορεί να είναι κενή."
+
+#: contents/ui/config/ConfigSidebar.qml:316
+msgid ""
+"Unsupported XDG shortcut. Use DOCUMENTS, DOWNLOAD, MUSIC, PICTURES, or "
+"VIDEOS."
+msgstr "Μη υποστηριζόμενη συντόμευση XDG. Χρησιμοποιήστε DOCUMENTS, DOWNLOAD, MUSIC, PICTURES ή VIDEOS."
+
+#: contents/ui/config/ConfigSidebar.qml:329
+msgid "Desktop launcher not found."
+msgstr "Δεν βρέθηκε εκκινητής επιφάνειας εργασίας."
+
+#: contents/ui/config/ConfigSidebar.qml:334
+msgid ""
+"Use an installed .desktop launcher, an xdg: shortcut, or a filesystem path."
+msgstr "Χρησιμοποιήστε έναν εγκατεστημένο εκκινητή .desktop, μια συντόμευση xdg: ή μια διαδρομή συστήματος αρχείων."
+
+#: contents/ui/config/ConfigSidebar.qml:354
+msgid "Shortcut Presets"
+msgstr "Προεπιλογές συντομεύσεων"
+
+#: contents/ui/config/ConfigSidebar.qml:360
+msgid "Add common folders and apps to the sidebar."
+msgstr "Προσθέστε συνηθισμένους φακέλους και εφαρμογές στην πλευρική μπάρα."
+
+#: contents/ui/config/ConfigSidebar.qml:426
+msgid "Classic Sidebar"
+msgstr "Κλασική πλευρική μπάρα"
+
+#: contents/ui/config/ConfigSidebar.qml:435
+msgid "Position"
+msgstr "Θέση"
+
+#: contents/ui/config/ConfigSidebar.qml:438
+msgid "Top"
+msgstr "Πάνω"
+
+#: contents/ui/config/ConfigSidebar.qml:439
+msgid "Bottom"
+msgstr "Κάτω"
+
+#: contents/ui/config/ConfigSidebar.qml:446
+msgid "Height"
+msgstr "Ύψος"
+
+#: contents/ui/config/ConfigTiles.qml:61 contents/ui/config/ConfigTiles.qml:67
+#: contents/ui/config/ConfigTiles.qml:76
+msgid "Tabs"
+msgstr "Καρτέλες"
+
+#: contents/ui/config/ConfigTiles.qml:66
+msgid "Tab Support"
+msgstr "Υποστήριξη καρτελών"
+
+#: contents/ui/config/ConfigTiles.qml:72
+msgid "Tab Style"
+msgstr "Στυλ καρτελών"
+
+#: contents/ui/config/ConfigTiles.qml:77
+msgid "Pills"
+msgstr "Καρτέλες τύπου pill"
+
+#: contents/ui/config/ConfigTiles.qml:83
+msgid "Size & Spacing"
+msgstr "Μέγεθος και αποστάσεις"
+
+#: contents/ui/config/ConfigTiles.qml:104
+msgid "Tile Icon Size"
+msgstr "Μέγεθος εικονιδίου πλακιδίου"
+
+#: contents/ui/config/ConfigTiles.qml:113
+msgid "Base size for tile icons; small/large variants scale from this"
+msgstr "Βασικό μέγεθος για τα εικονίδια πλακιδίων· οι μικρές/μεγάλες παραλλαγές κλιμακώνονται από αυτό"
+
+#: contents/ui/config/ConfigTiles.qml:130
+msgid "Tile Background Colour"
+msgstr "Χρώμα φόντου πλακιδίου"
+
+#: contents/ui/config/ConfigTiles.qml:167
+msgid "Hover Effect"
+msgstr "Εφέ κατάδειξης"
+
+#: contents/ui/config/ConfigTiles.qml:169
+#: contents/ui/config/ConfigTiles.qml:218
+msgid "Classic"
+msgstr "Κλασικό"
+
+#: contents/ui/config/ConfigTiles.qml:170
+msgid "Holographic"
+msgstr "Ολογραφικό"
+
+#: contents/ui/config/ConfigTiles.qml:176
+msgid "Play animated backgrounds only on hover"
+msgstr "Αναπαραγωγή κινούμενων φόντων μόνο κατά την κατάδειξη"
+
+#: contents/ui/config/ConfigTiles.qml:181
+msgid "Show tooltips on hover"
+msgstr "Εμφάνιση επεξηγήσεων κατά την κατάδειξη"
+
+#: contents/ui/config/ConfigTiles.qml:187
+msgid "Labels"
+msgstr "Ετικέτες"
+
+#: contents/ui/config/ConfigTiles.qml:195
+msgid "Centre"
+msgstr "Κέντρο"
+
+#: contents/ui/config/ConfigTiles.qml:210
+msgid "Groups"
+msgstr "Ομάδες"
+
+#: contents/ui/config/ConfigTiles.qml:215
+msgid "Group Tile Layout"
+msgstr "Διάταξη πλακιδίων ομάδας"
+
+#: contents/ui/config/ConfigTiles.qml:217
+msgid "Card"
+msgstr "Κάρτα"
+
+#: contents/ui/config/ConfigTiles.qml:229
+msgid "Preset Tile Folder"
+msgstr "Φάκελος προκαθορισμένων πλακιδίων"
+
+#: contents/ui/config/ConfigTiles.qml:371
+msgid "Browse..."
+msgstr "Περιήγηση..."
+
+#: contents/ui/config/ConfigTiles.qml:382
+msgid "Select Preset Tile Folder"
+msgstr "Επιλογή φακέλου προκαθορισμένων πλακιδίων"
+
+#: contents/ui/libconfig/ListBoxStringList.qml:348
+msgid "That shortcut already exists."
+msgstr "Αυτή η συντόμευση υπάρχει ήδη."
+
+#: contents/ui/libconfig/ListBoxStringList.qml:482
+msgid "Enter a desktop file, URL, or path"
+msgstr "Εισαγάγετε αρχείο desktop, URL ή διαδρομή"
+
+#: contents/ui/libconfig/ListBoxStringList.qml:598
+msgid "Add"
+msgstr "Προσθήκη"
+
+#: contents/ui/libconfig/ListBoxStringList.qml:603
+msgid "Save"
+msgstr "Αποθήκευση"
+
+#: contents/ui/libconfig/ListBoxStringList.qml:603
+msgid "Update"
+msgstr "Ενημέρωση"
+
+#: contents/ui/libconfig/ListBoxStringList.qml:609
+msgid "Remove"
+msgstr "Αφαίρεση"
+
+#: contents/ui/libconfig/ListBoxStringList.qml:615
+msgid "Up"
+msgstr "Πάνω"
+
+#: contents/ui/libconfig/ListBoxStringList.qml:621
+msgid "Down"
+msgstr "Κάτω"

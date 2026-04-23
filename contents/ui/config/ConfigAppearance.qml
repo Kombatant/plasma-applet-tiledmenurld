@@ -11,10 +11,22 @@ LibConfig.FormKCM {
 	id: formLayout
 	wideMode: false
 	readonly property bool pendingSurfaceFollowsTheme: !!(formLayout.cfg_sidebarFollowsTheme !== undefined ? formLayout.cfg_sidebarFollowsTheme : plasmoid.configuration.sidebarFollowsTheme)
+	readonly property string pendingSurfaceStyle: {
+		var value = formLayout.cfg_surfaceStyle !== undefined ? ("" + formLayout.cfg_surfaceStyle) : ("" + plasmoid.configuration.surfaceStyle)
+		if (value === "theme" || value === "custom" || value === "frosted") {
+			return value
+		}
+		return pendingSurfaceFollowsTheme ? "theme" : "custom"
+	}
 
 	readonly property string plasmaStyleLabelText: {
 		var plasmaStyleText = i18nd("kcm_desktoptheme", "Plasma Style")
 		return i18n("Follow Current %1 (%2)", plasmaStyleText, KSvg.ImageSet.imageSetName)
+	}
+
+	function setPendingSurfaceStyle(style) {
+		ConfigUtils.setPendingValue(formLayout, "surfaceStyle", style)
+		ConfigUtils.setPendingValue(formLayout, "sidebarFollowsTheme", style === "theme" || style === "frosted")
 	}
 
 	//-------------------------------------------------------
@@ -25,26 +37,35 @@ LibConfig.FormKCM {
 	LibConfig.RadioButtonGroup {
 		id: surfaceThemeGroup
 		spacing: 0
-		Kirigami.FormData.label: i18n("Surface Colour")
+		Kirigami.FormData.label: i18n("Surface Style")
 
 		QQC2.RadioButton {
 			text: plasmaStyleLabelText
 			QQC2.ButtonGroup.group: surfaceThemeGroup.group
-			checked: formLayout.pendingSurfaceFollowsTheme
-			onClicked: ConfigUtils.setPendingValue(formLayout, "sidebarFollowsTheme", true)
+			checked: formLayout.pendingSurfaceStyle === "theme"
+			onClicked: formLayout.setPendingSurfaceStyle("theme")
 		}
 
 		RowLayout {
 			QQC2.RadioButton {
 				text: i18n("Custom Colour")
 				QQC2.ButtonGroup.group: surfaceThemeGroup.group
-				checked: !formLayout.pendingSurfaceFollowsTheme
-				onClicked: ConfigUtils.setPendingValue(formLayout, "sidebarFollowsTheme", false)
+				checked: formLayout.pendingSurfaceStyle === "custom"
+				onClicked: formLayout.setPendingSurfaceStyle("custom")
 			}
 
 			LibConfig.ColorField {
 				configKey: 'sidebarBackgroundColor'
+				enabled: formLayout.pendingSurfaceStyle === "custom"
+				opacity: enabled ? 1 : 0.45
 			}
+		}
+
+		QQC2.RadioButton {
+			text: i18n("Frosted Glass")
+			QQC2.ButtonGroup.group: surfaceThemeGroup.group
+			checked: formLayout.pendingSurfaceStyle === "frosted"
+			onClicked: formLayout.setPendingSurfaceStyle("frosted")
 		}
 	}
 
@@ -72,7 +93,7 @@ LibConfig.FormKCM {
 
 	LibConfig.CheckBox {
 		Kirigami.FormData.label: i18n("Surface Borders")
-		text: i18n("Hide glass surface borders")
+		text: i18n("Hide surface borders")
 		configKey: 'sidebarHideBorder'
 	}
 

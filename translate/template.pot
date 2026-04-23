@@ -7,7 +7,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: tiledmenu\n"
-"Report-Msgid-Bugs-To: https://github.com/Kombatant/plasma-applet-tiledmenurld/issues\n"
+"Report-Msgid-Bugs-To: https://github.com/Kombatant/plasma-applet-"
+"tiledmenurld/issues\n"
 "POT-Creation-Date: 2025-02-25 20:49+1100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
@@ -286,7 +287,9 @@ msgid "File Manager"
 msgstr ""
 
 #: ../contents/ui/config/ConfigurationShortcuts.qml
-msgid "When this widget has a global shortcut set, like 'Alt+F1', Plasma will open this menu with just the ⊞ Windows / Meta key."
+msgid ""
+"When this widget has a global shortcut set, like 'Alt+F1', Plasma will open "
+"this menu with just the ⊞ Windows / Meta key."
 msgstr ""
 
 #: ../contents/ui/main.qml
@@ -330,7 +333,8 @@ msgctxt "Search [krunnerName, krunnerName, ...], "
 msgid "Search %1"
 msgstr ""
 
-#: ../contents/ui/SearchFiltersViewItem.qml ../contents/ui/SearchFiltersView.qml
+#: ../contents/ui/SearchFiltersViewItem.qml
+#: ../contents/ui/SearchFiltersView.qml
 msgid "Default"
 msgstr ""
 
@@ -676,6 +680,411 @@ msgid "Notes"
 msgstr ""
 
 #: ../contents/ui/config/ConfigAiChat.qml
-msgid "OpenAI, OpenRouter, Google, Perplexity and Anthropic require network access and an API key. Ollama connects to a local server (default: http://127.0.0.1:11434)."
+msgid ""
+"OpenAI, OpenRouter, Google, Perplexity and Anthropic require network access "
+"and an API key. Ollama connects to a local server (default: http://"
+"127.0.0.1:11434)."
 msgstr ""
 
+#: contents/ui/config/ConfigAppearance.qml:24
+#: contents/ui/config/ConfigSearch.qml:30
+msgid "Follow Current %1 (%2)"
+msgstr ""
+
+#: contents/ui/config/ConfigAppearance.qml:34
+msgid "Shared Surfaces"
+msgstr ""
+
+#: contents/ui/config/ConfigAppearance.qml:40
+msgid "Surface Style"
+msgstr ""
+
+#: contents/ui/config/ConfigAppearance.qml:51
+#: contents/ui/config/ConfigTiles.qml:135
+msgid "Custom Colour"
+msgstr ""
+
+#: contents/ui/config/ConfigAppearance.qml:65
+msgid "Frosted Glass"
+msgstr ""
+
+#: contents/ui/config/ConfigAppearance.qml:73
+msgid "Surface Corners"
+msgstr ""
+
+#: contents/ui/config/ConfigAppearance.qml:77
+msgid "Rounded corners"
+msgstr ""
+
+#: contents/ui/config/ConfigAppearance.qml:90
+msgid "Corner radius"
+msgstr ""
+
+#: contents/ui/config/ConfigAppearance.qml:95
+msgid "Surface Borders"
+msgstr ""
+
+#: contents/ui/config/ConfigAppearance.qml:96
+msgid "Hide surface borders"
+msgstr ""
+
+#: contents/ui/config/ConfigAppearance.qml:102
+msgid ""
+"Applies to tiles, group panels, sidebar cards, search box, and pill tab bar "
+"surfaces."
+msgstr ""
+
+#: contents/config/config.qml:11 contents/ui/config/ConfigTiles.qml:125
+msgid "Appearance"
+msgstr ""
+
+#: contents/ui/config/ConfigAiChat.qml:24
+msgid "OpenAI"
+msgstr ""
+
+#: contents/ui/config/ConfigAiChat.qml:25
+msgid "OpenRouter"
+msgstr ""
+
+#: contents/ui/config/ConfigAiChat.qml:26
+msgid "Google (Gemini API)"
+msgstr ""
+
+#: contents/ui/config/ConfigAiChat.qml:27
+msgid "Perplexity"
+msgstr ""
+
+#: contents/ui/config/ConfigAiChat.qml:28
+msgid "Anthropic"
+msgstr ""
+
+#: contents/ui/config/ConfigAiChat.qml:29
+msgid "Open WebUI"
+msgstr ""
+
+#: contents/ui/config/ConfigAiChat.qml:30
+msgid "Ollama (Local)"
+msgstr ""
+
+#: contents/ui/config/ConfigAiChat.qml:273
+msgid "Failed to save API key to KWallet."
+msgstr ""
+
+#: contents/ui/config/ConfigAiChat.qml:285
+msgid "Failed to remove API key from KWallet."
+msgstr ""
+
+#: contents/ui/config/ConfigAiChat.qml:354
+msgid "Enabled"
+msgstr ""
+
+#: contents/ui/config/ConfigAiChat.qml:355
+msgid "Disabled"
+msgstr ""
+
+#: contents/ui/config/ConfigAiChat.qml:388
+msgid "API Key (Optional)"
+msgstr ""
+
+#: contents/ui/config/ConfigAiChat.qml:391
+msgid "Required for this provider (stored in KWallet)"
+msgstr ""
+
+#: contents/ui/config/ConfigAiChat.qml:392
+msgid "Optional bearer token (stored in KWallet)"
+msgstr ""
+
+#: contents/ui/config/ConfigAiChat.qml:440
+msgid ""
+"An API key is already stored in KWallet. Enter a new key here to replace it."
+msgstr ""
+
+#: contents/ui/config/ConfigAiChat.qml:463
+msgid "Open WebUI Server"
+msgstr ""
+
+#: contents/ui/config/ConfigAiChat.qml:538
+msgid ""
+"<ul><li>OpenAI, OpenRouter, Google, Perplexity and Anthropic require network "
+"access and an API key.</li><li>Open WebUI uses its OpenAI-compatible API at "
+"your configured server URL and can optionally use a bearer token; both the "
+"server root and an /api URL are accepted.</li><li>Ollama connects to a local "
+"server (default: http://127.0.0.1:11434).</li></ul>"
+msgstr ""
+
+#: contents/ui/config/ConfigExportLayout.qml:652
+msgid "Invalid tile property JSON"
+msgstr ""
+
+#: contents/ui/config/ConfigExportLayout.qml:1075
+msgid "Applied tile model (%1 tiles)"
+msgstr ""
+
+#: contents/ui/config/ConfigExportLayout.qml:1110
+msgid "Failed to save file"
+msgstr ""
+
+#: contents/ui/config/ConfigExportLayout.qml:1128
+msgid "Failed to import file"
+msgstr ""
+
+#: contents/ui/config/ConfigExportLayout.qml:1137
+msgid "Import produced no data"
+msgstr ""
+
+#: contents/ui/config/ConfigExportLayout.qml:1146
+msgid "Failed to decode imported file"
+msgstr ""
+
+#: contents/ui/config/ConfigExportLayout.qml:1160
+msgid "Imported from %1"
+msgstr ""
+
+#: contents/ui/config/ConfigExportLayout.qml:1164
+msgid "Failed to import settings"
+msgstr ""
+
+#: contents/ui/config/ConfigExportLayout.qml:1172
+msgid "Save Layout"
+msgstr ""
+
+#: contents/ui/config/ConfigExportLayout.qml:1175
+#: contents/ui/config/ConfigExportLayout.qml:1194
+msgid "Layout Files (*.xml)"
+msgstr ""
+
+#: contents/ui/config/ConfigExportLayout.qml:1176
+#: contents/ui/config/ConfigExportLayout.qml:1195
+msgid "All Files (*)"
+msgstr ""
+
+#: contents/ui/config/ConfigExportLayout.qml:1191
+msgid "Import Layout"
+msgstr ""
+
+#: contents/ui/config/ConfigExportLayout.qml:1214
+msgid "Saved to %1"
+msgstr ""
+
+#: contents/ui/config/ConfigExportLayout.qml:1235
+msgid "Application Launcher XML layout"
+msgstr ""
+
+#: contents/ui/config/ConfigExportLayout.qml:1241
+msgid ""
+"These are all the settings and variables for this application launcher. Be "
+"careful when changing things by hand, because mistakes here can break the "
+"layout or configuration."
+msgstr ""
+
+#: contents/ui/config/ConfigExportLayout.qml:1280
+msgid "Import XML"
+msgstr ""
+
+#: contents/ui/config/ConfigExportLayout.qml:1285
+msgid "Export XML"
+msgstr ""
+
+#: contents/ui/config/ConfigGeneral.qml:307
+msgid "Application List"
+msgstr ""
+
+#: contents/ui/config/ConfigGeneral.qml:329
+msgid "Docked Sidebar Width"
+msgstr ""
+
+#: contents/ui/config/ConfigGeneral.qml:342
+msgid "Last Used View"
+msgstr ""
+
+#: contents/ui/config/ConfigSearch.qml:52
+msgid "Search On Top"
+msgstr ""
+
+#: contents/ui/config/ConfigSearch.qml:105
+msgid "Group search results"
+msgstr ""
+
+#: contents/ui/config/ConfigSidebar.qml:28
+msgid "Layout"
+msgstr ""
+
+#: contents/ui/config/ConfigSidebar.qml:34
+msgid "Layout Mode"
+msgstr ""
+
+#: contents/ui/config/ConfigSidebar.qml:36
+msgid "Docked Sidebar Layout"
+msgstr ""
+
+#: contents/ui/config/ConfigSidebar.qml:37
+msgid "Classic Layout"
+msgstr ""
+
+#: contents/ui/config/ConfigSidebar.qml:305
+#: contents/ui/libconfig/ListBoxStringList.qml:62
+#: contents/ui/libconfig/ListBoxStringList.qml:100
+#: contents/ui/libconfig/ListBoxStringList.qml:309
+msgid "Shortcut cannot be empty."
+msgstr ""
+
+#: contents/ui/config/ConfigSidebar.qml:316
+msgid ""
+"Unsupported XDG shortcut. Use DOCUMENTS, DOWNLOAD, MUSIC, PICTURES, or "
+"VIDEOS."
+msgstr ""
+
+#: contents/ui/config/ConfigSidebar.qml:329
+msgid "Desktop launcher not found."
+msgstr ""
+
+#: contents/ui/config/ConfigSidebar.qml:334
+msgid ""
+"Use an installed .desktop launcher, an xdg: shortcut, or a filesystem path."
+msgstr ""
+
+#: contents/ui/config/ConfigSidebar.qml:354
+msgid "Shortcut Presets"
+msgstr ""
+
+#: contents/ui/config/ConfigSidebar.qml:360
+msgid "Add common folders and apps to the sidebar."
+msgstr ""
+
+#: contents/ui/config/ConfigSidebar.qml:426
+msgid "Classic Sidebar"
+msgstr ""
+
+#: contents/ui/config/ConfigSidebar.qml:435
+msgid "Position"
+msgstr ""
+
+#: contents/ui/config/ConfigSidebar.qml:438
+msgid "Top"
+msgstr ""
+
+#: contents/ui/config/ConfigSidebar.qml:439
+msgid "Bottom"
+msgstr ""
+
+#: contents/ui/config/ConfigSidebar.qml:446
+msgid "Height"
+msgstr ""
+
+#: contents/ui/config/ConfigTiles.qml:61 contents/ui/config/ConfigTiles.qml:67
+#: contents/ui/config/ConfigTiles.qml:76
+msgid "Tabs"
+msgstr ""
+
+#: contents/ui/config/ConfigTiles.qml:66
+msgid "Tab Support"
+msgstr ""
+
+#: contents/ui/config/ConfigTiles.qml:72
+msgid "Tab Style"
+msgstr ""
+
+#: contents/ui/config/ConfigTiles.qml:77
+msgid "Pills"
+msgstr ""
+
+#: contents/ui/config/ConfigTiles.qml:83
+msgid "Size & Spacing"
+msgstr ""
+
+#: contents/ui/config/ConfigTiles.qml:104
+msgid "Tile Icon Size"
+msgstr ""
+
+#: contents/ui/config/ConfigTiles.qml:113
+msgid "Base size for tile icons; small/large variants scale from this"
+msgstr ""
+
+#: contents/ui/config/ConfigTiles.qml:130
+msgid "Tile Background Colour"
+msgstr ""
+
+#: contents/ui/config/ConfigTiles.qml:167
+msgid "Hover Effect"
+msgstr ""
+
+#: contents/ui/config/ConfigTiles.qml:169
+#: contents/ui/config/ConfigTiles.qml:218
+msgid "Classic"
+msgstr ""
+
+#: contents/ui/config/ConfigTiles.qml:170
+msgid "Holographic"
+msgstr ""
+
+#: contents/ui/config/ConfigTiles.qml:176
+msgid "Play animated backgrounds only on hover"
+msgstr ""
+
+#: contents/ui/config/ConfigTiles.qml:181
+msgid "Show tooltips on hover"
+msgstr ""
+
+#: contents/ui/config/ConfigTiles.qml:187
+msgid "Labels"
+msgstr ""
+
+#: contents/ui/config/ConfigTiles.qml:195
+msgid "Centre"
+msgstr ""
+
+#: contents/ui/config/ConfigTiles.qml:210
+msgid "Groups"
+msgstr ""
+
+#: contents/ui/config/ConfigTiles.qml:215
+msgid "Group Tile Layout"
+msgstr ""
+
+#: contents/ui/config/ConfigTiles.qml:217
+msgid "Card"
+msgstr ""
+
+#: contents/ui/config/ConfigTiles.qml:229
+msgid "Preset Tile Folder"
+msgstr ""
+
+#: contents/ui/config/ConfigTiles.qml:371
+msgid "Browse..."
+msgstr ""
+
+#: contents/ui/config/ConfigTiles.qml:382
+msgid "Select Preset Tile Folder"
+msgstr ""
+
+#: contents/ui/libconfig/ListBoxStringList.qml:348
+msgid "That shortcut already exists."
+msgstr ""
+
+#: contents/ui/libconfig/ListBoxStringList.qml:482
+msgid "Enter a desktop file, URL, or path"
+msgstr ""
+
+#: contents/ui/libconfig/ListBoxStringList.qml:598
+msgid "Add"
+msgstr ""
+
+#: contents/ui/libconfig/ListBoxStringList.qml:603
+msgid "Save"
+msgstr ""
+
+#: contents/ui/libconfig/ListBoxStringList.qml:603
+msgid "Update"
+msgstr ""
+
+#: contents/ui/libconfig/ListBoxStringList.qml:609
+msgid "Remove"
+msgstr ""
+
+#: contents/ui/libconfig/ListBoxStringList.qml:615
+msgid "Up"
+msgstr ""
+
+#: contents/ui/libconfig/ListBoxStringList.qml:621
+msgid "Down"
+msgstr ""

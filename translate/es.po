@@ -19,15 +19,15 @@ msgstr ""
 
 #: ../contents/ui/config/ConfigGeneral.qml
 msgid "Group header style"
-msgstr ""
+msgstr "Estilo de encabezado de grupo"
 
 #: ../contents/ui/config/ConfigGeneral.qml
 msgid "Plain"
-msgstr ""
+msgstr "Simple"
 
 #: ../contents/ui/config/ConfigGeneral.qml
 msgid "Section header"
-msgstr ""
+msgstr "Encabezado de sección"
 
 #: ../metadata.json
 msgid "Tiled Menu"
@@ -139,7 +139,7 @@ msgstr "Derecha"
 
 #: ../contents/ui/config/ConfigGeneral.qml
 msgid "Group Text Alignment"
-msgstr ""
+msgstr "Alineación del texto de grupo"
 
 #: ../contents/ui/config/ConfigGeneral.qml
 msgid "Sidebar"
@@ -159,7 +159,7 @@ msgstr "Alto del botón emergente"
 
 #: ../contents/ui/config/ConfigGeneral.qml
 msgid "Theme"
-msgstr ""
+msgstr "Tema"
 
 #: ../contents/ui/config/ConfigGeneral.qml
 msgid "Sidebar Shortcuts"
@@ -187,7 +187,7 @@ msgstr "Altura del campo de búsqueda"
 
 #: ../contents/ui/config/ConfigGeneral.qml
 msgid "Search Box Theme"
-msgstr ""
+msgstr "Tema del cuadro de búsqueda"
 
 #: ../contents/ui/config/ConfigGeneral.qml
 msgid "Windows (White)"
@@ -243,7 +243,7 @@ msgstr "Debajo"
 
 #: ../contents/ui/config/ConfigGeneral.qml
 msgid "App History"
-msgstr ""
+msgstr "Historial de aplicaciones"
 
 #: ../contents/ui/config/ConfigGeneral.qml
 msgid "Show:"
@@ -271,11 +271,11 @@ msgstr "Dividir en categorías (Menú de aplicaciones/Salpicadero)"
 
 #: ../contents/ui/config/ConfigGeneral.qml
 msgid "Right Click Menu"
-msgstr ""
+msgstr "Menú de clic derecho"
 
 #: ../contents/ui/config/ConfigGeneral.qml ../contents/ui/main.qml
 msgid "Terminal"
-msgstr "Terminal"
+msgstr "Consola"
 
 #: ../contents/ui/config/ConfigGeneral.qml ../contents/ui/main.qml
 msgid "Task Manager"
@@ -289,9 +289,7 @@ msgstr "Gestor de archivos"
 msgid ""
 "When this widget has a global shortcut set, like 'Alt+F1', Plasma will open "
 "this menu with just the ⊞ Windows / Meta key."
-msgstr ""
-"Cuando este elemento gráfico tenga asignado un atajo global, como 'Alt+F1', "
-"Plasma abrirá este menú con la tecla ⊞ Windows/Meta."
+msgstr "Cuando este elemento gráfico tenga asignado un atajo global, como 'Alt+F1', Plasma abrirá este menú con la tecla ⊞ Windows/Meta."
 
 #: ../contents/ui/main.qml
 msgid "System Info"
@@ -445,9 +443,7 @@ msgstr "Elegir imagen"
 
 #: ../contents/ui/TileEditorView.qml
 msgid "Image Files (*.png *.apng *.gif *.webp *.jpg *.jpeg *.bmp *.svg *.svgz)"
-msgstr ""
-"Archivos de imagen (*.png *.apng *.gif *.webp *.jpg *.jpeg *.bmp *.svg "
-"*.svgz)"
+msgstr "Archivos de imagen (*.png *.apng *.gif *.webp *.jpg *.jpeg *.bmp *.svg *.svgz)"
 
 #: ../contents/ui/TileEditorView.qml
 msgid "Preset Tiles"
@@ -532,7 +528,7 @@ msgstr "Ordenar baldosas"
 
 #: ../contents/ui/SidebarView.qml
 msgid "Tiled Menu Reloaded Settings"
-msgstr ""
+msgstr "Configuración de Tiled Menu Reloaded"
 
 #: ../contents/ui/config/ConfigMain.qml
 msgid "AI Chat"
@@ -560,15 +556,11 @@ msgstr "Iniciar una nueva conversación"
 
 #: ../contents/ui/AiChatView.qml
 msgid "Configure provider, API key and model in settings before sending."
-msgstr ""
-"Configure el proveedor, la clave API y el modelo en la configuración antes "
-"de enviar."
+msgstr "Configure el proveedor, la clave API y el modelo en la configuración antes de enviar."
 
 #: ../contents/ui/AiChatView.qml
 msgid "Ask anything... (Enter to send, Shift+Enter for newline)"
-msgstr ""
-"Preguntar cualquier cosa... (Introducir para enviar, Mayús+Intro para nueva "
-"línea)"
+msgstr "Preguntar cualquier cosa... (Introducir para enviar, Mayús+Intro para nueva línea)"
 
 #: ../contents/ui/AiChatModel.qml
 msgid "New Chat"
@@ -672,9 +664,7 @@ msgstr "Volver a cargar modelos"
 
 #: ../contents/ui/config/ConfigAiChat.qml
 msgid "No models detected yet. Paste your API key to auto-detect."
-msgstr ""
-"Todavía no se han detectado modelos. Pegue su clave API para la detección "
-"automática."
+msgstr "Todavía no se han detectado modelos. Pegue su clave API para la detección automática."
 
 #: ../contents/ui/config/ConfigAiChat.qml
 msgid "Chat Options"
@@ -693,10 +683,410 @@ msgid ""
 "OpenAI, OpenRouter, Google, Perplexity and Anthropic require network access "
 "and an API key. Ollama connects to a local server (default: http://"
 "127.0.0.1:11434)."
-msgstr ""
-"OpenAI, OpenRouter, Google, Perplexity y Anthropic requieren acceso a la red "
-"y una clave API. Ollama se conecta a un servidor local (por defecto: http://"
-"127.0.0.1:11434)."
+msgstr "OpenAI, OpenRouter, Google, Perplexity y Anthropic requieren acceso a la red y una clave API. Ollama se conecta a un servidor local (por defecto: http://127.0.0.1:11434)."
+
+#: contents/ui/config/ConfigAppearance.qml:24
+#: contents/ui/config/ConfigSearch.qml:30
+msgid "Follow Current %1 (%2)"
+msgstr "Seguir el %1 actual (%2)"
+
+#: contents/ui/config/ConfigAppearance.qml:34
+msgid "Shared Surfaces"
+msgstr "Superficies compartidas"
+
+#: contents/ui/config/ConfigAppearance.qml:40
+msgid "Surface Style"
+msgstr "Estilo de superficie"
+
+#: contents/ui/config/ConfigAppearance.qml:51
+#: contents/ui/config/ConfigTiles.qml:135
+msgid "Custom Colour"
+msgstr "Color personalizado"
+
+#: contents/ui/config/ConfigAppearance.qml:65
+msgid "Frosted Glass"
+msgstr "Vidrio esmerilado"
+
+#: contents/ui/config/ConfigAppearance.qml:73
+msgid "Surface Corners"
+msgstr "Esquinas de superficie"
+
+#: contents/ui/config/ConfigAppearance.qml:77
+msgid "Rounded corners"
+msgstr "Esquinas redondeadas"
+
+#: contents/ui/config/ConfigAppearance.qml:90
+msgid "Corner radius"
+msgstr "Radio de esquina"
+
+#: contents/ui/config/ConfigAppearance.qml:95
+msgid "Surface Borders"
+msgstr "Bordes de superficie"
+
+#: contents/ui/config/ConfigAppearance.qml:96
+msgid "Hide surface borders"
+msgstr "Ocultar bordes de superficie"
+
+#: contents/ui/config/ConfigAppearance.qml:102
+msgid ""
+"Applies to tiles, group panels, sidebar cards, search box, and pill tab bar "
+"surfaces."
+msgstr "Applies to tiles, group panels, sidebar cards, search box, and pill tab bar surfaces."
+
+#: contents/config/config.qml:11 contents/ui/config/ConfigTiles.qml:125
+msgid "Appearance"
+msgstr "Apariencia"
+
+#: contents/ui/config/ConfigAiChat.qml:24
+msgid "OpenAI"
+msgstr "OpenAI"
+
+#: contents/ui/config/ConfigAiChat.qml:25
+msgid "OpenRouter"
+msgstr "OpenRouter"
+
+#: contents/ui/config/ConfigAiChat.qml:26
+msgid "Google (Gemini API)"
+msgstr "Google (Gemini API)"
+
+#: contents/ui/config/ConfigAiChat.qml:27
+msgid "Perplexity"
+msgstr "Perplexity"
+
+#: contents/ui/config/ConfigAiChat.qml:28
+msgid "Anthropic"
+msgstr "Anthropic"
+
+#: contents/ui/config/ConfigAiChat.qml:29
+msgid "Open WebUI"
+msgstr "Open WebUI"
+
+#: contents/ui/config/ConfigAiChat.qml:30
+msgid "Ollama (Local)"
+msgstr "Ollama (Local)"
+
+#: contents/ui/config/ConfigAiChat.qml:273
+msgid "Failed to save API key to KWallet."
+msgstr "Failed to save API key to KWallet."
+
+#: contents/ui/config/ConfigAiChat.qml:285
+msgid "Failed to remove API key from KWallet."
+msgstr "Failed to remove API key from KWallet."
+
+#: contents/ui/config/ConfigAiChat.qml:354
+msgid "Enabled"
+msgstr "Activado"
+
+#: contents/ui/config/ConfigAiChat.qml:355
+msgid "Disabled"
+msgstr "Desactivado"
+
+#: contents/ui/config/ConfigAiChat.qml:388
+msgid "API Key (Optional)"
+msgstr "API Key (Optional)"
+
+#: contents/ui/config/ConfigAiChat.qml:391
+msgid "Required for this provider (stored in KWallet)"
+msgstr "Required for this provider (stored in KWallet)"
+
+#: contents/ui/config/ConfigAiChat.qml:392
+msgid "Optional bearer token (stored in KWallet)"
+msgstr "Optional bearer token (stored in KWallet)"
+
+#: contents/ui/config/ConfigAiChat.qml:440
+msgid ""
+"An API key is already stored in KWallet. Enter a new key here to replace it."
+msgstr "An API key is already stored in KWallet. Enter a new key here to replace it."
+
+#: contents/ui/config/ConfigAiChat.qml:463
+msgid "Open WebUI Server"
+msgstr "Open WebUI Server"
+
+#: contents/ui/config/ConfigAiChat.qml:538
+msgid ""
+"<ul><li>OpenAI, OpenRouter, Google, Perplexity and Anthropic require network "
+"access and an API key.</li><li>Open WebUI uses its OpenAI-compatible API at "
+"your configured server URL and can optionally use a bearer token; both the "
+"server root and an /api URL are accepted.</li><li>Ollama connects to a local "
+"server (default: http://127.0.0.1:11434).</li></ul>"
+msgstr "<ul><li>OpenAI, OpenRouter, Google, Perplexity and Anthropic require network access and an API key.</li><li>Open WebUI uses its OpenAI-compatible API at your configured server URL and can optionally use a bearer token; both the server root and an /api URL are accepted.</li><li>Ollama connects to a local server (default: http://127.0.0.1:11434).</li></ul>"
+
+#: contents/ui/config/ConfigExportLayout.qml:652
+msgid "Invalid tile property JSON"
+msgstr "Invalid tile property JSON"
+
+#: contents/ui/config/ConfigExportLayout.qml:1075
+msgid "Applied tile model (%1 tiles)"
+msgstr "Applied tile model (%1 tiles)"
+
+#: contents/ui/config/ConfigExportLayout.qml:1110
+msgid "Failed to save file"
+msgstr "Failed to save file"
+
+#: contents/ui/config/ConfigExportLayout.qml:1128
+msgid "Failed to import file"
+msgstr "Failed to import file"
+
+#: contents/ui/config/ConfigExportLayout.qml:1137
+msgid "Import produced no data"
+msgstr "Import produced no data"
+
+#: contents/ui/config/ConfigExportLayout.qml:1146
+msgid "Failed to decode imported file"
+msgstr "Failed to decode imported file"
+
+#: contents/ui/config/ConfigExportLayout.qml:1160
+msgid "Imported from %1"
+msgstr "Imported from %1"
+
+#: contents/ui/config/ConfigExportLayout.qml:1164
+msgid "Failed to import settings"
+msgstr "Failed to import settings"
+
+#: contents/ui/config/ConfigExportLayout.qml:1172
+msgid "Save Layout"
+msgstr "Save Layout"
+
+#: contents/ui/config/ConfigExportLayout.qml:1175
+#: contents/ui/config/ConfigExportLayout.qml:1194
+msgid "Layout Files (*.xml)"
+msgstr "Layout Files (*.xml)"
+
+#: contents/ui/config/ConfigExportLayout.qml:1176
+#: contents/ui/config/ConfigExportLayout.qml:1195
+msgid "All Files (*)"
+msgstr "Todos los archivos (*)"
+
+#: contents/ui/config/ConfigExportLayout.qml:1191
+msgid "Import Layout"
+msgstr "Import Layout"
+
+#: contents/ui/config/ConfigExportLayout.qml:1214
+msgid "Saved to %1"
+msgstr "Saved to %1"
+
+#: contents/ui/config/ConfigExportLayout.qml:1235
+msgid "Application Launcher XML layout"
+msgstr "Application Launcher XML layout"
+
+#: contents/ui/config/ConfigExportLayout.qml:1241
+msgid ""
+"These are all the settings and variables for this application launcher. Be "
+"careful when changing things by hand, because mistakes here can break the "
+"layout or configuration."
+msgstr "These are all the settings and variables for this application launcher. Be careful when changing things by hand, because mistakes here can break the layout or configuration."
+
+#: contents/ui/config/ConfigExportLayout.qml:1280
+msgid "Import XML"
+msgstr "Import XML"
+
+#: contents/ui/config/ConfigExportLayout.qml:1285
+msgid "Export XML"
+msgstr "Export XML"
+
+#: contents/ui/config/ConfigGeneral.qml:307
+msgid "Application List"
+msgstr "Lista de aplicaciones"
+
+#: contents/ui/config/ConfigGeneral.qml:329
+msgid "Docked Sidebar Width"
+msgstr "Docked Sidebar Width"
+
+#: contents/ui/config/ConfigGeneral.qml:342
+msgid "Last Used View"
+msgstr "Last Used View"
+
+#: contents/ui/config/ConfigSearch.qml:52
+msgid "Search On Top"
+msgstr "Search On Top"
+
+#: contents/ui/config/ConfigSearch.qml:105
+msgid "Group search results"
+msgstr "Group search results"
+
+#: contents/ui/config/ConfigSidebar.qml:28
+msgid "Layout"
+msgstr "Diseño"
+
+#: contents/ui/config/ConfigSidebar.qml:34
+msgid "Layout Mode"
+msgstr "Layout Mode"
+
+#: contents/ui/config/ConfigSidebar.qml:36
+msgid "Docked Sidebar Layout"
+msgstr "Docked Sidebar Layout"
+
+#: contents/ui/config/ConfigSidebar.qml:37
+msgid "Classic Layout"
+msgstr "Classic Layout"
+
+#: contents/ui/config/ConfigSidebar.qml:305
+#: contents/ui/libconfig/ListBoxStringList.qml:62
+#: contents/ui/libconfig/ListBoxStringList.qml:100
+#: contents/ui/libconfig/ListBoxStringList.qml:309
+msgid "Shortcut cannot be empty."
+msgstr "Shortcut cannot be empty."
+
+#: contents/ui/config/ConfigSidebar.qml:316
+msgid ""
+"Unsupported XDG shortcut. Use DOCUMENTS, DOWNLOAD, MUSIC, PICTURES, or "
+"VIDEOS."
+msgstr "Unsupported XDG shortcut. Use DOCUMENTS, DOWNLOAD, MUSIC, PICTURES, or VIDEOS."
+
+#: contents/ui/config/ConfigSidebar.qml:329
+msgid "Desktop launcher not found."
+msgstr "Desktop launcher not found."
+
+#: contents/ui/config/ConfigSidebar.qml:334
+msgid ""
+"Use an installed .desktop launcher, an xdg: shortcut, or a filesystem path."
+msgstr "Use an installed .desktop launcher, an xdg: shortcut, or a filesystem path."
+
+#: contents/ui/config/ConfigSidebar.qml:354
+msgid "Shortcut Presets"
+msgstr "Shortcut Presets"
+
+#: contents/ui/config/ConfigSidebar.qml:360
+msgid "Add common folders and apps to the sidebar."
+msgstr "Add common folders and apps to the sidebar."
+
+#: contents/ui/config/ConfigSidebar.qml:426
+msgid "Classic Sidebar"
+msgstr "Classic Sidebar"
+
+#: contents/ui/config/ConfigSidebar.qml:435
+msgid "Position"
+msgstr "Posición"
+
+#: contents/ui/config/ConfigSidebar.qml:438
+msgid "Top"
+msgstr "Arriba"
+
+#: contents/ui/config/ConfigSidebar.qml:439
+msgid "Bottom"
+msgstr "Abajo"
+
+#: contents/ui/config/ConfigSidebar.qml:446
+msgid "Height"
+msgstr "Altura"
+
+#: contents/ui/config/ConfigTiles.qml:61 contents/ui/config/ConfigTiles.qml:67
+#: contents/ui/config/ConfigTiles.qml:76
+msgid "Tabs"
+msgstr "Pestañas"
+
+#: contents/ui/config/ConfigTiles.qml:66
+msgid "Tab Support"
+msgstr "Tab Support"
+
+#: contents/ui/config/ConfigTiles.qml:72
+msgid "Tab Style"
+msgstr "Tab Style"
+
+#: contents/ui/config/ConfigTiles.qml:77
+msgid "Pills"
+msgstr "Píldoras"
+
+#: contents/ui/config/ConfigTiles.qml:83
+msgid "Size & Spacing"
+msgstr "Size & Spacing"
+
+#: contents/ui/config/ConfigTiles.qml:104
+msgid "Tile Icon Size"
+msgstr "Tile Icon Size"
+
+#: contents/ui/config/ConfigTiles.qml:113
+msgid "Base size for tile icons; small/large variants scale from this"
+msgstr "Base size for tile icons; small/large variants scale from this"
+
+#: contents/ui/config/ConfigTiles.qml:130
+msgid "Tile Background Colour"
+msgstr "Tile Background Colour"
+
+#: contents/ui/config/ConfigTiles.qml:167
+msgid "Hover Effect"
+msgstr "Hover Effect"
+
+#: contents/ui/config/ConfigTiles.qml:169
+#: contents/ui/config/ConfigTiles.qml:218
+msgid "Classic"
+msgstr "Clásico"
+
+#: contents/ui/config/ConfigTiles.qml:170
+msgid "Holographic"
+msgstr "Holographic"
+
+#: contents/ui/config/ConfigTiles.qml:176
+msgid "Play animated backgrounds only on hover"
+msgstr "Play animated backgrounds only on hover"
+
+#: contents/ui/config/ConfigTiles.qml:181
+msgid "Show tooltips on hover"
+msgstr "Show tooltips on hover"
+
+#: contents/ui/config/ConfigTiles.qml:187
+msgid "Labels"
+msgstr "Etiquetas"
+
+#: contents/ui/config/ConfigTiles.qml:195
+msgid "Centre"
+msgstr "Centro"
+
+#: contents/ui/config/ConfigTiles.qml:210
+msgid "Groups"
+msgstr "Grupos"
+
+#: contents/ui/config/ConfigTiles.qml:215
+msgid "Group Tile Layout"
+msgstr "Group Tile Layout"
+
+#: contents/ui/config/ConfigTiles.qml:217
+msgid "Card"
+msgstr "Tarjeta"
+
+#: contents/ui/config/ConfigTiles.qml:229
+msgid "Preset Tile Folder"
+msgstr "Preset Tile Folder"
+
+#: contents/ui/config/ConfigTiles.qml:371
+msgid "Browse..."
+msgstr "Navegar..."
+
+#: contents/ui/config/ConfigTiles.qml:382
+msgid "Select Preset Tile Folder"
+msgstr "Select Preset Tile Folder"
+
+#: contents/ui/libconfig/ListBoxStringList.qml:348
+msgid "That shortcut already exists."
+msgstr "That shortcut already exists."
+
+#: contents/ui/libconfig/ListBoxStringList.qml:482
+msgid "Enter a desktop file, URL, or path"
+msgstr "Enter a desktop file, URL, or path"
+
+#: contents/ui/libconfig/ListBoxStringList.qml:598
+msgid "Add"
+msgstr "Añadir"
+
+#: contents/ui/libconfig/ListBoxStringList.qml:603
+msgid "Save"
+msgstr "Guardar"
+
+#: contents/ui/libconfig/ListBoxStringList.qml:603
+msgid "Update"
+msgstr "Actualizar"
+
+#: contents/ui/libconfig/ListBoxStringList.qml:609
+msgid "Remove"
+msgstr "Eliminar"
+
+#: contents/ui/libconfig/ListBoxStringList.qml:615
+msgid "Up"
+msgstr "Arriba"
+
+#: contents/ui/libconfig/ListBoxStringList.qml:621
+msgid "Down"
+msgstr "Abajo"
 
 #~ msgid "<b>Version:</b> %1"
 #~ msgstr "<b>Versión:</b> %1"

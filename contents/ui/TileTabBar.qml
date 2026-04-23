@@ -111,12 +111,17 @@ Item {
 	// ── Styling — Pills ─────────────────────────────────────────────────────
 	readonly property real _pillRadius: config.tileCornerRadius
 	readonly property real _listPadding: Math.round(Kirigami.Units.smallSpacing * 0.5)
-	readonly property color _listBgColor: Qt.rgba(
+	readonly property bool _frostedSurface: config.surfaceUsesFrostedGlass
+	readonly property color _listBgColor: _frostedSurface
+		? (_listBorderBaseIsLight ? Qt.rgba(1, 1, 1, 0.24) : Qt.rgba(0.12, 0.14, 0.16, 0.46))
+		: Qt.rgba(
 		Kirigami.Theme.textColor.r,
 		Kirigami.Theme.textColor.g,
 		Kirigami.Theme.textColor.b,
 		0.08)
-	readonly property color _indicatorColor: Kirigami.Theme.backgroundColor
+	readonly property color _indicatorColor: _frostedSurface
+		? (_listBorderBaseIsLight ? Qt.rgba(1, 1, 1, 0.34) : Qt.rgba(1, 1, 1, 0.13))
+		: Kirigami.Theme.backgroundColor
 	readonly property color _activeTextColor: Kirigami.Theme.textColor
 	readonly property color _hoverTextColor: Qt.rgba(
 		Kirigami.Theme.textColor.r,
@@ -128,10 +133,12 @@ Item {
 		Kirigami.Theme.textColor.g,
 		Kirigami.Theme.textColor.b,
 		0.72)
-	readonly property color _listBorderBaseColor: plasmoid.configuration.sidebarFollowsTheme ? Kirigami.Theme.backgroundColor : config.sidebarBackgroundColor
+	readonly property color _listBorderBaseColor: config.surfaceBaseColor
 	readonly property bool _listBorderBaseIsLight: _relativeLuminance(_listBorderBaseColor) > 0.6
 	readonly property real _listBorderWidth: plasmoid.configuration.sidebarHideBorder ? 0 : Math.max(1, Math.round(Screen.devicePixelRatio))
-	readonly property color _listBorderColor: _listBorderBaseIsLight ? Qt.rgba(1, 1, 1, 0.62) : Qt.rgba(1, 1, 1, 0.18)
+	readonly property color _listBorderColor: _frostedSurface
+		? (_listBorderBaseIsLight ? Qt.rgba(1, 1, 1, 0.44) : Qt.rgba(1, 1, 1, 0.18))
+		: (_listBorderBaseIsLight ? Qt.rgba(1, 1, 1, 0.62) : Qt.rgba(1, 1, 1, 0.18))
 
 	function _relativeLuminance(color) {
 		function channel(c) {

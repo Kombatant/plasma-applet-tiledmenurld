@@ -91,6 +91,7 @@ Item {
 		_ensureSettingInitialized('defaultTileColor', '')
 		_ensureSettingInitialized('defaultTileGradient', false)
 		_ensureSettingInitialized('sidebarBackgroundColor', '')
+		_ensureSettingInitialized('surfaceStyle', '')
 
 		_ensureSettingInitialized('hideSearchField', false)
 		_ensureSettingInitialized('searchOnTop', false)
@@ -557,6 +558,16 @@ Item {
 	readonly property color defaultTileColor: plasmoid.configuration.defaultTileColor || themeButtonBgColor
 	readonly property bool defaultTileGradient: plasmoid.configuration.defaultTileGradient
 	readonly property color sidebarBackgroundColor: plasmoid.configuration.sidebarBackgroundColor || Kirigami.Theme.backgroundColor
+	readonly property string surfaceStyle: {
+		var value = typeof plasmoid.configuration.surfaceStyle !== "undefined" ? ("" + plasmoid.configuration.surfaceStyle) : ""
+		if (value === "theme" || value === "custom" || value === "frosted") {
+			return value
+		}
+		return plasmoid.configuration.sidebarFollowsTheme ? "theme" : "custom"
+	}
+	readonly property bool surfaceUsesFrostedGlass: surfaceStyle === "frosted"
+	readonly property bool surfaceUsesThemeBase: surfaceStyle === "theme" || surfaceStyle === "frosted"
+	readonly property color surfaceBaseColor: surfaceUsesThemeBase ? Kirigami.Theme.backgroundColor : sidebarBackgroundColor
 	readonly property color menuItemTextColor2: setAlpha(Kirigami.Theme.textColor, 0.6)
 	readonly property color flatButtonBgHoverColor: themeButtonBgColor
 	readonly property color flatButtonBgColor: Qt.rgba(flatButtonBgHoverColor.r, flatButtonBgHoverColor.g, flatButtonBgHoverColor.b, 0)

@@ -28,7 +28,7 @@ Item {
 
 	readonly property int _fixedHorizontalButtons: _aiChatEnabled ? 8 : 7 // auto resize + 3/4 view buttons + user + settings + power
 	readonly property int _fixedVerticalBottomButtons: 3 // user + settings + power
-	readonly property color _sidebarIconBackdrop: plasmoid.configuration.sidebarFollowsTheme ? Kirigami.Theme.backgroundColor : config.sidebarBackgroundColor
+	readonly property color _sidebarIconBackdrop: config.surfaceBaseColor
 	readonly property bool _sidebarIsLight: _relativeLuminance(_sidebarIconBackdrop) > 0.6
 	readonly property url settingsIconSource: Qt.resolvedUrl(_sidebarIsLight ? "assets/tiled-settings-light.png" : "assets/tiled-settings-dark.png")
 	readonly property int sidebarShortcutLimit: {

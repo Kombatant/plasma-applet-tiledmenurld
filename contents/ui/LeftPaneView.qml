@@ -40,7 +40,7 @@ ColumnLayout {
 		}
 		return (0.2126 * channel(color.r)) + (0.7152 * channel(color.g)) + (0.0722 * channel(color.b))
 	}
-	readonly property color _sidebarIconBackdrop: plasmoid.configuration.sidebarFollowsTheme ? Kirigami.Theme.backgroundColor : config.sidebarBackgroundColor
+	readonly property color _sidebarIconBackdrop: config.surfaceBaseColor
 	readonly property bool _bgIsLight: _relativeLuminance(_sidebarIconBackdrop) > 0.6
 	readonly property url settingsIconSource: Qt.resolvedUrl(_bgIsLight ? "assets/tiled-settings-light.png" : "assets/tiled-settings-dark.png")
 
