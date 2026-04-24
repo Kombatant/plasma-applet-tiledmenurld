@@ -16,6 +16,10 @@ Item {
 	property int composerHistoryIndex: -1
 	property bool _settingComposerFromHistory: false
 	property int copiedMessageIndex: -1
+	readonly property int surfaceGap: Math.max(
+		Kirigami.Units.largeSpacing,
+		Math.round((Kirigami.Units.gridUnit * 0.8 * ((typeof config !== "undefined" && config) ? config.surfaceShadowSizeMultiplier : 1.0)) + (2 * Screen.devicePixelRatio))
+	)
 	readonly property var detectedModels: chatModel ? (chatModel.detectedModels || []) : []
 	readonly property var detectedModelOptions: {
 		var options = []
@@ -285,22 +289,13 @@ Item {
 
 	Rectangle {
 		anchors.fill: parent
-		gradient: Gradient {
-			GradientStop {
-				position: 0.0
-				color: Qt.rgba(Kirigami.Theme.backgroundColor.r, Kirigami.Theme.backgroundColor.g, Kirigami.Theme.backgroundColor.b, 0.42)
-			}
-			GradientStop {
-				position: 1.0
-				color: Qt.rgba(Kirigami.Theme.backgroundColor.r * 0.95, Kirigami.Theme.backgroundColor.g * 0.95, Kirigami.Theme.backgroundColor.b * 0.95, 0.5)
-			}
-		}
+		color: "transparent"
 	}
 
 	ColumnLayout {
 		anchors.fill: parent
-		anchors.margins: Kirigami.Units.smallSpacing
-		spacing: Kirigami.Units.smallSpacing
+		anchors.margins: Kirigami.Units.largeSpacing
+		spacing: aiChatView.surfaceGap
 
 		SidebarGlassCard {
 			Layout.fillWidth: true
