@@ -34,7 +34,7 @@ TileEditorGroupBox {
 		target: appObj
 
 		function onTileChanged() {
-			if (key && tile) {
+			if (key && appObj.tile) {
 				colorField.updateOnChange = false
 				colorField.text = appObj.tile[key] || ''
 				colorField.updateOnChange = true
