@@ -7,6 +7,7 @@ import org.kde.kirigami as Kirigami
 Item {
 	id: formPage
 	default property alias _formChildren: formLayout.data
+	property string title: ""
 	property alias wideMode: formLayout.wideMode
 	readonly property int uniformComboBoxWidth: Kirigami.Units.gridUnit * 12
 	readonly property int uniformSpinBoxWidth: Kirigami.Units.gridUnit * 7
