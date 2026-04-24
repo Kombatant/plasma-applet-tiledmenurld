@@ -84,6 +84,14 @@ Item {
 		: (_listBorderBaseIsLight ? Qt.rgba(1, 1, 1, 0.62) : Qt.rgba(1, 1, 1, 0.18))
 	readonly property real _borderWidth: Math.max(1, Math.round(Screen.devicePixelRatio))
 	readonly property color _borderColor: Qt.rgba(1.0, 1.0, 1.0, 0.35)
+
+	// Shadow config mirroring SidebarGlassCard
+	readonly property real _shadowSizeMultiplier: (typeof config !== "undefined" && config) ? config.surfaceShadowSizeMultiplier : 1.0
+	readonly property real _shadowOpacityMultiplier: (typeof config !== "undefined" && config) ? config.surfaceShadowOpacityMultiplier : 1.0
+	readonly property real _baseShadowOpacity: _listBorderBaseIsLight ? 0.13 : (_frostedSurface ? 0.18 : 0.32)
+	readonly property int _shadowSize: Math.round(Kirigami.Units.gridUnit * (_frostedSurface ? 1.1 : 1.25) * _shadowSizeMultiplier)
+	readonly property color _shadowColor: Qt.rgba(0, 0, 0, Math.min(1, _baseShadowOpacity * _shadowOpacityMultiplier))
+	readonly property int _shadowYOffset: Math.round(2 * Screen.devicePixelRatio)
 	readonly property color _activeTopBorderColor: Kirigami.Theme.highlightColor
 	readonly property color _activeTopBorderGlowColor: Qt.rgba(
 		Kirigami.Theme.highlightColor.r,
@@ -169,12 +177,17 @@ Item {
 			y: Math.round((parent.height - height) / 2)
 			height: root.surfaceHeight
 
-			Rectangle {
+			Kirigami.ShadowedRectangle {
 				anchors.fill: parent
 				radius: config.tileCornerRadius
 				color: root._listBgColor
 				border.width: root._listBorderWidth
 				border.color: root._listBorderColor
+				shadow {
+					size: root._shadowSize
+					color: root._shadowColor
+					yOffset: root._shadowYOffset
+				}
 			}
 
 			Row {

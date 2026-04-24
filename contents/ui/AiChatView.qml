@@ -302,13 +302,10 @@ Item {
 		anchors.margins: Kirigami.Units.smallSpacing
 		spacing: Kirigami.Units.smallSpacing
 
-		Rectangle {
+		SidebarGlassCard {
 			Layout.fillWidth: true
 			Layout.preferredHeight: topRow.implicitHeight + (Kirigami.Units.smallSpacing * 2)
-			radius: Kirigami.Units.smallSpacing
-			color: Qt.rgba(Kirigami.Theme.backgroundColor.r, Kirigami.Theme.backgroundColor.g, Kirigami.Theme.backgroundColor.b, 0.34)
-			border.width: 1
-			border.color: Qt.rgba(Kirigami.Theme.textColor.r, Kirigami.Theme.textColor.g, Kirigami.Theme.textColor.b, 0.14)
+			contentMargins: 0
 
 			RowLayout {
 				id: topRow
@@ -376,13 +373,10 @@ Item {
 			}
 		}
 
-		Rectangle {
+		SidebarGlassCard {
 			Layout.fillWidth: true
 			Layout.fillHeight: true
-			radius: Kirigami.Units.smallSpacing
-			color: Qt.rgba(Kirigami.Theme.backgroundColor.r, Kirigami.Theme.backgroundColor.g, Kirigami.Theme.backgroundColor.b, 0.18)
-			border.width: 1
-			border.color: Qt.rgba(Kirigami.Theme.textColor.r, Kirigami.Theme.textColor.g, Kirigami.Theme.textColor.b, 0.12)
+			contentMargins: 0
 
 			ListView {
 				id: messageList
@@ -487,13 +481,10 @@ Item {
 			}
 		}
 
-		Rectangle {
+		SidebarGlassCard {
 			Layout.fillWidth: true
 			Layout.preferredHeight: composerRow.implicitHeight + (Kirigami.Units.smallSpacing * 1.4)
-			radius: Kirigami.Units.smallSpacing
-			color: Qt.rgba(Kirigami.Theme.backgroundColor.r, Kirigami.Theme.backgroundColor.g, Kirigami.Theme.backgroundColor.b, 0.38)
-			border.width: 1
-			border.color: Qt.rgba(Kirigami.Theme.textColor.r, Kirigami.Theme.textColor.g, Kirigami.Theme.textColor.b, 0.14)
+			contentMargins: 0
 
 			ColumnLayout {
 				id: composerRow
@@ -561,6 +552,16 @@ Item {
 							wrapMode: TextEdit.Wrap
 							selectByMouse: true
 							rightPadding: sendStopButton.width + (Kirigami.Units.smallSpacing * 1.5)
+							background: Item {
+								Rectangle {
+									anchors.left: parent.left
+									anchors.right: parent.right
+									anchors.bottom: parent.bottom
+									height: Math.max(1, Math.round(Screen.devicePixelRatio))
+									color: Kirigami.Theme.highlightColor
+									visible: composer.activeFocus
+								}
+							}
 							onTextChanged: {
 								if (!_settingComposerFromHistory && composerHistoryIndex >= 0) {
 									composerHistoryDraft = composer.text

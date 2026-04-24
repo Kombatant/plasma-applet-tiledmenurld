@@ -171,18 +171,6 @@ ColumnLayout {
 	}
 
 	// ──────────────────────────────────────────────
-	// 5. Separator
-	// ──────────────────────────────────────────────
-	Rectangle {
-		Layout.fillWidth: true
-		Layout.leftMargin: Kirigami.Units.smallSpacing
-		Layout.rightMargin: Kirigami.Units.smallSpacing
-		height: 1
-		color: Kirigami.Theme.textColor
-		opacity: 0.15
-	}
-
-	// ──────────────────────────────────────────────
 	// 6. Sidebar favourites row (pinned shortcuts)
 	// ──────────────────────────────────────────────
 	RowLayout {

@@ -140,6 +140,14 @@ Item {
 		? (_listBorderBaseIsLight ? Qt.rgba(1, 1, 1, 0.44) : Qt.rgba(1, 1, 1, 0.18))
 		: (_listBorderBaseIsLight ? Qt.rgba(1, 1, 1, 0.62) : Qt.rgba(1, 1, 1, 0.18))
 
+	// Shadow config mirroring SidebarGlassCard
+	readonly property real _shadowSizeMultiplier: (typeof config !== "undefined" && config) ? config.surfaceShadowSizeMultiplier : 1.0
+	readonly property real _shadowOpacityMultiplier: (typeof config !== "undefined" && config) ? config.surfaceShadowOpacityMultiplier : 1.0
+	readonly property real _baseShadowOpacity: _listBorderBaseIsLight ? 0.13 : (_frostedSurface ? 0.18 : 0.32)
+	readonly property int _shadowSize: Math.round(Kirigami.Units.gridUnit * (_frostedSurface ? 1.1 : 1.25) * _shadowSizeMultiplier)
+	readonly property color _shadowColor: Qt.rgba(0, 0, 0, Math.min(1, _baseShadowOpacity * _shadowOpacityMultiplier))
+	readonly property int _shadowYOffset: Math.round(2 * Screen.devicePixelRatio)
+
 	function _relativeLuminance(color) {
 		function channel(c) {
 			return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4)
@@ -174,13 +182,18 @@ Item {
 			y: tabBar.alignSurfaceToTop ? 0 : Math.round((parent.height - height) / 2)
 			height: tabBar.surfaceHeight
 
-			Rectangle {
+			Kirigami.ShadowedRectangle {
 				id: listBackground
 				anchors.fill: parent
 				radius: config.tileCornerRadius
 				color: tabBar._listBgColor
 				border.width: tabBar._listBorderWidth
 				border.color: tabBar._listBorderColor
+				shadow {
+					size: tabBar._shadowSize
+					color: tabBar._shadowColor
+					yOffset: tabBar._shadowYOffset
+				}
 			}
 
 			Flickable {
