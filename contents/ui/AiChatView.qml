@@ -552,16 +552,7 @@ Item {
 							wrapMode: TextEdit.Wrap
 							selectByMouse: true
 							rightPadding: sendStopButton.width + (Kirigami.Units.smallSpacing * 1.5)
-							background: Item {
-								Rectangle {
-									anchors.left: parent.left
-									anchors.right: parent.right
-									anchors.bottom: parent.bottom
-									height: Math.max(1, Math.round(Screen.devicePixelRatio))
-									color: Kirigami.Theme.highlightColor
-									visible: composer.activeFocus
-								}
-							}
+							background: Item {}
 							onTextChanged: {
 								if (!_settingComposerFromHistory && composerHistoryIndex >= 0) {
 									composerHistoryDraft = composer.text
