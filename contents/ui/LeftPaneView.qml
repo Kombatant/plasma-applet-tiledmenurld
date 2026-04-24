@@ -117,104 +117,52 @@ ColumnLayout {
 			}
 		}
 
-		SearchField {
-			id: profileSearchField
-			visible: !config.isEditingTile && (!config.hideSearchField || search.query.length > 0)
-			Layout.fillWidth: true
-			Layout.topMargin: Kirigami.Units.smallSpacing
-			Layout.preferredHeight: Math.round(config.searchFieldHeight * 0.7)
-			height: Math.round(config.searchFieldHeight * 0.7)
-			implicitHeight: Math.round(config.searchFieldHeight * 0.7)
-			listView: searchView.stackView && searchView.stackView.currentItem && searchView.stackView.currentItem.listView ? searchView.stackView.currentItem.listView : []
-		}
 	}
 
-	Rectangle {
+	SearchField {
+		id: profileSearchField
+		readonly property int _matchedHeight: viewTabBar.surfaceHeight
+		visible: !config.isEditingTile && (!config.hideSearchField || search.query.length > 0)
 		Layout.fillWidth: true
 		Layout.leftMargin: Kirigami.Units.smallSpacing
 		Layout.rightMargin: Kirigami.Units.smallSpacing
-		height: 1
-		color: Kirigami.Theme.textColor
-		opacity: 0.15
+		Layout.topMargin: Kirigami.Units.smallSpacing
+		Layout.bottomMargin: Kirigami.Units.largeSpacing
+		Layout.preferredHeight: _matchedHeight
+		height: _matchedHeight
+		implicitHeight: _matchedHeight
+		listView: searchView.stackView && searchView.stackView.currentItem && searchView.stackView.currentItem.listView ? searchView.stackView.currentItem.listView : []
 	}
 
 	// ──────────────────────────────────────────────
-	// 2. Horizontal row of view-mode buttons
+	// 2. View-mode selector (tabs / pills / flat)
 	// ──────────────────────────────────────────────
-	RowLayout {
-		Layout.alignment: Qt.AlignHCenter
+	SidebarViewTabBar {
+		id: viewTabBar
 		Layout.fillWidth: true
 		Layout.leftMargin: Kirigami.Units.smallSpacing
 		Layout.rightMargin: Kirigami.Units.smallSpacing
-		spacing: 0
-
-		SidebarViewButton {
-			appletIconName: "view-list-tree"
-			labelText: i18n("Categories")
-			defaultCheckedEdge: Qt.BottomEdge
-			checkedPillVisible: true
-			checkedUnderlineVisible: true
-			Layout.fillWidth: false
-			Layout.preferredWidth: config.flatButtonSize
-			Layout.preferredHeight: config.flatButtonSize
-			onClicked: leftPane.switchView(function() { appsView.showAppsCategorically() })
-			checked: searchView.showingAppsCategorically
+		Layout.preferredHeight: implicitHeight
+		categoriesChecked: searchView.showingAppsCategorically
+		alphabeticalChecked: searchView.showingAppsAlphabetically
+		aiChatChecked: searchView.showingAiChat
+		onCategoriesClicked: function(direction) {
+			if (searchView.stackView) searchView.stackView.slideDirection = direction
+			leftPane.switchView(function() { appsView.showAppsCategorically() })
 		}
-
-		SidebarViewButton {
-			appletIconName: "view-list-text"
-			labelText: i18n("Alphabetical")
-			defaultCheckedEdge: Qt.BottomEdge
-			checkedPillVisible: true
-			checkedUnderlineVisible: true
-			Layout.fillWidth: false
-			Layout.preferredWidth: config.flatButtonSize
-			Layout.preferredHeight: config.flatButtonSize
-			onClicked: leftPane.switchView(function() { appsView.showAppsAlphabetically() })
-			checked: searchView.showingAppsAlphabetically
+		onAlphabeticalClicked: function(direction) {
+			if (searchView.stackView) searchView.stackView.slideDirection = direction
+			leftPane.switchView(function() { appsView.showAppsAlphabetically() })
 		}
-
-		// "Tiles Only" not applicable in integrated layout — app list is always visible
-
-		SidebarViewButton {
-			appletIconName: "dialog-messages"
-			labelText: i18n("AI Chat")
-			defaultCheckedEdge: Qt.BottomEdge
-			checkedPillVisible: true
-			checkedUnderlineVisible: true
-			Layout.fillWidth: false
-			Layout.preferredWidth: config.flatButtonSize
-			Layout.preferredHeight: config.flatButtonSize
-			onClicked: leftPane.switchView(function() { searchView.showAiChat() })
-			checked: searchView.showingAiChat
-			visible: config.aiChatEnabled
+		onAiChatClicked: function(direction) {
+			if (searchView.stackView) searchView.stackView.slideDirection = direction
+			leftPane.switchView(function() { searchView.showAiChat() })
 		}
-
-		SidebarItem {
-			icon.name: "transform-scale"
-			text: i18n("Auto Resize")
-			tooltipText: i18n("Auto Resize")
-			Layout.fillWidth: false
-			Layout.preferredWidth: config.flatButtonSize
-			Layout.preferredHeight: config.flatButtonSize
-			onClicked: autoResizeDebounce.restart()
-		}
+		onAutoResizeClicked: autoResizeDebounce.restart()
 	}
 
 	// ──────────────────────────────────────────────
-	// 3. Separator
-	// ──────────────────────────────────────────────
-	Rectangle {
-		Layout.fillWidth: true
-		Layout.leftMargin: Kirigami.Units.smallSpacing
-		Layout.rightMargin: Kirigami.Units.smallSpacing
-		height: 1
-		color: Kirigami.Theme.textColor
-		opacity: 0.15
-	}
-
-	// ──────────────────────────────────────────────
-	// 4. SearchView slot (app list)
+	// 3. SearchView slot (app list)
 	// ──────────────────────────────────────────────
 	Item {
 		id: searchViewSlotItem

@@ -318,10 +318,40 @@ Item {
 			id: appsView
 			visible: false
 
+			function _captureSlideSnapshot(direction) {
+				if (!config.usesDockedSidebarLayout) return false
+				if (stackView.currentItem !== appsView) return false
+				if (appsViewSlideSnapshot.visible) return false
+				var dpr = Screen.devicePixelRatio || 1
+				var w = appsView.width
+				var h = appsView.height
+				if (w <= 0 || h <= 0) return false
+				var grabW = Math.max(1, Math.round(w * dpr))
+				var grabH = Math.max(1, Math.round(h * dpr))
+				appsView.grabToImage(function(result) {
+					appsViewSlideSnapshot.source = result.url
+					appsViewSlideSnapshot.width = w
+					appsViewSlideSnapshot.height = h
+					appsViewSlideSnapshot.x = 0
+					appsViewSlideSnapshot.y = 0
+					appsViewSlideSnapshot.visible = true
+					appsViewSlideAnim.to = -direction * w
+					appsViewSlideAnim.start()
+					appsView.x = direction * w
+					appsViewEnterAnim.to = 0
+					appsViewEnterAnim.start()
+				}, Qt.size(grabW, grabH))
+				return true
+			}
+
 			function showAppsAlphabetically() {
 				searchView.saveCurrentSizeMemoryViewBeforeSwitch()
 				searchView.rememberView("Alphabetical")
 				searchView.setActiveSizeMemoryView("Alphabetical")
+				if (appsModel.order !== "alphabetical") {
+					var dir = stackView.slideDirection || 1
+					appsView._captureSlideSnapshot(dir)
+				}
 				appsModel.order = "alphabetical"
 				show()
 			}
@@ -330,8 +360,12 @@ Item {
 				searchView.saveCurrentSizeMemoryViewBeforeSwitch()
 				searchView.rememberView("Categories")
 				searchView.setActiveSizeMemoryView("Categories")
+				if (appsModel.order !== "categories") {
+					var dir = stackView.slideDirection || -1
+					appsView._captureSlideSnapshot(dir)
+				}
 				appsModel.order = "categories"
-				
+
 				show()
 			}
 
@@ -415,6 +449,38 @@ Item {
 			id: stackView
 			anchors.fill: parent
 			initialItem: appsView
+		}
+
+		Image {
+			id: appsViewSlideSnapshot
+			visible: false
+			smooth: true
+			cache: false
+			fillMode: Image.Stretch
+			x: 0
+			y: 0
+			z: 10
+		}
+
+		NumberAnimation {
+			id: appsViewSlideAnim
+			target: appsViewSlideSnapshot
+			property: "x"
+			duration: 280
+			easing.type: Easing.OutCubic
+			onStopped: {
+				appsViewSlideSnapshot.visible = false
+				appsViewSlideSnapshot.source = ""
+			}
+		}
+
+		NumberAnimation {
+			id: appsViewEnterAnim
+			target: appsView
+			property: "x"
+			duration: 280
+			easing.type: Easing.OutCubic
+			onStopped: appsView.x = 0
 		}
 	}
     
