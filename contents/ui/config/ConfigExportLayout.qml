@@ -128,8 +128,6 @@ Item {
 	property var cfg_appListIconSizeDefault
 	property var cfg_searchFieldHeight
 	property var cfg_searchFieldHeightDefault
-	property var cfg_dockedSearchFieldWidth
-	property var cfg_dockedSearchFieldWidthDefault
 	property var cfg_appListWidth
 	property var cfg_appListWidthDefault
 	property var cfg_dockedSidebarWidth
@@ -259,7 +257,6 @@ Item {
 		appDescription: "string",
 		appListIconSize: "int",
 		searchFieldHeight: "int",
-		dockedSearchFieldWidth: "int",
 		appListWidth: "int",
 		dockedSidebarWidth: "int",
 		useDockedLayout: "bool",
@@ -506,7 +503,7 @@ Item {
 		if (configKey.indexOf("sidebar") === 0 || configKey === "dockedSidebarWidth") {
 			return "Sidebar"
 		}
-		if (configKey.indexOf("search") === 0 || configKey === "hideSearchField" || configKey === "dockedSearchFieldWidth") {
+		if (configKey.indexOf("search") === 0 || configKey === "hideSearchField") {
 			return "Search"
 		}
 		if (configKey.indexOf("appList") === 0 || configKey === "appDescription" || configKey === "defaultAppListView" || configKey === "lastUsedAppListView" || configKey === "showRecentApps" || configKey === "recentOrdering" || configKey === "numRecentApps") {

@@ -11,6 +11,10 @@ ColumnLayout {
 	spacing: 0
 
 	property alias searchViewSlot: searchViewSlotItem
+	property alias dockedSearchField: profileSearchField
+	readonly property int compactProfileIconSize: Math.round(Math.min(config.profileIconSize, config.flatButtonSize) * 1.5)
+	readonly property string displayName: kuser.loginName || i18n("User")
+	readonly property string fullDisplayName: kuser.fullName || ""
 
 	// ── Helper to save view size before switching ──
 	function switchView(action) {
@@ -45,34 +49,93 @@ ColumnLayout {
 	readonly property url settingsIconSource: Qt.resolvedUrl(_bgIsLight ? "assets/tiled-settings-light.png" : "assets/tiled-settings-dark.png")
 
 	// ──────────────────────────────────────────────
-	// 1. Large circular user profile icon
+	// 1. Compact user profile header with search
 	// ──────────────────────────────────────────────
-	Item {
-		id: profileButton
-		Layout.alignment: Qt.AlignHCenter
-		Layout.preferredWidth: config.profileIconSize
-		Layout.preferredHeight: config.profileIconSize
+	ColumnLayout {
+		id: profileHeader
+		Layout.fillWidth: true
 		Layout.topMargin: Kirigami.Units.largeSpacing
+		Layout.leftMargin: Kirigami.Units.largeSpacing
+		Layout.rightMargin: Kirigami.Units.largeSpacing
 		Layout.bottomMargin: Kirigami.Units.smallSpacing
+		spacing: Kirigami.Units.smallSpacing
 
-		SunkenAvatar {
-			anchors.fill: parent
-		}
+		RowLayout {
+			Layout.fillWidth: true
+			spacing: Kirigami.Units.largeSpacing
 
-		MouseArea {
-			anchors.fill: parent
-			acceptedButtons: Qt.RightButton
-			cursorShape: Qt.ArrowCursor
-			hoverEnabled: true
-			onClicked: {
-				userMenu.toggleOpen()
+			Item {
+				id: profileButton
+				Layout.alignment: Qt.AlignVCenter
+				Layout.preferredWidth: leftPane.compactProfileIconSize
+				Layout.preferredHeight: leftPane.compactProfileIconSize
+				Layout.minimumWidth: leftPane.compactProfileIconSize
+				Layout.minimumHeight: leftPane.compactProfileIconSize
+
+				SunkenAvatar {
+					anchors.fill: parent
+				}
+
+				MouseArea {
+					anchors.fill: parent
+					acceptedButtons: Qt.RightButton
+					cursorShape: Qt.ArrowCursor
+					hoverEnabled: true
+					onClicked: {
+						userMenu.toggleOpen()
+					}
+				}
+
+				ProfileContextMenu {
+					id: userMenu
+					visualParent: profileButton
+				}
+			}
+
+			ColumnLayout {
+				Layout.fillWidth: true
+				Layout.alignment: Qt.AlignVCenter
+				spacing: Kirigami.Units.smallSpacing / 2
+
+				PlasmaExtras.Heading {
+					Layout.fillWidth: true
+					level: 3
+					text: leftPane.displayName
+					elide: Text.ElideRight
+					maximumLineCount: 1
+					font.weight: Font.Bold
+					color: Kirigami.Theme.textColor
+				}
+
+				PlasmaExtras.DescriptiveLabel {
+					Layout.fillWidth: true
+					visible: leftPane.fullDisplayName.length > 0
+					text: leftPane.fullDisplayName
+					elide: Text.ElideRight
+					maximumLineCount: 1
+				}
 			}
 		}
 
-		ProfileContextMenu {
-			id: userMenu
-			visualParent: profileButton
+		SearchField {
+			id: profileSearchField
+			visible: !config.isEditingTile && (!config.hideSearchField || search.query.length > 0)
+			Layout.fillWidth: true
+			Layout.topMargin: Kirigami.Units.smallSpacing
+			Layout.preferredHeight: Math.round(config.searchFieldHeight * 0.7)
+			height: Math.round(config.searchFieldHeight * 0.7)
+			implicitHeight: Math.round(config.searchFieldHeight * 0.7)
+			listView: searchView.stackView && searchView.stackView.currentItem && searchView.stackView.currentItem.listView ? searchView.stackView.currentItem.listView : []
 		}
+	}
+
+	Rectangle {
+		Layout.fillWidth: true
+		Layout.leftMargin: Kirigami.Units.smallSpacing
+		Layout.rightMargin: Kirigami.Units.smallSpacing
+		height: 1
+		color: Kirigami.Theme.textColor
+		opacity: 0.15
 	}
 
 	// ──────────────────────────────────────────────
@@ -89,6 +152,8 @@ ColumnLayout {
 			appletIconName: "view-list-tree"
 			labelText: i18n("Categories")
 			defaultCheckedEdge: Qt.BottomEdge
+			checkedPillVisible: true
+			checkedUnderlineVisible: true
 			Layout.fillWidth: false
 			Layout.preferredWidth: config.flatButtonSize
 			Layout.preferredHeight: config.flatButtonSize
@@ -100,6 +165,8 @@ ColumnLayout {
 			appletIconName: "view-list-text"
 			labelText: i18n("Alphabetical")
 			defaultCheckedEdge: Qt.BottomEdge
+			checkedPillVisible: true
+			checkedUnderlineVisible: true
 			Layout.fillWidth: false
 			Layout.preferredWidth: config.flatButtonSize
 			Layout.preferredHeight: config.flatButtonSize
@@ -113,6 +180,8 @@ ColumnLayout {
 			appletIconName: "dialog-messages"
 			labelText: i18n("AI Chat")
 			defaultCheckedEdge: Qt.BottomEdge
+			checkedPillVisible: true
+			checkedUnderlineVisible: true
 			Layout.fillWidth: false
 			Layout.preferredWidth: config.flatButtonSize
 			Layout.preferredHeight: config.flatButtonSize

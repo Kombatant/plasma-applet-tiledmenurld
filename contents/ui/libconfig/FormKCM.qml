@@ -128,8 +128,6 @@ Item {
 	property var cfg_appListIconSizeDefault
 	property var cfg_searchFieldHeight
 	property var cfg_searchFieldHeightDefault
-	property var cfg_dockedSearchFieldWidth
-	property var cfg_dockedSearchFieldWidthDefault
 	property var cfg_appListWidth
 	property var cfg_appListWidthDefault
 	property var cfg_dockedSidebarWidth

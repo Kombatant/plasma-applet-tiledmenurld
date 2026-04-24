@@ -704,14 +704,10 @@ MouseArea {
 		var sidebarExtraHeight = (config.sidebarOnTop || config.sidebarOnBottom)
 			? (config.sidebarHeight + config.sidebarRightMargin)
 			: 0
-		// Top row hosts search field + tab bar side-by-side in docked layout.
-		// Reserve max of the two, plus the RowLayout's top/bottom margins.
+		// Top row hosts the tab bar; docked search lives in the left pane header.
 		var dpr = Screen.devicePixelRatio || 1
 		var tabRowTabsHeight = (config.useTileTabs && tileTabBar) ? tileTabBar.implicitHeight : 0
-		var tabRowSearchHeight = (config.usesDockedSidebarLayout && rightPaneSearchField && rightPaneSearchField.visible)
-			? rightPaneSearchField.implicitHeight
-			: 0
-		var tabRowContentHeight = Math.max(tabRowTabsHeight, tabRowSearchHeight)
+		var tabRowContentHeight = tabRowTabsHeight
 		var tabRowTopMargin = (config.usesDockedSidebarLayout || (config.usesClassicLayout && config.sidebarOnLeft))
 			? config.sidebarCardInset
 			: Kirigami.Units.largeSpacing
@@ -1189,117 +1185,34 @@ MouseArea {
 						Layout.leftMargin: Kirigami.Units.largeSpacing
 						Layout.rightMargin: Kirigami.Units.largeSpacing
 						Layout.bottomMargin: Kirigami.Units.smallSpacing
-						visible: _showDockedSearchField || _showTileTabs
-						implicitHeight: Math.max(
-							_showDockedSearchField ? rightPaneSearchField.implicitHeight : 0,
-							_showTileTabs ? tileTabBar.implicitHeight : 0)
+						visible: _showTileTabs
+						implicitHeight: _showTileTabs ? tileTabBar.implicitHeight : 0
 
-						readonly property bool _showDockedSearchField: config.usesDockedSidebarLayout
-							&& !config.isEditingTile
-							&& (!config.hideSearchField || search.query.length > 0)
 						readonly property bool _showTileTabs: config.useTileTabs
-						readonly property real _gap: Kirigami.Units.largeSpacing * 2
-						readonly property real _minSearchWidth: Kirigami.Units.gridUnit * 8
-						readonly property real _minTabsWidth: Kirigami.Units.gridUnit * 6
-						readonly property real _handleWidth: Kirigami.Units.smallSpacing * 2
-						readonly property bool _bothVisible: _showDockedSearchField && _showTileTabs
 						readonly property bool _alignTopSurfaces: config.usesDockedSidebarLayout
 							|| (config.usesClassicLayout && config.sidebarOnLeft)
-						readonly property real _dockedSearchFieldHeight: tileTabBar.surfaceHeight
-						readonly property real _effectiveSearchWidth: {
-							if (!_showDockedSearchField) return 0
-							if (!_showTileTabs) return width
-							var saved = plasmoid.configuration.dockedSearchFieldWidth || 0
-							var desired = saved > 0 ? saved : Math.round(width * 0.35)
-							var maxW = Math.max(_minSearchWidth, width - _minTabsWidth - _gap)
-							return Math.max(_minSearchWidth, Math.min(desired, maxW))
+
+						TileTabBar {
+							id: tileTabBar
+							anchors.right: parent.right
+							y: rightPaneTopRow._alignTopSurfaces ? 0 : Math.round((parent.height - height) / 2)
+							width: parent.width
+							height: implicitHeight
+							visible: rightPaneTopRow._showTileTabs
+							style: plasmoid.configuration.tileTabStyle || "tabs"
+							alignSurfaceToTop: rightPaneTopRow._alignTopSurfaces
+							activeTab: popup.activeTabIndex
+							tabs: popup.tileTabsData.map(function(t) {
+								return {id: t.id, name: t.name, icon: t.icon || ""}
+							})
+
+							onTabSelected: function(index) { popup.selectTab(index) }
+							onTabAdded: popup.addTab()
+							onTabDeleted: function(index) { popup.deleteTab(index) }
+							onTabRenamed: function(index, newName) { popup.renameTab(index, newName) }
+							onTabIconChanged: function(index, newIcon) { popup.changeTabIcon(index, newIcon) }
+							onTabMoved: function(fromIndex, toIndex) { popup.moveTab(fromIndex, toIndex) }
 						}
-
-							SearchField {
-								id: rightPaneSearchField
-								visible: rightPaneTopRow._showDockedSearchField
-								anchors.left: parent.left
-								y: rightPaneTopRow._alignTopSurfaces ? 0 : Math.round((parent.height - height) / 2)
-								width: rightPaneTopRow._showTileTabs ? rightPaneTopRow._effectiveSearchWidth : parent.width
-								height: rightPaneTopRow._dockedSearchFieldHeight
-								implicitHeight: rightPaneTopRow._dockedSearchFieldHeight
-								listView: searchView.stackView && searchView.stackView.currentItem && searchView.stackView.currentItem.listView ? searchView.stackView.currentItem.listView : []
-							}
-
-							Item {
-								id: topRowResizeHandle
-								visible: rightPaneTopRow._bothVisible
-								width: rightPaneTopRow._handleWidth
-								height: rightPaneTopRow._alignTopSurfaces ? rightPaneSearchField.height : parent.height
-								y: rightPaneTopRow._alignTopSurfaces ? 0 : Math.round((parent.height - height) / 2)
-								x: rightPaneSearchField.x + rightPaneSearchField.width + (rightPaneTopRow._gap - width) / 2
-								z: 2
-
-								Rectangle {
-									anchors.centerIn: parent
-									width: Math.max(2, Math.round(1 * Screen.devicePixelRatio))
-									height: Math.min(parent.height * 0.5, 24 * Screen.devicePixelRatio)
-									radius: width / 2
-									color: Kirigami.Theme.textColor
-									opacity: topRowResizeMA.containsMouse || topRowResizeMA.pressed ? 0.6 : 0.2
-									Behavior on opacity { NumberAnimation { duration: 150 } }
-								}
-
-								MouseArea {
-									id: topRowResizeMA
-									anchors.fill: parent
-									anchors.leftMargin: -Kirigami.Units.smallSpacing
-									anchors.rightMargin: -Kirigami.Units.smallSpacing
-									cursorShape: Qt.SplitHCursor
-									hoverEnabled: true
-									preventStealing: true
-
-									property real dragStartX: 0
-									property int dragStartWidth: 0
-
-									onPressed: function(mouse) {
-										dragStartX = mapToItem(rightPaneTopRow, mouse.x, 0).x
-										dragStartWidth = rightPaneSearchField.width
-									}
-
-									onPositionChanged: function(mouse) {
-										if (!pressed) return
-										var currentX = mapToItem(rightPaneTopRow, mouse.x, 0).x
-										var delta = currentX - dragStartX
-										var maxW = Math.max(rightPaneTopRow._minSearchWidth,
-											rightPaneTopRow.width - rightPaneTopRow._minTabsWidth - rightPaneTopRow._gap)
-										var newWidth = Math.max(rightPaneTopRow._minSearchWidth,
-											Math.min(maxW, Math.round(dragStartWidth + delta)))
-										if (plasmoid.configuration.dockedSearchFieldWidth !== newWidth) {
-											plasmoid.configuration.dockedSearchFieldWidth = newWidth
-										}
-									}
-								}
-							}
-
-							TileTabBar {
-								id: tileTabBar
-								anchors.right: parent.right
-								y: rightPaneTopRow._alignTopSurfaces ? 0 : Math.round((parent.height - height) / 2)
-								width: rightPaneTopRow._showDockedSearchField
-									? Math.max(0, parent.width - rightPaneSearchField.width - rightPaneTopRow._gap)
-									: parent.width
-								height: implicitHeight
-								visible: rightPaneTopRow._showTileTabs
-								style: plasmoid.configuration.tileTabStyle || "tabs"
-								alignSurfaceToTop: rightPaneTopRow._alignTopSurfaces
-								activeTab: popup.activeTabIndex
-								tabs: popup.tileTabsData.map(function(t) {
-									return {id: t.id, name: t.name, icon: t.icon || ""}
-								})
-
-								onTabSelected: function(index) { popup.selectTab(index) }
-								onTabAdded: popup.addTab()
-								onTabDeleted: function(index) { popup.deleteTab(index) }
-								onTabRenamed: function(index, newName) { popup.renameTab(index, newName) }
-								onTabIconChanged: function(index, newIcon) { popup.changeTabIcon(index, newIcon) }
-								onTabMoved: function(fromIndex, toIndex) { popup.moveTab(fromIndex, toIndex) }
-							}
 
 					}
 
@@ -1473,7 +1386,7 @@ MouseArea {
 			return config.searchOverlayActive ? searchOverlayContainer : searchViewSlot
 		}
 		anchors.fill: parent
-		externalSearchField: config.usesDockedSidebarLayout ? rightPaneSearchField : null
+		externalSearchField: config.usesDockedSidebarLayout ? leftPaneView.dockedSearchField : null
 	}
 
 	SidebarView {
