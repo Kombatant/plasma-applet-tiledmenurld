@@ -489,7 +489,14 @@ Item {
 		}
 		return Math.max(flatButtonSize, Math.ceil(maxLabel) + Kirigami.Units.smallSpacing * 2)
 	}
-	readonly property int dockedSidebarMinWidth: Math.max(dockedSidebarShortcutButtons * flatButtonSize, dockedSidebarPowerButtons * dockedSidebarPowerButtonWidth)
+	readonly property int dockedSidebarPowerRowMinWidth: {
+		var n = dockedSidebarPowerButtons
+		var spacing = Math.max(0, n - 1) * Kirigami.Units.smallSpacing
+		var sideMargins = Kirigami.Units.smallSpacing * 2
+		return n * dockedSidebarPowerButtonWidth + spacing + sideMargins
+	}
+	readonly property int dockedSidebarShortcutRowMinWidth: dockedSidebarShortcutButtons * flatButtonSize
+	readonly property int dockedSidebarMinWidth: Math.max(dockedSidebarShortcutRowMinWidth, dockedSidebarPowerRowMinWidth)
 	readonly property int dockedSidebarWidth: Math.max(dockedSidebarConfiguredWidth, dockedSidebarMinWidth)
 	readonly property int dockedSidebarSlotWidth: dockedSidebarWidth + (sidebarCardInset * 2) + (sidebarCardContentPadding * 2)
 	readonly property int classicLeftSidebarSlotWidth: sidebarWidth + (sidebarCardInset * 2) + (sidebarCardContentPadding * 2) + sidebarPaneGap
