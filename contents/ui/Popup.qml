@@ -1182,8 +1182,8 @@ MouseArea {
 						id: rightPaneTopRow
 						Layout.fillWidth: true
 						Layout.topMargin: _alignTopSurfaces ? config.sidebarCardInset : Kirigami.Units.largeSpacing
-						Layout.leftMargin: Kirigami.Units.largeSpacing
-						Layout.rightMargin: Kirigami.Units.largeSpacing
+						Layout.leftMargin: tileGrid.contentLeftInset
+						Layout.rightMargin: tileGrid.contentRightInset
 						Layout.bottomMargin: Kirigami.Units.smallSpacing
 						visible: _showTileTabs
 						implicitHeight: _showTileTabs ? tileTabBar.implicitHeight : 0
