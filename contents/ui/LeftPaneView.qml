@@ -1,4 +1,5 @@
 import QtQuick
+import QtQuick.Controls as QQC2
 import QtQuick.Layouts
 import org.kde.plasma.extras as PlasmaExtras
 import org.kde.kirigami as Kirigami
@@ -304,29 +305,67 @@ ColumnLayout {
 	}
 
 	// ──────────────────────────────────────────────
-	// 7. Power actions row
+	// 7. Power actions row (icon + label below)
 	// ──────────────────────────────────────────────
 	RowLayout {
 		Layout.alignment: Qt.AlignHCenter
 		Layout.fillWidth: true
+		Layout.leftMargin: Kirigami.Units.smallSpacing
+		Layout.rightMargin: Kirigami.Units.smallSpacing
 		Layout.bottomMargin: Kirigami.Units.smallSpacing
-		spacing: 0
+		Layout.topMargin: Kirigami.Units.smallSpacing
+		spacing: Kirigami.Units.smallSpacing
 
 		Repeater {
 			model: appsModel.powerActionsModel
-			delegate: SidebarItem {
-				// Filter out session actions (lock, logout, switch user)
+			delegate: QQC2.AbstractButton {
+				id: powerBtn
 				readonly property var _sessionIcons: ['system-lock-screen', 'system-log-out', 'system-save-session', 'system-switch-user']
 				readonly property string _baseIcon: model.iconName || model.decoration || ""
-				// Always prefer symbolic variant for power icons
-				icon.name: (_baseIcon && _baseIcon.indexOf("-symbolic") < 0) ? _baseIcon + "-symbolic" : _baseIcon
-				forceMonochromeIcon: true
+				readonly property string _resolvedIcon: (_baseIcon && _baseIcon.indexOf("-symbolic") < 0) ? _baseIcon + "-symbolic" : _baseIcon
+				readonly property string _label: model.name || model.display || ""
 				visible: !model.disabled && _sessionIcons.indexOf(model.iconName) < 0
-				tooltipText: model.name || model.display || ""
-				Layout.fillWidth: false
-				Layout.preferredWidth: config.flatButtonSize
-				Layout.preferredHeight: config.flatButtonSize
+				Layout.preferredWidth: config.dockedSidebarPowerButtonWidth
+				Layout.preferredHeight: config.flatButtonIconSize + powerLabel.implicitHeight + Kirigami.Units.smallSpacing * 2
+				hoverEnabled: true
 				onClicked: appsModel.powerActionsModel.triggerIndex(index)
+
+				background: Rectangle {
+					radius: Kirigami.Units.smallSpacing
+					color: powerBtn.pressed ? config.flatButtonBgPressedColor
+						: powerBtn.hovered ? config.flatButtonBgHoverColor
+						: "transparent"
+				}
+
+				contentItem: ColumnLayout {
+					spacing: Kirigami.Units.smallSpacing / 2
+
+					Kirigami.Icon {
+						Layout.alignment: Qt.AlignHCenter
+						Layout.preferredWidth: config.flatButtonIconSize
+						Layout.preferredHeight: config.flatButtonIconSize
+						source: powerBtn._resolvedIcon
+						color: Kirigami.Theme.textColor
+						isMask: true
+					}
+
+					QQC2.Label {
+						id: powerLabel
+						Layout.alignment: Qt.AlignHCenter
+						Layout.fillWidth: true
+						horizontalAlignment: Text.AlignHCenter
+						text: powerBtn._label
+						elide: Text.ElideRight
+						color: Kirigami.Theme.textColor
+						font: Kirigami.Theme.smallFont
+					}
+				}
+
+				QQC2.ToolTip {
+					visible: powerBtn.hovered && powerLabel.truncated
+					text: powerBtn._label
+					delay: 500
+				}
 			}
 		}
 	}

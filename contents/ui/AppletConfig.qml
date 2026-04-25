@@ -442,18 +442,18 @@ Item {
 		var modelCount = (typeof appsModel !== "undefined" && appsModel && appsModel.sidebarModel) ? appsModel.sidebarModel.count : 0
 		return Math.max(1, Math.max(configuredCount, modelCount) + 1)
 	}
+	readonly property var dockedSidebarPowerSessionIcons: ({
+		"system-lock-screen": true,
+		"system-log-out": true,
+		"system-save-session": true,
+		"system-switch-user": true,
+	})
 	readonly property int dockedSidebarPowerButtons: {
 		var visibleCount = 0
-		var sessionIcons = {
-			"system-lock-screen": true,
-			"system-log-out": true,
-			"system-save-session": true,
-			"system-switch-user": true,
-		}
 		if (typeof appsModel !== "undefined" && appsModel && appsModel.powerActionsModel && appsModel.powerActionsModel.list) {
 			for (var i = 0; i < appsModel.powerActionsModel.list.length; i++) {
 				var action = appsModel.powerActionsModel.list[i]
-				if (!action || action.disabled || sessionIcons[action.iconName]) {
+				if (!action || action.disabled || dockedSidebarPowerSessionIcons[action.iconName]) {
 					continue
 				}
 				visibleCount += 1
@@ -461,7 +461,35 @@ Item {
 		}
 		return Math.max(4, visibleCount)
 	}
-	readonly property int dockedSidebarMinWidth: Math.max(dockedSidebarShortcutButtons, dockedSidebarPowerButtons) * flatButtonSize
+	readonly property var dockedSidebarPowerLabels: {
+		var labels = []
+		if (typeof appsModel !== "undefined" && appsModel && appsModel.powerActionsModel && appsModel.powerActionsModel.list) {
+			for (var i = 0; i < appsModel.powerActionsModel.list.length; i++) {
+				var action = appsModel.powerActionsModel.list[i]
+				if (!action || action.disabled || dockedSidebarPowerSessionIcons[action.iconName]) {
+					continue
+				}
+				labels.push(action.name || action.display || "")
+			}
+		}
+		return labels
+	}
+	TextMetrics {
+		id: dockedSidebarPowerLabelMetrics
+		font: Kirigami.Theme.smallFont
+	}
+	readonly property int dockedSidebarPowerButtonWidth: {
+		var maxLabel = 0
+		var labels = dockedSidebarPowerLabels
+		for (var i = 0; i < labels.length; i++) {
+			dockedSidebarPowerLabelMetrics.text = labels[i]
+			if (dockedSidebarPowerLabelMetrics.width > maxLabel) {
+				maxLabel = dockedSidebarPowerLabelMetrics.width
+			}
+		}
+		return Math.max(flatButtonSize, Math.ceil(maxLabel) + Kirigami.Units.smallSpacing * 2)
+	}
+	readonly property int dockedSidebarMinWidth: Math.max(dockedSidebarShortcutButtons * flatButtonSize, dockedSidebarPowerButtons * dockedSidebarPowerButtonWidth)
 	readonly property int dockedSidebarWidth: Math.max(dockedSidebarConfiguredWidth, dockedSidebarMinWidth)
 	readonly property int dockedSidebarSlotWidth: dockedSidebarWidth + (sidebarCardInset * 2) + (sidebarCardContentPadding * 2)
 	readonly property int classicLeftSidebarSlotWidth: sidebarWidth + (sidebarCardInset * 2) + (sidebarCardContentPadding * 2) + sidebarPaneGap
