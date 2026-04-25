@@ -111,6 +111,10 @@ Item {
 	// ── Styling — Pills ─────────────────────────────────────────────────────
 	readonly property real _pillRadius: config.tileCornerRadius
 	readonly property real _listPadding: Math.round(Kirigami.Units.smallSpacing * 0.5)
+	readonly property bool _surfaceBorderVisible: !plasmoid.configuration.sidebarHideBorder
+	readonly property real _pillsInset: _surfaceBorderVisible ? _listPadding : 0
+	readonly property real _activeIndicatorInset: _surfaceBorderVisible ? 2 : 0
+	readonly property real _activeIndicatorRadius: Math.max(0, _pillRadius - _activeIndicatorInset)
 	readonly property bool _frostedSurface: config.surfaceUsesFrostedGlass
 	readonly property color _indicatorColor: _listBorderBaseIsLight
 		? Qt.darker(Kirigami.Theme.backgroundColor, 1.25)
@@ -174,7 +178,7 @@ Item {
 				anchors.left: parent.left
 				anchors.right: pillsTrailing.left
 				height: parent.height
-				contentWidth: pillsRow.width
+				contentWidth: pillsRow.width + tabBar._pillsInset * 2
 				contentHeight: height
 				clip: true
 				boundsBehavior: Flickable.StopAtBounds
@@ -258,17 +262,19 @@ Item {
 						void(pillsRepeater.count)
 						return pillsRepeater.itemAt(tabBar.activeTab)
 					}
-					readonly property bool _atLeftEdge: x <= 0
+					readonly property bool _atLeftEdge: x <= tabBar._pillsInset
 					x: _activeItem ? pillsRow.x + _activeItem.x : 0
 					anchors.top: pillsRow.top
 					anchors.bottom: pillsRow.bottom
+					anchors.topMargin: tabBar._activeIndicatorInset
+					anchors.bottomMargin: tabBar._activeIndicatorInset
 					width: _activeItem ? _activeItem.width : 0
 					color: tabBar._indicatorColor
 					corners {
-						topLeftRadius: activeIndicator._atLeftEdge ? tabBar._pillRadius : 0
-						bottomLeftRadius: activeIndicator._atLeftEdge ? tabBar._pillRadius : 0
-						topRightRadius: 0
-						bottomRightRadius: 0
+						topLeftRadius: tabBar._surfaceBorderVisible || activeIndicator._atLeftEdge ? tabBar._activeIndicatorRadius : 0
+						bottomLeftRadius: tabBar._surfaceBorderVisible || activeIndicator._atLeftEdge ? tabBar._activeIndicatorRadius : 0
+						topRightRadius: tabBar._surfaceBorderVisible ? tabBar._activeIndicatorRadius : 0
+						bottomRightRadius: tabBar._surfaceBorderVisible ? tabBar._activeIndicatorRadius : 0
 					}
 					Behavior on x { NumberAnimation { duration: 180; easing.type: Easing.InOutQuad } }
 					Behavior on width { NumberAnimation { duration: 180; easing.type: Easing.InOutQuad } }
@@ -276,7 +282,7 @@ Item {
 
 				Row {
 					id: pillsRow
-					x: 0
+					x: tabBar._pillsInset
 					height: tabFlickable.height
 					spacing: Kirigami.Units.smallSpacing
 
@@ -300,7 +306,7 @@ Item {
 
 				readonly property real _controlHeight: parent.height
 				readonly property real _availableWidth: Math.max(0, pillsSurface.width - pillsAddBtn.width - Kirigami.Units.smallSpacing)
-				readonly property real _tabsContentWidth: pillsRow.width + tabBar._listPadding * 2
+				readonly property real _tabsContentWidth: pillsRow.width + tabBar._pillsInset * 2
 				readonly property bool _overflow: _tabsContentWidth > _availableWidth
 				readonly property real _maxContentX: Math.max(0, tabFlickable.contentWidth - tabFlickable.width)
 

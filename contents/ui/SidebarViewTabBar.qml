@@ -66,6 +66,10 @@ Item {
 	// ── Shared styling ───────────────────────────────────────────────────
 	readonly property real _pillRadius: config.tileCornerRadius
 	readonly property real _listPadding: Math.round(Kirigami.Units.smallSpacing * 0.5)
+	readonly property bool _surfaceBorderVisible: !plasmoid.configuration.sidebarHideBorder
+	readonly property real _pillsInset: _surfaceBorderVisible ? _listPadding : 0
+	readonly property real _activeIndicatorInset: _surfaceBorderVisible ? 2 : 0
+	readonly property real _activeIndicatorRadius: Math.max(0, _pillRadius - _activeIndicatorInset)
 	readonly property bool _frostedSurface: config.surfaceUsesFrostedGlass
 	readonly property color _listBorderBaseColor: config.surfaceBaseColor
 	readonly property bool _listBorderBaseIsLight: _relativeLuminance(_listBorderBaseColor) > 0.6
@@ -170,7 +174,9 @@ Item {
 			Row {
 				id: pillsRow
 				anchors.left: parent.left
+				anchors.leftMargin: root._pillsInset
 				anchors.right: pillsAddBtn.left
+				anchors.rightMargin: root._pillsInset
 				height: parent.height
 				spacing: Kirigami.Units.smallSpacing
 
@@ -189,12 +195,14 @@ Item {
 						Kirigami.ShadowedRectangle {
 							visible: pillDelegate.isActive
 							anchors.fill: parent
+							anchors.topMargin: root._activeIndicatorInset
+							anchors.bottomMargin: root._activeIndicatorInset
 							color: root._indicatorColor
 							corners {
-								topLeftRadius: pillDelegate.itemIdx === 0 ? root._pillRadius : 0
-								bottomLeftRadius: pillDelegate.itemIdx === 0 ? root._pillRadius : 0
-								topRightRadius: 0
-								bottomRightRadius: 0
+								topLeftRadius: root._surfaceBorderVisible || pillDelegate.itemIdx === 0 ? root._activeIndicatorRadius : 0
+								bottomLeftRadius: root._surfaceBorderVisible || pillDelegate.itemIdx === 0 ? root._activeIndicatorRadius : 0
+								topRightRadius: root._surfaceBorderVisible ? root._activeIndicatorRadius : 0
+								bottomRightRadius: root._surfaceBorderVisible ? root._activeIndicatorRadius : 0
 							}
 						}
 
