@@ -31,19 +31,20 @@ Item {
 		var darkened = Qt.darker(baseColor, baseIsLight ? 1.08 : 1.18)
 		return colorWithAlpha(darkened, fillOpacity)
 	}
+	readonly property color lightFrostedGlassColor: Qt.rgba(0.95, 0.965, 0.985, 0.78)
 	readonly property color frostedGlassColor: baseIsLight
-		? Qt.rgba(1, 1, 1, 0.24)
+		? lightFrostedGlassColor
 		: Qt.rgba(0.12, 0.14, 0.16, 0.46)
 	readonly property color glassColor: useFrostedSurface ? frostedGlassColor : normalGlassColor
 	readonly property color rimColor: useFrostedSurface
-		? (baseIsLight ? Qt.rgba(1, 1, 1, 0.44) : Qt.rgba(1, 1, 1, 0.18))
+		? (baseIsLight ? Qt.rgba(1, 1, 1, 0.72) : Qt.rgba(1, 1, 1, 0.18))
 		: (baseIsLight ? Qt.rgba(1, 1, 1, 0.62) : Qt.rgba(1, 1, 1, 0.18))
 	readonly property color bottomRimColor: useFrostedSurface
-		? (baseIsLight ? Qt.rgba(0, 0, 0, 0.08) : Qt.rgba(0, 0, 0, 0.18))
+		? (baseIsLight ? Qt.rgba(0.16, 0.2, 0.24, 0.18) : Qt.rgba(0, 0, 0, 0.18))
 		: "transparent"
 	readonly property real shadowSizeMultiplier: (typeof config !== "undefined" && config) ? config.surfaceShadowSizeMultiplier : 1.0
 	readonly property real shadowOpacityMultiplier: (typeof config !== "undefined" && config) ? config.surfaceShadowOpacityMultiplier : 1.0
-	readonly property real baseShadowOpacity: baseIsLight ? 0.13 : (useFrostedSurface ? 0.18 : 0.32)
+	readonly property real baseShadowOpacity: baseIsLight ? (useFrostedSurface ? 0.19 : 0.13) : (useFrostedSurface ? 0.18 : 0.32)
 	readonly property int shadowSize: Math.round(Kirigami.Units.gridUnit * (useFrostedSurface ? 1.1 : 1.25) * shadowSizeMultiplier)
 	readonly property color shadowColor: Qt.rgba(0, 0, 0, Math.min(1, baseShadowOpacity * shadowOpacityMultiplier))
 	readonly property int shadowYOffset: Math.round(2 * Screen.devicePixelRatio)
@@ -71,9 +72,9 @@ Item {
 		visible: cardRoot.useFrostedSurface
 		radius: cardRoot.radius
 		gradient: Gradient {
-			GradientStop { position: 0.0; color: Qt.rgba(1, 1, 1, cardRoot.baseIsLight ? 0.14 : 0.10) }
-			GradientStop { position: 0.42; color: Qt.rgba(1, 1, 1, cardRoot.baseIsLight ? 0.04 : 0.03) }
-			GradientStop { position: 1.0; color: Qt.rgba(0, 0, 0, cardRoot.baseIsLight ? 0.02 : 0.08) }
+			GradientStop { position: 0.0; color: Qt.rgba(1, 1, 1, cardRoot.baseIsLight ? 0.24 : 0.10) }
+			GradientStop { position: 0.42; color: Qt.rgba(1, 1, 1, cardRoot.baseIsLight ? 0.10 : 0.03) }
+			GradientStop { position: 1.0; color: Qt.rgba(0, 0, 0, cardRoot.baseIsLight ? 0.08 : 0.08) }
 		}
 	}
 
