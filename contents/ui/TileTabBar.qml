@@ -112,16 +112,9 @@ Item {
 	readonly property real _pillRadius: config.tileCornerRadius
 	readonly property real _listPadding: Math.round(Kirigami.Units.smallSpacing * 0.5)
 	readonly property bool _frostedSurface: config.surfaceUsesFrostedGlass
-	readonly property color _listBgColor: _frostedSurface
-		? (_listBorderBaseIsLight ? Qt.rgba(1, 1, 1, 0.24) : Qt.rgba(0.12, 0.14, 0.16, 0.46))
-		: Qt.rgba(
-		Kirigami.Theme.textColor.r,
-		Kirigami.Theme.textColor.g,
-		Kirigami.Theme.textColor.b,
-		0.08)
-	readonly property color _indicatorColor: _frostedSurface
-		? (_listBorderBaseIsLight ? Qt.rgba(1, 1, 1, 0.34) : Qt.rgba(1, 1, 1, 0.13))
-		: Kirigami.Theme.backgroundColor
+	readonly property color _indicatorColor: _listBorderBaseIsLight
+		? Qt.darker(Kirigami.Theme.backgroundColor, 1.25)
+		: Qt.lighter(Kirigami.Theme.backgroundColor, 1.6)
 	readonly property color _activeTextColor: Kirigami.Theme.textColor
 	readonly property color _hoverTextColor: Qt.rgba(
 		Kirigami.Theme.textColor.r,
@@ -135,18 +128,6 @@ Item {
 		0.72)
 	readonly property color _listBorderBaseColor: config.surfaceBaseColor
 	readonly property bool _listBorderBaseIsLight: _relativeLuminance(_listBorderBaseColor) > 0.6
-	readonly property real _listBorderWidth: plasmoid.configuration.sidebarHideBorder ? 0 : Math.max(1, Math.round(Screen.devicePixelRatio))
-	readonly property color _listBorderColor: _frostedSurface
-		? (_listBorderBaseIsLight ? Qt.rgba(1, 1, 1, 0.44) : Qt.rgba(1, 1, 1, 0.18))
-		: (_listBorderBaseIsLight ? Qt.rgba(1, 1, 1, 0.62) : Qt.rgba(1, 1, 1, 0.18))
-
-	// Shadow config mirroring SidebarGlassCard
-	readonly property real _shadowSizeMultiplier: (typeof config !== "undefined" && config) ? config.surfaceShadowSizeMultiplier : 1.0
-	readonly property real _shadowOpacityMultiplier: (typeof config !== "undefined" && config) ? config.surfaceShadowOpacityMultiplier : 1.0
-	readonly property real _baseShadowOpacity: _listBorderBaseIsLight ? 0.13 : (_frostedSurface ? 0.18 : 0.32)
-	readonly property int _shadowSize: Math.round(Kirigami.Units.gridUnit * (_frostedSurface ? 1.1 : 1.25) * _shadowSizeMultiplier)
-	readonly property color _shadowColor: Qt.rgba(0, 0, 0, Math.min(1, _baseShadowOpacity * _shadowOpacityMultiplier))
-	readonly property int _shadowYOffset: Math.round(2 * Screen.devicePixelRatio)
 
 	function _relativeLuminance(color) {
 		function channel(c) {
@@ -182,18 +163,10 @@ Item {
 			y: tabBar.alignSurfaceToTop ? 0 : Math.round((parent.height - height) / 2)
 			height: tabBar.surfaceHeight
 
-			Kirigami.ShadowedRectangle {
+			SidebarGlassCard {
 				id: listBackground
 				anchors.fill: parent
-				radius: config.tileCornerRadius
-				color: tabBar._listBgColor
-				border.width: tabBar._listBorderWidth
-				border.color: tabBar._listBorderColor
-				shadow {
-					size: tabBar._shadowSize
-					color: tabBar._shadowColor
-					yOffset: tabBar._shadowYOffset
-				}
+				contentMargins: 0
 			}
 
 			Flickable {
@@ -201,7 +174,7 @@ Item {
 				anchors.left: parent.left
 				anchors.right: pillsTrailing.left
 				height: parent.height
-				contentWidth: pillsRow.width + tabBar._listPadding * 2
+				contentWidth: pillsRow.width
 				contentHeight: height
 				clip: true
 				boundsBehavior: Flickable.StopAtBounds
@@ -277,7 +250,7 @@ Item {
 					}
 				}
 
-				Rectangle {
+				Kirigami.ShadowedRectangle {
 					id: activeIndicator
 					z: 0
 					visible: pillsRepeater.count > 0
@@ -285,21 +258,25 @@ Item {
 						void(pillsRepeater.count)
 						return pillsRepeater.itemAt(tabBar.activeTab)
 					}
+					readonly property bool _atLeftEdge: x <= 0
 					x: _activeItem ? pillsRow.x + _activeItem.x : 0
-					y: _activeItem ? pillsRow.y + _activeItem.y + 2 : 0
+					anchors.top: pillsRow.top
+					anchors.bottom: pillsRow.bottom
 					width: _activeItem ? _activeItem.width : 0
-					height: _activeItem ? _activeItem.height - 4 : 0
-					radius: tabBar._pillRadius
 					color: tabBar._indicatorColor
-					border.width: 1
-					border.color: Qt.rgba(0, 0, 0, 0.08)
+					corners {
+						topLeftRadius: activeIndicator._atLeftEdge ? tabBar._pillRadius : 0
+						bottomLeftRadius: activeIndicator._atLeftEdge ? tabBar._pillRadius : 0
+						topRightRadius: 0
+						bottomRightRadius: 0
+					}
 					Behavior on x { NumberAnimation { duration: 180; easing.type: Easing.InOutQuad } }
 					Behavior on width { NumberAnimation { duration: 180; easing.type: Easing.InOutQuad } }
 				}
 
 				Row {
 					id: pillsRow
-					x: tabBar._listPadding
+					x: 0
 					height: tabFlickable.height
 					spacing: Kirigami.Units.smallSpacing
 

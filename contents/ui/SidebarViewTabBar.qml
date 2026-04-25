@@ -69,29 +69,14 @@ Item {
 	readonly property bool _frostedSurface: config.surfaceUsesFrostedGlass
 	readonly property color _listBorderBaseColor: config.surfaceBaseColor
 	readonly property bool _listBorderBaseIsLight: _relativeLuminance(_listBorderBaseColor) > 0.6
-	readonly property color _listBgColor: _frostedSurface
-		? (_listBorderBaseIsLight ? Qt.rgba(1, 1, 1, 0.24) : Qt.rgba(0.12, 0.14, 0.16, 0.46))
-		: Qt.rgba(Kirigami.Theme.textColor.r, Kirigami.Theme.textColor.g, Kirigami.Theme.textColor.b, 0.08)
-	readonly property color _indicatorColor: _frostedSurface
-		? (_listBorderBaseIsLight ? Qt.rgba(1, 1, 1, 0.34) : Qt.rgba(1, 1, 1, 0.13))
-		: Kirigami.Theme.backgroundColor
+	readonly property color _indicatorColor: _listBorderBaseIsLight
+		? Qt.darker(Kirigami.Theme.backgroundColor, 1.25)
+		: Qt.lighter(Kirigami.Theme.backgroundColor, 1.6)
 	readonly property color _activeTextColor: Kirigami.Theme.textColor
 	readonly property color _hoverTextColor: Qt.rgba(Kirigami.Theme.textColor.r, Kirigami.Theme.textColor.g, Kirigami.Theme.textColor.b, 0.88)
 	readonly property color _idleTextColor: Qt.rgba(Kirigami.Theme.textColor.r, Kirigami.Theme.textColor.g, Kirigami.Theme.textColor.b, 0.72)
-	readonly property real _listBorderWidth: plasmoid.configuration.sidebarHideBorder ? 0 : Math.max(1, Math.round(Screen.devicePixelRatio))
-	readonly property color _listBorderColor: _frostedSurface
-		? (_listBorderBaseIsLight ? Qt.rgba(1, 1, 1, 0.44) : Qt.rgba(1, 1, 1, 0.18))
-		: (_listBorderBaseIsLight ? Qt.rgba(1, 1, 1, 0.62) : Qt.rgba(1, 1, 1, 0.18))
 	readonly property real _borderWidth: Math.max(1, Math.round(Screen.devicePixelRatio))
 	readonly property color _borderColor: Qt.rgba(1.0, 1.0, 1.0, 0.35)
-
-	// Shadow config mirroring SidebarGlassCard
-	readonly property real _shadowSizeMultiplier: (typeof config !== "undefined" && config) ? config.surfaceShadowSizeMultiplier : 1.0
-	readonly property real _shadowOpacityMultiplier: (typeof config !== "undefined" && config) ? config.surfaceShadowOpacityMultiplier : 1.0
-	readonly property real _baseShadowOpacity: _listBorderBaseIsLight ? 0.13 : (_frostedSurface ? 0.18 : 0.32)
-	readonly property int _shadowSize: Math.round(Kirigami.Units.gridUnit * (_frostedSurface ? 1.1 : 1.25) * _shadowSizeMultiplier)
-	readonly property color _shadowColor: Qt.rgba(0, 0, 0, Math.min(1, _baseShadowOpacity * _shadowOpacityMultiplier))
-	readonly property int _shadowYOffset: Math.round(2 * Screen.devicePixelRatio)
 	readonly property color _activeTopBorderColor: Kirigami.Theme.highlightColor
 	readonly property color _activeTopBorderGlowColor: Qt.rgba(
 		Kirigami.Theme.highlightColor.r,
@@ -177,25 +162,15 @@ Item {
 			y: Math.round((parent.height - height) / 2)
 			height: root.surfaceHeight
 
-			Kirigami.ShadowedRectangle {
+			SidebarGlassCard {
 				anchors.fill: parent
-				radius: config.tileCornerRadius
-				color: root._listBgColor
-				border.width: root._listBorderWidth
-				border.color: root._listBorderColor
-				shadow {
-					size: root._shadowSize
-					color: root._shadowColor
-					yOffset: root._shadowYOffset
-				}
+				contentMargins: 0
 			}
 
 			Row {
 				id: pillsRow
 				anchors.left: parent.left
-				anchors.leftMargin: root._listPadding
 				anchors.right: pillsAddBtn.left
-				anchors.rightMargin: root._listPadding
 				height: parent.height
 				spacing: Kirigami.Units.smallSpacing
 
@@ -211,15 +186,16 @@ Item {
 						width: Math.max(0, (pillsRow.width - (pillsRepeater.count - 1) * pillsRow.spacing) / pillsRepeater.count)
 						height: pillsRow.height
 
-						Rectangle {
+						Kirigami.ShadowedRectangle {
 							visible: pillDelegate.isActive
 							anchors.fill: parent
-							anchors.topMargin: 2
-							anchors.bottomMargin: 2
-							radius: root._pillRadius
 							color: root._indicatorColor
-							border.width: 1
-							border.color: Qt.rgba(0, 0, 0, 0.08)
+							corners {
+								topLeftRadius: pillDelegate.itemIdx === 0 ? root._pillRadius : 0
+								bottomLeftRadius: pillDelegate.itemIdx === 0 ? root._pillRadius : 0
+								topRightRadius: 0
+								bottomRightRadius: 0
+							}
 						}
 
 						Kirigami.Icon {
