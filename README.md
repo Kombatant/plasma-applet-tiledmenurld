@@ -14,14 +14,15 @@ Tiled Menu Reloaded is a Plasma applet that provides a tiled launcher loosely in
 - Support modern Qt6/Plasma 6 environments.
 
 ## Highlights
-- **New with 0.9 version**: New Docked Sidebar layout - still in early stages but it works, with support for custom user avatars (animated or static)
+- **New with 0.95 version**: New type of tile: hero carousel tile. Added support for IGDB game tiles with automatic metadata fetching.
+- Docked Sidebar layout - with support for custom user avatars (animated or static).
 - Tabs support in the tile area.
 - Added a AI Chat tab to the sidebar, which can be used to interact with various LLMs. 
 - Tile-based launcher with configurable sizes (1×1, 2×2, 4×4, and mixed layouts). 
 - Rounded tiles with customizable corner radius now supported.
 - Group tiles with headers; move and sort items within groups.
 - Drag-and-drop pinning from file manager and search results.
-- Animated tile support (GIF, APNG, WEBP) and per-tile background images.
+- Animated tile support (GIF, APNG, WEBP) and per-tile background images. **Make sure you use reasonably sized images for good performance.**
 - Configurable sidebar position, shortcuts and search filters.
 - Quick search/filtering of applications and files.
 - Stores tile layout as a Base64-encoded XML fragment. 
@@ -30,7 +31,7 @@ Tiled Menu Reloaded is a Plasma applet that provides a tiled launcher loosely in
 <details>
 <summary><h2>Click here for screenshots</h2></summary>
 
-![Docked sidebar Layout](contents/docs/docked_sidebar.png)
+![Docked sidebar Layout and Carousel Tile](contents/docs/docked_sidebar.png)
 
 ![Classic Layout](contents/docs/main.png)
 
