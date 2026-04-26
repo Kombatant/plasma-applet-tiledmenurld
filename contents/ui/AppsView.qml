@@ -1,10 +1,13 @@
 import QtQuick
 import QtQuick.Controls as QQC2
+import QtQuick.Dialogs as QtDialogs
 import org.kde.kirigami as Kirigami
 
 QQC2.ScrollView {
 	id: appsView
 	property alias listView: appsListView
+	property var pendingRecentAppsClearAction: null
+	property bool canClearRecentApps: false
 	background: Item {} // Remove the default ScrollView frame border
 
 	// The horizontal ScrollBar always appears in QQC2 for some reason.
@@ -45,6 +48,12 @@ QQC2.ScrollView {
 
 		section.delegate: KickerSectionHeader {
 			enableJumpToSection: true
+			actionButtonVisible: section == appsModel.recentAppsSectionKey
+			actionButtonEnabled: appsView.canClearRecentApps
+			actionButtonText: i18n("Clear")
+			actionButtonHandler: function() {
+				appsView.confirmClearRecentApps()
+			}
 		}
 
 		delegate: MenuListItem {
@@ -54,6 +63,82 @@ QQC2.ScrollView {
 
 		iconSize: config.appListIconSize
 		showItemUrl: false
+	}
+
+	Connections {
+		target: appsListView.model
+		ignoreUnknownSignals: true
+		function onRefreshed() {
+			appsView.updateRecentAppsActionState()
+		}
+	}
+
+	function isForgetAllRecentAppsAction(actionItem) {
+		if (!actionItem) {
+			return false
+		}
+		var id = actionItem.actionId ? ("" + actionItem.actionId).toLowerCase() : ""
+		if (id.indexOf("forget") >= 0 && id.indexOf("all") >= 0) {
+			return true
+		}
+		var text = actionItem.text ? ("" + actionItem.text).toLowerCase() : ""
+		return text.indexOf("forget all") >= 0
+	}
+
+	function findClearRecentAppsAction() {
+		var model = appsListView.model
+		if (!model || typeof model.count !== "number"
+				|| typeof model.get !== "function"
+				|| typeof model.getActionList !== "function"
+				|| typeof model.triggerIndexAction !== "function") {
+			return null
+		}
+
+		for (var i = 0; i < model.count; i++) {
+			var item = model.get(i)
+			if (!item || item.sectionKey !== appsModel.recentAppsSectionKey) {
+				continue
+			}
+
+			var actionList = []
+			try {
+				actionList = model.getActionList(i)
+			} catch (e) {
+				actionList = []
+			}
+
+			if (!actionList || typeof actionList.length !== "number") {
+				continue
+			}
+
+			for (var ai = 0; ai < actionList.length; ai++) {
+				var actionItem = actionList[ai]
+				if (!appsView.isForgetAllRecentAppsAction(actionItem)) {
+					continue
+				}
+				return {
+					index: i,
+					actionId: actionItem.actionId,
+					actionArgument: actionItem.actionArgument,
+					text: actionItem.text || "",
+				}
+			}
+		}
+
+		return null
+	}
+
+	function updateRecentAppsActionState() {
+		canClearRecentApps = !!findClearRecentAppsAction()
+	}
+
+	function confirmClearRecentApps() {
+		pendingRecentAppsClearAction = findClearRecentAppsAction()
+		if (!pendingRecentAppsClearAction) {
+			canClearRecentApps = false
+			return
+		}
+		clearRecentAppsDialog.open()
 	}
 
 	function scrollToTop() {
@@ -68,6 +153,31 @@ QQC2.ScrollView {
 				appsListView.positionViewAtIndex(i, ListView.Beginning)
 				break
 			}
+		}
+	}
+
+	Component.onCompleted: updateRecentAppsActionState()
+	onVisibleChanged: {
+		if (visible) {
+			updateRecentAppsActionState()
+		}
+	}
+
+	QtDialogs.MessageDialog {
+		id: clearRecentAppsDialog
+		title: i18n("Clear Recent Apps")
+		text: i18n("Forget all recent applications?")
+		buttons: QtDialogs.MessageDialog.Yes | QtDialogs.MessageDialog.No
+		onButtonClicked: function(button, role) {
+			if (button === QtDialogs.MessageDialog.Yes && appsView.pendingRecentAppsClearAction) {
+				appsListView.model.triggerIndexAction(
+					appsView.pendingRecentAppsClearAction.index,
+					appsView.pendingRecentAppsClearAction.actionId,
+					appsView.pendingRecentAppsClearAction.actionArgument
+				)
+			}
+			appsView.pendingRecentAppsClearAction = null
+			Qt.callLater(appsView.updateRecentAppsActionState)
 		}
 	}
 }
