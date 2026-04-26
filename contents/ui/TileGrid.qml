@@ -1058,7 +1058,17 @@ DropArea {
 			tileType: "hero",
 			w: limit(2, columns-x, 6),
 			h: 3,
-			subTiles: [{ backgroundImage: "", launchUrl: "", label: "", iconName: "" }],
+			subTiles: [{
+				backgroundImage: "",
+				launchUrl: "",
+				label: "",
+				iconName: "",
+				showDownloadedInfo: false,
+				storeTitle: "",
+				storeDescription: "",
+				igdbTags: [],
+				steamAppId: "",
+			}],
 			autoScrollEnabled: true,
 			autoScrollInterval: 5000,
 		}
@@ -1084,6 +1094,11 @@ DropArea {
 			iconName: iconName,
 			label: appLabel,
 			launchUrl: url || "",
+			showDownloadedInfo: false,
+			storeTitle: "",
+			storeDescription: "",
+			igdbTags: [],
+			steamAppId: "",
 		}
 		var arr = (tile.subTiles || []).slice()
 		if (arr.length === 1 && !arr[0].backgroundImage && !arr[0].launchUrl && !arr[0].iconName) {

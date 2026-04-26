@@ -18,6 +18,10 @@ ColumnLayout {
 		id: presetHelper
 	}
 
+	HeroPageMetadataFetcher {
+		id: metadataFetcher
+	}
+
 	function _pages() {
 		if (!appObj || !appObj.tile || !Array.isArray(appObj.tile.subTiles)) return []
 		return appObj.tile.subTiles
@@ -39,9 +43,63 @@ ColumnLayout {
 		_commit(arr)
 	}
 
+	function updatePageFields(index, values) {
+		var arr = _pages().slice()
+		if (index < 0 || index >= arr.length) return
+		var p = Object.assign({}, arr[index])
+		var keys = Object.keys(values || {})
+		for (var i = 0; i < keys.length; i++) {
+			p[keys[i]] = values[keys[i]]
+		}
+		arr[index] = p
+		_commit(arr)
+	}
+
+	function refreshPageMetadata(index, delegate) {
+		var page = _pages()[index]
+		if (!page) {
+			return
+		}
+		if (delegate) {
+			delegate.metadataLoading = true
+			delegate.metadataStatus = i18n("Downloading metadata...")
+		}
+		metadataFetcher.fetchForPage(page, function(success, data, message) {
+			if (delegate) {
+				delegate.metadataLoading = false
+			}
+			if (!success || !data) {
+				if (delegate) {
+					delegate.metadataStatus = message || i18n("Metadata download failed.")
+				}
+				return
+			}
+			heroPanel.updatePageFields(index, {
+				steamAppId: data.steamAppId || "",
+				storeTitle: data.storeTitle || "",
+				storeDescription: data.storeDescription || "",
+				igdbTags: data.igdbTags || [],
+				showDownloadedInfo: true,
+			})
+			if (delegate) {
+				delegate.metadataStatus = message || i18n("Downloaded metadata.")
+			}
+		})
+	}
+
 	function addPage() {
 		var arr = _pages().slice()
-		arr.push({ backgroundImage: "", launchUrl: "", label: "", iconName: "" })
+		arr.push({
+			backgroundImage: "",
+			launchUrl: "",
+			label: "",
+			iconName: "",
+			showDownloadedInfo: false,
+			storeTitle: "",
+			storeDescription: "",
+			igdbTags: [],
+			steamAppId: "",
+		})
 		_commit(arr)
 	}
 
@@ -126,6 +184,11 @@ ColumnLayout {
 			readonly property var page: (heroPanel._refreshToken >= 0 && heroPanel._pages()[index]) ? heroPanel._pages()[index] : ({})
 			readonly property var presetSpecs: presetHelper.presetSpecsForLaunchUrl(page.launchUrl || "")
 			readonly property bool canDownloadPresetImages: presetSpecs.length > 0
+			readonly property bool canDownloadMetadata: !!metadataFetcher._steamGameIdForPage(page)
+			readonly property bool hasIgdbMetadataSettings: metadataFetcher.hasIgdbMetadataSettings
+			readonly property bool canShowDownloadedInfo: canDownloadMetadata && hasIgdbMetadataSettings
+			property bool metadataLoading: false
+			property string metadataStatus: ""
 			property int _pendingPresetSaveIndex: -1
 
 			function downloadPresetImages() {
@@ -300,6 +363,48 @@ ColumnLayout {
 						placeholderText: i18n("Optional .desktop file or http(s):// URL")
 						onEditingFinished: heroPanel.updatePage(index, "launchUrl", text)
 					}
+				}
+
+				RowLayout {
+					Layout.fillWidth: true
+					QQC2.CheckBox {
+						id: downloadedInfoCheck
+						text: i18n("Show downloaded store info and tags")
+						checked: !!pageDelegate.page.showDownloadedInfo
+						enabled: pageDelegate.canShowDownloadedInfo
+						onToggled: {
+							heroPanel.updatePage(index, "showDownloadedInfo", checked)
+							if (checked) {
+								heroPanel.refreshPageMetadata(index, pageDelegate)
+							} else {
+								pageDelegate.metadataStatus = ""
+							}
+						}
+						QQC2.ToolTip.visible: hovered
+						QQC2.ToolTip.text: enabled
+							? i18n("Download Steam store text and IGDB tags for this page when enabled")
+							: (pageDelegate.canDownloadMetadata
+								? i18n("Set the IGDB Client ID and Client Secret in the Tiles settings to enable this option")
+								: i18n("This option is only available for Steam game launchers"))
+					}
+					Item { Layout.fillWidth: true }
+					QQC2.ToolButton {
+						icon.name: "view-refresh"
+						enabled: pageDelegate.canShowDownloadedInfo && !pageDelegate.metadataLoading
+						onClicked: heroPanel.refreshPageMetadata(index, pageDelegate)
+						QQC2.ToolTip.visible: hovered
+						QQC2.ToolTip.text: enabled
+							? i18n("Refresh downloaded metadata")
+							: i18n("Fill in the IGDB metadata settings first")
+					}
+				}
+
+				QQC2.Label {
+					visible: pageDelegate.metadataLoading || metadataStatus.length > 0
+					Layout.fillWidth: true
+					wrapMode: Text.Wrap
+					opacity: 0.8
+					text: pageDelegate.metadataLoading ? i18n("Downloading metadata...") : metadataStatus
 				}
 			}
 		}

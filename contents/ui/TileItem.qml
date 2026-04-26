@@ -278,7 +278,11 @@ Item {
 		QQC2.ToolTip.visible: !!plasmoid.configuration.showTileTooltips && containsMouse && tileTooltipText.length > 0
 		QQC2.ToolTip.text: tileTooltipText
 		acceptedButtons: Qt.LeftButton | Qt.RightButton
-		cursorShape: (dragActive && dragOutside) ? Qt.ForbiddenCursor : (editing ? Qt.ClosedHandCursor : Qt.ArrowCursor)
+		cursorShape: (dragActive && dragOutside)
+			? Qt.ForbiddenCursor
+			: ((appObj.isHero && heroTileView && heroTileView.containsPlayButton(tileMouseArea.mouseX - heroTileView.x, tileMouseArea.mouseY - heroTileView.y))
+				? Qt.PointingHandCursor
+				: (editing ? Qt.ClosedHandCursor : Qt.ArrowCursor))
 		readonly property bool isLeftPressed: pressedButtons & Qt.LeftButton
 		property bool dragOutside: false
 
@@ -313,15 +317,8 @@ Item {
 				if (tileEditorView && tileEditorView.tile) {
 					openTileEditor()
 				} else if (appObj.isHero) {
-					// Edge-hit navigation: left ~15% prev, right ~15% next, center launches.
-					var w = tileMouseArea.width
-					var edge = Math.max(28, w * 0.15)
-					if (heroTileView && heroTileView.effectivePages.length > 1 && mouse.x < edge) {
-						heroTileView.prev()
-					} else if (heroTileView && heroTileView.effectivePages.length > 1 && mouse.x > w - edge) {
-						heroTileView.next()
-					} else if (heroTileView && heroTileView.currentSub && heroTileView.currentSub.launchUrl) {
-						try { Qt.openUrlExternally(heroTileView.currentSub.launchUrl) } catch (e) { console.warn('Hero tile launch failed', e) }
+					if (heroTileView && heroTileView.containsPlayButton(mouse.x - heroTileView.x, mouse.y - heroTileView.y)) {
+						heroTileView.launchCurrentPage()
 					}
 				} else if (modelData.url) {
 					var favoriteId = modelData.favoriteId || modelData.url
@@ -377,16 +374,14 @@ Item {
 		}
 	}
 
-	// Hero-tile prev/next click overlays (above tileMouseArea in document order
-	// so they receive clicks before the broader tile mouse area).
+	// Hero-tile prev/next click overlays aligned to the visible chevrons.
 	MouseArea {
 		id: heroPrevArea
 		visible: appObj.isHero && heroTileView && heroTileView.effectivePages.length > 1
-		anchors.left: parent.left
-		anchors.verticalCenter: parent.verticalCenter
-		anchors.leftMargin: cellMargin
-		width: Math.max(36, parent.width * 0.18)
-		height: Math.min(parent.height - cellMargin * 2, 96)
+		x: heroTileView.x
+		y: heroTileView.y + Math.round((heroTileView.height - height) / 2)
+		width: Kirigami.Units.iconSizes.medium + Kirigami.Units.smallSpacing * 2
+		height: width
 		acceptedButtons: Qt.LeftButton
 		hoverEnabled: true
 		cursorShape: Qt.PointingHandCursor
@@ -398,11 +393,10 @@ Item {
 	MouseArea {
 		id: heroNextArea
 		visible: appObj.isHero && heroTileView && heroTileView.effectivePages.length > 1
-		anchors.right: parent.right
-		anchors.verticalCenter: parent.verticalCenter
-		anchors.rightMargin: cellMargin
-		width: Math.max(36, parent.width * 0.18)
-		height: Math.min(parent.height - cellMargin * 2, 96)
+		x: heroTileView.x + heroTileView.width - width
+		y: heroTileView.y + Math.round((heroTileView.height - height) / 2)
+		width: Kirigami.Units.iconSizes.medium + Kirigami.Units.smallSpacing * 2
+		height: width
 		acceptedButtons: Qt.LeftButton
 		hoverEnabled: true
 		cursorShape: Qt.PointingHandCursor

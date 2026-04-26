@@ -48,6 +48,10 @@ Item {
 	property var cfg_aiProviderDefault
 	property var cfg_aiApiKey
 	property var cfg_aiApiKeyDefault
+	property var cfg_igdbClientId
+	property var cfg_igdbClientIdDefault
+	property var cfg_igdbClientSecret
+	property var cfg_igdbClientSecretDefault
 	property var cfg_aiOllamaUrl
 	property var cfg_aiOllamaUrlDefault
 	property var cfg_aiOpenWebUiUrl
@@ -219,6 +223,8 @@ Item {
 		aiChatEnabled: "bool",
 		aiProvider: "string",
 		aiApiKey: "string",
+		igdbClientId: "string",
+		igdbClientSecret: "string",
 		aiOllamaUrl: "string",
 		aiOpenWebUiUrl: "string",
 		aiModel: "string",

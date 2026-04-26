@@ -7,6 +7,7 @@ import org.kde.kirigami as Kirigami
 import Qt.labs.platform as QtLabsPlatform
 
 import ".." as TiledMenu
+import "../lib"
 import "../libconfig" as LibConfig
 import "../libconfig/ConfigUtils.js" as ConfigUtils
 
@@ -14,6 +15,15 @@ import "../libconfig/ConfigUtils.js" as ConfigUtils
 LibConfig.FormKCM {
 	id: formLayout
 	wideMode: false
+	property string pendingIgdbClientSecret: ""
+	property bool pendingIgdbClientSecretInitialized: false
+	property bool _updatingIgdbSecretField: false
+	property bool _igdbSecretEdited: false
+	readonly property bool hasStoredIgdbClientSecret: !!((secureIgdbClientSecret.secret || "").trim())
+
+	function saveConfig() {
+		_applyPendingIgdbClientSecret()
+	}
 
 	function tileScaleToAbsoluteSize(scale) {
 		return Math.round((scale || 0) * 160)
@@ -67,6 +77,90 @@ LibConfig.FormKCM {
 
 	property var config: TiledMenu.AppletConfig {
 		id: config
+	}
+
+	KWalletSecret {
+		id: secureIgdbClientSecret
+		entryName: "igdbClientSecret"
+		onLoaded: function(success) {
+			if (success && !formLayout.pendingIgdbClientSecretInitialized) {
+				formLayout._setPendingIgdbClientSecret(secret || ((plasmoid.configuration.igdbClientSecret || "").trim()), false)
+				formLayout.pendingIgdbClientSecretInitialized = true
+			}
+		}
+		onSaved: function(success) {
+			if (success) {
+				ConfigUtils.setPendingValue(formLayout, "igdbClientSecret", "", false)
+				return
+			}
+			if (typeof showPassiveNotification === "function") {
+				showPassiveNotification(i18n("Failed to save the IGDB client secret to KWallet."))
+			}
+		}
+		onCleared: function(success) {
+			if (success) {
+				ConfigUtils.setPendingValue(formLayout, "igdbClientSecret", "", false)
+				formLayout._setPendingIgdbClientSecret("", false)
+				return
+			}
+			if (typeof showPassiveNotification === "function") {
+				showPassiveNotification(i18n("Failed to remove the IGDB client secret from KWallet."))
+			}
+		}
+	}
+
+	function _setPendingIgdbClientSecret(value, markDirty) {
+		var nextValue = value || ""
+		if (formLayout.pendingIgdbClientSecret === nextValue) {
+			return
+		}
+		formLayout.pendingIgdbClientSecret = nextValue
+		if (markDirty !== false) {
+			ConfigUtils.markConfigurationChanged(formLayout)
+		}
+		formLayout._updatingIgdbSecretField = true
+		igdbClientSecretField.text = nextValue
+		formLayout._updatingIgdbSecretField = false
+		if (markDirty === false) {
+			formLayout._igdbSecretEdited = false
+		}
+	}
+
+	function _igdbClientSecretValue() {
+		var pendingValue = (formLayout.pendingIgdbClientSecret || "").trim()
+		if (pendingValue) {
+			return pendingValue
+		}
+		if (formLayout._igdbSecretEdited) {
+			return ""
+		}
+		return (secureIgdbClientSecret.secret || "").trim()
+	}
+
+	function _applyPendingIgdbClientSecret() {
+		if (!secureIgdbClientSecret.secureStorageAvailable || secureIgdbClientSecret.saving) {
+			return
+		}
+		var draft = _igdbClientSecretValue()
+		var stored = secureIgdbClientSecret.secret || ""
+		ConfigUtils.setPendingValue(formLayout, "igdbClientSecret", "", false)
+		if (draft === stored) {
+			return
+		}
+		if (!draft) {
+			secureIgdbClientSecret.clearSecret()
+			return
+		}
+		secureIgdbClientSecret.saveSecret(draft)
+	}
+
+	Component.onCompleted: {
+		if (!formLayout.pendingIgdbClientSecretInitialized && (plasmoid.configuration.igdbClientSecret || "").trim()) {
+			formLayout.pendingIgdbClientSecret = (plasmoid.configuration.igdbClientSecret || "").trim()
+			formLayout.pendingIgdbClientSecretInitialized = true
+		}
+		secureIgdbClientSecret.inspectAvailability()
+		secureIgdbClientSecret.readSecret()
 	}
 
 	//-------------------------------------------------------
@@ -394,6 +488,73 @@ LibConfig.FormKCM {
 				}
 			}
 		}
+	}
+
+	//-------------------------------------------------------
+	LibConfig.Heading {
+		text: i18n("Online Metadata")
+	}
+
+	Kirigami.InlineMessage {
+		Layout.fillWidth: true
+		visible: secureIgdbClientSecret.checkedAvailability && !secureIgdbClientSecret.secureStorageAvailable && !!secureIgdbClientSecret.availabilityMessage
+		type: Kirigami.MessageType.Warning
+		text: secureIgdbClientSecret.availabilityMessage
+	}
+
+	LibConfig.TextField {
+		configKey: "igdbClientId"
+		Kirigami.FormData.label: i18n("IGDB Client ID")
+		placeholderText: i18n("Required for hero-page IGDB tags")
+	}
+
+	LibConfig.TextField {
+		id: igdbClientSecretField
+		enabled: secureIgdbClientSecret.secureStorageAvailable
+		Kirigami.FormData.label: i18n("IGDB Client Secret")
+		echoMode: _showSecret ? TextInput.Normal : TextInput.Password
+		placeholderText: i18n("Stored in KWallet")
+		property bool _showSecret: false
+		rightPadding: _toggleSecretButton.width + Kirigami.Units.smallSpacing * 2
+
+		QQC2.ToolButton {
+			id: _toggleSecretButton
+			anchors.right: parent.right
+			anchors.rightMargin: Kirigami.Units.smallSpacing
+			anchors.verticalCenter: parent.verticalCenter
+			icon.name: igdbClientSecretField._showSecret ? "password-show-off" : "password-show-on"
+			onClicked: igdbClientSecretField._showSecret = !igdbClientSecretField._showSecret
+			QQC2.ToolTip.text: igdbClientSecretField._showSecret ? i18n("Hide client secret") : i18n("Show client secret")
+			QQC2.ToolTip.visible: hovered
+			flat: true
+			focusPolicy: Qt.NoFocus
+			display: QQC2.AbstractButton.IconOnly
+			implicitHeight: igdbClientSecretField.implicitHeight - Kirigami.Units.smallSpacing * 2
+			implicitWidth: implicitHeight
+		}
+
+		onTextChanged: {
+			if (formLayout._updatingIgdbSecretField) {
+				return
+			}
+			formLayout._igdbSecretEdited = true
+			formLayout._setPendingIgdbClientSecret(text, true)
+		}
+	}
+
+	QQC2.Label {
+		visible: secureIgdbClientSecret.loadedOnce && formLayout.hasStoredIgdbClientSecret
+		Layout.fillWidth: true
+		wrapMode: Text.Wrap
+		opacity: 0.8
+		text: i18n("An IGDB client secret is already stored in KWallet. Enter a new value here to replace it.")
+	}
+
+	QQC2.Label {
+		Layout.fillWidth: true
+		wrapMode: Text.Wrap
+		opacity: 0.8
+		text: i18n("Hero pages can download Steam store descriptions and IGDB tags when you enable the per-page metadata option in the hero editor.")
 	}
 
 }

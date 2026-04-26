@@ -59,6 +59,8 @@ Item {
 		_ensureSettingInitialized('aiChatEnabled', true)
 		_ensureSettingInitialized('aiProvider', 'openai')
 		_ensureSettingInitialized('aiApiKey', '')
+		_ensureSettingInitialized('igdbClientId', '')
+		_ensureSettingInitialized('igdbClientSecret', '')
 		_ensureSettingInitialized('aiOllamaUrl', 'http://127.0.0.1:11434')
 		_ensureSettingInitialized('aiOpenWebUiUrl', 'http://127.0.0.1:3000')
 		_ensureSettingInitialized('aiModel', '')

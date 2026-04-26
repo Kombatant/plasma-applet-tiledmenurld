@@ -4,6 +4,7 @@ import QtQuick.Effects
 import org.kde.plasma.components as PlasmaComponents3
 import org.kde.kirigami as Kirigami
 import org.kde.plasma.plasmoid
+import "Utils.js" as Utils
 
 Item {
 	id: heroView
@@ -33,6 +34,55 @@ Item {
 	property bool autoScrollEnabled: _modelToken >= 0 && !!(appObj && appObj.tile && appObj.tile.autoScrollEnabled)
 	property int autoScrollInterval: (_modelToken >= 0 && appObj && appObj.tile && appObj.tile.autoScrollInterval) ? appObj.tile.autoScrollInterval : 5000
 	property bool hovered: false
+	function _normalizedStringList(value) {
+		var out = []
+
+		function pushItem(item) {
+			var text = ("" + (item || "")).trim()
+			if (text) {
+				out.push(text)
+			}
+		}
+
+		if (!value) {
+			return out
+		}
+
+		if (Array.isArray(value)) {
+			for (var i = 0; i < value.length; i++) {
+				pushItem(value[i])
+			}
+			return out
+		}
+
+		if (typeof value === "object" && typeof value.length === "number") {
+			for (var j = 0; j < value.length; j++) {
+				pushItem(value[j])
+			}
+			return out
+		}
+
+		if (typeof value === "string") {
+			var text = value.trim()
+			if (!text) {
+				return out
+			}
+			var parts = text.split(/\s*,\s*/)
+			for (var k = 0; k < parts.length; k++) {
+				pushItem(parts[k])
+			}
+			return out
+		}
+
+		pushItem(value)
+		return out
+	}
+	readonly property real _tagChipSpacing: Kirigami.Units.smallSpacing
+	readonly property real _tagChipPaddingX: Kirigami.Units.smallSpacing * 1.5
+	readonly property real _tagChipPaddingY: Math.max(2, Math.round(Kirigami.Units.smallSpacing * 0.5))
+	readonly property real _heroNavHitSize: Kirigami.Units.iconSizes.medium + Kirigami.Units.smallSpacing * 2
+	readonly property real _heroContentSideMargin: Kirigami.Units.largeSpacing + ((effectivePages && effectivePages.length > 1) ? (_heroNavHitSize + Kirigami.Units.smallSpacing) : 0)
+	readonly property real _heroContentRowSpacing: Kirigami.Units.smallSpacing * 1.5
 
 	Connections {
 		target: typeof tileGrid !== "undefined" ? tileGrid : null
@@ -58,6 +108,12 @@ Item {
 	}
 	readonly property var currentSub: (effectivePages && effectivePages.length > 0 && currentIndex >= 0 && currentIndex < effectivePages.length) ? effectivePages[currentIndex] : null
 	readonly property var nextSub: (effectivePages && effectivePages.length > 1) ? effectivePages[(currentIndex + 1) % effectivePages.length] : null
+	readonly property bool showDownloadedInfo: !!(currentSub && currentSub.showDownloadedInfo)
+	readonly property string currentTitleText: currentSub ? ("" + (currentSub.label || currentSub.storeTitle || "")).trim() : ""
+	readonly property string currentDescriptionText: (showDownloadedInfo && currentSub) ? ("" + (currentSub.storeDescription || "")).trim() : ""
+	readonly property var currentTags: showDownloadedInfo ? _normalizedStringList(currentSub ? currentSub.igdbTags : []) : []
+	readonly property string currentLaunchUrl: currentSub ? ("" + (currentSub.launchUrl || "")).trim() : ""
+	readonly property bool canLaunchCurrentPage: !!currentLaunchUrl
 
 	readonly property bool effectiveExpanded: {
 		if (typeof widget !== "undefined" && widget && typeof widget.expanded !== "undefined") {
@@ -99,6 +155,35 @@ Item {
 		currentIndex = (currentIndex - 1 + effectivePages.length) % effectivePages.length
 	}
 
+	function launchCurrentPage() {
+		if (!canLaunchCurrentPage) {
+			return false
+		}
+
+		var favoriteId = Utils.kickerFavoriteId((currentSub && currentSub.favoriteId) || currentLaunchUrl)
+		if (favoriteId && typeof appsModel !== "undefined" && appsModel && typeof appsModel.runTileApp === "function") {
+			if (appsModel.runTileApp(favoriteId)) {
+				return true
+			}
+		}
+
+		try {
+			return Qt.openUrlExternally(currentLaunchUrl)
+		} catch (e) {
+			console.warn("HeroTileView launch failed", currentLaunchUrl, e)
+		}
+		return false
+	}
+
+	function containsPlayButton(x, y) {
+		if (!playButtonFrame.visible) {
+			return false
+		}
+		var origin = playButtonFrame.mapToItem(heroView, 0, 0)
+		return x >= origin.x && x <= origin.x + playButtonFrame.width
+			&& y >= origin.y && y <= origin.y + playButtonFrame.height
+	}
+
 	function _commitCurrent() {
 		var inactive = useLoaderA ? loaderB : loaderA
 		if (inactive.item) {
@@ -130,6 +215,17 @@ Item {
 	Item {
 		id: contentLayer
 		anchors.fill: parent
+
+	Rectangle {
+		anchors.fill: parent
+		radius: heroView.cornerRadius
+		visible: !!heroView.currentTitleText
+		gradient: Gradient {
+			GradientStop { position: 0.0; color: Qt.rgba(0, 0, 0, 0.04) }
+			GradientStop { position: 0.45; color: Qt.rgba(0, 0, 0, 0.1) }
+			GradientStop { position: 1.0; color: Qt.rgba(0, 0, 0, heroView.showDownloadedInfo ? 0.64 : 0.5) }
+		}
+	}
 
 	// Themed backdrop for icon-only or empty pages.
 	Rectangle {
@@ -220,31 +316,139 @@ Item {
 		}
 	}
 
-	// Label overlay for the current page (bottom-left).
+	// Metadata and CTA overlay for the current page (bottom-left).
 	Item {
-		id: labelOverlay
+		id: infoOverlay
 		anchors.left: parent.left
 		anchors.right: parent.right
 		anchors.bottom: parent.bottom
-		anchors.margins: Kirigami.Units.largeSpacing
-		anchors.bottomMargin: Kirigami.Units.largeSpacing * 2 + 8 // leave room for indicator
-		height: pageLabel.implicitHeight
-		visible: !!heroView.currentSub && !!heroView.currentSub.label
+		anchors.leftMargin: heroView._heroContentSideMargin
+		anchors.rightMargin: heroView._heroContentSideMargin
+		anchors.topMargin: Kirigami.Units.largeSpacing
+		anchors.bottomMargin: Kirigami.Units.largeSpacing * 2 + 8
+		height: infoColumn.implicitHeight
+		visible: !!heroView.currentSub && (heroView.canLaunchCurrentPage || !!heroView.currentTitleText || !!heroView.currentDescriptionText || heroView.currentTags.length > 0)
 		opacity: visible ? 1 : 0
 		Behavior on opacity { NumberAnimation { duration: 350 } }
 
-		PlasmaComponents3.Label {
-			id: pageLabel
+		Column {
+			id: infoColumn
 			anchors.left: parent.left
 			anchors.right: parent.right
-			text: heroView.currentSub ? ("" + (heroView.currentSub.label || "")) : ""
-			color: "white"
-			font.pixelSize: Kirigami.Theme.defaultFont.pixelSize * 1.6
-			font.bold: true
-			elide: Text.ElideRight
-			wrapMode: Text.NoWrap
-			style: Text.Outline
-			styleColor: Qt.rgba(0, 0, 0, 0.85)
+			anchors.bottom: parent.bottom
+			spacing: heroView._heroContentRowSpacing
+
+			PlasmaComponents3.Label {
+				visible: !!heroView.currentTitleText
+				anchors.left: parent.left
+				anchors.right: parent.right
+				text: heroView.currentTitleText
+				color: "white"
+				font.pixelSize: Kirigami.Theme.defaultFont.pixelSize * 1.6
+				font.bold: true
+				elide: Text.ElideRight
+				wrapMode: Text.NoWrap
+				style: Text.Outline
+				styleColor: Qt.rgba(0, 0, 0, 0.85)
+			}
+
+			PlasmaComponents3.Label {
+				visible: !!heroView.currentDescriptionText
+				anchors.left: parent.left
+				anchors.right: parent.right
+				text: heroView.currentDescriptionText
+				color: Qt.rgba(1, 1, 1, 0.92)
+				font.pixelSize: Kirigami.Theme.smallFont.pixelSize
+				maximumLineCount: 2
+				wrapMode: Text.Wrap
+				elide: Text.ElideRight
+				style: Text.Outline
+				styleColor: Qt.rgba(0, 0, 0, 0.78)
+			}
+
+			Item {
+				id: tagViewport
+				visible: heroView.currentTags.length > 0
+				width: parent.width
+				height: Math.max(0, tagChipRow.childrenRect.height)
+				clip: true
+
+				Row {
+					id: tagChipRow
+					height: childrenRect.height
+					spacing: heroView._tagChipSpacing
+
+					Repeater {
+						model: heroView.currentTags.length
+						delegate: Rectangle {
+							readonly property string tagText: (heroView.currentTags[index] || "")
+							readonly property bool fitsWidth: (x + width) <= tagViewport.width
+							radius: Math.round(height / 2)
+							color: Qt.rgba(0, 0, 0, 0.36)
+							border.color: Qt.rgba(1, 1, 1, 0.12)
+							border.width: 1
+							height: chipLabel.implicitHeight + heroView._tagChipPaddingY * 2
+							width: chipLabel.implicitWidth + heroView._tagChipPaddingX * 2
+							implicitHeight: height
+							implicitWidth: width
+							opacity: fitsWidth ? 1 : 0
+
+							PlasmaComponents3.Label {
+								id: chipLabel
+								anchors.centerIn: parent
+								text: parent.tagText
+								color: Qt.rgba(1, 1, 1, 0.92)
+								font.pixelSize: Kirigami.Theme.smallFont.pixelSize
+								wrapMode: Text.NoWrap
+								elide: Text.ElideNone
+								maximumLineCount: 1
+								style: Text.Outline
+								styleColor: Qt.rgba(0, 0, 0, 0.62)
+							}
+						}
+					}
+				}
+			}
+
+			Item {
+				id: playButtonFrame
+				visible: heroView.canLaunchCurrentPage
+				width: playButtonBackground.implicitWidth
+				height: playButtonBackground.implicitHeight
+
+				Rectangle {
+					id: playButtonShadow
+					anchors.fill: playButtonBackground
+					anchors.topMargin: 2
+					radius: playButtonBackground.radius
+					color: Qt.rgba(0, 0, 0, 0.28)
+				}
+
+				Rectangle {
+					id: playButtonBackground
+					anchors.fill: parent
+					implicitWidth: Math.max(Kirigami.Units.gridUnit * 4.75, playButtonLabel.implicitWidth + Kirigami.Units.largeSpacing * 1.6)
+					implicitHeight: playButtonLabel.implicitHeight + Kirigami.Units.smallSpacing * 2.2
+					radius: Math.round(height / 4)
+					border.width: 1
+					border.color: Qt.rgba(1, 1, 1, 0.18)
+					gradient: Gradient {
+						GradientStop { position: 0.0; color: Qt.rgba(0.18, 0.58, 0.95, 0.98) }
+						GradientStop { position: 1.0; color: Qt.rgba(0.11, 0.42, 0.88, 0.98) }
+					}
+
+					PlasmaComponents3.Label {
+						id: playButtonLabel
+						anchors.centerIn: parent
+						text: i18n("Launch")
+						color: "white"
+						font.pixelSize: Kirigami.Theme.defaultFont.pixelSize
+						font.bold: true
+						style: Text.Outline
+						styleColor: Qt.rgba(0, 0, 0, 0.24)
+					}
+				}
+			}
 		}
 	}
 
@@ -269,7 +473,7 @@ Item {
 		}
 	}
 
-	// Hint chevrons on hover (visual only — clicks go through TileItem's edge-hit zones).
+	// Hint chevrons on hover. Click handling is mapped in TileItem to these visual controls.
 	Kirigami.Icon {
 		anchors.left: parent.left
 		anchors.verticalCenter: parent.verticalCenter

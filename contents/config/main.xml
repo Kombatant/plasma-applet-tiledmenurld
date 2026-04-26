@@ -59,6 +59,12 @@
 		<entry name="aiApiKey" type="string">
 			<default></default>
 		</entry>
+		<entry name="igdbClientId" type="string">
+			<default></default>
+		</entry>
+		<entry name="igdbClientSecret" type="string">
+			<default></default>
+		</entry>
 		<entry name="aiOllamaUrl" type="string">
 			<default>http://127.0.0.1:11434</default>
 		</entry>
