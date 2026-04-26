@@ -12,6 +12,12 @@ TileEditorGroupBox {
 	property var labelField
 	property var iconField
 	property var tileGrid
+	readonly property var steamPresetSpecs: presetHelper.presetSpecsForSteamGameId(steamGameId)
+	readonly property var lutrisPresetSpecs: presetHelper.presetSpecsForLutrisGameSlug(lutrisGameSlug)
+
+	TilePresetImageHelper {
+		id: presetHelper
+	}
 
 	visible: false
 	function checkForPreset() {
@@ -130,11 +136,10 @@ TileEditorGroupBox {
 			labelField: tileEditorPresetTiles.labelField
 			iconField: tileEditorPresetTiles.iconField
 			tileGrid: tileEditorPresetTiles.tileGrid
-			filename: 'steam_' + steamGameId + '_4x2.jpg'
-			property string tileImageUrl: 'https://steamcdn-a.akamaihd.net/steam/apps/' + steamGameId + '/header.jpg'
-			source: isSteamGameLauncher ? tileImageUrl : ''
-			w: 4
-			h: 2
+			filename: tileEditorPresetTiles.steamPresetSpecs.length > 0 ? tileEditorPresetTiles.steamPresetSpecs[0].filename : ''
+			source: isSteamGameLauncher && tileEditorPresetTiles.steamPresetSpecs.length > 0 ? tileEditorPresetTiles.steamPresetSpecs[0].source : ''
+			w: tileEditorPresetTiles.steamPresetSpecs.length > 0 ? tileEditorPresetTiles.steamPresetSpecs[0].w : 0
+			h: tileEditorPresetTiles.steamPresetSpecs.length > 0 ? tileEditorPresetTiles.steamPresetSpecs[0].h : 0
 		}
 
 		// 3x1
@@ -144,11 +149,10 @@ TileEditorGroupBox {
 			labelField: tileEditorPresetTiles.labelField
 			iconField: tileEditorPresetTiles.iconField
 			tileGrid: tileEditorPresetTiles.tileGrid
-			filename: 'steam_' + steamGameId + '_3x1.jpg'
-			property string tileImageUrl: 'https://steamcdn-a.akamaihd.net/steam/apps/' + steamGameId + '/capsule_184x69.jpg'
-			source: isSteamGameLauncher ? tileImageUrl : ''
-			w: 3
-			h: 1
+			filename: tileEditorPresetTiles.steamPresetSpecs.length > 1 ? tileEditorPresetTiles.steamPresetSpecs[1].filename : ''
+			source: isSteamGameLauncher && tileEditorPresetTiles.steamPresetSpecs.length > 1 ? tileEditorPresetTiles.steamPresetSpecs[1].source : ''
+			w: tileEditorPresetTiles.steamPresetSpecs.length > 1 ? tileEditorPresetTiles.steamPresetSpecs[1].w : 0
+			h: tileEditorPresetTiles.steamPresetSpecs.length > 1 ? tileEditorPresetTiles.steamPresetSpecs[1].h : 0
 		}
 
 		// 5x3 or 3x2
@@ -158,11 +162,10 @@ TileEditorGroupBox {
 			labelField: tileEditorPresetTiles.labelField
 			iconField: tileEditorPresetTiles.iconField
 			tileGrid: tileEditorPresetTiles.tileGrid
-			filename: 'steam_' + steamGameId + '_5x3.jpg'
-			property string tileImageUrl: 'https://steamcdn-a.akamaihd.net/steam/apps/' + steamGameId + '/capsule_616x353.jpg'
-			source: isSteamGameLauncher ? tileImageUrl : ''
-			w: 3
-			h: 2
+			filename: tileEditorPresetTiles.steamPresetSpecs.length > 2 ? tileEditorPresetTiles.steamPresetSpecs[2].filename : ''
+			source: isSteamGameLauncher && tileEditorPresetTiles.steamPresetSpecs.length > 2 ? tileEditorPresetTiles.steamPresetSpecs[2].source : ''
+			w: tileEditorPresetTiles.steamPresetSpecs.length > 2 ? tileEditorPresetTiles.steamPresetSpecs[2].w : 0
+			h: tileEditorPresetTiles.steamPresetSpecs.length > 2 ? tileEditorPresetTiles.steamPresetSpecs[2].h : 0
 		}
 
 		// 5x2 or 2x1
@@ -172,11 +175,10 @@ TileEditorGroupBox {
 			labelField: tileEditorPresetTiles.labelField
 			iconField: tileEditorPresetTiles.iconField
 			tileGrid: tileEditorPresetTiles.tileGrid
-			filename: 'lutris_' + lutrisGameSlug + '_2x1.jpg'
-			property string tileImageUrl: 'https://lutris.net/games/banner/' + lutrisGameSlug + '.jpg'
-			source: (isLutrisGameLauncher) ? tileImageUrl : ''
-			w: 2
-			h: 1
+			filename: tileEditorPresetTiles.lutrisPresetSpecs.length > 0 ? tileEditorPresetTiles.lutrisPresetSpecs[0].filename : ''
+			source: isLutrisGameLauncher && tileEditorPresetTiles.lutrisPresetSpecs.length > 0 ? tileEditorPresetTiles.lutrisPresetSpecs[0].source : ''
+			w: tileEditorPresetTiles.lutrisPresetSpecs.length > 0 ? tileEditorPresetTiles.lutrisPresetSpecs[0].w : 0
+			h: tileEditorPresetTiles.lutrisPresetSpecs.length > 0 ? tileEditorPresetTiles.lutrisPresetSpecs[0].h : 0
 		}
 	}
 }

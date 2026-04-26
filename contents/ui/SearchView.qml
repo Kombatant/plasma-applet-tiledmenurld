@@ -433,10 +433,11 @@ Item {
 			visible: false
 			active: false
 			// asynchronous: true
-			function open(tile) {
+			function open(tile, grid) {
 				config.searchOverlayActive = false
 				config.showSearch = true
 				active = true
+				if (grid !== undefined) item.tileGrid = grid
 				item.open(tile)
 			}
 			readonly property bool isCurrentView: stackView.currentItem == tileEditorView

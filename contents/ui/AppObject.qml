@@ -8,12 +8,13 @@ QtObject {
 
 	readonly property bool isCardLayout: plasmoid && plasmoid.configuration && plasmoid.configuration.tileGroupLayout === "card"
 	readonly property bool isGroup: tile && tile.tileType == "group"
-	readonly property bool isLauncher: !isGroup
+	readonly property bool isHero: tile && tile.tileType == "hero"
+	readonly property bool isLauncher: !isGroup && !isHero
 
-	readonly property color defaultBackgroundColor: isGroup ? "transparent" : config.defaultTileColor
-	readonly property bool defaultShowIcon: isGroup ? false : true
-	readonly property int defaultTileW: isGroup ? 6 : 2
-	readonly property int defaultTileH: isGroup ? 1 : 2
+	readonly property color defaultBackgroundColor: (isGroup || isHero) ? "transparent" : config.defaultTileColor
+	readonly property bool defaultShowIcon: (isGroup || isHero) ? false : true
+	readonly property int defaultTileW: isHero ? 6 : (isGroup ? 6 : 2)
+	readonly property int defaultTileH: isHero ? 3 : (isGroup ? 1 : 2)
 
 	readonly property string favoriteId: tile && (tile.favoriteId || tile.url) || ''
 	readonly property string kickerFavoriteId: Utils.kickerFavoriteId(favoriteId)
@@ -26,7 +27,7 @@ QtObject {
 	readonly property var iconSource: tile && tile.icon || appIcon || kickerFavoriteId
 	readonly property bool iconFill: tile && typeof tile.iconFill !== "undefined" ? tile.iconFill : false
 	readonly property bool showIcon: tile && typeof tile.showIcon !== "undefined" ? tile.showIcon : defaultShowIcon
-	readonly property bool showLabel: tile && typeof tile.showLabel !== "undefined" ? tile.showLabel : true
+	readonly property bool showLabel: tile && typeof tile.showLabel !== "undefined" ? tile.showLabel : !isHero
 	readonly property bool hasExplicitBackgroundColor: tile && typeof tile.backgroundColor !== "undefined"
 	readonly property bool hasExplicitBackgroundImage: tile && typeof tile.backgroundImage !== "undefined" && !!tile.backgroundImage
 	readonly property bool hasExplicitGradient: tile && typeof tile.gradient !== "undefined"

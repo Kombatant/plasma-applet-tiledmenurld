@@ -680,8 +680,12 @@ MouseArea {
 				}
 				c = Math.max(c, t.x + t.w)
 				r = Math.max(r, t.y + t.h)
-				hoverW = Math.max(hoverW, t.w)
-				hoverH = Math.max(hoverH, t.h)
+				// Hero tiles don't scale on hover, so they must not inflate
+				// the holographic padding budget (which scales with cell span).
+				if (t.tileType !== "hero") {
+					hoverW = Math.max(hoverW, t.w)
+					hoverH = Math.max(hoverH, t.h)
+				}
 			}
 		}
 		return { cols: Math.max(1, c), rows: Math.max(1, r), hoverW: hoverW, hoverH: hoverH }
@@ -1307,7 +1311,7 @@ MouseArea {
 
 							tileModel: config.useTileTabs ? popup.activeTabTiles : config.tileModel.value
 
-							onEditTile: function(tile) { tileEditorViewLoader.open(tile) }
+							onEditTile: function(tile) { tileEditorViewLoader.open(tile, tileGrid) }
 							onMoveTileToTab: function(tileIndex, tabId) { popup.moveTileToTab(tileIndex, tabId) }
 
 							onTileModelChanged: {

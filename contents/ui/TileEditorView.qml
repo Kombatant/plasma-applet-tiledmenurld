@@ -13,6 +13,7 @@ ColumnLayout {
 		id: appObj
 	}
 	property alias tile: appObj.tile
+	property var tileGrid: null
 
 	function resetView() {
 		tile = null
@@ -72,13 +73,14 @@ ColumnLayout {
 			width: scrollView.availableWidth
 
 			TileEditorField {
-				// visible: appObj.isLauncher
+				visible: !appObj.isHero
 				title: i18n("Url")
 				key: 'url'
 			}
 
 			TileEditorField {
 				id: labelField
+				visible: !appObj.isHero
 				title: i18n("Label")
 				placeholderText: appObj.appLabel
 				key: 'label'
@@ -87,6 +89,7 @@ ColumnLayout {
 
 			TileEditorField {
 				id: iconField
+				visible: !appObj.isHero
 				title: i18n("Icon")
 				// placeholderText: appObj.appIcon ? appObj.appIcon.toString() : ''
 				key: 'icon'
@@ -142,6 +145,7 @@ ColumnLayout {
 
 			TileEditorFileField {
 				id: backgroundImageField
+				visible: !appObj.isHero
 				title: i18n("Background Image")
 				key: 'backgroundImage'
 				enabled: !iconField.checked
@@ -158,6 +162,7 @@ ColumnLayout {
 			}
 
 			TileEditorPresetTiles {
+				visible: !appObj.isHero
 				title: i18n("Preset Tiles")
 				appObj: appObj
 				backgroundImageField: backgroundImageField
@@ -167,10 +172,17 @@ ColumnLayout {
 			}
 
 			TileEditorColorGroup {
+				visible: !appObj.isHero
 				title: i18n("Background Colour")
 				placeholderText: config.defaultTileColor
 				key: 'backgroundColor'
 				enabled: !(appObj.isGroup && !appObj.isCardLayout)
+			}
+
+			TileEditorHeroPanel {
+				visible: appObj.isHero
+				appObj: appObj
+				tileGrid: tileEditorView.tileGrid
 			}
 
 			TileEditorRectField {

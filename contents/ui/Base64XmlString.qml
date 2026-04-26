@@ -131,6 +131,8 @@ QtObject {
 
     function _tilePropertyOrder() {
         return [
+            "autoScrollEnabled",
+            "autoScrollInterval",
             "backgroundColor",
             "backgroundImage",
             "description",
@@ -144,6 +146,7 @@ QtObject {
             "launchUrl",
             "showIcon",
             "showLabel",
+            "subTiles",
             "tileType",
             "url",
             "w",
@@ -161,8 +164,9 @@ QtObject {
         var keys = Object.keys(tile)
         var seen = {}
         var isGroup = tile.tileType === "group"
+        var isHero = tile.tileType === "hero"
         var launchUrl = ""
-        if (!isGroup) {
+        if (!isGroup && !isHero) {
             if (typeof tile.launchUrl !== "undefined" && tile.launchUrl !== null && ("" + tile.launchUrl) !== "") {
                 launchUrl = "" + tile.launchUrl
             } else if (typeof tile.url !== "undefined" && tile.url !== null && ("" + tile.url) !== "") {
@@ -170,7 +174,7 @@ QtObject {
             }
         }
         var favoriteId = ""
-        if (!isGroup) {
+        if (!isGroup && !isHero) {
             if (typeof tile.favoriteId !== "undefined" && tile.favoriteId !== null && ("" + tile.favoriteId) !== "") {
                 favoriteId = "" + tile.favoriteId
             } else if (launchUrl) {
@@ -196,7 +200,7 @@ QtObject {
                 seen.launchUrl = true
                 continue
             }
-            if (preferredKey === "url" && !isGroup && favoriteId) {
+            if (preferredKey === "url" && !isGroup && !isHero && favoriteId) {
                 out.url = favoriteId
                 seen.url = true
                 continue

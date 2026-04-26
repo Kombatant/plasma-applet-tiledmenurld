@@ -79,8 +79,22 @@ Item {
 		anchors.fill: parent
 		clip: appObj.inGroup
 
+		HeroTileView {
+			id: heroTileView
+			visible: appObj.isHero
+			anchors.fill: parent
+			// Match group-panel insets so hero-to-group gaps equal group-to-group gaps.
+			anchors.leftMargin: tileGrid.groupPanelInsetX
+			anchors.rightMargin: tileGrid.groupPanelInsetX
+			anchors.topMargin: tileGrid.groupPanelInsetTop
+			anchors.bottomMargin: tileGrid.groupPanelInsetBottom
+			cornerRadius: tileItemView.cornerRadius
+			hovered: tileMouseArea.containsMouse || heroPrevArea.containsMouse || heroNextArea.containsMouse
+		}
+
 		TileItemView {
 			id: tileItemView
+			visible: !appObj.isHero
 			anchors.left: parent.left
 			anchors.right: parent.right
 			anchors.top: parent.top
@@ -108,7 +122,7 @@ Item {
 
 		Item {
 			id: labelOverlay
-			visible: useOverlayLabel && !useStyledGroupHeader && appObj.showLabel && appObj.labelText.length > 0
+			visible: !appObj.isHero && useOverlayLabel && !useStyledGroupHeader && appObj.showLabel && appObj.labelText.length > 0
 			anchors.left: parent.left
 			anchors.right: parent.right
 			anchors.bottom: parent.bottom
@@ -207,7 +221,7 @@ Item {
 		QQC2.Label {
 			id: descriptionLabelBelow
 			// Hide when inline label is used (wide single-row non-group tiles with label)
-			visible: !useOverlayLabel && !useStyledGroupHeader && appObj.showLabel && appObj.labelText.length > 0 && !tileItemView.useInlineLabel
+			visible: !appObj.isHero && !useOverlayLabel && !useStyledGroupHeader && appObj.showLabel && appObj.labelText.length > 0 && !tileItemView.useInlineLabel
 			text: appObj.labelText
 			anchors.top: tileItemView.bottom
 			anchors.left: parent.left
@@ -248,7 +262,7 @@ Item {
 		mouseArea: tileMouseArea
 		// Only show classic hover effect when holographic is not enabled; skip group tiles
 		// (group tiles use groupEffectLoader instead and the small header rect looks disconnected)
-		visible: !appObj.isGroup && !tileItemView.useHolographicEffect && tileMouseArea.containsMouse
+		visible: !appObj.isHero && !appObj.isGroup && !tileItemView.useHolographicEffect && tileMouseArea.containsMouse
 	}
 
 	Kicker.ProcessRunner {
@@ -298,6 +312,17 @@ Item {
 			if (mouse.button == Qt.LeftButton) {
 				if (tileEditorView && tileEditorView.tile) {
 					openTileEditor()
+				} else if (appObj.isHero) {
+					// Edge-hit navigation: left ~15% prev, right ~15% next, center launches.
+					var w = tileMouseArea.width
+					var edge = Math.max(28, w * 0.15)
+					if (heroTileView && heroTileView.effectivePages.length > 1 && mouse.x < edge) {
+						heroTileView.prev()
+					} else if (heroTileView && heroTileView.effectivePages.length > 1 && mouse.x > w - edge) {
+						heroTileView.next()
+					} else if (heroTileView && heroTileView.currentSub && heroTileView.currentSub.launchUrl) {
+						try { Qt.openUrlExternally(heroTileView.currentSub.launchUrl) } catch (e) { console.warn('Hero tile launch failed', e) }
+					}
 				} else if (modelData.url) {
 					var favoriteId = modelData.favoriteId || modelData.url
 					var launchUrl = modelData.launchUrl || modelData.url
@@ -349,6 +374,41 @@ Item {
 			} else if (mouse.button == Qt.RightButton) {
 				contextMenu.open(mouse.x, mouse.y)
 			}
+		}
+	}
+
+	// Hero-tile prev/next click overlays (above tileMouseArea in document order
+	// so they receive clicks before the broader tile mouse area).
+	MouseArea {
+		id: heroPrevArea
+		visible: appObj.isHero && heroTileView && heroTileView.effectivePages.length > 1
+		anchors.left: parent.left
+		anchors.verticalCenter: parent.verticalCenter
+		anchors.leftMargin: cellMargin
+		width: Math.max(36, parent.width * 0.18)
+		height: Math.min(parent.height - cellMargin * 2, 96)
+		acceptedButtons: Qt.LeftButton
+		hoverEnabled: true
+		cursorShape: Qt.PointingHandCursor
+		onClicked: function(mouse) {
+			mouse.accepted = true
+			if (heroTileView) heroTileView.prev()
+		}
+	}
+	MouseArea {
+		id: heroNextArea
+		visible: appObj.isHero && heroTileView && heroTileView.effectivePages.length > 1
+		anchors.right: parent.right
+		anchors.verticalCenter: parent.verticalCenter
+		anchors.rightMargin: cellMargin
+		width: Math.max(36, parent.width * 0.18)
+		height: Math.min(parent.height - cellMargin * 2, 96)
+		acceptedButtons: Qt.LeftButton
+		hoverEnabled: true
+		cursorShape: Qt.PointingHandCursor
+		onClicked: function(mouse) {
+			mouse.accepted = true
+			if (heroTileView) heroTileView.next()
 		}
 	}
 
@@ -417,7 +477,7 @@ Item {
 			if (!plasmoid.configuration.tilesLocked) {
 				menu.addPinToMenuAction(modelData.url)
 
-				if (modelData.tileType == "group") {
+				if (modelData.tileType == "group" || modelData.tileType == "hero") {
 					var unpinItem = menu.newMenuItem()
 					unpinItem.text = i18n("Unpin from Menu")
 					unpinItem.icon = 'list-remove'

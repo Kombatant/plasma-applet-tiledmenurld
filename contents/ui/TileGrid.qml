@@ -61,6 +61,9 @@ DropArea {
 	readonly property int dropWidth: draggedItem ? draggedItem.w : addedItem ? addedItem.w : 0
 	readonly property int dropHeight: draggedItem ? draggedItem.h : addedItem ? addedItem.h : 0
 	property bool canDrop: false
+	property var dropTargetHeroTile: null
+	property string dropPendingUrl: ""
+	property string dropPendingFavoriteId: ""
 	readonly property bool hasDrag: tileGrid.editing && dropHoverX >= 0 && dropHoverY >= 0
 	readonly property bool isDraggingGroup: hasDrag && draggedItem && draggedItem.tileType == "group"
 
@@ -89,8 +92,11 @@ DropArea {
 		onDropped: drop => {
 		 dragTick(drop)
 		if (canDrop) {
-		if (draggedItem) {
-			
+		if (dropTargetHeroTile) {
+			tileGrid.appendHeroPage(dropTargetHeroTile, dropPendingUrl, dropPendingFavoriteId)
+			tileGrid.resetDrag()
+		} else if (draggedItem) {
+
 				tileGrid.moveTile(draggedItem, dropHoverX, dropHoverY)
 			    tileGrid.resetDrag()
 			
@@ -120,6 +126,9 @@ DropArea {
 		scrollUpArea.containsDrag = false
 		scrollDownArea.containsDrag = false
 		addedItem = null
+		dropTargetHeroTile = null
+		dropPendingUrl = ""
+		dropPendingFavoriteId = ""
 	}
 	function resetDrag() {
 		resetDragHover()
@@ -220,7 +229,11 @@ DropArea {
 	// QQuickDropEvent
 	// https://github.com/qt/qtdeclarative/blob/a4aa8d9ade44d75cb5a1d84bd7c1773fadc73095/src/quick/items/qquickdroparea_p.h#L63
 	function dragTick(event) {
-		
+
+		dropTargetHeroTile = null
+		dropPendingUrl = ""
+		dropPendingFavoriteId = ""
+
 		var dragX = event.x - dropOffsetX - _holoPad
 		var dragY = event.y - dropOffsetY - _holoPad
 		var modelX = Math.floor(dragX / cellBoxSize)
@@ -231,12 +244,45 @@ DropArea {
 
 		 //moveTile(draggedItem,dragX,dragY)
 
+		// Hero-tile drop interception: on every tick (even when addedItem is
+		// already created from an earlier tick on empty cells), if the cursor
+		// is over a hero tile, route the drop to appendHeroPage instead.
+		if (!draggedItem) {
+			var url = ""
+			var favId = ""
+			if (event && event.keys && event.keys.indexOf('favoriteId') >= 0) {
+				favId = event.getDataAsString('favoriteId')
+				url = favId
+			} else if (event && event.hasUrls && event.urls && event.urls.length > 0) {
+				url = "" + event.urls[0]
+			} else if (addedItem) {
+				url = addedItem.launchUrl || addedItem.url || ""
+				favId = addedItem.favoriteId || ""
+			}
+
+			if (url) {
+				var heroTarget = findHeroTileAt(modelX, modelY)
+				if (heroTarget) {
+					addedItem = null
+					dropTargetHeroTile = heroTarget
+					dropPendingUrl = url
+					dropPendingFavoriteId = favId
+					dropHoverX = heroTarget.x
+					dropHoverY = heroTarget.y
+					canDrop = true
+					return
+				}
+			}
+		}
+
 		if (draggedItem) {
 		} else if (addedItem) {
 		} else if (event && event.hasUrls && event.urls) {
 			var url = ""
+			var favId = ""
 			if (event.keys && event.keys.indexOf('favoriteId') >= 0) {
-				url = event.getDataAsString('favoriteId')
+				favId = event.getDataAsString('favoriteId')
+				url = favId
 			} else {
 				url = "" + event.urls[0]
 			}
@@ -307,7 +353,7 @@ DropArea {
 			}
 			w = Math.max(w, tile.w)
 			h = Math.max(h, tile.h)
-			if (tile.tileType !== "group") {
+			if (tile.tileType !== "group" && tile.tileType !== "hero") {
 				hoverW = Math.max(hoverW, tile.w)
 				hoverH = Math.max(hoverH, tile.h)
 			}
@@ -585,6 +631,16 @@ DropArea {
 					visible: !plasmoid.configuration.tilesLocked
 					onClicked: {
 						var tile = tileGrid.addGroup(cellContextMenu.cellX, cellContextMenu.cellY)
+						tileGrid.editTile(tile)
+					}
+				}
+
+				PlasmaExtras.MenuItem {
+					icon: "view-presentation"
+					text: i18n("New Hero Tile")
+					visible: !plasmoid.configuration.tilesLocked
+					onClicked: {
+						var tile = tileGrid.addHeroTile(cellContextMenu.cellX, cellContextMenu.cellY)
 						tileGrid.editTile(tile)
 					}
 				}
@@ -995,6 +1051,60 @@ DropArea {
 			}
 		}
 		return addTile(x, y, groupProps)
+	}
+
+	function addHeroTile(x, y, props) {
+		var heroProps = {
+			tileType: "hero",
+			w: limit(2, columns-x, 6),
+			h: 3,
+			subTiles: [{ backgroundImage: "", launchUrl: "", label: "", iconName: "" }],
+			autoScrollEnabled: true,
+			autoScrollInterval: 5000,
+		}
+		if (typeof props !== "undefined") {
+			var keys = Object.keys(props)
+			for (var i = 0; i < keys.length; i++) {
+				var key = keys[i]
+				var value = props[key]
+				heroProps[key] = value
+			}
+		}
+		return addTile(x, y, heroProps)
+	}
+
+	function appendHeroPage(tile, url, favoriteId) {
+		if (!tile || tile.tileType !== "hero") return
+		var resolvedFav = favoriteId || Utils.parseDropUrl(url || "")
+		var app = (resolvedFav && appsModel) ? appsModel.getTileApp(resolvedFav) : null
+		var iconName = app ? ("" + app.decoration) : ""
+		var appLabel = app ? ("" + app.display) : ""
+		var page = {
+			backgroundImage: "",
+			iconName: iconName,
+			label: appLabel,
+			launchUrl: url || "",
+		}
+		var arr = (tile.subTiles || []).slice()
+		if (arr.length === 1 && !arr[0].backgroundImage && !arr[0].launchUrl && !arr[0].iconName) {
+			arr[0] = page
+		} else {
+			arr.push(page)
+		}
+		tile.subTiles = arr
+		tileModelChanged()
+	}
+
+	function findHeroTileAt(cellX, cellY) {
+		if (!tileModel) return null
+		for (var i = 0; i < tileModel.length; i++) {
+			var t = tileModel[i]
+			if (!t || t.tileType !== "hero") continue
+			if (cellX >= t.x && cellX < t.x + t.w && cellY >= t.y && cellY < t.y + t.h) {
+				return t
+			}
+		}
+		return null
 	}
 
 	// Use for quickly testing on widget load
