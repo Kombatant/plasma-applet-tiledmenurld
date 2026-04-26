@@ -183,7 +183,13 @@ MouseArea {
 		popup.saveTileTabs()
 		// Close the tile editor: the tile reference belongs to the current tab and
 		// would become stale once the model switches to a different tab's tiles.
+		// Switch the stack back to the default view BEFORE destroying the editor
+		// loader — deactivating while the editor is stackView.currentItem leaves
+		// the stack pointing at a destroyed item (blank pane + later crash).
 		if (tileEditorViewLoader && tileEditorViewLoader.active) {
+			if (searchView && typeof searchView.showDefaultView === "function") {
+				searchView.showDefaultView()
+			}
 			tileEditorViewLoader.active = false
 		}
 		var direction = (index > activeTabIndex) ? 1 : -1
@@ -229,8 +235,13 @@ MouseArea {
 		if (index < 0 || index >= tileTabsData.length) return
 		// Persist before deleting
 		popup.saveTileTabs()
-		// Close editor if it is editing a tile from the deleted tab
+		// Close editor if it is editing a tile from the deleted tab.
+		// Switch stack to default view first so the loader isn't destroyed while
+		// it is the stackView.currentItem.
 		if (tileEditorViewLoader && tileEditorViewLoader.active) {
+			if (searchView && typeof searchView.showDefaultView === "function") {
+				searchView.showDefaultView()
+			}
 			tileEditorViewLoader.active = false
 		}
 		var newTabs = tileTabsData.slice()
@@ -321,8 +332,13 @@ MouseArea {
 		}
 		if (destIdx < 0 || destIdx === activeTabIndex) return
 
-		// Close tile editor — references belong to the current tab's model
+		// Close tile editor — references belong to the current tab's model.
+		// Switch stack to default view first so the loader isn't destroyed while
+		// it is the stackView.currentItem.
 		if (tileEditorViewLoader && tileEditorViewLoader.active) {
+			if (searchView && typeof searchView.showDefaultView === "function") {
+				searchView.showDefaultView()
+			}
 			tileEditorViewLoader.active = false
 		}
 
@@ -597,13 +613,14 @@ MouseArea {
 
 	function resetViewsAfterTileModelReload() {
 		// Importing settings can replace the tileModel JS array and invalidate any
-		// references held by editor views. Ensure the editor is fully destroyed.
-		if (tileEditorViewLoader && tileEditorViewLoader.active) {
-			tileEditorViewLoader.active = false
-		}
-		// Return to the user's default view.
+		// references held by editor views. Switch the stack back to the default
+		// view first so the loader isn't destroyed while it is currentItem, then
+		// deactivate the loader.
 		if (searchView && typeof searchView.showDefaultView === "function") {
 			searchView.showDefaultView()
+		}
+		if (tileEditorViewLoader && tileEditorViewLoader.active) {
+			tileEditorViewLoader.active = false
 		}
 	}
 
