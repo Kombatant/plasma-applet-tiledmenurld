@@ -41,7 +41,8 @@ MouseArea {
 		// Add 4pt to font. Default 10pt => 14pt
 		font.pointSize: Kirigami.Theme.defaultFont.pointSize + 4
 
-		property bool centerOverIcon: !actionButton.visible && !collapseIndicator.visible && sectionHeading.contentWidth <= listView.iconSize
+		// Use the intrinsic label width so elision cannot collapse the header into the icon-width path.
+		property bool centerOverIcon: !actionButton.visible && !collapseIndicator.visible && sectionHeading.implicitWidth <= listView.iconSize
 		width: centerOverIcon ? listView.iconSize : Math.max(listView.iconSize, parent.width - anchors.leftMargin - sectionDelegate.trailingSpace)
 		horizontalAlignment: centerOverIcon ? Text.AlignHCenter : Text.AlignLeft
 		elide: Text.ElideRight
