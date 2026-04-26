@@ -101,6 +101,18 @@ Rectangle {
 
 	// Clear image sources when the plasmoid is closed to release cached frames/textures.
 	// Use a short delay to avoid thrash when toggling quickly.
+	// In docked sidebar mode `plasmoid.expanded` is unreliable (often false even
+	// while the sidebar is shown); fall back to `widget.expanded` which Popup.qml
+	// already uses as its expansion source of truth.
+	readonly property bool effectiveExpanded: {
+		if (typeof widget !== "undefined" && widget && typeof widget.expanded !== "undefined") {
+			return !!widget.expanded
+		}
+		if (plasmoid && typeof plasmoid.expanded !== "undefined") {
+			return !!plasmoid.expanded
+		}
+		return true
+	}
 	property bool expandedActive: true
 	readonly property string activeBackgroundSource: expandedActive ? normalizedBackgroundSource(appObj.backgroundImage) : ""
 	property string failedBackgroundSource: ""
@@ -229,7 +241,7 @@ Rectangle {
 			// If `tileAnimatedPlayOnHover` is enabled, create the AnimatedImage only while hovered
 			// so the instance is destroyed (and memory released) when hover ends.
 			// Also unload when the plasmoid is closed so decoded frames are released.
-			readonly property bool plasmoidExpanded: (plasmoid && typeof plasmoid.expanded !== "undefined") ? plasmoid.expanded : true
+			readonly property bool plasmoidExpanded: tileItemView.effectiveExpanded
 			active: tileItemView.backgroundUseAnimatedRenderer
 				&& !!safeBackgroundSource
 				&& plasmoidExpanded
@@ -264,11 +276,12 @@ Rectangle {
 			onTriggered: tileItemView.expandedActive = false
 		}
 
+		// React to whichever expansion source actually toggles (widget.expanded in
+		// docked sidebar mode, plasmoid.expanded in floating popup mode).
 		Connections {
-			target: plasmoid
-			ignoreUnknownSignals: true
-			function onExpandedChanged() {
-				if (plasmoid.expanded) {
+			target: tileItemView
+			function onEffectiveExpandedChanged() {
+				if (tileItemView.effectiveExpanded) {
 					unloadDelayTimer.stop()
 					tileItemView.expandedActive = true
 					tileItemView.bumpAnimatedReload()
