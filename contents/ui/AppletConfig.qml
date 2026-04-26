@@ -94,11 +94,14 @@ Item {
 		_ensureSettingInitialized('defaultTileGradient', false)
 		_ensureSettingInitialized('sidebarBackgroundColor', '')
 		_ensureSettingInitialized('surfaceStyle', '')
+		_ensureSettingInitialized('surfaceShadowDarkness', 'normal')
+		_ensureSettingInitialized('surfaceShadowSize', 'normal')
 
 		_ensureSettingInitialized('hideSearchField', false)
 		_ensureSettingInitialized('searchOnTop', false)
 		_ensureSettingInitialized('searchFieldFollowsTheme', false)
 		_ensureSettingInitialized('sidebarFollowsTheme', false)
+		_ensureSettingInitialized('sidebarHideBorder', false)
 		_ensureSettingInitialized('tileLabelAlignment', 'left')
 		_ensureSettingInitialized('groupLabelAlignment', 'left')
 		if (plasmoid.configuration.groupLabelAlignment === 'center') {
