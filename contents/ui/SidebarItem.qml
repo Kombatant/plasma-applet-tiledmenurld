@@ -24,7 +24,7 @@ FlatButton {
 	property bool forceMonochromeIcon: false
 	property bool desaturateIcon: false
 	icon.color: forceMonochromeIcon ? (checked ? Kirigami.Theme.highlightColor : Kirigami.Theme.textColor) : "transparent"
-	layer.enabled: desaturateIcon
+	layer.enabled: desaturateIcon && !hovered && !pressed
 	layer.effect: MultiEffect {
 		saturation: -1.0
 	}

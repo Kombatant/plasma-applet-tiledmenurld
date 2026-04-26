@@ -320,7 +320,7 @@ ColumnLayout {
 
 		Repeater {
 			model: appsModel.powerActionsModel
-			delegate: QQC2.AbstractButton {
+			delegate: FlatButton {
 				id: powerBtn
 				readonly property var _sessionIcons: ['system-lock-screen', 'system-log-out', 'system-save-session', 'system-switch-user']
 				readonly property string _baseIcon: model.iconName || model.decoration || ""
@@ -329,14 +329,19 @@ ColumnLayout {
 				visible: !model.disabled && _sessionIcons.indexOf(model.iconName) < 0
 				Layout.preferredWidth: config.dockedSidebarPowerButtonWidth
 				Layout.preferredHeight: config.flatButtonIconSize + powerLabel.implicitHeight + Kirigami.Units.smallSpacing * 2
+				buttonHeight: Layout.preferredHeight
 				hoverEnabled: true
 				onClicked: appsModel.powerActionsModel.triggerIndex(index)
 
-				background: Rectangle {
-					radius: Kirigami.Units.smallSpacing
-					color: powerBtn.pressed ? config.flatButtonBgPressedColor
-						: powerBtn.hovered ? config.flatButtonBgHoverColor
-						: "transparent"
+				Loader {
+					id: powerHoverEffect
+					anchors.fill: parent
+					source: "HoverOutlineButtonEffect.qml"
+					asynchronous: true
+					property var mouseArea: powerBtn.__behavior
+					active: !!mouseArea && mouseArea.containsMouse
+					visible: active
+					property var __mouseArea: mouseArea
 				}
 
 				contentItem: ColumnLayout {
