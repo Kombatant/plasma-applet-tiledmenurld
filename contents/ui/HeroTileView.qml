@@ -93,6 +93,8 @@ Item {
 
 	property int currentIndex: 0
 	property bool useLoaderA: true
+	property int _pageSlideDirection: 1
+	property bool _pageLayersInitialized: false
 
 	readonly property var effectivePages: {
 		var arr = []
@@ -148,10 +150,12 @@ Item {
 
 	function next() {
 		if (effectivePages.length < 2) return
+		_pageSlideDirection = 1
 		currentIndex = (currentIndex + 1) % effectivePages.length
 	}
 	function prev() {
 		if (effectivePages.length < 2) return
+		_pageSlideDirection = -1
 		currentIndex = (currentIndex - 1 + effectivePages.length) % effectivePages.length
 	}
 
@@ -175,21 +179,68 @@ Item {
 		return false
 	}
 
+	function _assignPage(loader, page) {
+		if (!loader) {
+			return
+		}
+		loader.pageData = page
+		if (loader.item) {
+			loader.item.page = page
+		}
+	}
+
+	function _activePageItem() {
+		var activeLoader = useLoaderA ? loaderA : loaderB
+		return activeLoader && activeLoader.item ? activeLoader.item : null
+	}
+
 	function containsPlayButton(x, y) {
-		if (!playButtonFrame.visible) {
+		var activePage = _activePageItem()
+		if (!activePage || !activePage.playButtonVisible || !activePage.playButtonItem) {
 			return false
 		}
-		var origin = playButtonFrame.mapToItem(heroView, 0, 0)
-		return x >= origin.x && x <= origin.x + playButtonFrame.width
-			&& y >= origin.y && y <= origin.y + playButtonFrame.height
+		var origin = activePage.playButtonItem.mapToItem(heroView, 0, 0)
+		return x >= origin.x && x <= origin.x + activePage.playButtonItem.width
+			&& y >= origin.y && y <= origin.y + activePage.playButtonItem.height
 	}
 
 	function _commitCurrent() {
-		var inactive = useLoaderA ? loaderB : loaderA
-		if (inactive.item) {
-			inactive.item.page = currentSub
+		var active = useLoaderA ? loaderA : loaderB
+		var incoming = useLoaderA ? loaderB : loaderA
+
+		pageSlideAnim.stop()
+		_assignPage(incoming, currentSub)
+
+		if (!currentSub || effectivePages.length <= 1 || heroView.width <= 0 || !heroView._pageLayersInitialized) {
+			heroView._assignPage(active, currentSub)
+			active.x = 0
+			active.opacity = currentSub ? 1 : 0
+			incoming.x = 0
+			incoming.opacity = 0
+			heroView._pageLayersInitialized = true
+			return
 		}
+
+		active.x = 0
+		active.opacity = 1
+		incoming.x = heroView.width * heroView._pageSlideDirection
+		incoming.opacity = 0
 		useLoaderA = !useLoaderA
+
+		pageSlideOutX.target = active
+		pageSlideOutX.from = 0
+		pageSlideOutX.to = -heroView.width * heroView._pageSlideDirection
+		pageSlideOutOpacity.target = active
+		pageSlideOutOpacity.from = 1
+		pageSlideOutOpacity.to = 0
+		pageSlideInX.target = incoming
+		pageSlideInX.from = heroView.width * heroView._pageSlideDirection
+		pageSlideInX.to = 0
+		pageSlideInOpacity.target = incoming
+		pageSlideInOpacity.from = 0
+		pageSlideInOpacity.to = 1
+		pageSlideAnim.start()
+		heroView._pageLayersInitialized = true
 	}
 
 	Connections {
@@ -197,7 +248,12 @@ Item {
 		function onCurrentSubChanged() { heroView._commitCurrent() }
 	}
 	Component.onCompleted: {
-		if (loaderA.item) loaderA.item.page = heroView.currentSub
+		heroView._assignPage(loaderA, heroView.currentSub)
+		loaderA.x = 0
+		loaderA.opacity = heroView.currentSub ? 1 : 0
+		loaderB.x = 0
+		loaderB.opacity = 0
+		heroView._pageLayersInitialized = true
 	}
 
 	Kirigami.ShadowedRectangle {
@@ -215,39 +271,37 @@ Item {
 	Item {
 		id: contentLayer
 		anchors.fill: parent
+		clip: true
 
-	Rectangle {
-		anchors.fill: parent
-		radius: heroView.cornerRadius
-		visible: !!heroView.currentTitleText
-		gradient: Gradient {
-			GradientStop { position: 0.0; color: Qt.rgba(0, 0, 0, 0.04) }
-			GradientStop { position: 0.45; color: Qt.rgba(0, 0, 0, 0.1) }
-			GradientStop { position: 1.0; color: Qt.rgba(0, 0, 0, heroView.showDownloadedInfo ? 0.64 : 0.5) }
-		}
-	}
-
-	// Themed backdrop for icon-only or empty pages.
-	Rectangle {
-		anchors.fill: parent
-		radius: heroView.cornerRadius
-		gradient: Gradient {
-			GradientStop { position: 0.0; color: Qt.rgba(Kirigami.Theme.backgroundColor.r, Kirigami.Theme.backgroundColor.g, Kirigami.Theme.backgroundColor.b, 0.6) }
-			GradientStop { position: 1.0; color: Qt.rgba(Kirigami.Theme.backgroundColor.r * 0.6, Kirigami.Theme.backgroundColor.g * 0.6, Kirigami.Theme.backgroundColor.b * 0.6, 0.85) }
-		}
-	}
-
-	// Two crossfade page layers.
+	// Two page layers animated with the same slide semantics as docked tab transitions.
 	Component {
 		id: pageComponent
 		Item {
 			id: pageRoot
 			property var page: null
+			property alias playButtonItem: playButtonFrame
+			readonly property bool playButtonVisible: playButtonFrame.visible
 			anchors.fill: parent
 
 			readonly property string bgSource: page && page.backgroundImage ? ("" + page.backgroundImage) : ""
 			readonly property string iconName: page && page.iconName ? ("" + page.iconName) : ""
 			readonly property bool useAnimated: heroView._isAnimated(bgSource)
+			readonly property bool showDownloadedInfo: !!(page && page.showDownloadedInfo)
+			readonly property string titleText: page ? ("" + (page.label || page.storeTitle || "")).trim() : ""
+			readonly property string descriptionText: (showDownloadedInfo && page) ? ("" + (page.storeDescription || "")).trim() : ""
+			readonly property var tags: showDownloadedInfo ? heroView._normalizedStringList(page ? page.igdbTags : []) : []
+			readonly property string launchUrl: page ? ("" + (page.launchUrl || "")).trim() : ""
+			readonly property bool canLaunch: !!launchUrl
+			readonly property bool hasOverlayContent: canLaunch || !!titleText || !!descriptionText || tags.length > 0
+
+			Rectangle {
+				anchors.fill: parent
+				radius: heroView.cornerRadius
+				gradient: Gradient {
+					GradientStop { position: 0.0; color: Qt.rgba(Kirigami.Theme.backgroundColor.r, Kirigami.Theme.backgroundColor.g, Kirigami.Theme.backgroundColor.b, 0.6) }
+					GradientStop { position: 1.0; color: Qt.rgba(Kirigami.Theme.backgroundColor.r * 0.6, Kirigami.Theme.backgroundColor.g * 0.6, Kirigami.Theme.backgroundColor.b * 0.6, 0.85) }
+				}
+			}
 
 			Loader {
 				anchors.fill: parent
@@ -275,23 +329,198 @@ Item {
 				visible: !pageRoot.bgSource && !!pageRoot.iconName
 				source: pageRoot.iconName
 			}
+
+			Rectangle {
+				anchors.fill: parent
+				radius: heroView.cornerRadius
+				visible: !!pageRoot.titleText
+				gradient: Gradient {
+					GradientStop { position: 0.0; color: Qt.rgba(0, 0, 0, 0.04) }
+					GradientStop { position: 0.45; color: Qt.rgba(0, 0, 0, 0.1) }
+					GradientStop { position: 1.0; color: Qt.rgba(0, 0, 0, pageRoot.showDownloadedInfo ? 0.64 : 0.5) }
+				}
+			}
+
+			Item {
+				id: infoOverlay
+				anchors.left: parent.left
+				anchors.right: parent.right
+				anchors.bottom: parent.bottom
+				anchors.leftMargin: heroView._heroContentSideMargin
+				anchors.rightMargin: heroView._heroContentSideMargin
+				anchors.topMargin: Kirigami.Units.largeSpacing
+				anchors.bottomMargin: Kirigami.Units.largeSpacing * 2 + 8
+				height: infoColumn.implicitHeight
+				visible: !!pageRoot.page && pageRoot.hasOverlayContent
+				opacity: visible ? 1 : 0
+				Behavior on opacity { NumberAnimation { duration: 350 } }
+
+				Column {
+					id: infoColumn
+					anchors.left: parent.left
+					anchors.right: parent.right
+					anchors.bottom: parent.bottom
+					spacing: heroView._heroContentRowSpacing
+
+					PlasmaComponents3.Label {
+						visible: !!pageRoot.titleText
+						anchors.left: parent.left
+						anchors.right: parent.right
+						text: pageRoot.titleText
+						color: "white"
+						font.pixelSize: Kirigami.Theme.defaultFont.pixelSize * 1.6
+						font.bold: true
+						elide: Text.ElideRight
+						wrapMode: Text.NoWrap
+						style: Text.Outline
+						styleColor: Qt.rgba(0, 0, 0, 0.85)
+					}
+
+					PlasmaComponents3.Label {
+						visible: !!pageRoot.descriptionText
+						anchors.left: parent.left
+						anchors.right: parent.right
+						text: pageRoot.descriptionText
+						color: Qt.rgba(1, 1, 1, 0.92)
+						font.pixelSize: Kirigami.Theme.smallFont.pixelSize
+						maximumLineCount: 2
+						wrapMode: Text.Wrap
+						elide: Text.ElideRight
+						style: Text.Outline
+						styleColor: Qt.rgba(0, 0, 0, 0.78)
+					}
+
+					Item {
+						id: tagViewport
+						visible: pageRoot.tags.length > 0
+						width: parent.width
+						height: Math.max(0, tagChipRow.childrenRect.height)
+						clip: true
+
+						Row {
+							id: tagChipRow
+							height: childrenRect.height
+							spacing: heroView._tagChipSpacing
+
+							Repeater {
+								model: pageRoot.tags.length
+								delegate: Rectangle {
+									readonly property string tagText: (pageRoot.tags[index] || "")
+									readonly property bool fitsWidth: (x + width) <= tagViewport.width
+									radius: Math.round(height / 2)
+									color: Qt.rgba(0, 0, 0, 0.36)
+									border.color: Qt.rgba(1, 1, 1, 0.12)
+									border.width: 1
+									height: chipLabel.implicitHeight + heroView._tagChipPaddingY * 2
+									width: chipLabel.implicitWidth + heroView._tagChipPaddingX * 2
+									implicitHeight: height
+									implicitWidth: width
+									opacity: fitsWidth ? 1 : 0
+
+									PlasmaComponents3.Label {
+										id: chipLabel
+										anchors.centerIn: parent
+										text: parent.tagText
+										color: Qt.rgba(1, 1, 1, 0.92)
+										font.pixelSize: Kirigami.Theme.smallFont.pixelSize
+										wrapMode: Text.NoWrap
+										elide: Text.ElideNone
+										maximumLineCount: 1
+										style: Text.Outline
+										styleColor: Qt.rgba(0, 0, 0, 0.62)
+									}
+								}
+							}
+						}
+					}
+
+					Item {
+						id: playButtonFrame
+						visible: pageRoot.canLaunch
+						width: playButtonBackground.implicitWidth
+						height: playButtonBackground.implicitHeight
+
+						Rectangle {
+							id: playButtonShadow
+							anchors.fill: playButtonBackground
+							anchors.topMargin: 2
+							radius: playButtonBackground.radius
+							color: Qt.rgba(0, 0, 0, 0.28)
+						}
+
+						Rectangle {
+							id: playButtonBackground
+							anchors.fill: parent
+							implicitWidth: Math.max(Kirigami.Units.gridUnit * 4.75, playButtonLabel.implicitWidth + Kirigami.Units.largeSpacing * 1.6)
+							implicitHeight: playButtonLabel.implicitHeight + Kirigami.Units.smallSpacing * 2.2
+							radius: Math.round(height / 4)
+							border.width: 1
+							border.color: Qt.rgba(1, 1, 1, 0.18)
+							gradient: Gradient {
+								GradientStop { position: 0.0; color: Qt.rgba(0.18, 0.58, 0.95, 0.98) }
+								GradientStop { position: 1.0; color: Qt.rgba(0.11, 0.42, 0.88, 0.98) }
+							}
+
+							PlasmaComponents3.Label {
+								id: playButtonLabel
+								anchors.centerIn: parent
+								text: i18n("Launch")
+								color: "white"
+								font.pixelSize: Kirigami.Theme.defaultFont.pixelSize
+								font.bold: true
+								style: Text.Outline
+								styleColor: Qt.rgba(0, 0, 0, 0.24)
+							}
+						}
+					}
+				}
+			}
 		}
 	}
 
 	Loader {
 		id: loaderA
-		anchors.fill: parent
+		y: 0
+		width: parent ? parent.width : 0
+		height: parent ? parent.height : 0
+		property var pageData: null
 		sourceComponent: pageComponent
-		opacity: heroView.useLoaderA ? 1 : 0
-		Behavior on opacity { NumberAnimation { duration: 350; easing.type: Easing.InOutCubic } }
-		onLoaded: if (item) item.page = heroView.currentSub
+		onLoaded: if (item) item.page = pageData
 	}
 	Loader {
 		id: loaderB
-		anchors.fill: parent
+		y: 0
+		width: parent ? parent.width : 0
+		height: parent ? parent.height : 0
+		property var pageData: null
 		sourceComponent: pageComponent
-		opacity: heroView.useLoaderA ? 0 : 1
-		Behavior on opacity { NumberAnimation { duration: 350; easing.type: Easing.InOutCubic } }
+		onLoaded: if (item) item.page = pageData
+	}
+
+	ParallelAnimation {
+		id: pageSlideAnim
+		NumberAnimation {
+			id: pageSlideInX
+			property: "x"
+			duration: 280
+			easing.type: Easing.OutCubic
+		}
+		NumberAnimation {
+			id: pageSlideOutX
+			property: "x"
+			duration: 280
+			easing.type: Easing.OutCubic
+		}
+		NumberAnimation {
+			id: pageSlideInOpacity
+			property: "opacity"
+			duration: 180
+		}
+		NumberAnimation {
+			id: pageSlideOutOpacity
+			property: "opacity"
+			duration: 180
+		}
 	}
 
 	// Empty-state hint.
@@ -313,142 +542,6 @@ Item {
 			wrapMode: Text.Wrap
 			opacity: 0.8
 			text: i18n("Hero Tile — right-click → Edit, or drop an app here to add a page")
-		}
-	}
-
-	// Metadata and CTA overlay for the current page (bottom-left).
-	Item {
-		id: infoOverlay
-		anchors.left: parent.left
-		anchors.right: parent.right
-		anchors.bottom: parent.bottom
-		anchors.leftMargin: heroView._heroContentSideMargin
-		anchors.rightMargin: heroView._heroContentSideMargin
-		anchors.topMargin: Kirigami.Units.largeSpacing
-		anchors.bottomMargin: Kirigami.Units.largeSpacing * 2 + 8
-		height: infoColumn.implicitHeight
-		visible: !!heroView.currentSub && (heroView.canLaunchCurrentPage || !!heroView.currentTitleText || !!heroView.currentDescriptionText || heroView.currentTags.length > 0)
-		opacity: visible ? 1 : 0
-		Behavior on opacity { NumberAnimation { duration: 350 } }
-
-		Column {
-			id: infoColumn
-			anchors.left: parent.left
-			anchors.right: parent.right
-			anchors.bottom: parent.bottom
-			spacing: heroView._heroContentRowSpacing
-
-			PlasmaComponents3.Label {
-				visible: !!heroView.currentTitleText
-				anchors.left: parent.left
-				anchors.right: parent.right
-				text: heroView.currentTitleText
-				color: "white"
-				font.pixelSize: Kirigami.Theme.defaultFont.pixelSize * 1.6
-				font.bold: true
-				elide: Text.ElideRight
-				wrapMode: Text.NoWrap
-				style: Text.Outline
-				styleColor: Qt.rgba(0, 0, 0, 0.85)
-			}
-
-			PlasmaComponents3.Label {
-				visible: !!heroView.currentDescriptionText
-				anchors.left: parent.left
-				anchors.right: parent.right
-				text: heroView.currentDescriptionText
-				color: Qt.rgba(1, 1, 1, 0.92)
-				font.pixelSize: Kirigami.Theme.smallFont.pixelSize
-				maximumLineCount: 2
-				wrapMode: Text.Wrap
-				elide: Text.ElideRight
-				style: Text.Outline
-				styleColor: Qt.rgba(0, 0, 0, 0.78)
-			}
-
-			Item {
-				id: tagViewport
-				visible: heroView.currentTags.length > 0
-				width: parent.width
-				height: Math.max(0, tagChipRow.childrenRect.height)
-				clip: true
-
-				Row {
-					id: tagChipRow
-					height: childrenRect.height
-					spacing: heroView._tagChipSpacing
-
-					Repeater {
-						model: heroView.currentTags.length
-						delegate: Rectangle {
-							readonly property string tagText: (heroView.currentTags[index] || "")
-							readonly property bool fitsWidth: (x + width) <= tagViewport.width
-							radius: Math.round(height / 2)
-							color: Qt.rgba(0, 0, 0, 0.36)
-							border.color: Qt.rgba(1, 1, 1, 0.12)
-							border.width: 1
-							height: chipLabel.implicitHeight + heroView._tagChipPaddingY * 2
-							width: chipLabel.implicitWidth + heroView._tagChipPaddingX * 2
-							implicitHeight: height
-							implicitWidth: width
-							opacity: fitsWidth ? 1 : 0
-
-							PlasmaComponents3.Label {
-								id: chipLabel
-								anchors.centerIn: parent
-								text: parent.tagText
-								color: Qt.rgba(1, 1, 1, 0.92)
-								font.pixelSize: Kirigami.Theme.smallFont.pixelSize
-								wrapMode: Text.NoWrap
-								elide: Text.ElideNone
-								maximumLineCount: 1
-								style: Text.Outline
-								styleColor: Qt.rgba(0, 0, 0, 0.62)
-							}
-						}
-					}
-				}
-			}
-
-			Item {
-				id: playButtonFrame
-				visible: heroView.canLaunchCurrentPage
-				width: playButtonBackground.implicitWidth
-				height: playButtonBackground.implicitHeight
-
-				Rectangle {
-					id: playButtonShadow
-					anchors.fill: playButtonBackground
-					anchors.topMargin: 2
-					radius: playButtonBackground.radius
-					color: Qt.rgba(0, 0, 0, 0.28)
-				}
-
-				Rectangle {
-					id: playButtonBackground
-					anchors.fill: parent
-					implicitWidth: Math.max(Kirigami.Units.gridUnit * 4.75, playButtonLabel.implicitWidth + Kirigami.Units.largeSpacing * 1.6)
-					implicitHeight: playButtonLabel.implicitHeight + Kirigami.Units.smallSpacing * 2.2
-					radius: Math.round(height / 4)
-					border.width: 1
-					border.color: Qt.rgba(1, 1, 1, 0.18)
-					gradient: Gradient {
-						GradientStop { position: 0.0; color: Qt.rgba(0.18, 0.58, 0.95, 0.98) }
-						GradientStop { position: 1.0; color: Qt.rgba(0.11, 0.42, 0.88, 0.98) }
-					}
-
-					PlasmaComponents3.Label {
-						id: playButtonLabel
-						anchors.centerIn: parent
-						text: i18n("Launch")
-						color: "white"
-						font.pixelSize: Kirigami.Theme.defaultFont.pixelSize
-						font.bold: true
-						style: Text.Outline
-						styleColor: Qt.rgba(0, 0, 0, 0.24)
-					}
-				}
-			}
 		}
 	}
 
