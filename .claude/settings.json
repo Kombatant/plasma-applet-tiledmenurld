@@ -1,7 +1,9 @@
 {
   "permissions": {
     "allow": [
-      "Bash(qmllint /home/kombatant/Dev/KDE/org.kde.plasma.plasmoid.kombatant.tiledmenurld/contents/ui/HeroicLutrisMetadataFetcher.qml)"
+      "Bash(qmllint /home/kombatant/Dev/KDE/org.kde.plasma.plasmoid.kombatant.tiledmenurld/contents/ui/HeroicLutrisMetadataFetcher.qml)",
+      "Read(//tmp/**)",
+      "Read(//usr/share/plasma/**)"
     ]
   }
 }

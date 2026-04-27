@@ -6,6 +6,7 @@ import org.kde.ksvg as KSvg
 import org.kde.kirigami as Kirigami
 import org.kde.coreaddons as KCoreAddons
 import ".." as TiledMenu
+import "../lib" as Lib
 import "../libconfig" as LibConfig
 import "../libconfig/ConfigUtils.js" as ConfigUtils
 
@@ -120,6 +121,67 @@ LibConfig.FormKCM {
 		id: appAutocomplete
 	}
 
+	readonly property string _localVersion: (typeof plasmoid !== "undefined" && plasmoid.metaData && plasmoid.metaData.version) ? plasmoid.metaData.version : ""
+	readonly property string _projectUrl: "https://github.com/Kombatant/plasma-applet-tiledmenurld"
+
+	Lib.UpdateChecker {
+		id: updatesChecker
+		localVersion: formLayout._localVersion
+	}
+
+	//-------------------------------------------------------
+	//-------------------------------------------------------
+	LibConfig.Heading {
+		text: i18n("Updates")
+	}
+
+	QQC2.Label {
+		Layout.fillWidth: true
+		text: i18n("Installed version: %1", formLayout._localVersion || i18n("Unknown"))
+		textFormat: Text.PlainText
+	}
+
+	Kirigami.InlineMessage {
+		Layout.fillWidth: true
+		visible: updatesChecker.checking
+		type: Kirigami.MessageType.Information
+		text: i18n("Checking for updates…")
+	}
+
+	Kirigami.InlineMessage {
+		Layout.fillWidth: true
+		visible: !updatesChecker.checking && updatesChecker.checked && updatesChecker.updateAvailable
+		type: Kirigami.MessageType.Positive
+		text: i18n("A new version (%1) is available. Visit the project page on GitHub to upgrade.", updatesChecker.latestVersion)
+		actions: [
+			Kirigami.Action {
+				text: i18n("Open GitHub")
+				icon.name: "internet-services"
+				onTriggered: Qt.openUrlExternally(formLayout._projectUrl)
+			}
+		]
+	}
+
+	Kirigami.InlineMessage {
+		Layout.fillWidth: true
+		visible: !updatesChecker.checking && updatesChecker.checked && !updatesChecker.updateAvailable && !updatesChecker.failed
+		type: Kirigami.MessageType.Information
+		text: i18n("You are running the latest version.")
+	}
+
+	Kirigami.InlineMessage {
+		Layout.fillWidth: true
+		visible: updatesChecker.checked && updatesChecker.failed
+		type: Kirigami.MessageType.Warning
+		text: i18n("Could not check for updates. Check your internet connection.")
+	}
+
+	QQC2.Button {
+		text: i18n("Check Again")
+		icon.name: "view-refresh"
+		enabled: !updatesChecker.checking
+		onClicked: updatesChecker.check(true)
+	}
 
 	//-------------------------------------------------------
 	//-------------------------------------------------------

@@ -289,7 +289,10 @@ ColumnLayout {
 			icon.name: ""
 			icon.source: leftPane.settingsIconSource
 			text: i18n("Settings")
-			tooltipText: i18n("Tiled Menu Reloaded Settings")
+			showBadge: !!(widget && widget.updateAvailable)
+			tooltipText: widget && widget.updateAvailable
+				? i18n("Tiled Menu Reloaded Settings — Update available")
+				: i18n("Tiled Menu Reloaded Settings")
 			Layout.fillWidth: false
 			Layout.preferredWidth: config.flatButtonSize
 			Layout.preferredHeight: config.flatButtonSize

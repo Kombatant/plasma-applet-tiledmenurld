@@ -16,6 +16,8 @@ PlasmoidItem {
 	property string systemTerminalApp: ""
 	property string systemFileManagerApp: ""
 	property bool suppressHideOnWindowDeactivate: false
+	readonly property bool updateAvailable: updateChecker.updateAvailable
+	readonly property string latestVersion: updateChecker.latestVersion
 	readonly property url userAvatarSource: avatarResolver.avatarSource
 	readonly property bool hasUserAvatar: ("" + userAvatarSource)
 
@@ -200,6 +202,11 @@ PlasmoidItem {
 
 	AppletConfig {
 		id: config
+	}
+
+	UpdateChecker {
+		id: updateChecker
+		localVersion: Plasmoid.metaData.version
 	}
 
 	toolTipMainText: ""

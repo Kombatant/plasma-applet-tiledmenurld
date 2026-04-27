@@ -23,6 +23,7 @@ FlatButton {
 	property string tooltipText: ""
 	property bool forceMonochromeIcon: false
 	property bool desaturateIcon: false
+	property bool showBadge: false
 	icon.color: forceMonochromeIcon ? (checked ? Kirigami.Theme.highlightColor : Kirigami.Theme.textColor) : "transparent"
 	layer.enabled: desaturateIcon && !hovered && !pressed
 	layer.effect: MultiEffect {
@@ -36,6 +37,20 @@ FlatButton {
 		delay: 0
 		x: parent.width + rightPadding
 		y: (parent.height - height) / 2
+	}
+
+	Rectangle {
+		id: updateBadgeDot
+		visible: sidebarItem.showBadge
+		width: Math.max(8, Math.round(sidebarItem.height * 0.22))
+		height: width
+		radius: width / 2
+		color: Kirigami.Theme.negativeTextColor
+		border.color: Kirigami.Theme.backgroundColor
+		border.width: Math.max(1, Math.round(Screen.devicePixelRatio))
+		z: 9999
+		x: sidebarItem.width - width - Math.round(width * 0.2)
+		y: Math.round(width * 0.2)
 	}
 
 	Loader {
