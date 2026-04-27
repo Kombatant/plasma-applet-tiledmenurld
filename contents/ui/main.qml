@@ -17,7 +17,6 @@ PlasmoidItem {
 	property string systemFileManagerApp: ""
 	property bool suppressHideOnWindowDeactivate: false
 	readonly property bool updateAvailable: updateChecker.updateAvailable
-	readonly property string latestVersion: updateChecker.latestVersion
 	readonly property url userAvatarSource: avatarResolver.avatarSource
 	readonly property bool hasUserAvatar: ("" + userAvatarSource)
 

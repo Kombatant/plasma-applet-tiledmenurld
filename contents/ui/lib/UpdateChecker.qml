@@ -5,7 +5,6 @@ QtObject {
 	id: updateChecker
 
 	property string remoteUrl: "https://raw.githubusercontent.com/Kombatant/plasma-applet-tiledmenurld/master/metadata.json"
-	property string releaseUrl: "https://github.com/Kombatant/plasma-applet-tiledmenurld"
 
 	property string localVersion: ""
 	property string latestVersion: ""
@@ -13,8 +12,6 @@ QtObject {
 	property bool checked: false
 	property bool checking: false
 	property bool failed: false
-
-	signal checkFinished(bool ok)
 
 	function _cmp(a, b) {
 		var pa = ("" + (a || "0")).split(".").map(function(x) { return parseInt(x, 10) || 0 })
@@ -40,24 +37,12 @@ QtObject {
 				failed = true
 				updateAvailable = false
 				console.warn("UpdateChecker: failed to fetch remote metadata:", err)
-				checkFinished(false)
 				return
 			}
 			latestVersion = "" + data.KPlugin.Version
 			updateAvailable = _cmp(latestVersion, localVersion) > 0
-			checkFinished(true)
 		})
 	}
 
-	Component.onCompleted: {
-		if (localVersion) {
-			check(false)
-		}
-	}
-
-	onLocalVersionChanged: {
-		if (!checked && !checking && localVersion) {
-			check(false)
-		}
-	}
+	Component.onCompleted: check(false)
 }
