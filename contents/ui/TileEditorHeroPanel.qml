@@ -5,6 +5,7 @@ import QtQuick.Dialogs as QtDialogs
 import org.kde.plasma.components as PlasmaComponents3
 import org.kde.plasma.extras as PlasmaExtras
 import org.kde.kirigami as Kirigami
+import "libconfig" as LibConfig
 
 ColumnLayout {
 	id: heroPanel
@@ -16,6 +17,10 @@ ColumnLayout {
 
 	TilePresetImageHelper {
 		id: presetHelper
+	}
+
+	AppAutocompleteHelper {
+		id: appAutocomplete
 	}
 
 	HeroPageMetadataFetcher {
@@ -301,7 +306,7 @@ ColumnLayout {
 
 				RowLayout {
 					Layout.fillWidth: true
-					PlasmaComponents3.Label { text: i18n("Image:"); Layout.preferredWidth: 70 }
+					PlasmaComponents3.Label { text: i18n("Image:"); Layout.preferredWidth: Kirigami.Units.gridUnit * 6 }
 					QQC2.TextField {
 						id: imageField
 						Layout.fillWidth: true
@@ -345,7 +350,7 @@ ColumnLayout {
 
 				RowLayout {
 					Layout.fillWidth: true
-					PlasmaComponents3.Label { text: i18n("Label:"); Layout.preferredWidth: 70 }
+					PlasmaComponents3.Label { text: i18n("Label:"); Layout.preferredWidth: Kirigami.Units.gridUnit * 6 }
 					QQC2.TextField {
 						Layout.fillWidth: true
 						text: ("" + (pageDelegate.page.label || ""))
@@ -356,11 +361,12 @@ ColumnLayout {
 
 				RowLayout {
 					Layout.fillWidth: true
-					PlasmaComponents3.Label { text: i18n("Launch URL:"); Layout.preferredWidth: 70 }
-					QQC2.TextField {
+					PlasmaComponents3.Label { text: i18n("Launch URL:"); Layout.preferredWidth: Kirigami.Units.gridUnit * 6 }
+					LibConfig.AutocompleteTextField {
 						Layout.fillWidth: true
 						text: ("" + (pageDelegate.page.launchUrl || ""))
 						placeholderText: i18n("Optional .desktop file or http(s):// URL")
+						suggestionsProvider: appAutocomplete.suggestionsProvider
 						onEditingFinished: heroPanel.updatePage(index, "launchUrl", text)
 					}
 				}

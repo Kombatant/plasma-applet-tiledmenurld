@@ -12,6 +12,10 @@ ColumnLayout {
 	AppObject {
 		id: appObj
 	}
+
+	AppAutocompleteHelper {
+		id: appAutocomplete
+	}
 	property alias tile: appObj.tile
 	property var tileGrid: null
 
@@ -42,6 +46,9 @@ ColumnLayout {
 
 
 	RowLayout {
+		Layout.fillWidth: true
+		Layout.rightMargin: scrollView.width - scrollView.availableWidth
+
 		PlasmaExtras.Heading {
 			Layout.fillWidth: true
 			level: 2
@@ -76,6 +83,7 @@ ColumnLayout {
 				visible: !appObj.isHero
 				title: i18n("Url")
 				key: 'url'
+				suggestionsProvider: appAutocomplete.suggestionsProvider
 			}
 
 			TileEditorField {

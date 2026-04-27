@@ -3,7 +3,6 @@ import QtQuick.Controls as QQC2
 import QtQuick.Layouts
 import org.kde.kirigami as Kirigami
 import org.kde.plasma.core as PlasmaCore
-import org.kde.plasma.private.kicker as Kicker
 import org.kde.coreaddons as KCoreAddons
 import Qt.labs.platform as QtLabsPlatform
 
@@ -48,93 +47,8 @@ LibConfig.FormKCM {
 		stepSize: 2
 	}
 
-	function endsWith(a, b) {
-		return a.indexOf(b, a.length - b.length) !== -1
-	}
-
-	Kicker.RootModel {
-		id: appAutocompleteRootModel
-		appletInterface: (typeof plasmoid !== "undefined" && plasmoid) ? plasmoid : formLayout
-		flat: true
-		showSeparators: false
-		showAllApps: true
-		showRecentApps: false
-		showRecentDocs: false
-		autoPopulate: false
-
-		Component.onCompleted: {
-			appAutocompleteRefreshTimer.restart()
-		}
-
-		onCountChanged: {
-			appAutocompleteDebounce.restart()
-		}
-
-		onRefreshed: {
-			appAutocompleteDebounce.restart()
-		}
-	}
-
-	Timer {
-		id: appAutocompleteRefreshTimer
-		interval: 0
-		repeat: false
-		onTriggered: appAutocompleteRootModel.refresh()
-	}
-
-	Timer {
-		id: appAutocompleteDebounce
-		interval: 50
-		repeat: false
-		onTriggered: installedAppsModel.refresh()
-	}
-
-	TiledMenu.KickerListModel {
-		id: installedAppsModel
-
-		function refresh() {
-			refreshing()
-			var appList = []
-			var sourceModel = appAutocompleteRootModel.count > 0 ? appAutocompleteRootModel.modelForRow(0) : null
-			if (sourceModel) {
-				parseModel(appList, sourceModel)
-			}
-			appList = appList.filter(function(item) {
-				return item && item.name
-			}).sort(function(a, b) {
-				return ("" + a.name).toLowerCase().localeCompare(("" + b.name).toLowerCase())
-			})
-			list = appList
-			refreshed()
-		}
-	}
-
-	function desktopEntryIdFromUrl(url) {
-		var value = ("" + (url || "")).trim()
-		if (!value.length) {
-			return ""
-		}
-		var queryIndex = value.indexOf("?")
-		if (queryIndex >= 0) {
-			value = value.substring(0, queryIndex)
-		}
-		var fragmentIndex = value.indexOf("#")
-		if (fragmentIndex >= 0) {
-			value = value.substring(0, fragmentIndex)
-		}
-		var lastSlash = Math.max(value.lastIndexOf("/"), value.lastIndexOf(":"))
-		var entryId = lastSlash >= 0 ? value.substring(lastSlash + 1) : value
-		return endsWith(entryId, ".desktop") ? entryId : ""
-	}
-
-	function desktopEntryIdForApp(app) {
-		if (!app) {
-			return ""
-		}
-		if (app.favoriteId && endsWith(app.favoriteId, ".desktop")) {
-			return app.favoriteId
-		}
-		return desktopEntryIdFromUrl(app.url)
+	TiledMenu.AppAutocompleteHelper {
+		id: appAutocomplete
 	}
 
 	function findInstalledAppByDesktopEntry(shortcut) {
@@ -142,39 +56,13 @@ LibConfig.FormKCM {
 		if (!target.length) {
 			return null
 		}
-		for (var i = 0; i < installedAppsModel.count; i++) {
-			var app = installedAppsModel.get(i)
-			if (desktopEntryIdForApp(app) === target) {
+		for (var i = 0; i < appAutocomplete.installedAppsModel.count; i++) {
+			var app = appAutocomplete.installedAppsModel.get(i)
+			if (appAutocomplete.desktopEntryIdForApp(app) === target) {
 				return app
 			}
 		}
 		return null
-	}
-
-	function sidebarSuggestionScore(candidate, query) {
-		var lowerQuery = query.toLowerCase()
-		var fields = [candidate.label || "", candidate.value || "", candidate.description || ""]
-		var bestScore = -1
-		for (var i = 0; i < fields.length; i++) {
-			var field = ("" + fields[i]).toLowerCase()
-			var index = field.indexOf(lowerQuery)
-			if (index < 0) {
-				continue
-			}
-			var score = 1000 - index - field.length
-			if (index === 0) {
-				score += 250
-			}
-			if (i === 0) {
-				score += 200
-			} else if (i === 1) {
-				score += 100
-			}
-			if (score > bestScore) {
-				bestScore = score
-			}
-		}
-		return bestScore
 	}
 
 	//-------------------------------------------------------
@@ -256,7 +144,7 @@ LibConfig.FormKCM {
 					if (configured[shortcutValue] && shortcutValue !== inputText.trim()) {
 						continue
 					}
-					var shortcutScore = sidebarSuggestionScore(shortcut, query)
+					var shortcutScore = appAutocomplete.suggestionScore(shortcut, query)
 					if (shortcutScore >= 0) {
 						shortcut.score = shortcutScore + 50
 						results.push(shortcut)
@@ -264,9 +152,9 @@ LibConfig.FormKCM {
 					}
 				}
 
-				for (var k = 0; k < installedAppsModel.count; k++) {
-					var app = installedAppsModel.get(k)
-					var desktopEntryId = desktopEntryIdForApp(app)
+				for (var k = 0; k < appAutocomplete.installedAppsModel.count; k++) {
+					var app = appAutocomplete.installedAppsModel.get(k)
+					var desktopEntryId = appAutocomplete.desktopEntryIdForApp(app)
 					if (!desktopEntryId.length || seen[desktopEntryId]) {
 						continue
 					}
@@ -278,7 +166,7 @@ LibConfig.FormKCM {
 						label: app.name || desktopEntryId,
 						description: app.description || desktopEntryId
 					}
-					var appScore = sidebarSuggestionScore(candidate, query)
+					var appScore = appAutocomplete.suggestionScore(candidate, query)
 					if (appScore < 0) {
 						continue
 					}
@@ -319,7 +207,7 @@ LibConfig.FormKCM {
 				if (startsWith(shortcut, 'file:///') || startsWith(shortcut, '/') || startsWith(shortcut, '~/')) {
 					return { valid: true, message: "" }
 				}
-				if (endsWith(shortcut, '.desktop')) {
+				if (appAutocomplete.endsWith(shortcut, '.desktop')) {
 					var app = findInstalledAppByDesktopEntry(shortcut)
 					if (app) {
 						return { valid: true, message: "" }

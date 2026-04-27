@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
 import org.kde.plasma.components as PlasmaComponents3
+import "libconfig" as LibConfig
 
 TileEditorGroupBox {
 	id: tileEditorField
@@ -11,6 +12,7 @@ TileEditorGroupBox {
 	property alias enabled: textField.enabled
 	property string key: ''
 	property string checkedKey: ''
+	property var suggestionsProvider: null
 	checkable: checkedKey
 	property bool checkedDefault: true
 
@@ -42,10 +44,11 @@ TileEditorGroupBox {
 		anchors.left: parent.left
 		anchors.right: parent.right
 
-		PlasmaComponents3.TextField {
+		LibConfig.AutocompleteTextField {
 			id: textField
 			Layout.fillWidth: true
 			text: key && appObj.tile && appObj.tile[key] ? appObj.tile[key] : ''
+			suggestionsProvider: tileEditorField.suggestionsProvider
 			property bool updateOnChange: false
 			onTextChanged: {
 				if (key && textField.updateOnChange) {

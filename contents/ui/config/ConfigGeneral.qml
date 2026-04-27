@@ -5,8 +5,6 @@ import QtQuick.Window
 import org.kde.ksvg as KSvg
 import org.kde.kirigami as Kirigami
 import org.kde.coreaddons as KCoreAddons
-import org.kde.plasma.private.kicker as Kicker
-
 import ".." as TiledMenu
 import "../libconfig" as LibConfig
 import "../libconfig/ConfigUtils.js" as ConfigUtils
@@ -118,158 +116,8 @@ LibConfig.FormKCM {
 		}
 	}
 
-	// --- App autocomplete for Right Click Menu ---
-	function endsWith(a, b) {
-		return a.indexOf(b, a.length - b.length) !== -1
-	}
-
-	Kicker.RootModel {
-		id: appAutocompleteRootModel
-		appletInterface: (typeof plasmoid !== "undefined" && plasmoid) ? plasmoid : formLayout
-		flat: true
-		showSeparators: false
-		showAllApps: true
-		showRecentApps: false
-		showRecentDocs: false
-		autoPopulate: false
-
-		Component.onCompleted: {
-			appAutocompleteRefreshTimer.restart()
-		}
-
-		onCountChanged: {
-			appAutocompleteDebounce.restart()
-		}
-
-		onRefreshed: {
-			appAutocompleteDebounce.restart()
-		}
-	}
-
-	Timer {
-		id: appAutocompleteRefreshTimer
-		interval: 0
-		repeat: false
-		onTriggered: appAutocompleteRootModel.refresh()
-	}
-
-	Timer {
-		id: appAutocompleteDebounce
-		interval: 50
-		repeat: false
-		onTriggered: installedAppsModel.refresh()
-	}
-
-	TiledMenu.KickerListModel {
-		id: installedAppsModel
-
-		function refresh() {
-			refreshing()
-			var appList = []
-			var sourceModel = appAutocompleteRootModel.count > 0 ? appAutocompleteRootModel.modelForRow(0) : null
-			if (sourceModel) {
-				parseModel(appList, sourceModel)
-			}
-			appList = appList.filter(function(item) {
-				return item && item.name
-			}).sort(function(a, b) {
-				return ("" + a.name).toLowerCase().localeCompare(("" + b.name).toLowerCase())
-			})
-			list = appList
-			refreshed()
-		}
-	}
-
-	function desktopEntryIdFromUrl(url) {
-		var value = ("" + (url || "")).trim()
-		if (!value.length) {
-			return ""
-		}
-		var queryIndex = value.indexOf("?")
-		if (queryIndex >= 0) {
-			value = value.substring(0, queryIndex)
-		}
-		var fragmentIndex = value.indexOf("#")
-		if (fragmentIndex >= 0) {
-			value = value.substring(0, fragmentIndex)
-		}
-		var lastSlash = Math.max(value.lastIndexOf("/"), value.lastIndexOf(":"))
-		var entryId = lastSlash >= 0 ? value.substring(lastSlash + 1) : value
-		return endsWith(entryId, ".desktop") ? entryId : ""
-	}
-
-	function desktopEntryIdForApp(app) {
-		if (!app) {
-			return ""
-		}
-		if (app.favoriteId && endsWith(app.favoriteId, ".desktop")) {
-			return app.favoriteId
-		}
-		return desktopEntryIdFromUrl(app.url)
-	}
-
-	function appSuggestionItemsForInput(value) {
-		var query = ("" + value).trim()
-		if (!query.length) {
-			return []
-		}
-
-		var results = []
-		var seen = {}
-		for (var i = 0; i < installedAppsModel.count; i++) {
-			var app = installedAppsModel.get(i)
-			var desktopEntryId = desktopEntryIdForApp(app)
-			if (!desktopEntryId.length || seen[desktopEntryId]) {
-				continue
-			}
-			var candidate = {
-				value: desktopEntryId,
-				label: app.name || desktopEntryId,
-				description: app.description || desktopEntryId
-			}
-			var score = _suggestionScore(candidate, query)
-			if (score < 0) {
-				continue
-			}
-			candidate.score = score
-			results.push(candidate)
-			seen[desktopEntryId] = true
-		}
-
-		results.sort(function(a, b) {
-			if (a.score !== b.score) {
-				return b.score - a.score
-			}
-			return (a.label || "").toLowerCase().localeCompare((b.label || "").toLowerCase())
-		})
-
-		return results.slice(0, 10)
-	}
-
-	function _suggestionScore(candidate, query) {
-		var lowerQuery = query.toLowerCase()
-		var fields = [candidate.label || "", candidate.value || "", candidate.description || ""]
-		var bestScore = -1
-		for (var i = 0; i < fields.length; i++) {
-			var field = ("" + fields[i]).toLowerCase()
-			var index = field.indexOf(lowerQuery)
-			if (index < 0) {
-				continue
-			}
-			var score = 1000 - index - field.length
-			if (index === 0) {
-				score += 250
-			}
-			if (i === 0) {
-				score += 200
-			} else if (i === 1) {
-				score += 100
-			}
-			if (score > bestScore) {
-				bestScore = score
-			}
-		}
-		return bestScore
+	TiledMenu.AppAutocompleteHelper {
+		id: appAutocomplete
 	}
 
 
@@ -389,19 +237,19 @@ LibConfig.FormKCM {
 		configKey: 'terminalApp'
 		Kirigami.FormData.label: i18n("Terminal")
 		placeholderText: cfg_terminalAppDefault || "org.kde.konsole.desktop"
-		suggestionsProvider: formLayout.appSuggestionItemsForInput
+		suggestionsProvider: appAutocomplete.suggestionsProvider
 	}
 	LibConfig.AutocompleteTextField {
 		configKey: 'taskManagerApp'
 		Kirigami.FormData.label: i18n("Task Manager")
 		placeholderText: cfg_taskManagerAppDefault || "org.kde.plasma-systemmonitor.desktop"
-		suggestionsProvider: formLayout.appSuggestionItemsForInput
+		suggestionsProvider: appAutocomplete.suggestionsProvider
 	}
 	LibConfig.AutocompleteTextField {
 		configKey: 'fileManagerApp'
 		Kirigami.FormData.label: i18n("File Manager")
 		placeholderText: cfg_fileManagerAppDefault || "org.kde.dolphin.desktop"
-		suggestionsProvider: formLayout.appSuggestionItemsForInput
+		suggestionsProvider: appAutocomplete.suggestionsProvider
 	}
 
 }
