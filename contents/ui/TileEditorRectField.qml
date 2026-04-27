@@ -7,12 +7,14 @@ TileEditorGroupBox {
 	title: i18n("Label")
 	implicitWidth: parent.implicitWidth
 	Layout.fillWidth: true
+	property int currentTileW: appObj && appObj.tile ? (appObj.tile.w || 1) : 1
+	property int currentTileH: appObj && appObj.tile ? (appObj.tile.h || 1) : 1
 
 	readonly property bool isGroupTile: appObj && appObj.isGroup
 	readonly property string heightKey: isGroupTile ? 'groupAreaH' : 'h'
 	readonly property int effectiveTileH: {
 		if (!isGroupTile) {
-			return appObj ? appObj.tileH : 1
+			return currentTileH
 		}
 		var storedH = (appObj && appObj.tile && typeof appObj.tile.groupAreaH !== "undefined")
 			? appObj.tile.groupAreaH
@@ -21,6 +23,24 @@ TileEditorGroupBox {
 			? appObj.groupRect.h
 			: 1
 		return Math.max(storedH, actualH)
+	}
+
+	function syncCurrentTileSize() {
+		if (!appObj || !appObj.tile) {
+			currentTileW = 1
+			currentTileH = 1
+			return
+		}
+		currentTileW = appObj.tile.w || 1
+		currentTileH = appObj.tile.h || 1
+	}
+
+	function refreshEditors() {
+		syncCurrentTileSize()
+		xSpinBox.syncValue()
+		ySpinBox.syncValue()
+		wSpinBox.syncValue()
+		hSpinBox.syncValue()
 	}
 
 	function normalizeGroupTile() {
@@ -64,12 +84,16 @@ TileEditorGroupBox {
 		}
 	}
 
-	Component.onCompleted: normalizeGroupTile()
+	Component.onCompleted: {
+		refreshEditors()
+		normalizeGroupTile()
+	}
 
 	Connections {
 		target: appObj
 
 		function onTileChanged() {
+			tileEditorRectField.refreshEditors()
 			tileEditorRectField.normalizeGroupTile()
 		}
 	}
@@ -78,6 +102,7 @@ TileEditorGroupBox {
 		target: tileGrid
 
 		function onTileModelChanged() {
+			tileEditorRectField.refreshEditors()
 			if (tileEditorRectField.isGroupTile && appObj.tile) {
 				tileEditorRectField.normalizeGroupTile()
 			}
@@ -93,6 +118,7 @@ TileEditorGroupBox {
 
 			PlasmaComponents3.Label { text: i18n("x:") }
 			TileEditorSpinBox {
+				id: xSpinBox
 				key: 'x'
 				from: 0
 				// to: tileGrid.columns - (appObj.tile && appObj.tile.w-1 || 0)
@@ -100,11 +126,13 @@ TileEditorGroupBox {
 			}
 			PlasmaComponents3.Label { text: i18n("y:") }
 			TileEditorSpinBox {
+				id: ySpinBox
 				key: 'y'
 				from: 0
 			}
 			PlasmaComponents3.Label { text: i18n("w:") }
 			TileEditorSpinBox {
+				id: wSpinBox
 				key: 'w'
 				from: 1
 				// to: tileGrid.columns - (appObj.tile && appObj.tile.x || 0)
@@ -112,6 +140,7 @@ TileEditorGroupBox {
 			}
 			PlasmaComponents3.Label { text: i18n("h:") }
 			TileEditorSpinBox {
+				id: hSpinBox
 				key: tileEditorRectField.heightKey
 				from: 1
 			}
@@ -132,7 +161,7 @@ TileEditorGroupBox {
 					property int w: (modelData % resizeGrid.columns) + 1
 					property int h: Math.floor(modelData / resizeGrid.columns) + 1
 					text: '' + w + 'x' + h
-					checked: w <= appObj.tileW && h <= tileEditorRectField.effectiveTileH
+					checked: w <= tileEditorRectField.currentTileW && h <= tileEditorRectField.effectiveTileH
 					// enabled: w - appObj.tileW <= tileEditorRectField.xLeft
 					onClicked: {
 						appObj.tile.w = w
@@ -142,6 +171,7 @@ TileEditorGroupBox {
 						} else {
 							appObj.tile.h = h
 						}
+						tileEditorRectField.refreshEditors()
 						appObj.tileChanged()
 						tileGrid.tileModelChanged()
 					}

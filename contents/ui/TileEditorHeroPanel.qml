@@ -187,19 +187,62 @@ ColumnLayout {
 
 			readonly property int rowIndex: index
 			readonly property var page: (heroPanel._refreshToken >= 0 && heroPanel._pages()[index]) ? heroPanel._pages()[index] : ({})
-			readonly property var presetSpecs: presetHelper.presetSpecsForLaunchUrl(page.launchUrl || "")
-			readonly property bool canDownloadPresetImages: presetSpecs.length > 0
-			readonly property bool canDownloadMetadata: !!metadataFetcher._steamGameIdForPage(page)
+			readonly property var staticPresetSpecs: presetHelper.presetSpecsForLaunchUrl(page.launchUrl || "")
+			property var igdbPresetSpecs: []
+			readonly property var presetSpecs: staticPresetSpecs.concat(igdbPresetSpecs)
+			readonly property bool canDownloadPresetImages: staticPresetSpecs.length > 0 || canDownloadHeroicLutrisMetadata
+			readonly property bool canDownloadSteamMetadata: !!metadataFetcher._steamGameIdForPage(page)
+			property string heroicLutrisKind: ""
+			readonly property bool canDownloadHeroicLutrisMetadata: heroicLutrisKind.length > 0
+			readonly property bool canDownloadMetadata: canDownloadSteamMetadata || canDownloadHeroicLutrisMetadata
 			readonly property bool hasIgdbMetadataSettings: metadataFetcher.hasIgdbMetadataSettings
-			readonly property bool canShowDownloadedInfo: canDownloadMetadata && hasIgdbMetadataSettings
+			readonly property bool canShowDownloadedInfo: (canDownloadSteamMetadata && hasIgdbMetadataSettings) || (canDownloadHeroicLutrisMetadata && hasIgdbMetadataSettings)
 			property bool metadataLoading: false
 			property string metadataStatus: ""
 			property int _pendingPresetSaveIndex: -1
 
+			function refreshHeroicLutrisKind(done) {
+				metadataFetcher.resolveHeroicLutrisKindForPage(page, function(kind) {
+					pageDelegate.heroicLutrisKind = kind || ""
+					if (done) {
+						done()
+					}
+				})
+			}
+
 			function downloadPresetImages() {
+				if (!staticPresetSpecs.length && !heroicLutrisKind) {
+					refreshHeroicLutrisKind(function() {
+						pageDelegate.downloadPresetImages()
+					})
+					return
+				}
 				if (!canDownloadPresetImages) {
 					return
 				}
+				if (heroicLutrisKind && hasIgdbMetadataSettings && igdbPresetSpecs.length === 0) {
+					var title = metadataFetcher._titleForPage(page)
+					if (title) {
+						metadataStatus = i18n("Looking up IGDB artwork...")
+						metadataLoading = true
+						metadataFetcher.fetchIgdbArtworksByTitle(title, function(err, detail) {
+							metadataLoading = false
+							if (err || !detail) {
+								metadataStatus = err || i18n("No IGDB artwork found.")
+								_startPresetSave()
+								return
+							}
+							igdbPresetSpecs = presetHelper.presetSpecsForIgdbDetail(detail)
+							metadataStatus = i18n("Downloaded IGDB artwork.")
+							_startPresetSave()
+						})
+						return
+					}
+				}
+				_startPresetSave()
+			}
+
+			function _startPresetSave() {
 				_pendingPresetSaveIndex = 0
 				_saveNextPresetImage()
 			}
@@ -218,6 +261,9 @@ ColumnLayout {
 				}
 				_pendingPresetSaveIndex = -1
 			}
+
+			Component.onCompleted: refreshHeroicLutrisKind()
+			onPageChanged: refreshHeroicLutrisKind()
 
 			Repeater {
 				id: presetImageRepeater
@@ -388,10 +434,10 @@ ColumnLayout {
 						}
 						QQC2.ToolTip.visible: hovered
 						QQC2.ToolTip.text: enabled
-							? i18n("Download Steam store text and IGDB tags for this page when enabled")
+							? i18n("Download store text and tags for this page when enabled")
 							: (pageDelegate.canDownloadMetadata
 								? i18n("Set the IGDB Client ID and Client Secret in the Tiles settings to enable this option")
-								: i18n("This option is only available for Steam game launchers"))
+								: i18n("This option is only available for Steam, Heroic, or Lutris game launchers"))
 					}
 					Item { Layout.fillWidth: true }
 					QQC2.ToolButton {

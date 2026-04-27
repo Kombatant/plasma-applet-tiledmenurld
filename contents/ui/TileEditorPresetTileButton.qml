@@ -4,7 +4,7 @@ import QtQuick.Layouts
 Item {
 	id: presetTileButton
 	Layout.fillWidth: true
-	Layout.preferredHeight: image.paintedHeight
+	Layout.preferredHeight: visible ? image.paintedHeight : 0
 
 	visible: source
 	enabled: !!source
@@ -17,6 +17,7 @@ Item {
 	property var labelField
 	property var iconField
 	property var tileGrid
+	property var positionSizeField
 
 	TilePresetImageHelper {
 		id: presetHelper
@@ -65,6 +66,9 @@ Item {
 			appObj.tileChanged()
 			tileGrid.tileModelChanged()
 		}
+		if (positionSizeField && positionSizeField.refreshEditors) {
+			positionSizeField.refreshEditors()
+		}
 	}
 
 	function setTileBackgroundImage(filepath) {
@@ -84,14 +88,14 @@ Item {
 		var sourceFilepath = '' + source // cast to string
 		var isLocalFilepath = sourceFilepath.indexOf('file://') == 0 || sourceFilepath.indexOf('/') == 0
 		if (isLocalFilepath) {
-			presetTileButton.setTileBackgroundImage(source)
 			presetTileButton.resizeTile()
+			presetTileButton.setTileBackgroundImage(source)
 		} else {
 			image.grabToImage(function(result){
 				var localFilepath = presetHelper.saveGrabResultToPresetFolder(result, filename)
 				if (localFilepath) {
-					presetTileButton.setTileBackgroundImage(localFilepath)
 					presetTileButton.resizeTile()
+					presetTileButton.setTileBackgroundImage(localFilepath)
 				}
 			}, image.sourceSize)
 		}

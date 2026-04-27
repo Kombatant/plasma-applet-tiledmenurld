@@ -177,6 +177,7 @@ ColumnLayout {
 				labelField: labelField
 				iconField: iconField
 				tileGrid: tileGrid
+				positionSizeField: positionSizeField
 			}
 
 			TileEditorColorGroup {
@@ -194,6 +195,7 @@ ColumnLayout {
 			}
 
 			TileEditorRectField {
+				id: positionSizeField
 				title: i18n("Position / Size")
 			}
 

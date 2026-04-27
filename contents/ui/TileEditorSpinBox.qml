@@ -7,13 +7,29 @@ PlasmaComponents3.SpinBox {
 	property string key: ''
 	Layout.fillWidth: true
 	implicitWidth: 20
-	value: appObj.tile && appObj.tile[key] || 0
+	value: 0
 	property bool updateOnChange: false
+
+	function syncValue() {
+		if (!key || !appObj || !appObj.tile) {
+			updateOnChange = false
+			value = 0
+			updateOnChange = true
+			return
+		}
+		updateOnChange = false
+		value = appObj.tile[key] || 0
+		updateOnChange = true
+	}
+
+	Component.onCompleted: syncValue()
+	onKeyChanged: syncValue()
+
 	onValueChanged: {
-		if (key && updateOnChange) {
+		if (key && updateOnChange && appObj && appObj.tile) {
 			appObj.tile[key] = value
 			appObj.tileChanged()
-			tileGrid.tileModelChanged()
+			if (tileGrid) tileGrid.tileModelChanged()
 		}
 	}
 
@@ -21,11 +37,15 @@ PlasmaComponents3.SpinBox {
 		target: appObj
 
 		function onTileChanged() {
-			if (key && tile) {
-				spinBox.updateOnChange = false
-				spinBox.value = appObj.tile[key] || 0
-				spinBox.updateOnChange = true
-			}
+			spinBox.syncValue()
+		}
+	}
+
+	Connections {
+		target: tileGrid
+
+		function onTileModelChanged() {
+			spinBox.syncValue()
 		}
 	}
 }

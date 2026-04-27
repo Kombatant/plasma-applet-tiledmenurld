@@ -10,7 +10,7 @@ Item {
 	id: tileItem
 	x: modelData.x * cellBoxSize + _holoPad
 	y: modelData.y * cellBoxSize + _holoPad
-	width: modelData.w * cellBoxSize 
+	width: modelData.w * cellBoxSize
 	height: modelData.h * cellBoxSize
 	z: dragActive ? 20 : ((tileItemView && tileItemView.useHolographicEffect && tileMouseArea.containsMouse) ? 10 : 0)
 

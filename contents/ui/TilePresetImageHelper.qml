@@ -161,10 +161,36 @@ QtObject {
 			{
 				filename: 'steam_' + gameId + '_5x3.jpg',
 				source: 'https://steamcdn-a.akamaihd.net/steam/apps/' + gameId + '/capsule_616x353.jpg',
-				w: 3,
-				h: 2
+				w: 5,
+				h: 3
 			}
 		]
+	}
+
+	function presetSpecsForIgdbDetail(detail) {
+		if (!detail || !detail.gameId) {
+			return []
+		}
+		var specs = []
+		var prefix = 'igdb_' + detail.gameId
+		var artworks = detail.artworks || []
+		var landscapeUrl = (artworks.length > 0 && artworks[0].url) ? artworks[0].url : ""
+		if (!landscapeUrl) {
+			var shots = detail.screenshots || []
+			landscapeUrl = (shots.length > 0 && shots[0].url) ? shots[0].url : ""
+		}
+		if (landscapeUrl) {
+			specs.push({ filename: prefix + '_4x2.jpg', source: landscapeUrl, w: 4, h: 2 })
+			specs.push({ filename: prefix + '_3x1.jpg', source: landscapeUrl, w: 3, h: 1 })
+			specs.push({ filename: prefix + '_5x3.jpg', source: landscapeUrl, w: 5, h: 3 })
+		}
+		var covers = detail.covers || []
+		var coverUrl = (covers.length > 0 && covers[0].url) ? covers[0].url : ""
+		if (coverUrl) {
+			specs.push({ filename: prefix + '_1x1.jpg', source: coverUrl, w: 1, h: 1 })
+			specs.push({ filename: prefix + '_2x2.jpg', source: coverUrl, w: 2, h: 2 })
+		}
+		return specs
 	}
 
 	function presetSpecsForLutrisGameSlug(gameSlug) {

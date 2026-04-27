@@ -21,6 +21,10 @@ Item {
 		id: presetHelper
 	}
 
+	HeroicLutrisMetadataFetcher {
+		id: heroicLutrisFetcher
+	}
+
 	KWalletSecret {
 		id: secureIgdbClientSecret
 		entryName: "igdbClientSecret"
@@ -57,6 +61,30 @@ Item {
 
 	Component.onCompleted: {
 		_ensureSecretLoaded(function() {})
+	}
+
+	function _appForPage(page) {
+		if (!page) return null
+		return presetHelper.launcherAppForLaunchUrl("" + (page.launchUrl || ""))
+	}
+
+	function _heroicLutrisKindForPage(page) {
+		if (!page) return ""
+		return heroicLutrisFetcher.detectKindForApp(_appForPage(page), "" + (page.launchUrl || ""))
+	}
+
+	function resolveHeroicLutrisInfoForPage(page, callback) {
+		if (!page) {
+			callback({ kind: "", heroicAppName: "", lutrisSlug: "" })
+			return
+		}
+		heroicLutrisFetcher.resolveLauncherInfo(_appForPage(page), "" + (page.launchUrl || ""), "", callback)
+	}
+
+	function resolveHeroicLutrisKindForPage(page, callback) {
+		resolveHeroicLutrisInfoForPage(page, function(info) {
+			callback((info && info.kind) ? ("" + info.kind) : "")
+		})
 	}
 
 	function _steamGameIdForPage(page) {
@@ -199,7 +227,93 @@ Item {
 		})
 	}
 
-	function _findIgdbGameIdByTitle(title, year, clientId, accessToken, callback) {
+	function _normalizeIgdbTitle(title) {
+		var normalized = ("" + (title || "")).toLowerCase()
+		normalized = normalized.replace(/[™®©]/g, "")
+		normalized = normalized.replace(/[’']/g, "")
+		normalized = normalized.replace(/[^a-z0-9]+/g, " ")
+		normalized = normalized.replace(/\s+/g, " ").trim()
+		return normalized
+	}
+
+	function _trimIgdbEditionSuffix(title) {
+		var trimmed = ("" + (title || "")).trim()
+		var patterns = [
+			/\s+ultimate edition$/i,
+			/\s+complete edition$/i,
+			/\s+definitive edition$/i,
+			/\s+deluxe edition$/i,
+			/\s+legendary edition$/i,
+			/\s+enhanced edition$/i,
+			/\s+special edition$/i,
+			/\s+gold edition$/i,
+			/\s+premium edition$/i,
+			/\s+collector'?s edition$/i,
+			/\s+game of the year edition$/i,
+			/\s+goty edition$/i,
+			/\s+director'?s cut$/i,
+			/\s+remastered$/i,
+			/\s+anniversary edition$/i
+		]
+		for (var i = 0; i < patterns.length; i++) {
+			var candidate = trimmed.replace(patterns[i], "").trim()
+			if (candidate && candidate !== trimmed) {
+				return candidate
+			}
+		}
+		return ""
+	}
+
+	function _igdbTitleCandidates(title) {
+		var seen = {}
+		var candidates = []
+
+		function pushCandidate(value) {
+			var candidate = ("" + (value || "")).trim()
+			if (!candidate) {
+				return
+			}
+			var key = candidate.toLowerCase()
+			if (seen[key]) {
+				return
+			}
+			seen[key] = true
+			candidates.push(candidate)
+		}
+
+		pushCandidate(title)
+		pushCandidate(_trimIgdbEditionSuffix(title))
+		return candidates
+	}
+
+	function _chooseIgdbGameIdFromPayload(payload, title, year) {
+		var normalizedTitle = _normalizeIgdbTitle(title)
+		var chosenId = 0
+		for (var i = 0; payload && i < payload.length; i++) {
+			var item = payload[i]
+			if (!item || !item.id || !item.name) {
+				continue
+			}
+			if (_normalizeIgdbTitle(item.name) !== normalizedTitle) {
+				continue
+			}
+			if (!year || !item.first_release_date) {
+				chosenId = item.id
+				break
+			}
+			var itemYear = new Date(item.first_release_date * 1000).getUTCFullYear()
+			if (("" + itemYear) === ("" + year)) {
+				chosenId = item.id
+				break
+			}
+			if (!chosenId) {
+				chosenId = item.id
+			}
+		}
+		return chosenId
+	}
+
+	function _findIgdbGameIdBySingleTitle(title, year, clientId, accessToken, callback) {
 		var safeTitle = ("" + (title || "")).replace(/"/g, '\\"')
 		var query = 'search "' + safeTitle + '"; fields name,first_release_date; limit 5;'
 		_igdbRequest("games", query, clientId, accessToken, function(err, payload) {
@@ -207,35 +321,30 @@ Item {
 				callback(err, 0)
 				return
 			}
-			var normalizedTitle = safeTitle.toLowerCase()
-			var chosenId = 0
-			for (var i = 0; payload && i < payload.length; i++) {
-				var item = payload[i]
-				if (!item || !item.id || !item.name) {
-					continue
-				}
-				if (("" + item.name).toLowerCase() !== normalizedTitle) {
-					continue
-				}
-				if (!year || !item.first_release_date) {
-					chosenId = item.id
-					break
-				}
-				var itemYear = new Date(item.first_release_date * 1000).getUTCFullYear()
-				if (("" + itemYear) === ("" + year)) {
-					chosenId = item.id
-					break
-				}
-				if (!chosenId) {
-					chosenId = item.id
-				}
-			}
-			if (!chosenId) {
+			callback(null, _chooseIgdbGameIdFromPayload(payload, title, year))
+		})
+	}
+
+	function _findIgdbGameIdByTitle(title, year, clientId, accessToken, callback) {
+		var candidates = _igdbTitleCandidates(title)
+		function tryCandidate(index) {
+			if (index >= candidates.length) {
 				callback(i18n("IGDB has no title match for %1.", title), 0)
 				return
 			}
-			callback(null, chosenId)
-		})
+			_findIgdbGameIdBySingleTitle(candidates[index], year, clientId, accessToken, function(err, gameId) {
+				if (err) {
+					callback(err, 0)
+					return
+				}
+				if (gameId) {
+					callback(null, gameId)
+					return
+				}
+				tryCandidate(index + 1)
+			})
+		}
+		tryCandidate(0)
 	}
 
 	function _collectIgdbTags(game) {
@@ -283,10 +392,144 @@ Item {
 		})
 	}
 
+	function _igdbImageUrl(image, sizeToken) {
+		if (!image || !image.image_id) return ""
+		return "https://images.igdb.com/igdb/image/upload/t_" + sizeToken + "/" + image.image_id + ".jpg"
+	}
+
+	function _collectIgdbArtworks(game) {
+		var coverUrls = []
+		if (game && game.cover && game.cover.image_id) {
+			coverUrls.push({ url: _igdbImageUrl(game.cover, "cover_big"), w: 1, h: 1 })
+		}
+		var artworkUrls = []
+		var arts = (game && game.artworks) || []
+		for (var i = 0; i < arts.length; i++) {
+			var u = _igdbImageUrl(arts[i], "screenshot_huge")
+			if (u) artworkUrls.push({ url: u, image_id: arts[i].image_id })
+		}
+		var screenshotUrls = []
+		var shots = (game && game.screenshots) || []
+		for (var j = 0; j < shots.length; j++) {
+			var s = _igdbImageUrl(shots[j], "screenshot_huge")
+			if (s) screenshotUrls.push({ url: s, image_id: shots[j].image_id })
+		}
+		return { covers: coverUrls, artworks: artworkUrls, screenshots: screenshotUrls }
+	}
+
+	function _requestIgdbGameDetails(gameId, clientId, accessToken, callback) {
+		var query = "fields name,summary,storyline,genres.name,themes.name,game_modes.name,keywords.name,cover.image_id,artworks.image_id,screenshots.image_id; where id = " + gameId + "; limit 1;"
+		_igdbRequest("games", query, clientId, accessToken, function(err, payload) {
+			if (err) {
+				callback(err, null)
+				return
+			}
+			if (!payload || !payload.length) {
+				callback(i18n("IGDB returned no data for game %1.", gameId), null)
+				return
+			}
+			var game = payload[0]
+			var media = _collectIgdbArtworks(game)
+			callback(null, {
+				gameId: game.id || gameId,
+				name: "" + (game.name || ""),
+				description: ("" + (game.summary || game.storyline || "")).trim(),
+				tags: _collectIgdbTags(game),
+				covers: media.covers,
+				artworks: media.artworks,
+				screenshots: media.screenshots
+			})
+		})
+	}
+
+	function fetchIgdbArtworksByTitle(title, callback) {
+		if (!title) {
+			callback("Empty title.", null)
+			return
+		}
+		if (!igdbClientId || !igdbClientSecret) {
+			callback("Missing IGDB credentials.", null)
+			return
+		}
+		_ensureSecretLoaded(function() {
+			_requestIgdbToken(igdbClientId, igdbClientSecret, function(tokenErr, accessToken) {
+				if (tokenErr) {
+					callback(tokenErr, null)
+					return
+				}
+				_findIgdbGameIdByTitle(title, "", igdbClientId, accessToken, function(searchErr, gameId) {
+					if (searchErr || !gameId) {
+						callback(searchErr || "No IGDB match.", null)
+						return
+					}
+					_requestIgdbGameDetails(gameId, igdbClientId, accessToken, function(detailErr, detail) {
+						if (detailErr || !detail) {
+							callback(detailErr || "No details.", null)
+							return
+						}
+						callback(null, detail)
+					})
+				})
+			})
+		})
+	}
+
+	function _titleForPage(page) {
+		if (!page) return ""
+		var app = _appForPage(page)
+		var fromApp = app && app.display ? ("" + app.display).trim() : (app && app.name ? ("" + app.name).trim() : "")
+		if (fromApp) return fromApp
+		return ("" + (page.label || "")).trim()
+	}
+
+	function _fetchIgdbByTitle(title, callback) {
+		if (!igdbClientId || !igdbClientSecret) {
+			callback(false, null, i18n("Set the IGDB Client ID and Client Secret in the Tiles settings to download metadata for this launcher."))
+			return
+		}
+		_ensureSecretLoaded(function() {
+			_requestIgdbToken(igdbClientId, igdbClientSecret, function(tokenErr, accessToken) {
+				if (tokenErr) {
+					callback(false, null, i18n("IGDB authentication failed."))
+					return
+				}
+				_findIgdbGameIdByTitle(title, "", igdbClientId, accessToken, function(searchErr, gameId) {
+					if (searchErr || !gameId) {
+						callback(false, null, searchErr || i18n("No IGDB match for %1.", title))
+						return
+					}
+					_requestIgdbGameDetails(gameId, igdbClientId, accessToken, function(detailErr, detail) {
+						if (detailErr || !detail) {
+							callback(false, null, detailErr || i18n("Could not fetch IGDB details."))
+							return
+						}
+						callback(true, {
+							steamAppId: "",
+							storeTitle: detail.name || title,
+							storeDescription: detail.description || "",
+							igdbTags: detail.tags || []
+						}, i18n("Downloaded IGDB metadata."))
+					})
+				})
+			})
+		})
+	}
+
 	function fetchForPage(page, callback) {
 		var appId = _steamGameIdForPage(page)
 		if (!appId) {
-			callback(false, null, i18n("This hero page is not linked to a Steam game launcher."))
+			resolveHeroicLutrisInfoForPage(page, function(info) {
+				if (info && info.kind) {
+					var title = _titleForPage(page)
+					if (!title) {
+						callback(false, null, i18n("Could not determine a title for this page."))
+						return
+					}
+					_fetchIgdbByTitle(title, callback)
+					return
+				}
+				callback(false, null, i18n("This hero page is not linked to a Steam, Heroic, or Lutris game launcher."))
+			})
 			return
 		}
 		_ensureSecretLoaded(function() {

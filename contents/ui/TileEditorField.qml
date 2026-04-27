@@ -17,6 +17,18 @@ TileEditorGroupBox {
 	property bool checkedDefault: true
 
 	property bool updateOnChange: false
+
+	function syncChecked() {
+		if (!checkedKey || !appObj || !appObj.tile) {
+			updateOnChange = false
+			checked = checkedDefault
+			updateOnChange = true
+			return
+		}
+		updateOnChange = false
+		checked = typeof appObj.tile[checkedKey] !== "undefined" ? appObj.tile[checkedKey] : checkedDefault
+		updateOnChange = true
+	}
 	onCheckedChanged: {
 		if (checkedKey && tileEditorField.updateOnChange) {
 			appObj.tile[checkedKey] = checked
@@ -31,11 +43,7 @@ TileEditorGroupBox {
 		target: appObj
 
 		function onTileChanged() {
-			if (checkedKey && tile) {
-				tileEditorField.updateOnChange = false
-				tileEditorField.checked = typeof appObj.tile[checkedKey] !== "undefined" ? appObj.tile[checkedKey] : checkedDefault
-				tileEditorField.updateOnChange = true
-			}
+			tileEditorField.syncChecked()
 		}
 	}
 
@@ -47,9 +55,23 @@ TileEditorGroupBox {
 		LibConfig.AutocompleteTextField {
 			id: textField
 			Layout.fillWidth: true
-			text: key && appObj.tile && appObj.tile[key] ? appObj.tile[key] : ''
+			text: ''
 			suggestionsProvider: tileEditorField.suggestionsProvider
 			property bool updateOnChange: false
+
+			function syncText() {
+				if (!key || !appObj || !appObj.tile) {
+					updateOnChange = false
+					text = ''
+					updateOnChange = true
+					return
+				}
+				updateOnChange = false
+				text = appObj.tile[key] || ''
+				updateOnChange = true
+			}
+
+			Component.onCompleted: syncText()
 			onTextChanged: {
 				if (key && textField.updateOnChange) {
 					appObj.tile[key] = text
@@ -62,13 +84,27 @@ TileEditorGroupBox {
 				target: appObj
 
 				function onTileChanged() {
-					if (key && tile) {
-						textField.updateOnChange = false
-						textField.text = appObj.tile[key] || ''
-						textField.updateOnChange = true
-					}
+					textField.syncText()
 				}
 			}
+
+			Connections {
+				target: tileGrid
+
+				function onTileModelChanged() {
+					textField.syncText()
+				}
+			}
+		}
+	}
+
+	Component.onCompleted: syncChecked()
+
+	Connections {
+		target: tileGrid
+
+		function onTileModelChanged() {
+			tileEditorField.syncChecked()
 		}
 	}
 }
