@@ -14,7 +14,7 @@ Tiled Menu Reloaded is a Plasma applet that provides a tiled launcher loosely in
 - Support modern Qt6/Plasma 6 environments.
 
 ## Highlights
-- **New with 0.95 version**: New type of tile: hero carousel tile. Added support for IGDB game tiles with automatic metadata fetching.
+- **New with 0.95 version**: Hero carousel tiles, including support for IGDB game metadata fetching.
 - Docked Sidebar layout - with support for custom user avatars (animated or static).
 - Tabs support in the tile area.
 - Added a AI Chat tab to the sidebar, which can be used to interact with various LLMs. 
@@ -25,7 +25,7 @@ Tiled Menu Reloaded is a Plasma applet that provides a tiled launcher loosely in
 - Animated tile support (GIF, APNG, WEBP) and per-tile background images. **Make sure you use reasonably sized images for good performance.**
 - Configurable sidebar position, shortcuts and search filters.
 - Quick search/filtering of applications and files.
-- Stores tile layout as a Base64-encoded XML fragment. 
+- Stores tile layouts in config-backed encoded data, including the legacy Base64-encoded XML layout and tabbed tile layouts.
 - New default preset images folder: ~/Pictures/TiledMenuReloaded, configurable in settings.
 
 <details>
@@ -88,7 +88,7 @@ Add the applet: right-click your application launcher, choose "Show Alternatives
 - Pin items: right‑click an application or file and select "Pin" or drag it to the tile grid.
 - Edit tiles: use the tile editor to change label, icon, background image, size, and placement.
 - Groups: create a new group from the grid context menu; drag tiles into groups and use the group header to sort.
-- Resize the popup by dragging its edges or just use the auto resize button in the sidebar.
+- Resize the launcher panes using the resize handle between the app list and tile area, or use the Auto Resize button in the sidebar.
 
 ## Configuration
 - Settings are available from the applet configuration dialog. Important options include default tile folder, tile scale, grid columns, and search filters.
