@@ -48,6 +48,7 @@ ColumnLayout {
 	readonly property color _sidebarIconBackdrop: config.surfaceBaseColor
 	readonly property bool _bgIsLight: _relativeLuminance(_sidebarIconBackdrop) > 0.6
 	readonly property url settingsIconSource: Qt.resolvedUrl(_bgIsLight ? "assets/tiled-settings-light.png" : "assets/tiled-settings-dark.png")
+	readonly property bool pillRowsEnabled: !!config.useTileTabs && (plasmoid.configuration.tileTabStyle || "tabs") === "pills"
 
 	// ──────────────────────────────────────────────
 	// 1. Compact user profile header with search
@@ -180,6 +181,7 @@ ColumnLayout {
 		Layout.alignment: Qt.AlignHCenter
 		Layout.fillWidth: true
 		spacing: 0
+		visible: !leftPane.pillRowsEnabled
 
 		property QtObject xdgUserDir: Lib.XdgUserDir {}
 
@@ -307,6 +309,17 @@ ColumnLayout {
 		height: 1
 		color: Kirigami.Theme.textColor
 		opacity: 0.2
+		visible: !leftPane.pillRowsEnabled
+	}
+
+	SidebarShortcutPillRow {
+		visible: leftPane.pillRowsEnabled
+		Layout.fillWidth: true
+		Layout.leftMargin: Kirigami.Units.smallSpacing
+		Layout.rightMargin: Kirigami.Units.smallSpacing
+		Layout.preferredHeight: viewTabBar.surfaceHeight
+		surfaceHeight: viewTabBar.surfaceHeight
+		settingsIconSource: leftPane.settingsIconSource
 	}
 
 	// ──────────────────────────────────────────────
@@ -320,6 +333,7 @@ ColumnLayout {
 		Layout.bottomMargin: Kirigami.Units.smallSpacing
 		Layout.topMargin: Kirigami.Units.smallSpacing
 		spacing: Kirigami.Units.smallSpacing
+		visible: !leftPane.pillRowsEnabled
 
 		Repeater {
 			model: appsModel.powerActionsModel
@@ -378,5 +392,15 @@ ColumnLayout {
 				}
 			}
 		}
+	}
+
+	PowerActionPillRow {
+		visible: leftPane.pillRowsEnabled
+		Layout.fillWidth: true
+		Layout.leftMargin: Kirigami.Units.smallSpacing
+		Layout.rightMargin: Kirigami.Units.smallSpacing
+		Layout.bottomMargin: Kirigami.Units.smallSpacing
+		Layout.topMargin: Kirigami.Units.largeSpacing
+		Layout.preferredHeight: implicitHeight
 	}
 }

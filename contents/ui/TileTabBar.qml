@@ -254,10 +254,11 @@ Item {
 					}
 				}
 
-				Kirigami.ShadowedRectangle {
+				PillHighlight {
 					id: activeIndicator
 					z: 0
 					visible: pillsRepeater.count > 0
+					styleSource: tabBar
 					readonly property var _activeItem: {
 						void(pillsRepeater.count)
 						return pillsRepeater.itemAt(tabBar.activeTab)
@@ -266,16 +267,7 @@ Item {
 					x: _activeItem ? pillsRow.x + _activeItem.x : 0
 					anchors.top: pillsRow.top
 					anchors.bottom: pillsRow.bottom
-					anchors.topMargin: tabBar._activeIndicatorInset
-					anchors.bottomMargin: tabBar._activeIndicatorInset
 					width: _activeItem ? _activeItem.width : 0
-					color: tabBar._indicatorColor
-					corners {
-						topLeftRadius: tabBar._activeIndicatorRadius
-						bottomLeftRadius: tabBar._activeIndicatorRadius
-						topRightRadius: tabBar._activeIndicatorRadius
-						bottomRightRadius: tabBar._activeIndicatorRadius
-					}
 					Behavior on x { NumberAnimation { duration: 180; easing.type: Easing.InOutQuad } }
 					Behavior on width { NumberAnimation { duration: 180; easing.type: Easing.InOutQuad } }
 				}

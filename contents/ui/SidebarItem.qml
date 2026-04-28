@@ -24,6 +24,7 @@ FlatButton {
 	property bool forceMonochromeIcon: false
 	property bool desaturateIcon: false
 	property bool showBadge: false
+	property bool showHoverOutline: true
 	icon.color: forceMonochromeIcon ? (checked ? Kirigami.Theme.highlightColor : Kirigami.Theme.textColor) : "transparent"
 	layer.enabled: desaturateIcon && !hovered && !pressed
 	layer.effect: MultiEffect {
@@ -59,7 +60,7 @@ FlatButton {
 		source: "HoverOutlineButtonEffect.qml"
 		asynchronous: true
 		property var mouseArea: sidebarItem.__behavior
-		active: !!mouseArea && mouseArea.containsMouse
+		active: sidebarItem.showHoverOutline && !!mouseArea && mouseArea.containsMouse
 		visible: active
 		property var __mouseArea: mouseArea
 	}

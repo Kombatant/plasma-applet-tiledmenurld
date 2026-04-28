@@ -192,18 +192,10 @@ Item {
 						width: Math.max(0, (pillsRow.width - (pillsRepeater.count - 1) * pillsRow.spacing) / pillsRepeater.count)
 						height: pillsRow.height
 
-						Kirigami.ShadowedRectangle {
+						PillHighlight {
 							visible: pillDelegate.isActive
 							anchors.fill: parent
-							anchors.topMargin: root._activeIndicatorInset
-							anchors.bottomMargin: root._activeIndicatorInset
-							color: root._indicatorColor
-							corners {
-								topLeftRadius: root._activeIndicatorRadius
-								bottomLeftRadius: root._activeIndicatorRadius
-								topRightRadius: root._activeIndicatorRadius
-								bottomRightRadius: root._activeIndicatorRadius
-							}
+							styleSource: root
 						}
 
 						Kirigami.Icon {
