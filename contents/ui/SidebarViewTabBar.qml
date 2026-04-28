@@ -199,10 +199,10 @@ Item {
 							anchors.bottomMargin: root._activeIndicatorInset
 							color: root._indicatorColor
 							corners {
-								topLeftRadius: root._surfaceBorderVisible || pillDelegate.itemIdx === 0 ? root._activeIndicatorRadius : 0
-								bottomLeftRadius: root._surfaceBorderVisible || pillDelegate.itemIdx === 0 ? root._activeIndicatorRadius : 0
-								topRightRadius: root._surfaceBorderVisible ? root._activeIndicatorRadius : 0
-								bottomRightRadius: root._surfaceBorderVisible ? root._activeIndicatorRadius : 0
+								topLeftRadius: root._activeIndicatorRadius
+								bottomLeftRadius: root._activeIndicatorRadius
+								topRightRadius: root._activeIndicatorRadius
+								bottomRightRadius: root._activeIndicatorRadius
 							}
 						}
 

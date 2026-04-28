@@ -271,10 +271,10 @@ Item {
 					width: _activeItem ? _activeItem.width : 0
 					color: tabBar._indicatorColor
 					corners {
-						topLeftRadius: tabBar._surfaceBorderVisible || activeIndicator._atLeftEdge ? tabBar._activeIndicatorRadius : 0
-						bottomLeftRadius: tabBar._surfaceBorderVisible || activeIndicator._atLeftEdge ? tabBar._activeIndicatorRadius : 0
-						topRightRadius: tabBar._surfaceBorderVisible ? tabBar._activeIndicatorRadius : 0
-						bottomRightRadius: tabBar._surfaceBorderVisible ? tabBar._activeIndicatorRadius : 0
+						topLeftRadius: tabBar._activeIndicatorRadius
+						bottomLeftRadius: tabBar._activeIndicatorRadius
+						topRightRadius: tabBar._activeIndicatorRadius
+						bottomRightRadius: tabBar._activeIndicatorRadius
 					}
 					Behavior on x { NumberAnimation { duration: 180; easing.type: Easing.InOutQuad } }
 					Behavior on width { NumberAnimation { duration: 180; easing.type: Easing.InOutQuad } }
