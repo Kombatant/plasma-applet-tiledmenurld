@@ -123,9 +123,9 @@ Item {
 		Item {
 			id: labelOverlay
 			visible: !appObj.isHero && useOverlayLabel && !useStyledGroupHeader && appObj.showLabel && appObj.labelText.length > 0
-			anchors.left: parent.left
-			anchors.right: parent.right
-			anchors.bottom: parent.bottom
+			anchors.left: tileItemView.left
+			anchors.right: tileItemView.right
+			anchors.bottom: tileItemView.bottom
 			anchors.leftMargin: labelPaddingX
 			anchors.rightMargin: labelPaddingX
 			anchors.bottomMargin: labelPaddingY
