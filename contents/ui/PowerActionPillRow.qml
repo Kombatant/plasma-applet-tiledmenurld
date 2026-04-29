@@ -7,6 +7,9 @@ PillRowSurface {
 
 	surfaceHeight: Math.round(config.flatButtonIconSize + Kirigami.Units.gridUnit + Kirigami.Units.smallSpacing * 3)
 	implicitHeight: surfaceHeight
+	property int hoveredPowerActionIndex: -1
+	property bool hoverAnimationEnabled: true
+	readonly property int _pillMotionDuration: 420
 	readonly property var sessionIcons: ['system-lock-screen', 'system-log-out', 'system-save-session', 'system-switch-user']
 	readonly property int firstVisiblePowerActionIndex: visiblePowerActionIndex(1)
 	readonly property int lastVisiblePowerActionIndex: visiblePowerActionIndex(-1)
@@ -30,6 +33,60 @@ PillRowSurface {
 			}
 		}
 		return -1
+	}
+
+	function setHoveredPowerActionIndex(index) {
+		hoverAnimationEnabled = hoveredPowerActionIndex >= 0
+		hoveredPowerActionIndex = index
+		Qt.callLater(function() {
+			hoverAnimationEnabled = true
+		})
+	}
+
+	function resetHoverIndicator() {
+		hoverAnimationEnabled = false
+		hoveredPowerActionIndex = -1
+	}
+
+	HoverHandler {
+		id: powerRowHover
+		target: root
+		onHoveredChanged: {
+			if (!hovered) {
+				root.resetHoverIndicator()
+			}
+		}
+	}
+
+	PillHighlight {
+		id: hoverIndicator
+		visible: root.hoveredPowerActionIndex >= 0 && !!_hoveredItem
+		styleSource: root
+		active: false
+		readonly property var _hoveredItem: {
+			void(powerPillsRepeater.count)
+			return root.hoveredPowerActionIndex >= 0 ? powerPillsRepeater.itemAt(root.hoveredPowerActionIndex) : null
+		}
+		x: _hoveredItem ? powerPills.x + _hoveredItem.x : 0
+		anchors.top: powerPills.top
+		anchors.bottom: powerPills.bottom
+		width: _hoveredItem ? _hoveredItem.width : 0
+		flushLeft: root.hoveredPowerActionIndex === root.firstVisiblePowerActionIndex
+		flushRight: root.hoveredPowerActionIndex === root.lastVisiblePowerActionIndex
+		Behavior on x {
+			enabled: root.hoverAnimationEnabled
+			NumberAnimation {
+				duration: root._pillMotionDuration
+				easing.type: Easing.OutCubic
+			}
+		}
+		Behavior on width {
+			enabled: root.hoverAnimationEnabled
+			NumberAnimation {
+				duration: root._pillMotionDuration
+				easing.type: Easing.OutCubic
+			}
+		}
 	}
 
 	RowLayout {
@@ -57,11 +114,19 @@ PillRowSurface {
 				styleSource: root
 				flushLeft: index === root.firstVisiblePowerActionIndex
 				flushRight: index === root.lastVisiblePowerActionIndex
+				highlightEnabled: false
 				Layout.fillWidth: true
 				Layout.fillHeight: true
 				Layout.minimumWidth: 0
 				iconSize: config.flatButtonIconSize
 				onClicked: appsModel.powerActionsModel.triggerIndex(index)
+				onHoveredChanged: {
+					if (hovered) {
+						root.setHoveredPowerActionIndex(index)
+					} else if (root.hoveredPowerActionIndex === index && !powerRowHover.hovered) {
+						root.resetHoverIndicator()
+					}
+				}
 			}
 		}
 	}

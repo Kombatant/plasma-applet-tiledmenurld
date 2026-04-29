@@ -136,6 +136,8 @@ Item {
 		Kirigami.Theme.textColor.g,
 		Kirigami.Theme.textColor.b,
 		0.72)
+	readonly property int _pillMotionDuration: 420
+	readonly property int _pillScrollDuration: 320
 
 	// ── Styling — Tabs (classic) ────────────────────────────────────────────
 	readonly property real _borderWidth: Math.max(1, Math.round(Screen.devicePixelRatio))
@@ -229,6 +231,14 @@ Item {
 
 				onMovementEnded: contentX = snapContentX(contentX)
 
+				Behavior on contentX {
+					enabled: tabBar._pillsMode && !tabFlickable.dragging && !tabFlickable.flicking
+					NumberAnimation {
+						duration: tabBar._pillScrollDuration
+						easing.type: Easing.OutCubic
+					}
+				}
+
 				Connections {
 					target: tabBar
 					function onActiveTabChanged() {
@@ -271,8 +281,18 @@ Item {
 					width: _activeItem ? _activeItem.width : 0
 					flushLeft: _atLeftEdge
 					flushRight: _atRightEdge
-					Behavior on x { NumberAnimation { duration: 180; easing.type: Easing.InOutQuad } }
-					Behavior on width { NumberAnimation { duration: 180; easing.type: Easing.InOutQuad } }
+					Behavior on x {
+						NumberAnimation {
+							duration: tabBar._pillMotionDuration
+							easing.type: Easing.OutCubic
+						}
+					}
+					Behavior on width {
+						NumberAnimation {
+							duration: tabBar._pillMotionDuration
+							easing.type: Easing.OutCubic
+						}
+					}
 				}
 
 				Row {

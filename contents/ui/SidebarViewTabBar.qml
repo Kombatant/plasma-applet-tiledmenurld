@@ -91,6 +91,7 @@ Item {
 		Kirigami.Theme.highlightColor.g,
 		Kirigami.Theme.highlightColor.b,
 		0.25)
+	readonly property int _pillMotionDuration: 420
 
 	// ═════════════════════════════════════════════════════════════════════
 	// Flat fallback — original icon row
@@ -168,6 +169,39 @@ Item {
 				contentMargins: 0
 			}
 
+			PillHighlight {
+				id: activePillIndicator
+				visible: root._activeIndex >= 0 && !!_activeItem
+				styleSource: root
+				readonly property var _activeItem: {
+					void(pillsRepeater.count)
+					for (var i = 0; i < pillsRepeater.count; i++) {
+						var item = pillsRepeater.itemAt(i)
+						if (item && item.itemIdx === root._activeIndex) {
+							return item
+						}
+					}
+					return null
+				}
+				x: _activeItem ? pillsRow.x + _activeItem.x : 0
+				anchors.top: pillsRow.top
+				anchors.bottom: pillsRow.bottom
+				width: _activeItem ? _activeItem.width : 0
+				flushLeft: _activeItem && _activeItem.index === 0
+				Behavior on x {
+					NumberAnimation {
+						duration: root._pillMotionDuration
+						easing.type: Easing.OutCubic
+					}
+				}
+				Behavior on width {
+					NumberAnimation {
+						duration: root._pillMotionDuration
+						easing.type: Easing.OutCubic
+					}
+				}
+			}
+
 			Row {
 				id: pillsRow
 				anchors.left: parent.left
@@ -189,13 +223,6 @@ Item {
 						readonly property bool isHovered: pillMA.containsMouse
 						width: Math.max(0, (pillsRow.width - (pillsRepeater.count - 1) * pillsRow.spacing) / pillsRepeater.count)
 						height: pillsRow.height
-
-						PillHighlight {
-							visible: pillDelegate.isActive
-							anchors.fill: parent
-							styleSource: root
-							flushLeft: pillDelegate.index === 0
-						}
 
 						Kirigami.Icon {
 							anchors.centerIn: parent

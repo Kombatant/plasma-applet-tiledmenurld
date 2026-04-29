@@ -16,6 +16,7 @@ Item {
     property var styleSource: null
     property bool flushLeft: false
     property bool flushRight: false
+    property bool highlightEnabled: true
     property int iconSize: Kirigami.Units.iconSizes.smallMedium
     readonly property bool hovered: mouseArea.containsMouse
     readonly property color foregroundColor: hovered ? _styleValue("activeTextColor", "_activeTextColor", Kirigami.Theme.textColor) : _styleValue("idleTextColor", "_idleTextColor", Kirigami.Theme.textColor)
@@ -43,7 +44,7 @@ Item {
         active: false
         flushLeft: root.flushLeft
         flushRight: root.flushRight
-        visible: root.hovered
+        visible: root.highlightEnabled && root.hovered
     }
 
     ColumnLayout {

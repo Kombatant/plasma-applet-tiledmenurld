@@ -7,8 +7,71 @@ PillRowSurface {
 	id: root
 
 	property url settingsIconSource
+	property int hoveredShortcutIndex: -1
+	property bool hoverAnimationEnabled: true
+	readonly property int _pillMotionDuration: 420
 
 	property QtObject xdgUserDir: Lib.XdgUserDir {}
+
+	function setHoveredShortcutIndex(index) {
+		hoverAnimationEnabled = hoveredShortcutIndex >= 0
+		hoveredShortcutIndex = index
+		Qt.callLater(function() {
+			hoverAnimationEnabled = true
+		})
+	}
+
+	function resetHoverIndicator() {
+		hoverAnimationEnabled = false
+		hoveredShortcutIndex = -1
+	}
+
+	HoverHandler {
+		id: shortcutRowHover
+		target: root
+		onHoveredChanged: {
+			if (!hovered) {
+				root.resetHoverIndicator()
+			}
+		}
+	}
+
+	PillHighlight {
+		id: hoverIndicator
+		visible: root.hoveredShortcutIndex >= 0 && !!_hoveredItem
+		styleSource: root
+		active: false
+		readonly property var _hoveredItem: {
+			void(shortcutPillsRepeater.count)
+			if (root.hoveredShortcutIndex < 0) {
+				return null
+			}
+			if (root.hoveredShortcutIndex < shortcutPillsRepeater.count) {
+				return shortcutPillsRepeater.itemAt(root.hoveredShortcutIndex)
+			}
+			return root.hoveredShortcutIndex === shortcutPillsRepeater.count ? settingsPill : null
+		}
+		x: _hoveredItem ? shortcutPills.x + _hoveredItem.x : 0
+		anchors.top: shortcutPills.top
+		anchors.bottom: shortcutPills.bottom
+		width: _hoveredItem ? _hoveredItem.width : 0
+		flushLeft: root.hoveredShortcutIndex === 0
+		flushRight: root.hoveredShortcutIndex === shortcutPillsRepeater.count
+		Behavior on x {
+			enabled: root.hoverAnimationEnabled
+			NumberAnimation {
+				duration: root._pillMotionDuration
+				easing.type: Easing.OutCubic
+			}
+		}
+		Behavior on width {
+			enabled: root.hoverAnimationEnabled
+			NumberAnimation {
+				duration: root._pillMotionDuration
+				easing.type: Easing.OutCubic
+			}
+		}
+	}
 
 	RowLayout {
 		id: shortcutPills
@@ -20,19 +83,12 @@ PillRowSurface {
 		spacing: Kirigami.Units.smallSpacing
 
 		Repeater {
+			id: shortcutPillsRepeater
 			model: appsModel.sidebarModel
 			delegate: Item {
 				Layout.fillWidth: true
 				Layout.fillHeight: true
 				Layout.minimumWidth: 0
-
-				PillHighlight {
-					anchors.fill: parent
-					styleSource: root
-					active: false
-					flushLeft: index === 0
-					visible: shortcutHoverArea.containsMouse
-				}
 
 				SidebarItem {
 					id: shortcutButton
@@ -69,6 +125,12 @@ PillRowSurface {
 					anchors.fill: parent
 					acceptedButtons: Qt.NoButton
 					hoverEnabled: true
+					onEntered: root.setHoveredShortcutIndex(index)
+					onExited: {
+						if (root.hoveredShortcutIndex === index && !shortcutRowHover.hovered) {
+							root.resetHoverIndicator()
+						}
+					}
 				}
 
 				function isLocalizedFolder() {
@@ -145,17 +207,10 @@ PillRowSurface {
 		}
 
 		Item {
+			id: settingsPill
 			Layout.fillWidth: true
 			Layout.fillHeight: true
 			Layout.minimumWidth: 0
-
-			PillHighlight {
-				anchors.fill: parent
-				styleSource: root
-				active: false
-				flushRight: true
-				visible: settingsHoverArea.containsMouse
-			}
 
 			SidebarItem {
 				id: settingsButton
@@ -178,6 +233,12 @@ PillRowSurface {
 				anchors.fill: parent
 				acceptedButtons: Qt.NoButton
 				hoverEnabled: true
+				onEntered: root.setHoveredShortcutIndex(shortcutPillsRepeater.count)
+				onExited: {
+					if (root.hoveredShortcutIndex === shortcutPillsRepeater.count && !shortcutRowHover.hovered) {
+						root.resetHoverIndicator()
+					}
+				}
 			}
 		}
 	}
