@@ -1081,7 +1081,10 @@ MouseArea {
 
 			SidebarGlassCard {
 				anchors.fill: parent
-				anchors.margins: config.sidebarCardInset
+				anchors.leftMargin: config.sidebarCardInset
+				anchors.rightMargin: 0
+				anchors.topMargin: config.sidebarCardInset
+				anchors.bottomMargin: config.sidebarCardInset
 
 				LeftPaneView {
 					id: leftPaneView
@@ -1138,7 +1141,7 @@ MouseArea {
 				Item {
 					id: appAreaResizeHandle
 					Layout.fillHeight: true
-					Layout.preferredWidth: Kirigami.Units.smallSpacing * 2
+					Layout.preferredWidth: config.usesDockedSidebarLayout ? Kirigami.Units.smallSpacing : Kirigami.Units.smallSpacing * 2
 					visible: {
 						if (config.usesDockedSidebarLayout) {
 							return true // Always show resize handle in Docked Sidebar layout
@@ -1153,7 +1156,7 @@ MouseArea {
 						height: Math.min(parent.height * 0.3, 48 * Screen.devicePixelRatio)
 						radius: width / 2
 						color: Kirigami.Theme.textColor
-						opacity: appAreaResizeMouseArea.containsMouse || appAreaResizeMouseArea.pressed ? 0.6 : 0.15
+						opacity: appAreaResizeMouseArea.containsMouse || appAreaResizeMouseArea.pressed ? 0.6 : 0
 						Behavior on opacity {
 							NumberAnimation { duration: 150 }
 						}

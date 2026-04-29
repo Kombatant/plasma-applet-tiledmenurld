@@ -380,11 +380,12 @@ Item {
 				spacing: Kirigami.Units.largeSpacing * 0.6
 				model: messages
 				clip: true
+				readonly property int scrollBarGutter: messageScrollBar.width + Kirigami.Units.smallSpacing
 
 				delegate: Item {
 					required property var modelData
 					required property int index
-					width: messageList.width
+					width: Math.max(0, messageList.width - messageList.scrollBarGutter)
 					height: bubble.implicitHeight + roleLabel.implicitHeight + Kirigami.Units.smallSpacing * 0.35
 
 					readonly property bool isUser: modelData.role === "user"
@@ -463,7 +464,22 @@ Item {
 					}
 				}
 
-				QQC2.ScrollBar.vertical: QQC2.ScrollBar {}
+				QQC2.ScrollBar.vertical: QQC2.ScrollBar {
+					id: messageScrollBar
+					implicitWidth: 6
+					width: 6
+					padding: 0
+					policy: QQC2.ScrollBar.AsNeeded
+					background: Item { implicitWidth: 6 }
+					contentItem: Rectangle {
+						implicitWidth: 4
+						width: 4
+						radius: width / 2
+						color: Kirigami.Theme.textColor
+						opacity: parent.pressed ? 0.6 : parent.hovered ? 0.4 : 0.25
+						Behavior on opacity { NumberAnimation { duration: 120 } }
+					}
+				}
 				onCountChanged: Qt.callLater(function() { positionViewAtEnd() })
 			}
 

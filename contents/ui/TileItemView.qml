@@ -394,6 +394,8 @@ Rectangle {
 		anchors.fill: parent
 		radius: tileItemView.cornerRadius
 		color: "white"
+		antialiasing: true
+		smooth: true
 	}
 
 	ShaderEffectSource {
@@ -402,6 +404,7 @@ Rectangle {
 		recursive: true
 		live: true
 		hideSource: true
+		smooth: true
 	}
 
 	ShaderEffectSource {
@@ -410,6 +413,7 @@ Rectangle {
 		recursive: true
 		live: true
 		hideSource: true
+		smooth: true
 	}
 
 	MultiEffect {
@@ -417,5 +421,7 @@ Rectangle {
 		source: contentSource
 		maskEnabled: true
 		maskSource: roundedMaskSource
+		antialiasing: true
+		smooth: true
 	}
 }

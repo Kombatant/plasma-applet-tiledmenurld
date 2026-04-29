@@ -13,23 +13,6 @@ Item {
 	property real cornerRadius: 0
 	property int _modelToken: 0
 
-	readonly property color _surfaceBaseColor: (typeof config !== "undefined" && config) ? config.surfaceBaseColor : Kirigami.Theme.backgroundColor
-	readonly property bool _surfaceFrosted: (typeof config !== "undefined" && config) ? config.surfaceUsesFrostedGlass : false
-	readonly property real _surfaceShadowSizeMul: (typeof config !== "undefined" && config) ? config.surfaceShadowSizeMultiplier : 1.0
-	readonly property real _surfaceShadowOpacityMul: (typeof config !== "undefined" && config) ? config.surfaceShadowOpacityMultiplier : 1.0
-	function _relLuma(c) {
-		function ch(v) { return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4) }
-		return 0.2126 * ch(c.r) + 0.7152 * ch(c.g) + 0.0722 * ch(c.b)
-	}
-	readonly property bool _baseIsLight: _relLuma(_surfaceBaseColor) > 0.6
-	readonly property color _rimColor: _surfaceFrosted
-		? (_baseIsLight ? Qt.rgba(1, 1, 1, 0.72) : Qt.rgba(1, 1, 1, 0.18))
-		: (_baseIsLight ? Qt.rgba(1, 1, 1, 0.62) : Qt.rgba(1, 1, 1, 0.18))
-	readonly property real _baseShadowOpacity: _baseIsLight ? (_surfaceFrosted ? 0.19 : 0.13) : (_surfaceFrosted ? 0.18 : 0.32)
-	readonly property int _shadowSize: Math.round(Kirigami.Units.gridUnit * (_surfaceFrosted ? 1.1 : 1.25) * _surfaceShadowSizeMul)
-	readonly property color _shadowColor: Qt.rgba(0, 0, 0, Math.min(1, _baseShadowOpacity * _surfaceShadowOpacityMul))
-	readonly property int _shadowYOffset: Math.round(2 * Screen.devicePixelRatio)
-	readonly property int _rimWidth: plasmoid.configuration.sidebarHideBorder ? 0 : Math.max(1, Math.round(Screen.devicePixelRatio))
 	property var subTiles: (_modelToken >= 0 && appObj && appObj.tile && appObj.tile.subTiles) ? appObj.tile.subTiles : []
 	property bool autoScrollEnabled: _modelToken >= 0 && !!(appObj && appObj.tile && appObj.tile.autoScrollEnabled)
 	property int autoScrollInterval: (_modelToken >= 0 && appObj && appObj.tile && appObj.tile.autoScrollInterval) ? appObj.tile.autoScrollInterval : 5000
@@ -256,16 +239,11 @@ Item {
 		heroView._pageLayersInitialized = true
 	}
 
-	Kirigami.ShadowedRectangle {
-		id: surfaceShadow
+	SidebarGlassCard {
+		id: surfaceCard
 		anchors.fill: parent
-		color: "transparent"
 		radius: heroView.cornerRadius
-		shadow {
-			size: heroView._shadowSize
-			color: heroView._shadowColor
-			yOffset: heroView._shadowYOffset
-		}
+		contentMargins: 0
 	}
 
 	Item {
@@ -598,7 +576,10 @@ Item {
 		radius: heroView.cornerRadius
 		color: "white"
 		visible: false
+		antialiasing: true
+		smooth: true
 		layer.enabled: true
+		layer.smooth: true
 	}
 
 	ShaderEffectSource {
@@ -607,6 +588,7 @@ Item {
 		recursive: true
 		live: true
 		hideSource: true
+		smooth: true
 	}
 
 	ShaderEffectSource {
@@ -615,6 +597,7 @@ Item {
 		recursive: true
 		live: true
 		hideSource: true
+		smooth: true
 	}
 
 	MultiEffect {
@@ -622,15 +605,8 @@ Item {
 		source: contentSource
 		maskEnabled: true
 		maskSource: roundedMaskSource
-	}
-
-	Rectangle {
-		anchors.fill: parent
-		radius: heroView.cornerRadius
-		color: "transparent"
-		border.width: heroView._rimWidth
-		border.color: heroView._rimColor
-		visible: heroView._rimWidth > 0
+		antialiasing: true
+		smooth: true
 	}
 
 	Timer {
