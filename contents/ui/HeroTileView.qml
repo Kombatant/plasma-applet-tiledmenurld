@@ -534,12 +534,14 @@ Item {
 		Repeater {
 			model: heroView.effectivePages.length
 			Rectangle {
-				width: 8
+				readonly property bool active: index === heroView.currentIndex
+				width: active ? 20 : 8
 				height: 8
 				radius: 4
-				color: index === heroView.currentIndex ? Kirigami.Theme.highlightColor : Qt.rgba(1, 1, 1, 0.5)
+				color: active ? Kirigami.Theme.highlightColor : Qt.rgba(1, 1, 1, 0.5)
 				border.color: Qt.rgba(0, 0, 0, 0.4)
 				border.width: 1
+				Behavior on width { NumberAnimation { duration: 180; easing.type: Easing.OutCubic } }
 			}
 		}
 	}
