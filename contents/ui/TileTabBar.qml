@@ -116,9 +116,15 @@ Item {
 	readonly property real _activeIndicatorInset: _surfaceBorderVisible ? 2 : 0
 	readonly property real _activeIndicatorRadius: Math.max(0, _pillRadius - _activeIndicatorInset)
 	readonly property bool _frostedSurface: config.surfaceUsesFrostedGlass
-	readonly property color _indicatorColor: _listBorderBaseIsLight
-		? Qt.darker(Kirigami.Theme.backgroundColor, 1.25)
-		: Qt.lighter(Kirigami.Theme.backgroundColor, 1.6)
+	readonly property color _accentHighlightColor: Kirigami.Theme.highlightColor
+	readonly property real _activeHighlightBorderOpacity: 0.95
+	readonly property real _activeHighlightGlowOpacity: 0.78
+	readonly property real _activeHighlightFillStrength: 1.0
+	readonly property real _activeHighlightInnerRimOpacity: 0.24
+	readonly property real _hoverHighlightBorderOpacity: 0.62
+	readonly property real _hoverHighlightGlowOpacity: 0.44
+	readonly property real _hoverHighlightFillStrength: 0.58
+	readonly property real _hoverHighlightInnerRimOpacity: 0.14
 	readonly property color _activeTextColor: Kirigami.Theme.textColor
 	readonly property color _hoverTextColor: Qt.rgba(
 		Kirigami.Theme.textColor.r,
@@ -130,15 +136,6 @@ Item {
 		Kirigami.Theme.textColor.g,
 		Kirigami.Theme.textColor.b,
 		0.72)
-	readonly property color _listBorderBaseColor: config.surfaceBaseColor
-	readonly property bool _listBorderBaseIsLight: _relativeLuminance(_listBorderBaseColor) > 0.6
-
-	function _relativeLuminance(color) {
-		function channel(c) {
-			return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4)
-		}
-		return (0.2126 * channel(color.r)) + (0.7152 * channel(color.g)) + (0.0722 * channel(color.b))
-	}
 
 	// ── Styling — Tabs (classic) ────────────────────────────────────────────
 	readonly property real _borderWidth: Math.max(1, Math.round(Screen.devicePixelRatio))
@@ -264,10 +261,16 @@ Item {
 						return pillsRepeater.itemAt(tabBar.activeTab)
 					}
 					readonly property bool _atLeftEdge: x <= tabBar._pillsInset
+					readonly property bool _atRightEdge: {
+						if (!_activeItem) return false
+						return x + width >= tabFlickable.contentWidth - tabBar._pillsInset
+					}
 					x: _activeItem ? pillsRow.x + _activeItem.x : 0
 					anchors.top: pillsRow.top
 					anchors.bottom: pillsRow.bottom
 					width: _activeItem ? _activeItem.width : 0
+					flushLeft: _atLeftEdge
+					flushRight: _atRightEdge
 					Behavior on x { NumberAnimation { duration: 180; easing.type: Easing.InOutQuad } }
 					Behavior on width { NumberAnimation { duration: 180; easing.type: Easing.InOutQuad } }
 				}

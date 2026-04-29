@@ -13,20 +13,18 @@ Item {
     readonly property real pillsInset: surfaceBorderVisible ? listPadding : 0
     readonly property real activeIndicatorInset: surfaceBorderVisible ? 2 : 0
     readonly property real activeIndicatorRadius: Math.max(0, pillRadius - activeIndicatorInset)
-    readonly property color listBorderBaseColor: config.surfaceBaseColor
-    readonly property bool listBorderBaseIsLight: _relativeLuminance(listBorderBaseColor) > 0.6
-    readonly property color indicatorColor: listBorderBaseIsLight ? Qt.darker(Kirigami.Theme.backgroundColor, 1.25) : Qt.lighter(Kirigami.Theme.backgroundColor, 1.6)
+    readonly property color accentHighlightColor: Kirigami.Theme.highlightColor
+    readonly property real activeHighlightBorderOpacity: 0.95
+    readonly property real activeHighlightGlowOpacity: 0.78
+    readonly property real activeHighlightFillStrength: 1.0
+    readonly property real activeHighlightInnerRimOpacity: 0.24
+    readonly property real hoverHighlightBorderOpacity: 0.62
+    readonly property real hoverHighlightGlowOpacity: 0.44
+    readonly property real hoverHighlightFillStrength: 0.58
+    readonly property real hoverHighlightInnerRimOpacity: 0.14
     readonly property color activeTextColor: Kirigami.Theme.textColor
     readonly property color hoverTextColor: Qt.rgba(Kirigami.Theme.textColor.r, Kirigami.Theme.textColor.g, Kirigami.Theme.textColor.b, 0.88)
     readonly property color idleTextColor: Qt.rgba(Kirigami.Theme.textColor.r, Kirigami.Theme.textColor.g, Kirigami.Theme.textColor.b, 0.72)
-
-    function _relativeLuminance(color) {
-        function channel(c) {
-            return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
-        }
-
-        return (0.2126 * channel(color.r)) + (0.7152 * channel(color.g)) + (0.0722 * channel(color.b));
-    }
 
     implicitHeight: surfaceHeight
 

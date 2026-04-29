@@ -71,11 +71,15 @@ Item {
 	readonly property real _activeIndicatorInset: _surfaceBorderVisible ? 2 : 0
 	readonly property real _activeIndicatorRadius: Math.max(0, _pillRadius - _activeIndicatorInset)
 	readonly property bool _frostedSurface: config.surfaceUsesFrostedGlass
-	readonly property color _listBorderBaseColor: config.surfaceBaseColor
-	readonly property bool _listBorderBaseIsLight: _relativeLuminance(_listBorderBaseColor) > 0.6
-	readonly property color _indicatorColor: _listBorderBaseIsLight
-		? Qt.darker(Kirigami.Theme.backgroundColor, 1.25)
-		: Qt.lighter(Kirigami.Theme.backgroundColor, 1.6)
+	readonly property color _accentHighlightColor: Kirigami.Theme.highlightColor
+	readonly property real _activeHighlightBorderOpacity: 0.95
+	readonly property real _activeHighlightGlowOpacity: 0.78
+	readonly property real _activeHighlightFillStrength: 1.0
+	readonly property real _activeHighlightInnerRimOpacity: 0.24
+	readonly property real _hoverHighlightBorderOpacity: 0.62
+	readonly property real _hoverHighlightGlowOpacity: 0.44
+	readonly property real _hoverHighlightFillStrength: 0.58
+	readonly property real _hoverHighlightInnerRimOpacity: 0.14
 	readonly property color _activeTextColor: Kirigami.Theme.textColor
 	readonly property color _hoverTextColor: Qt.rgba(Kirigami.Theme.textColor.r, Kirigami.Theme.textColor.g, Kirigami.Theme.textColor.b, 0.88)
 	readonly property color _idleTextColor: Qt.rgba(Kirigami.Theme.textColor.r, Kirigami.Theme.textColor.g, Kirigami.Theme.textColor.b, 0.72)
@@ -87,13 +91,6 @@ Item {
 		Kirigami.Theme.highlightColor.g,
 		Kirigami.Theme.highlightColor.b,
 		0.25)
-
-	function _relativeLuminance(color) {
-		function channel(c) {
-			return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4)
-		}
-		return (0.2126 * channel(color.r)) + (0.7152 * channel(color.g)) + (0.0722 * channel(color.b))
-	}
 
 	// ═════════════════════════════════════════════════════════════════════
 	// Flat fallback — original icon row
@@ -185,6 +182,7 @@ Item {
 					model: root._items
 					delegate: Item {
 						id: pillDelegate
+						required property int index
 						required property var modelData
 						readonly property int itemIdx: modelData.idx
 						readonly property bool isActive: root._activeIndex === itemIdx
@@ -196,6 +194,7 @@ Item {
 							visible: pillDelegate.isActive
 							anchors.fill: parent
 							styleSource: root
+							flushLeft: pillDelegate.index === 0
 						}
 
 						Kirigami.Icon {

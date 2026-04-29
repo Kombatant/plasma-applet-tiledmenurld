@@ -29,6 +29,8 @@ PillRowSurface {
 				PillHighlight {
 					anchors.fill: parent
 					styleSource: root
+					active: false
+					flushLeft: index === 0
 					visible: shortcutHoverArea.containsMouse
 				}
 
@@ -36,6 +38,7 @@ PillRowSurface {
 					id: shortcutButton
 					anchors.fill: parent
 					hoverEnabled: false
+					down: false
 					icon.name: resolvedIconName
 					icon.source: resolvedIconSource
 					forceMonochromeIcon: true
@@ -149,6 +152,8 @@ PillRowSurface {
 			PillHighlight {
 				anchors.fill: parent
 				styleSource: root
+				active: false
+				flushRight: true
 				visible: settingsHoverArea.containsMouse
 			}
 
@@ -156,6 +161,7 @@ PillRowSurface {
 				id: settingsButton
 				anchors.fill: parent
 				hoverEnabled: false
+				down: false
 				icon.name: ""
 				icon.source: root.settingsIconSource
 				text: i18n("Settings")

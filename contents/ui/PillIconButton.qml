@@ -14,6 +14,8 @@ Item {
     property bool labelVisible: false
     property bool showBadge: false
     property var styleSource: null
+    property bool flushLeft: false
+    property bool flushRight: false
     property int iconSize: Kirigami.Units.iconSizes.smallMedium
     readonly property bool hovered: mouseArea.containsMouse
     readonly property color foregroundColor: hovered ? _styleValue("activeTextColor", "_activeTextColor", Kirigami.Theme.textColor) : _styleValue("idleTextColor", "_idleTextColor", Kirigami.Theme.textColor)
@@ -38,6 +40,9 @@ Item {
     PillHighlight {
         anchors.fill: parent
         styleSource: root.styleSource
+        active: false
+        flushLeft: root.flushLeft
+        flushRight: root.flushRight
         visible: root.hovered
     }
 

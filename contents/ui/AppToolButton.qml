@@ -17,6 +17,7 @@ MouseArea {
 	property real minimumWidth: 0
 	property real minimumHeight: 0
 	property bool flat: true
+	property bool showHoverOutline: true
 
 	property int paddingTop: styleLoader.item ? styleLoader.item.paddingTop : 0
 	property int paddingLeft: styleLoader.item ? styleLoader.item.paddingLeft : 0
@@ -27,7 +28,9 @@ MouseArea {
 		id: styleLoader
 		anchors.fill: parent
 		asynchronous: true
-		source: "HoverOutlineButtonStyle.qml"
+		active: control.showHoverOutline
+		visible: active
+		source: active ? "HoverOutlineButtonStyle.qml" : ""
 		property var mouseArea: control
 	}
 }

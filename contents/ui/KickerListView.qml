@@ -1,5 +1,4 @@
 import QtQuick
-import org.kde.plasma.extras as PlasmaExtras
 
 ListView {
 	id: listView
@@ -20,10 +19,6 @@ ListView {
 	delegate: MenuListItem {}
 
 	property var modelList: model ? model.list : []
-
-	highlight: PlasmaExtras.Highlight {
-		visible: listView.currentItem && !listView.currentItem.isSeparator
-	}
 
 	function goUp() {
 		if (verticalLayoutDirection == ListView.TopToBottom) {

@@ -12,6 +12,7 @@ import "Utils.js" as Utils
 AppToolButton {
 	id: itemDelegate
 	preventStealing: true
+	showHoverOutline: false
 
 	KQuickControlsAddons.Clipboard {
 		id: clipboard
@@ -38,6 +39,18 @@ AppToolButton {
 	property string fullResultTooltip: (model && model.name ? model.name : '') + ((model && model.description) ? ('\n' + model.description) : '')
 	readonly property string tooltipMainText: (model && model.name) ? ('' + model.name) : ''
 	readonly property string tooltipSubText: (model && model.description && model.description !== model.name) ? ('' + model.description) : ''
+
+	AccentHighlight {
+		anchors.fill: parent
+		anchors.leftMargin: 0
+		anchors.rightMargin: 0
+		visible: itemDelegate.containsMouse
+		radius: config.tileCornerRadius
+		borderOpacity: 0.9
+		glowOpacity: 0.5
+		fillStrength: 0.7
+		innerRimOpacity: 0
+	}
 
 	// Plasma tooltip follows cursor without stealing hover (avoids flashing).
 	// Uses a custom mainItem so long runner replies (e.g. LLM) are fully
