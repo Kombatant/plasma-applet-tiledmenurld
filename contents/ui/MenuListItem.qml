@@ -155,9 +155,9 @@ AppToolButton {
 	RowLayout { // ItemListDelegate
 		id: row
 		anchors.left: parent.left
-		anchors.leftMargin: Kirigami.Units.smallSpacing
+		anchors.leftMargin: Kirigami.Units.largeSpacing
 		anchors.right: parent.right
-		anchors.rightMargin: Kirigami.Units.smallSpacing
+		anchors.rightMargin: Kirigami.Units.largeSpacing
 
 		Item {
 			Layout.fillHeight: true
@@ -183,11 +183,50 @@ AppToolButton {
 			RowLayout {
 				Layout.fillWidth: true
 
-				PlasmaComponents3.Label {
-					id: itemLabel
-					text: model.name
-					maximumLineCount: 1
-					height: implicitHeight
+				Item {
+					id: itemLabelClip
+					readonly property bool inlineDescriptionVisible: inlineDescriptionLabel.text.length > 0
+					Layout.fillWidth: !inlineDescriptionVisible
+					Layout.maximumWidth: inlineDescriptionVisible ? itemLabel.implicitWidth : Number.POSITIVE_INFINITY
+					implicitWidth: itemLabel.implicitWidth
+					implicitHeight: itemLabel.implicitHeight
+					clip: true
+
+					readonly property bool scrolling: itemDelegate.containsMouse
+						&& itemDelegate.hoverScrollDescriptions
+						&& itemLabel.implicitWidth > width
+						&& itemLabel.text.length > 0
+
+					PlasmaComponents3.Label {
+						id: itemLabel
+						x: 0
+						width: Math.max(implicitWidth, itemLabelClip.width)
+						text: model.name
+						maximumLineCount: 1
+						elide: itemLabelClip.scrolling ? Text.ElideNone : Text.ElideRight
+						height: implicitHeight
+					}
+
+					SequentialAnimation {
+						running: itemLabelClip.scrolling
+						loops: Animation.Infinite
+
+						PauseAnimation { duration: 350 }
+						NumberAnimation {
+							target: itemLabel
+							property: "x"
+							to: -(itemLabel.implicitWidth - itemLabelClip.width)
+							duration: Math.max(1, Math.round(((itemLabel.implicitWidth - itemLabelClip.width) / itemDelegate.hoverScrollPixelsPerSecond) * 1000))
+							easing.type: Easing.Linear
+						}
+						PauseAnimation { duration: 500 }
+					}
+
+					onScrollingChanged: {
+						if (!scrolling) {
+							itemLabel.x = 0
+						}
+					}
 				}
 
 				Item {

@@ -27,7 +27,7 @@ MouseArea {
 		id: sectionHeading
 		anchors {
 			left: parent.left
-			leftMargin: Kirigami.Units.smallSpacing
+			leftMargin: Kirigami.Units.largeSpacing
 			verticalCenter:  parent.verticalCenter
 		}
 		text: {
@@ -52,7 +52,7 @@ MouseArea {
 		id: actionButton
 		anchors {
 			right: collapseIndicator.visible ? collapseIndicator.left : parent.right
-			rightMargin: Kirigami.Units.smallSpacing
+			rightMargin: Kirigami.Units.largeSpacing
 			verticalCenter: parent.verticalCenter
 		}
 		visible: sectionDelegate.actionButtonVisible
@@ -101,7 +101,7 @@ MouseArea {
 		id: collapseIndicator
 		anchors {
 			right: parent.right
-			rightMargin: Kirigami.Units.smallSpacing
+			rightMargin: Kirigami.Units.largeSpacing
 			verticalCenter: parent.verticalCenter
 		}
 		visible: sectionDelegate.collapsible
@@ -115,13 +115,16 @@ MouseArea {
 		}
 	}
 
-	HoverOutlineEffect {
-		id: hoverOutlineEffect
+	AccentHighlight {
 		anchors.fill: parent
+		anchors.leftMargin: 0
+		anchors.rightMargin: 0
 		visible: sectionDelegate.interactive && sectionDelegate.containsMouse
-		hoverRadius: width/2
-		pressedRadius: width
-		mouseArea: sectionDelegate
+		radius: config.tileCornerRadius
+		borderOpacity: 0.9
+		glowOpacity: 0.5
+		fillStrength: 0.7
+		innerRimOpacity: 0
 	}
 
 	hoverEnabled: true
