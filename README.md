@@ -14,7 +14,8 @@ Tiled Menu Reloaded is a Plasma applet that provides a tiled launcher loosely in
 - Support modern Qt6/Plasma 6 environments.
 
 ## Highlights
-- **New with 0.95 version**: Hero carousel tiles, including support for IGDB game metadata fetching.
+- **New with 0.96 version**: Update notifications, UI design refinements and optimizations.
+- Hero carousel tiles, including support for IGDB game metadata fetching. Support for Steam, Heroic and Lutris game entries.
 - Docked Sidebar layout - with support for custom user avatars (animated or static).
 - Tabs support in the tile area.
 - Added a AI Chat tab to the sidebar, which can be used to interact with various LLMs. 
