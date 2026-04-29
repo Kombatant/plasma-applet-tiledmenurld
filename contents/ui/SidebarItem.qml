@@ -43,15 +43,15 @@ FlatButton {
 	Rectangle {
 		id: updateBadgeDot
 		visible: sidebarItem.showBadge
-		width: Math.max(8, Math.round(sidebarItem.height * 0.22))
+		width: Math.max(10, Math.round(sidebarItem.height * 0.32))
 		height: width
 		radius: width / 2
 		color: Kirigami.Theme.negativeTextColor
 		border.color: Kirigami.Theme.backgroundColor
-		border.width: Math.max(1, Math.round(Screen.devicePixelRatio))
+		border.width: Math.max(1, Math.round(Screen.devicePixelRatio * 1.5))
 		z: 9999
-		x: sidebarItem.width - width - Math.round(width * 0.2)
-		y: Math.round(width * 0.2)
+		x: sidebarItem.width - width - Math.round(width)
+		y: Math.round(width * 0.1)
 	}
 
 	Loader {
