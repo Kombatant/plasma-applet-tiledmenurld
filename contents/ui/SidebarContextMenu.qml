@@ -61,5 +61,5 @@ PlasmaExtras.Menu {
 	}
 	placement: computePlacement()
 
-    // No debug logging in production.
+	// No debug logging in production.
 }

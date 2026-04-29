@@ -296,11 +296,9 @@ Item {
 					}
 					searchResultsView.filterViewOpen = false
 				}
-			}
-            
-            
-          
-			onVisibleChanged: {
+				}
+
+				onVisibleChanged: {
 				if (!visible) { // !stackView.currentItem
 					search.query = ""
 				}
@@ -483,10 +481,10 @@ Item {
 			easing.type: Easing.OutCubic
 			onStopped: appsView.x = 0
 		}
-	}
-    
+		}
 
-	SearchField {
+
+		SearchField {
 		id: searchField
 		// Hide when using the Docked Sidebar layout external search field, or when
 		// sidebar is at top/bottom (centered sidebar search is visible instead).
