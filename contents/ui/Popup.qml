@@ -170,6 +170,22 @@ MouseArea {
 		saveTileTabsDebounce.restart()
 	}
 
+	function flushPendingTileTabsSave() {
+		if (saveTileTabsDebounce.running) {
+			saveTileTabsDebounce.stop()
+			popup.saveTileTabsImmediate()
+		}
+	}
+
+	function flushPendingTileLayoutSave() {
+		if (typeof tileGrid !== "undefined"
+				&& tileGrid
+				&& typeof tileGrid.flushPendingTileLayoutSave === "function") {
+			tileGrid.flushPendingTileLayoutSave()
+		}
+		popup.flushPendingTileTabsSave()
+	}
+
 	function saveTileTabsImmediate() {
 		try {
 			var json = JSON.stringify(tileTabsData)
@@ -989,6 +1005,9 @@ MouseArea {
 			popup.loadTileTabs()
 		}
 	}
+	Component.onDestruction: {
+		popup.flushPendingTileLayoutSave()
+	}
 	Screen.onDevicePixelRatioChanged: {
 		var currentDpr = popup.effectiveDevicePixelRatio()
 		if (Math.abs(currentDpr - popup._lastKnownDevicePixelRatio) > 0.01) {
@@ -1004,10 +1023,13 @@ MouseArea {
 				searchView.setActiveSizeMemoryView(searchView.resolveConfiguredDefaultView())
 			}
 			popup.scheduleRestoreForCurrentView("widget-expanded")
-		} else if (!popup._suppressPersist && popup._sizeRestored) {
-			// The debounced saver can lose the final manual resize if the popup is
-			// closed before it fires. Persist the live size one last time on close.
-			popup.saveCurrentViewSize()
+		} else {
+			if (!popup._suppressPersist && popup._sizeRestored) {
+				// The debounced saver can lose the final manual resize if the popup is
+				// closed before it fires. Persist the live size one last time on close.
+				popup.saveCurrentViewSize()
+			}
+			popup.flushPendingTileLayoutSave()
 		}
 	}
 
@@ -1331,28 +1353,50 @@ MouseArea {
 							cellPushedMargin: config.cellPushedMargin
 
 							tileModel: config.useTileTabs ? popup.activeTabTiles : config.tileModel.value
+							property bool _tileModelSavePending: false
+							property bool _activeTabTilesSavePending: false
 
 							onEditTile: function(tile) { tileEditorViewLoader.open(tile, tileGrid) }
 							onMoveTileToTab: function(tileIndex, tabId) { popup.moveTileToTab(tileIndex, tabId) }
 
+							function flushPendingTileLayoutSave() {
+								if (_tileModelSavePending) {
+									saveTileModel.stop()
+									_tileModelSavePending = false
+									config.tileModel.save()
+								}
+								if (_activeTabTilesSavePending) {
+									saveActiveTabTilesDebounced.stop()
+									_activeTabTilesSavePending = false
+									popup.saveTileTabsImmediate()
+								}
+							}
+
 							onTileModelChanged: {
 								if (config.useTileTabs) {
+									_activeTabTilesSavePending = true
 									saveActiveTabTilesDebounced.restart()
 								} else {
+									_tileModelSavePending = true
 									saveTileModel.restart()
 								}
 							}
+							Component.onDestruction: flushPendingTileLayoutSave()
 							Timer {
 								id: saveTileModel
 								interval: 2000
-								onTriggered: config.tileModel.save()
+								onTriggered: {
+									_tileModelSavePending = false
+									config.tileModel.save()
+								}
 							}
 							Timer {
 								id: saveActiveTabTilesDebounced
 								interval: 2000
 								onTriggered: {
+									_activeTabTilesSavePending = false
 									if (config.useTileTabs) {
-										popup.saveTileTabs()
+										popup.saveTileTabsImmediate()
 									}
 								}
 							}
