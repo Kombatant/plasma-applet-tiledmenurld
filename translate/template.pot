@@ -107,11 +107,7 @@ msgid "Tile Margin"
 msgstr ""
 
 #: ../contents/ui/config/ConfigGeneral.qml ../contents/ui/TileEditorView.qml
-msgid "Background Color"
-msgstr ""
-
-#: ../contents/ui/config/ConfigGeneral.qml
-msgid "Custom Color"
+msgid "Background Colour"
 msgstr ""
 
 #: ../contents/ui/config/ConfigGeneral.qml

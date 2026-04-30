@@ -111,12 +111,8 @@ msgid "Tile Margin"
 msgstr "שולֵי האריח"
 
 #: ../contents/ui/config/ConfigGeneral.qml ../contents/ui/TileEditorView.qml
-msgid "Background Color"
+msgid "Background Colour"
 msgstr "צבע רקע"
-
-#: ../contents/ui/config/ConfigGeneral.qml
-msgid "Custom Color"
-msgstr "צבע מותאם אישית"
 
 #: ../contents/ui/config/ConfigGeneral.qml
 msgid "Gradient"

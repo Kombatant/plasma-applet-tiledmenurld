@@ -106,12 +106,8 @@ msgid "Tile Margin"
 msgstr "Margen de baldosa"
 
 #: ../contents/ui/config/ConfigGeneral.qml ../contents/ui/TileEditorView.qml
-msgid "Background Color"
+msgid "Background Colour"
 msgstr "Color de fondo"
-
-#: ../contents/ui/config/ConfigGeneral.qml
-msgid "Custom Color"
-msgstr "Color personalizado"
 
 #: ../contents/ui/config/ConfigGeneral.qml
 msgid "Gradient"

@@ -108,12 +108,8 @@ msgid "Tile Margin"
 msgstr "Tegelruimte"
 
 #: ../contents/ui/config/ConfigGeneral.qml ../contents/ui/TileEditorView.qml
-msgid "Background Color"
+msgid "Background Colour"
 msgstr "Achtergrondkleur"
-
-#: ../contents/ui/config/ConfigGeneral.qml
-msgid "Custom Color"
-msgstr "Aangepaste kleur"
 
 #: ../contents/ui/config/ConfigGeneral.qml
 msgid "Gradient"

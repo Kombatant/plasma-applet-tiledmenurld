@@ -108,12 +108,8 @@ msgid "Tile Margin"
 msgstr "方塊磚邊距"
 
 #: ../contents/ui/config/ConfigGeneral.qml ../contents/ui/TileEditorView.qml
-msgid "Background Color"
+msgid "Background Colour"
 msgstr "背景顏色"
-
-#: ../contents/ui/config/ConfigGeneral.qml
-msgid "Custom Color"
-msgstr "自訂顏色"
 
 #: ../contents/ui/config/ConfigGeneral.qml
 msgid "Gradient"

@@ -106,12 +106,8 @@ msgid "Tile Margin"
 msgstr "Rob ploščice"
 
 #: ../contents/ui/config/ConfigGeneral.qml ../contents/ui/TileEditorView.qml
-msgid "Background Color"
+msgid "Background Colour"
 msgstr "Barva ozadja"
-
-#: ../contents/ui/config/ConfigGeneral.qml
-msgid "Custom Color"
-msgstr "Barva po meri"
 
 #: ../contents/ui/config/ConfigGeneral.qml
 msgid "Gradient"

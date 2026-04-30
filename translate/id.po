@@ -106,12 +106,8 @@ msgid "Tile Margin"
 msgstr "Margin Ubin"
 
 #: ../contents/ui/config/ConfigGeneral.qml ../contents/ui/TileEditorView.qml
-msgid "Background Color"
+msgid "Background Colour"
 msgstr "Warna Latar Belakang"
-
-#: ../contents/ui/config/ConfigGeneral.qml
-msgid "Custom Color"
-msgstr "Warna Kustom"
 
 #: ../contents/ui/config/ConfigGeneral.qml
 msgid "Gradient"

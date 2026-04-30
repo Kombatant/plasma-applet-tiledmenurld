@@ -22,7 +22,7 @@ Item {
 	}
 
 	function colorWithAlpha(color, alpha) {
-		return Qt.rgba(color.r, color.g, color.b, alpha)
+		return Qt.rgba(color.r, color.g, color.b, Math.max(0, Math.min(1, color.a * alpha)))
 	}
 
 	readonly property bool baseIsLight: relativeLuminance(baseColor) > 0.6

@@ -106,12 +106,8 @@ msgid "Tile Margin"
 msgstr "타일 계선"
 
 #: ../contents/ui/config/ConfigGeneral.qml ../contents/ui/TileEditorView.qml
-msgid "Background Color"
+msgid "Background Colour"
 msgstr "배경 컬러"
-
-#: ../contents/ui/config/ConfigGeneral.qml
-msgid "Custom Color"
-msgstr "커스텀 컬러"
 
 #: ../contents/ui/config/ConfigGeneral.qml
 msgid "Gradient"

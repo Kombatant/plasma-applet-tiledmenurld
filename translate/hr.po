@@ -106,12 +106,8 @@ msgid "Tile Margin"
 msgstr "Margina Pločice"
 
 #: ../contents/ui/config/ConfigGeneral.qml ../contents/ui/TileEditorView.qml
-msgid "Background Color"
+msgid "Background Colour"
 msgstr "Boja Pozadine"
-
-#: ../contents/ui/config/ConfigGeneral.qml
-msgid "Custom Color"
-msgstr "Boja po volji"
 
 #: ../contents/ui/config/ConfigGeneral.qml
 msgid "Gradient"

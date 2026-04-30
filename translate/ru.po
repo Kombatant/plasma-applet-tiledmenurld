@@ -106,12 +106,8 @@ msgid "Tile Margin"
 msgstr "Край плитки"
 
 #: ../contents/ui/config/ConfigGeneral.qml ../contents/ui/TileEditorView.qml
-msgid "Background Color"
+msgid "Background Colour"
 msgstr "Цвет Фона"
-
-#: ../contents/ui/config/ConfigGeneral.qml
-msgid "Custom Color"
-msgstr "Пользовательский Цвет"
 
 #: ../contents/ui/config/ConfigGeneral.qml
 msgid "Gradient"

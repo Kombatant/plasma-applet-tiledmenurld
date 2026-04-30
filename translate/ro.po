@@ -106,12 +106,8 @@ msgid "Tile Margin"
 msgstr "Margine dală"
 
 #: ../contents/ui/config/ConfigGeneral.qml ../contents/ui/TileEditorView.qml
-msgid "Background Color"
+msgid "Background Colour"
 msgstr "Culoare de fundal"
-
-#: ../contents/ui/config/ConfigGeneral.qml
-msgid "Custom Color"
-msgstr "Culoare personalizată"
 
 #: ../contents/ui/config/ConfigGeneral.qml
 msgid "Gradient"

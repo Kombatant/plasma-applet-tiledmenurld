@@ -106,12 +106,8 @@ msgid "Tile Margin"
 msgstr "Kachelabstand"
 
 #: ../contents/ui/config/ConfigGeneral.qml ../contents/ui/TileEditorView.qml
-msgid "Background Color"
+msgid "Background Colour"
 msgstr "Hintergrundfarbe"
-
-#: ../contents/ui/config/ConfigGeneral.qml
-msgid "Custom Color"
-msgstr "Benutzerdefinierte Farbe"
 
 #: ../contents/ui/config/ConfigGeneral.qml
 msgid "Gradient"

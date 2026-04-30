@@ -108,12 +108,8 @@ msgid "Tile Margin"
 msgstr "Marginaali"
 
 #: ../contents/ui/config/ConfigGeneral.qml ../contents/ui/TileEditorView.qml
-msgid "Background Color"
+msgid "Background Colour"
 msgstr "Taustaväri"
-
-#: ../contents/ui/config/ConfigGeneral.qml
-msgid "Custom Color"
-msgstr "Väri"
 
 #: ../contents/ui/config/ConfigGeneral.qml
 msgid "Gradient"

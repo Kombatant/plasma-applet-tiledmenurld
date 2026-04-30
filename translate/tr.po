@@ -107,12 +107,8 @@ msgid "Tile Margin"
 msgstr "Döşeme Kenar Boşluğu"
 
 #: ../contents/ui/config/ConfigGeneral.qml ../contents/ui/TileEditorView.qml
-msgid "Background Color"
+msgid "Background Colour"
 msgstr "Arkaplan Rengi"
-
-#: ../contents/ui/config/ConfigGeneral.qml
-msgid "Custom Color"
-msgstr "Özel Renk"
 
 #: ../contents/ui/config/ConfigGeneral.qml
 msgid "Gradient"

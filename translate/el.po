@@ -106,12 +106,8 @@ msgid "Tile Margin"
 msgstr "Περιθώριο πλακιδίου"
 
 #: ../contents/ui/config/ConfigGeneral.qml ../contents/ui/TileEditorView.qml
-msgid "Background Color"
+msgid "Background Colour"
 msgstr "Χρώμα φόντου"
-
-#: ../contents/ui/config/ConfigGeneral.qml
-msgid "Custom Color"
-msgstr "Προσαρμοσμένο χρώμα"
 
 #: ../contents/ui/config/ConfigGeneral.qml
 msgid "Gradient"
