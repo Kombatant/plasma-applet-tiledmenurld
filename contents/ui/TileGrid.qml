@@ -34,7 +34,10 @@ DropArea {
 	}
 	readonly property int _holoPad: holographicPaddingFor(maxHoverWidth, maxHoverHeight)
 	readonly property real contentLeftInset: _holoPad + groupPanelInsetX
-	readonly property real contentRightInset: _holoPad + groupPanelInsetX
+	readonly property real contentRightInset: Math.max(
+		groupPanelInsetX,
+		width - (_holoPad + columns * cellBoxSize - groupPanelInsetX)
+	)
 
 	property int minColumns: Math.floor((width - 2 * _holoPad) / cellBoxSize)
 	property int minRows: Math.floor((height - 2 * _holoPad) / cellBoxSize)
