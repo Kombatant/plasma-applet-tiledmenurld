@@ -118,17 +118,23 @@ ListModel {
 			resultModel.append(resultList[i]);
 		}
 
-		//--- listen for changes
-		for (var i = 0; i < runnerModel.count; i++){
-			var runner = runnerModel.modelForRow(i);
-			if (!runner.listenersBound) {
-				runner.countChanged.connect(debouncedRefresh.logAndRestart)
-				runner.dataChanged.connect(debouncedRefresh.logAndRestart)
-				runner.listenersBound = true;
-			}
-		}
+		bindRunnerListeners()
 
 		refreshed()
+	}
+
+	// Connect runner listeners once per runner. Called from refresh() and from
+	// SearchModel.qml on runnerModel.onCountChanged so handlers can't pile up.
+	function bindRunnerListeners() {
+		for (var i = 0; i < runnerModel.count; i++) {
+			var runner = runnerModel.modelForRow(i)
+			if (!runner || runner.listenersBound) {
+				continue
+			}
+			runner.countChanged.connect(debouncedRefresh.logAndRestart)
+			runner.dataChanged.connect(debouncedRefresh.logAndRestart)
+			runner.listenersBound = true
+		}
 	}
 
 	function triggerIndex(index) {

@@ -202,6 +202,10 @@ Item {
 			appsView.showAppsAlphabetically()
 			return
 		}
+		// Trigger lazy AiChatModel construction in main.qml.
+		if (typeof popup !== "undefined" && popup) {
+			popup.aiChatViewRequested()
+		}
 		saveCurrentSizeMemoryViewBeforeSwitch()
 		rememberView("AiChat")
 		setActiveSizeMemoryView("AiChat")
@@ -430,7 +434,7 @@ Item {
 			source: "TileEditorView.qml"
 			visible: false
 			active: false
-			// asynchronous: true
+			asynchronous: true
 			function open(tile, grid) {
 				config.searchOverlayActive = false
 				config.showSearch = true

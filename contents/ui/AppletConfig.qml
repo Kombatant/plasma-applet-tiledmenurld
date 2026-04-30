@@ -8,6 +8,10 @@ import Qt.labs.platform as QtLabsPlatform
 Item {
 	readonly property string defaultPresetTilesFolderToken: "%PICTURES%/TiledMenuReloaded"
 
+	// Bump when adding new entries to ensureAllSettingsInitialized() so existing
+	// installs run the migration once, then skip on subsequent starts.
+	readonly property int currentSchemaVersion: 1
+
 	function _ensureSettingInitialized(key, defaultValue) {
 		var cur = plasmoid.configuration[key]
 		if (typeof cur === 'undefined' || cur === null) {
@@ -150,7 +154,11 @@ Item {
 	}
 
 	Component.onCompleted: {
-		ensureAllSettingsInitialized()
+		var stored = plasmoid.configuration.configSchemaVersion || 0
+		if (stored < currentSchemaVersion) {
+			ensureAllSettingsInitialized()
+			plasmoid.configuration.configSchemaVersion = currentSchemaVersion
+		}
 	}
 
 	function setAlpha(c, a) {

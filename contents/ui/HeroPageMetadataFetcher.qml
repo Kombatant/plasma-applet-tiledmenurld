@@ -59,9 +59,10 @@ Item {
 		secureIgdbClientSecret.readSecret()
 	}
 
-	Component.onCompleted: {
-		_ensureSecretLoaded(function() {})
-	}
+	// KWallet secret is read lazily on the first fetch path that needs it
+	// (resolveHeroicLutrisInfoForPage / IGDB token request). No eager warm-up
+	// at construction so opening the tile editor doesn't trigger a kwalletd
+	// qdbus round-trip until the user actually starts a metadata lookup.
 
 	function _appForPage(page) {
 		if (!page) return null

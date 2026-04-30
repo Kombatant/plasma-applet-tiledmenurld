@@ -3,7 +3,8 @@
     "allow": [
       "Bash(qmllint /home/kombatant/Dev/KDE/org.kde.plasma.plasmoid.kombatant.tiledmenurld/contents/ui/HeroicLutrisMetadataFetcher.qml)",
       "Read(//tmp/**)",
-      "Read(//usr/share/plasma/**)"
+      "Read(//usr/share/plasma/**)",
+      "Bash(journalctl --user --since \"2 minutes ago\")"
     ]
   }
 }

@@ -348,6 +348,10 @@
 			<label>Layout mode: true = Docked Sidebar layout, false = Classic layout.</label>
 			<default>true</default>
 		</entry>
+		<entry name="configSchemaVersion" type="int">
+			<label>Internal: bumped when AppletConfig.ensureAllSettingsInitialized adds new keys; used to skip the migration scan on subsequent starts.</label>
+			<default>0</default>
+		</entry>
 	</group>
 
 </kcfg>

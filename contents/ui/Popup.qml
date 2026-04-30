@@ -52,6 +52,7 @@ MouseArea {
 	property alias tileEditorViewLoader: searchView.tileEditorViewLoader
 	property alias tileGrid: tileGrid
 	property var aiChatModel
+	signal aiChatViewRequested()
 	property real _lastKnownDevicePixelRatio: 1
 	property real _lastRestoreDevicePixelRatio: 0
 	property bool _pendingDprSyncRestore: false
@@ -166,6 +167,10 @@ MouseArea {
 	}
 
 	function saveTileTabs() {
+		saveTileTabsDebounce.restart()
+	}
+
+	function saveTileTabsImmediate() {
 		try {
 			var json = JSON.stringify(tileTabsData)
 			_tabsWriting = true
@@ -174,6 +179,13 @@ MouseArea {
 		} catch (e) {
 			_tabsWriting = false
 		}
+	}
+
+	Timer {
+		id: saveTileTabsDebounce
+		interval: 250
+		repeat: false
+		onTriggered: popup.saveTileTabsImmediate()
 	}
 
 	function selectTab(index) {
@@ -1251,6 +1263,12 @@ MouseArea {
 
 						function runSlide(direction, newIndex) {
 							if (!config.useTileTabs) {
+								popup.activeTabIndex = newIndex
+								return
+							}
+							// Skip the snapshot transition when the source has not painted
+							// yet (first open, hidden tab) — it would flash a black frame.
+							if (tileGrid.width <= 0 || tileGrid.height <= 0 || !popup.widgetExpanded) {
 								popup.activeTabIndex = newIndex
 								return
 							}

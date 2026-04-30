@@ -119,6 +119,13 @@ Item {
 		id: resultModel
 	}
 
+	Connections {
+		target: runnerModel
+		function onCountChanged() {
+			resultModel.bindRunnerListeners()
+		}
+	}
+
 	readonly property var defaultFilters: plasmoid.configuration.searchDefaultFilters
 	function defaultFiltersContains(runnerId) {
 		return defaultFilters.indexOf(runnerId) != -1

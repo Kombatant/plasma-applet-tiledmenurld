@@ -13,7 +13,7 @@ Item {
 
 	property string order: "categories"
 	onOrderChanged: {
-		allAppsModel.refresh()
+		allAppsModel.applyOrder()
 	}
 	readonly property bool hasConfiguration: (typeof plasmoid !== "undefined") && plasmoid && plasmoid.configuration
 
@@ -370,40 +370,13 @@ Item {
 	}
 
 	Item {
-		//--- Detect Changes
-		// Changes aren't bubbled up to the RootModel, so we need to detect changes somehow.
-		
-		// Recent Apps
-		Repeater {
-			model: rootModel.count >= 0 ? rootModel.modelForRow(rootModel.recentAppsIndex) : []
-			
-				Item {
-					Component.onCompleted: {
-						if (appsModel.hasConfiguration && plasmoid.configuration.showRecentApps) {
-							debouncedRefreshRecentApps.restart()
-						}
-					}
-			}
-		}
-
-		// All Apps
-		Repeater { // A-Z
-			model: rootModel.count >= 2 ? rootModel.modelForRow(rootModel.allAppsIndex) : []
-
-			Item {
-				property var parentModel: rootModel.modelForRow(rootModel.allAppsIndex).modelForRow(index)
-
-				Repeater { // Aaa ... Azz (Apps)
-					model: parentModel && parentModel.hasChildren ? parentModel : []
-
-					Item {
-						Component.onCompleted: {
-							debouncedRefresh.restart()
-						}
-					}
-				}
-			}
-		}
+		// Detect Changes
+		// Refreshes are driven by:
+		//   - rootModel.onRefreshed (above) → debouncedRefresh.restart()
+		//   - rootModel.onCountChanged (above) → debouncedRefresh.restart()
+		//   - explicit config changes below.
+		// The previous nested-Repeater leaf-watcher fired per-app at construction
+		// and was fully redundant with rootModel.refreshed (which fires once).
 
 		Timer {
 			id: debouncedRefresh
@@ -416,11 +389,11 @@ Item {
 			interval: debouncedRefresh.interval
 			onTriggered: allAppsModel.refreshRecentApps()
 		}
-		
+
 		Connections {
 			target: appsModel.hasConfiguration ? plasmoid.configuration : null
 			function onShowRecentAppsChanged() { debouncedRefresh.restart() }
-			function onNumRecentAppsChanged() { debouncedRefresh.restart() }
+			function onNumRecentAppsChanged() { debouncedRefreshRecentApps.restart() }
 		}
 	}
 
@@ -472,6 +445,12 @@ Item {
 		onItemTriggered: {
 			plasmoid.expanded = false
 		}
+
+		// Cache of the parsed/sorted app lists. Both orderings come from the same
+		// rootModel snapshot; cache once per refresh and swap on order toggle
+		// instead of reparsing.
+		property var _cachedAlphabetical: null
+		property var _cachedCategories: null
 
 		function getRecentApps() {
 			var recentAppList = [];
@@ -601,30 +580,15 @@ Item {
 			return appList
 		}
 
-		function refresh() {
-			refreshing()
-			
-			//--- Apps
-			var appList = []
-			if (appsModel.order == "categories") {
-				appList = getAllCategories()
-			} else {
-				appList = getAllApps()
-			}
-
-			//--- Recent Apps
+		function _composeList(orderingList) {
+			var appList = orderingList.slice()
 			if (appsModel.hasConfiguration && plasmoid.configuration.showRecentApps) {
-				var recentAppList = getRecentApps();
-				appList = recentAppList.concat(appList); // prepend
+				appList = getRecentApps().concat(appList)
 			}
+			return appList
+		}
 
-			//--- Power
-			// var systemModel = rootModel.modelForRow(rootModel.count - 1)
-			// var systemList = []
-			// parseModel(systemList, systemModel)
-			// powerActionsModel.list = systemList;
-
-			//--- parse sectionIcons
+		function _applyList(appList) {
 			allAppsModel.sectionIcons = {}
 			for (var i = 0; i < appList.length; i++) {
 				var item = appList[i]
@@ -632,9 +596,30 @@ Item {
 					allAppsModel.sectionIcons[item.sectionKey] = item.sectionIcon
 				}
 			}
+			allAppsModel.list = appList
+		}
 
-			//--- apply model
-			allAppsModel.list = appList;
+		function applyOrder() {
+			// Swap to the cached ordering without reparsing the full app tree.
+			var ordering = (appsModel.order == "categories") ? _cachedCategories : _cachedAlphabetical
+			if (!ordering) {
+				refresh()
+				return
+			}
+			refreshing()
+			_applyList(_composeList(ordering))
+			refreshed()
+		}
+
+		function refresh() {
+			refreshing()
+
+			// Rebuild both ordering caches from the current rootModel snapshot.
+			_cachedAlphabetical = getAllApps()
+			_cachedCategories = getAllCategories()
+
+			var ordering = (appsModel.order == "categories") ? _cachedCategories : _cachedAlphabetical
+			_applyList(_composeList(ordering))
 
 			refreshed()
 		}

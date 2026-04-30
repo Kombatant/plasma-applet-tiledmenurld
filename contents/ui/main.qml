@@ -16,9 +16,29 @@ PlasmoidItem {
 	property string systemTerminalApp: ""
 	property string systemFileManagerApp: ""
 	property bool suppressHideOnWindowDeactivate: false
-	readonly property bool updateAvailable: updateChecker.updateAvailable
+	readonly property bool updateAvailable: updateCheckerLoader.item ? updateCheckerLoader.item.updateAvailable : false
 	readonly property url userAvatarSource: avatarResolver.avatarSource
 	readonly property bool hasUserAvatar: ("" + userAvatarSource)
+	property bool _systemDefaultsResolved: false
+	property bool _firstExpandHandled: false
+	readonly property var aiChatModelInstance: aiChatModelLoader.item
+
+	// Cold-start timing probes. Compare against onExpandedChanged for first-expand cost.
+	property double _bootStart: Date.now()
+
+	function _ensureSystemDefaultsResolved() {
+		if (_systemDefaultsResolved) {
+			return
+		}
+		_systemDefaultsResolved = true
+		systemDefaultsExec.readTerminalService()
+		systemFileManagerExec.readFileManagerService()
+	}
+
+	function _ensureAiChatModel() {
+		aiChatModelLoader.active = true
+		return aiChatModelLoader.item
+	}
 
 	function refreshAvatar() {
 		avatarResolver.refresh()
@@ -36,6 +56,7 @@ PlasmoidItem {
 	Plasmoid.backgroundHints: PlasmaCore.Types.DefaultBackground | PlasmaCore.Types.ConfigurableBackground
 
 	function resolveTerminalLauncher() {
+		_ensureSystemDefaultsResolved()
 		if (systemTerminalApp) {
 			return systemTerminalApp
 		}
@@ -43,6 +64,7 @@ PlasmoidItem {
 	}
 
 	function resolveFileManagerLauncher() {
+		_ensureSystemDefaultsResolved()
 		if (systemFileManagerApp) {
 			return systemFileManagerApp
 		}
@@ -62,8 +84,12 @@ PlasmoidItem {
 		}
 	}
 
-	AiChatModel {
-		id: aiChatService
+	// Lazy: AiChatModel does Base64+JSON.parse of chat history and KWallet qdbus on
+	// completion. Defer until user actually opens AI chat view.
+	Loader {
+		id: aiChatModelLoader
+		active: false
+		sourceComponent: AiChatModel {}
 	}
 
 	property alias rootModel: appsModel.rootModel
@@ -82,7 +108,7 @@ PlasmoidItem {
 			id: avatarResolver
 			property string avatarPath: ""
 			readonly property url avatarSource: avatarPath ? _fileUrl(avatarPath) : ""
-			Component.onCompleted: refresh()
+			// Avatar refresh deferred to first popup expand (see onExpandedChanged).
 
 			function _localPathFromUrl(value) {
 				if (!value) {
@@ -133,20 +159,27 @@ PlasmoidItem {
 			}
 		}
 
+		Timer {
+			id: avatarRefreshDebounce
+			interval: 50
+			repeat: false
+			onTriggered: avatarResolver.refresh()
+		}
+
 		Connections {
 			target: plasmoid.configuration
 			function onCustomAvatarPathChanged() {
-				avatarResolver.refresh()
+				avatarRefreshDebounce.restart()
 			}
 		}
 
 		Connections {
 			target: kuser
 			function onFaceIconUrlChanged() {
-				avatarResolver.refresh()
+				avatarRefreshDebounce.restart()
 			}
 			function onLoginNameChanged() {
-				avatarResolver.refresh()
+				avatarRefreshDebounce.restart()
 			}
 		}
 
@@ -203,9 +236,14 @@ PlasmoidItem {
 		id: config
 	}
 
-	UpdateChecker {
-		id: updateChecker
-		localVersion: Plasmoid.metaData.version
+	// Lazy: avoid HTTP fetch to GitHub at plasmoid construction. Loader is activated
+	// after the first popup expand idle tick (see onExpandedChanged).
+	Loader {
+		id: updateCheckerLoader
+		active: false
+		sourceComponent: UpdateChecker {
+			localVersion: Plasmoid.metaData.version
+		}
 	}
 
 	toolTipMainText: ""
@@ -251,6 +289,18 @@ PlasmoidItem {
 
 			// Show icon active effect without hovering
 			justOpenedTimer.start()
+
+			// First-expand deferred work: kick off update check + log timing.
+			if (!widget._firstExpandHandled) {
+				widget._firstExpandHandled = true
+				logger.log('first expand at', (Date.now() - widget._bootStart) + 'ms after construction')
+				Qt.callLater(function() {
+					updateCheckerLoader.active = true
+					if (updateCheckerLoader.item && typeof updateCheckerLoader.item.check === 'function') {
+						updateCheckerLoader.item.check(false)
+					}
+				})
+			}
 		}
 	}
 	Timer {
@@ -261,7 +311,8 @@ PlasmoidItem {
 
 	fullRepresentation: Popup {
 		id: popup
-		aiChatModel: aiChatService
+		aiChatModel: widget.aiChatModelInstance
+		onAiChatViewRequested: widget._ensureAiChatModel()
 
 		Layout.minimumWidth: config.minimumPopupWidth
 		Layout.minimumHeight: config.minimumHeight
@@ -344,7 +395,9 @@ PlasmoidItem {
 	]
 
 	Component.onCompleted: {
-		systemDefaultsExec.readTerminalService()
-		systemFileManagerExec.readFileManagerService()
+		// kreadconfig6 lookups deferred to first resolveTerminalLauncher/resolveFileManagerLauncher call.
+		// AiChatModel + UpdateChecker constructed lazily via Loaders.
+		// Avatar refresh fires on first popup expand.
+		logger.log('Component.onCompleted at', (Date.now() - _bootStart) + 'ms')
 	}
 }
