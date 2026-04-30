@@ -487,7 +487,7 @@ Item {
 		}
 		return labels
 	}
-	TextMetrics {
+	FontMetrics {
 		id: dockedSidebarPowerLabelMetrics
 		font: Kirigami.Theme.smallFont
 	}
@@ -495,9 +495,9 @@ Item {
 		var maxLabel = 0
 		var labels = dockedSidebarPowerLabels
 		for (var i = 0; i < labels.length; i++) {
-			dockedSidebarPowerLabelMetrics.text = labels[i]
-			if (dockedSidebarPowerLabelMetrics.width > maxLabel) {
-				maxLabel = dockedSidebarPowerLabelMetrics.width
+			var labelWidth = dockedSidebarPowerLabelMetrics.advanceWidth(labels[i] || "")
+			if (labelWidth > maxLabel) {
+				maxLabel = labelWidth
 			}
 		}
 		return Math.max(flatButtonSize, Math.ceil(maxLabel) + Kirigami.Units.smallSpacing * 2)
