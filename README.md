@@ -5,6 +5,10 @@ Tiled Menu Reloaded is a Plasma applet that provides a tiled launcher loosely in
 > [!IMPORTANT]  
 > Used various LLMs as a playground for code generation and assistance in forking/structuring/coding the project.
 
+![Docked sidebar Layout and Carousel Tile](contents/docs/docked_sidebar.png)
+
+![Classic Layout](contents/docs/main.png)
+
 ## Origins
 - Forked from zren's (kind of abandoned) Tiled Menu: https://github.com/Zren/plasma-applet-tiledmenu
 
@@ -30,13 +34,9 @@ Tiled Menu Reloaded is a Plasma applet that provides a tiled launcher loosely in
 - New default preset images folder: ~/Pictures/TiledMenuReloaded, configurable in settings.
 
 <details>
-<summary><h2>Click here for screenshots</h2></summary>
+<summary><h2>Click here for more screenshots</h2></summary>
 
-![Docked sidebar Layout and Carousel Tile](contents/docs/docked_sidebar.png)
-
-![Classic Layout](contents/docs/main.png)
-
-![With tab support enabled](contents/docs/tabs.png)
+![Hidden tabs](contents/docs/no_tabs.png)
 
 ![Bottom Sidebar position](contents/docs/bottom_sidebar.png)
 

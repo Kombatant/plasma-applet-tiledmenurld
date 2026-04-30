@@ -40,6 +40,13 @@ FlatButton {
 		y: (parent.height - height) / 2
 	}
 
+	readonly property real _badgeIconWidth: Math.max(0, icon.width || sidebarItem._iconSize)
+	readonly property real _badgeIconHeight: Math.max(0, icon.height || sidebarItem._iconSize)
+	readonly property real _badgeIconLeft: display === QQC2.AbstractButton.IconOnly
+		? leftPadding + ((availableWidth - _badgeIconWidth) / 2)
+		: leftPadding
+	readonly property real _badgeIconTop: topPadding + ((availableHeight - _badgeIconHeight) / 2)
+
 	Rectangle {
 		id: updateBadgeDot
 		visible: sidebarItem.showBadge
@@ -50,8 +57,8 @@ FlatButton {
 		border.color: Kirigami.Theme.backgroundColor
 		border.width: Math.max(1, Math.round(Screen.devicePixelRatio * 1.5))
 		z: 9999
-		x: sidebarItem.width - width - Math.round(width)
-		y: Math.round(width * 0.1)
+		x: Math.round(sidebarItem._badgeIconLeft + sidebarItem._badgeIconWidth - (width * 0.45))
+		y: Math.round(sidebarItem._badgeIconTop - (width * 0.15))
 	}
 
 	Loader {
