@@ -348,7 +348,12 @@ ColumnLayout {
 				Layout.preferredHeight: config.flatButtonIconSize + powerLabel.implicitHeight + Kirigami.Units.smallSpacing * 2
 				buttonHeight: Layout.preferredHeight
 				hoverEnabled: true
-				onClicked: appsModel.powerActionsModel.triggerIndex(index)
+				onClicked: {
+					if (popup && typeof popup.flushPendingTileLayoutSave === "function") {
+						popup.flushPendingTileLayoutSave()
+					}
+					appsModel.powerActionsModel.triggerIndex(index)
+				}
 
 				Loader {
 					id: powerHoverEffect

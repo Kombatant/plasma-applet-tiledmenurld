@@ -8,6 +8,12 @@ PlasmaExtras.Menu {
 	id: kickerContextMenu
 	required property var model
 
+	function flushPendingState() {
+		if (popup && typeof popup.flushPendingTileLayoutSave === "function") {
+			popup.flushPendingTileLayoutSave()
+		}
+	}
+
 	function computePlacement() {
 		// Align to the sidebar, not the panel edge, per Plasma 6 menu behavior.
 		if (typeof config !== "undefined" && config) {
@@ -53,6 +59,7 @@ PlasmaExtras.Menu {
 			text: model.name || model.display
 			visible: !model.disabled
 			onClicked: {
+				kickerContextMenu.flushPendingState()
 				kickerContextMenu.model.triggerIndex(index)
 			}
 		}
