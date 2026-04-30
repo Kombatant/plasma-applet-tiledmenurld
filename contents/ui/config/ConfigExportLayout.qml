@@ -196,6 +196,8 @@ Item {
 	property var cfg_sidebarPositionDefault
 	property var cfg_useDockedLayout
 	property var cfg_useDockedLayoutDefault
+	property var cfg_configSchemaVersion
+	property var cfg_configSchemaVersionDefault
 
 	// Force Window color scheme instead of inheriting Plasma theme colors
 	Kirigami.Theme.colorSet: Kirigami.Theme.Window
@@ -297,6 +299,7 @@ Item {
 		sidebarPosition: "string",
 		tileRoundedCorners: "bool",
 		tileCornerRadius: "int",
+		configSchemaVersion: "int",
 	})
 
 			TiledMenu.Base64XmlString {

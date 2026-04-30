@@ -196,6 +196,8 @@ Item {
 	property var cfg_sidebarPositionDefault
 	property var cfg_useDockedLayout
 	property var cfg_useDockedLayoutDefault
+	property var cfg_configSchemaVersion
+	property var cfg_configSchemaVersionDefault
 
 	// Force Window color scheme instead of inheriting Plasma theme colors
 	// This ensures controls look correct in light mode when Plasma theme is dark
