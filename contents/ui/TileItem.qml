@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Controls as QQC2
+import QtQuick.Effects
 import org.kde.plasma.core as PlasmaCore
 import org.kde.plasma.private.kicker as Kicker
 import org.kde.kirigami as Kirigami
@@ -85,7 +86,7 @@ Item {
 	Item {
 		id: tileContent
 		anchors.fill: parent
-		clip: appObj.inGroup
+		clip: appObj.inGroup && !(tileItemView && tileItemView.useHolographicEffect && tileItemView.hovered)
 		scale: (tileItemView && tileItemView.useHolographicEffect && tileMouseArea.containsMouse) ? tileGrid.holographicHoverScale : 1.0
 		transformOrigin: Item.Center
 		Behavior on scale {
@@ -137,8 +138,68 @@ Item {
 		}
 
 		Item {
-			id: labelOverlay
+			id: labelOverlayScrim
 			visible: !appObj.isHero && useOverlayLabel && !useStyledGroupHeader && appObj.showLabel && appObj.labelText.length > 0
+			anchors.fill: tileItemView
+
+			Item {
+				id: labelOverlayScrimContent
+				anchors.fill: parent
+
+				Rectangle {
+					anchors.left: parent.left
+					anchors.right: parent.right
+					anchors.bottom: parent.bottom
+					height: (descriptionLabelFontMetrics.lineSpacing * 2) + labelScrimTopPadding + labelPaddingY
+					visible: height > 0
+					gradient: Gradient {
+						GradientStop { position: 0.0; color: Qt.rgba(0, 0, 0, 0.0) }
+						GradientStop { position: 0.45; color: Qt.rgba(0, 0, 0, 0.18) }
+						GradientStop { position: 1.0; color: Qt.rgba(0, 0, 0, 0.82) }
+					}
+				}
+			}
+
+			Rectangle {
+				id: labelOverlayScrimMask
+				anchors.fill: parent
+				radius: tileItemView.cornerRadius
+				color: "white"
+				antialiasing: true
+				smooth: true
+			}
+
+			ShaderEffectSource {
+				id: labelOverlayScrimMaskSource
+				sourceItem: labelOverlayScrimMask
+				recursive: true
+				live: true
+				hideSource: true
+				smooth: true
+			}
+
+			ShaderEffectSource {
+				id: labelOverlayScrimSource
+				sourceItem: labelOverlayScrimContent
+				recursive: true
+				live: true
+				hideSource: true
+				smooth: true
+			}
+
+			MultiEffect {
+				anchors.fill: parent
+				source: labelOverlayScrimSource
+				maskEnabled: true
+				maskSource: labelOverlayScrimMaskSource
+				antialiasing: true
+				smooth: true
+			}
+		}
+
+		Item {
+			id: labelOverlay
+			visible: labelOverlayScrim.visible
 			anchors.left: tileItemView.left
 			anchors.right: tileItemView.right
 			anchors.bottom: tileItemView.bottom
@@ -146,18 +207,6 @@ Item {
 			anchors.rightMargin: labelPaddingX
 			anchors.bottomMargin: labelPaddingY
 			height: visible ? (descriptionLabelFontMetrics.lineSpacing * 2) : 0
-
-			Rectangle {
-				x: -labelPaddingX
-				y: -labelScrimTopPadding
-				width: parent.width + labelPaddingX * 2
-				height: parent.height + labelScrimTopPadding + labelPaddingY
-				gradient: Gradient {
-					GradientStop { position: 0.0; color: Qt.rgba(0, 0, 0, 0.0) }
-					GradientStop { position: 0.45; color: Qt.rgba(0, 0, 0, 0.18) }
-					GradientStop { position: 1.0; color: Qt.rgba(0, 0, 0, 0.82) }
-				}
-			}
 
 			QQC2.Label {
 				id: descriptionLabelOutlineDark

@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Effects
+import Qt5Compat.GraphicalEffects as QtGraphicalEffects
 import org.kde.plasma.components as PlasmaComponents3
 import org.kde.kirigami as Kirigami
 import org.kde.plasma.plasmoid
@@ -8,7 +9,7 @@ Rectangle {
 	id: tileItemView
 	color: (appObj.isGroup || appObj.usesGroupPanelStyling) ? "transparent" : appObj.backgroundColor
 	radius: cornerRadius
-	clip: appObj.inGroup
+	clip: appObj.inGroup && !(useHolographicEffect && hovered)
 	readonly property real cornerRadius: (config && config.tileCornerRadius ? config.tileCornerRadius : 0)
 	property color gradientBottomColor: Qt.darker(appObj.backgroundColor, 2.0)
 	readonly property bool usesPanelBackground: !appObj.isGroup && !appObj.usesGroupPanelStyling
@@ -17,18 +18,9 @@ Rectangle {
 	readonly property bool useHolographicEffect: !appObj.isGroup && plasmoid && plasmoid.configuration && plasmoid.configuration.tileHoverEffect === "holographic"
 	readonly property color holographicColor: "#00ffff" // Cyan
 	readonly property real holographicGlowOpacity: 0.5
-
-	// Glow effect layer (box-shadow emulation) - only for holographic effect
-	layer.enabled: useHolographicEffect && hovered
-	layer.effect: MultiEffect {
-		autoPaddingEnabled: true
-		shadowEnabled: true
-		shadowHorizontalOffset: 0
-		shadowVerticalOffset: 0
-		shadowBlur: 1.0
-		shadowOpacity: tileItemView.holographicGlowOpacity
-		shadowColor: tileItemView.holographicColor
-	}
+	readonly property real holographicGlowSpread: (typeof tileGrid !== "undefined" && tileGrid && typeof tileGrid.hoverOutlineSize !== "undefined")
+		? tileGrid.hoverOutlineSize
+		: Math.max(1, Math.round(Screen.devicePixelRatio))
 
 	function _fileExtFromUrl(url) {
 		if (!url) {
@@ -487,6 +479,30 @@ Rectangle {
 						easing.type: Easing.OutCubic
 					}
 				}
+			}
+		}
+	}
+
+	QtGraphicalEffects.RectangularGlow {
+		id: holographicGlow
+		anchors.fill: parent
+		anchors.margins: -tileItemView.holographicGlowSpread
+		visible: tileItemView.useHolographicEffect
+		opacity: (tileItemView.useHolographicEffect && tileItemView.hovered) ? 1 : 0
+		glowRadius: tileItemView.holographicGlowSpread * 2
+		spread: 0.2
+		color: Qt.rgba(
+			tileItemView.holographicColor.r,
+			tileItemView.holographicColor.g,
+			tileItemView.holographicColor.b,
+			tileItemView.holographicGlowOpacity
+		)
+		cornerRadius: tileItemView.cornerRadius + tileItemView.holographicGlowSpread * 2
+
+		Behavior on opacity {
+			NumberAnimation {
+				duration: 300
+				easing.type: Easing.OutCubic
 			}
 		}
 	}
