@@ -1,6 +1,5 @@
 import QtQuick
 import QtQuick.Layouts
-import QtQuick.Window
 import QtQuick.Effects
 import org.kde.plasma.components as PlasmaComponents3
 import org.kde.kirigami as Kirigami
@@ -67,8 +66,6 @@ Item {
 	readonly property real _heroNavHitSize: Kirigami.Units.iconSizes.medium + Kirigami.Units.smallSpacing * 2
 	readonly property real _heroContentSideMargin: Kirigami.Units.largeSpacing + ((effectivePages && effectivePages.length > 1) ? (_heroNavHitSize + Kirigami.Units.smallSpacing) : 0)
 	readonly property real _heroContentRowSpacing: Kirigami.Units.smallSpacing * 1.5
-	readonly property bool _surfaceBorderVisible: !plasmoid.configuration.sidebarHideBorder
-	readonly property real _surfaceBorderWidth: _surfaceBorderVisible ? Math.max(1, Math.round(Screen.devicePixelRatio)) : 0
 
 	Connections {
 		target: typeof tileGrid !== "undefined" ? tileGrid : null
@@ -612,27 +609,6 @@ Item {
 		maskSource: roundedMaskSource
 		antialiasing: true
 		smooth: true
-	}
-
-	Rectangle {
-		anchors.fill: parent
-		radius: heroView.cornerRadius
-		color: "transparent"
-		visible: heroView._surfaceBorderVisible
-		border.width: heroView._surfaceBorderWidth
-		border.color: surfaceCard.rimColor
-	}
-
-	Rectangle {
-		anchors.left: parent.left
-		anchors.right: parent.right
-		anchors.bottom: parent.bottom
-		anchors.leftMargin: heroView.cornerRadius
-		anchors.rightMargin: heroView.cornerRadius
-		visible: surfaceCard.useFrostedSurface && heroView._surfaceBorderVisible
-		height: heroView._surfaceBorderWidth
-		color: surfaceCard.bottomRimColor
-		opacity: 0.55
 	}
 
 	Timer {

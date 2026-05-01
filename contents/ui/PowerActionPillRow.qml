@@ -48,12 +48,6 @@ PillRowSurface {
 		hoveredPowerActionIndex = -1
 	}
 
-	function flushPendingState() {
-		if (popup && typeof popup.flushPendingTileLayoutSave === "function") {
-			popup.flushPendingTileLayoutSave()
-		}
-	}
-
 	HoverHandler {
 		id: powerRowHover
 		target: root
@@ -125,10 +119,7 @@ PillRowSurface {
 				Layout.fillHeight: true
 				Layout.minimumWidth: 0
 				iconSize: config.flatButtonIconSize
-				onClicked: {
-					root.flushPendingState()
-					appsModel.powerActionsModel.triggerIndex(index)
-				}
+				onClicked: appsModel.powerActionsModel.triggerIndex(index)
 				onHoveredChanged: {
 					if (hovered) {
 						root.setHoveredPowerActionIndex(index)
