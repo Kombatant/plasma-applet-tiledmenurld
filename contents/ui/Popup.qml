@@ -1359,25 +1359,33 @@ MouseArea {
 							onEditTile: function(tile) { tileEditorViewLoader.open(tile, tileGrid) }
 							onMoveTileToTab: function(tileIndex, tabId) { popup.moveTileToTab(tileIndex, tabId) }
 
+							function syncConfigTileModelValue() {
+								if (!config.useTileTabs) {
+									config.tileModel.value = tileGrid.tileModel
+								}
+							}
+
 							function flushPendingTileLayoutSave() {
-								if (_tileModelSavePending) {
+								if (tileGrid._tileModelSavePending) {
 									saveTileModel.stop()
-									_tileModelSavePending = false
+									tileGrid._tileModelSavePending = false
+									tileGrid.syncConfigTileModelValue()
 									config.tileModel.save()
 								}
-								if (_activeTabTilesSavePending) {
+								if (tileGrid._activeTabTilesSavePending) {
 									saveActiveTabTilesDebounced.stop()
-									_activeTabTilesSavePending = false
+									tileGrid._activeTabTilesSavePending = false
 									popup.saveTileTabsImmediate()
 								}
 							}
 
 							onTileModelChanged: {
 								if (config.useTileTabs) {
-									_activeTabTilesSavePending = true
+									tileGrid._activeTabTilesSavePending = true
 									saveActiveTabTilesDebounced.restart()
 								} else {
-									_tileModelSavePending = true
+									tileGrid.syncConfigTileModelValue()
+									tileGrid._tileModelSavePending = true
 									saveTileModel.restart()
 								}
 							}
@@ -1386,7 +1394,8 @@ MouseArea {
 								id: saveTileModel
 								interval: 2000
 								onTriggered: {
-									_tileModelSavePending = false
+									tileGrid._tileModelSavePending = false
+									tileGrid.syncConfigTileModelValue()
 									config.tileModel.save()
 								}
 							}
@@ -1394,7 +1403,7 @@ MouseArea {
 								id: saveActiveTabTilesDebounced
 								interval: 2000
 								onTriggered: {
-									_activeTabTilesSavePending = false
+									tileGrid._activeTabTilesSavePending = false
 									if (config.useTileTabs) {
 										popup.saveTileTabsImmediate()
 									}

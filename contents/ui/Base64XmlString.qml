@@ -11,6 +11,7 @@ QtObject {
 	property string configValue: ""
 	property variant value: { return {} }
 	property variant defaultValue: { return {} }
+	property bool usePendingWrites: false
 	property bool writing: false
 	property bool loadOnConfigChange: true
 	property var _disconnectConfigChange: null
@@ -60,7 +61,11 @@ QtObject {
 	function refreshConfigValue() {
 		var nextValue = ""
 		if (configKey) {
-			nextValue = ConfigUtils.pendingValue(base64XmlString, configKey, plasmoid.configuration[configKey]) || ""
+			if (usePendingWrites) {
+				nextValue = ConfigUtils.pendingValue(base64XmlString, configKey, plasmoid.configuration[configKey]) || ""
+			} else {
+				nextValue = plasmoid.configuration[configKey] || ""
+			}
 		}
 		if (configValue !== nextValue) {
 			configValue = nextValue
@@ -302,11 +307,20 @@ QtObject {
 	}
 
 	function setBase64Xml(key, data) {
-		// Serialize to an XML <tiles> fragment then base64 encode
-		var xml = _buildTilesXmlFragment(data)
-		var val = Base64.encodeString(xml)
+		var val = ""
+		if (!(Array.isArray(data) && data.length === 0)) {
+			// Serialize to an XML <tiles> fragment then base64 encode.
+			// For an empty array, persist the config default as an empty string so
+			// KConfig drops the stale previous value instead of keeping old tile data.
+			var xml = _buildTilesXmlFragment(data)
+			val = Base64.encodeString(xml)
+		}
 		writing = true
-		ConfigUtils.setPendingValue(base64XmlString, key, val)
+		if (usePendingWrites) {
+			ConfigUtils.setPendingValue(base64XmlString, key, val)
+		} else {
+			plasmoid.configuration[key] = val
+		}
 		configValue = val
 		writing = false
 	}

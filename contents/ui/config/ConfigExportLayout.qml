@@ -309,6 +309,7 @@ Item {
 				id: configTileModel
 				configKey: "tileModel"
 				defaultValue: []
+				usePendingWrites: true
 			}
 
 	property bool _updatingTextFromConfig: false
