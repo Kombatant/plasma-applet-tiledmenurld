@@ -434,7 +434,7 @@ Item {
 			source: "TileEditorView.qml"
 			visible: false
 			active: false
-			asynchronous: true
+			asynchronous: false
 			function open(tile, grid) {
 				config.searchOverlayActive = false
 				config.showSearch = true
