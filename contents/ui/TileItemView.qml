@@ -165,6 +165,12 @@ Rectangle {
 		&& !useInlineLabel
 		&& modelData.h >= 2
 	readonly property real standaloneLabelRowTop: Math.max(0, (modelData.h - 1) * cellBoxSize - cellMargin)
+	readonly property bool labelOverlapsIcon: label.visible
+		&& icon.visible
+		&& label.x < icon.x + icon.width
+		&& label.x + label.width > icon.x
+		&& label.y < icon.y + icon.height
+		&& label.y + label.height > icon.y
 	property bool hovered: false
 
 	states: [
@@ -368,7 +374,7 @@ Rectangle {
 
 		PlasmaComponents3.Label {
 			id: labelOutlineDark
-			visible: label.visible && (appObj.usesGroupPanelStyling || tileItem.labelOutlineDarkOpacity > 0)
+			visible: label.visible && tileItem.labelNeedsInlineOutline
 			text: label.text
 			anchors.fill: label
 			clip: true
@@ -381,12 +387,12 @@ Rectangle {
 			renderType: Text.QtRendering
 			color: "transparent"
 			style: Text.Outline
-			styleColor: appObj.usesGroupPanelStyling ? tileItem.groupTileLabelOutlineDarkColor : tileItem.labelOutlineDarkColor
+			styleColor: tileItem.labelOutlineDarkColor
 		}
 
 		PlasmaComponents3.Label {
 			id: labelOutlineLight
-			visible: label.visible && (appObj.usesGroupPanelStyling || tileItem.labelOutlineLightOpacity > 0)
+			visible: false
 			text: label.text
 			anchors.fill: label
 			clip: true
@@ -399,12 +405,12 @@ Rectangle {
 			renderType: Text.QtRendering
 			color: "transparent"
 			style: Text.Outline
-			styleColor: appObj.usesGroupPanelStyling ? tileItem.groupTileLabelOutlineLightColor : tileItem.labelOutlineLightColor
+			styleColor: "transparent"
 		}
 
 		PlasmaComponents3.Label {
 			id: labelShadow
-			visible: label.visible
+			visible: label.visible && tileItem.labelNeedsShadow
 			text: label.text
 			x: label.x + tileItem.labelShadowOffset
 			y: label.y + tileItem.labelShadowOffset
@@ -417,7 +423,7 @@ Rectangle {
 			horizontalAlignment: label.horizontalAlignment
 			verticalAlignment: label.verticalAlignment
 			renderType: Text.QtRendering
-			color: appObj.usesGroupPanelStyling ? tileItem.groupTileLabelSoftShadowColor : tileItem.labelShadowColor
+			color: tileItem.labelShadowColor
 		}
 
 		PlasmaComponents3.Label {
@@ -438,7 +444,7 @@ Rectangle {
 			verticalAlignment: Text.AlignBottom
 			width: parent.width
 			renderType: Text.QtRendering // Fix pixelation when scaling. Plasma.Label uses NativeRendering.
-			color: appObj.usesGroupPanelStyling ? tileItem.groupTileLabelColor : tileItem.readableLabelTextColor
+			color: tileItem.readableLabelTextColor
 			style: Text.Normal
 			styleColor: "transparent"
 		}

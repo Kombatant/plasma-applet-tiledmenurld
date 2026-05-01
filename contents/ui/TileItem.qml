@@ -44,19 +44,24 @@ Item {
 	readonly property real labelShadowOffset: Math.max(1, Math.round(1 * Screen.devicePixelRatio))
 	readonly property color labelBaseColor: (tileItemView && appObj.backgroundGradient ? tileItemView.gradientBottomColor : appObj.backgroundColor)
 	readonly property real labelBaseLuma: _relativeLuminance(labelBaseColor)
-	readonly property real labelOutlineDarkOpacity: useOverlayLabel ? 0.88 : 0.78
-	readonly property real labelOutlineLightOpacity: 0.0
-	readonly property color labelOutlineDarkColor: Qt.rgba(0, 0, 0, labelOutlineDarkOpacity)
-	readonly property color labelOutlineLightColor: Qt.rgba(1, 1, 1, labelOutlineLightOpacity)
-	readonly property color labelShadowColor: useOverlayLabel ? Qt.rgba(0, 0, 0, 0.42) : Qt.rgba(0, 0, 0, 0.34)
-	readonly property color readableLabelTextColor: Qt.rgba(1, 1, 1, 0.98)
-	readonly property real groupTileLabelBgLuma: _relativeLuminance(Kirigami.Theme.backgroundColor)
-	readonly property bool groupTileLabelBgIsLight: groupTileLabelBgLuma >= 0.5
-	readonly property color groupTileLabelColor: Qt.rgba(Kirigami.Theme.textColor.r, Kirigami.Theme.textColor.g, Kirigami.Theme.textColor.b, 0.92)
-	readonly property color groupTileLabelShadowColor: groupTileLabelBgIsLight ? Qt.rgba(1, 1, 1, 0.9) : Qt.rgba(0, 0, 0, 0.75)
-	readonly property color groupTileLabelOutlineDarkColor: Qt.rgba(0, 0, 0, 0.45)
-	readonly property color groupTileLabelOutlineLightColor: Qt.rgba(1, 1, 1, 0.45)
-	readonly property color groupTileLabelSoftShadowColor: groupTileLabelBgIsLight ? Qt.rgba(0, 0, 0, 0.2) : Qt.rgba(1, 1, 1, 0.2)
+	readonly property bool labelUsesThemeForeground: appObj.usesGroupPanelStyling || (!useOverlayLabel && appObj.backgroundColor.a <= 0.01)
+	readonly property bool labelUsesImageScrim: useOverlayLabel
+	readonly property bool labelNeedsInlineOutline: !!(tileItemView && tileItemView.labelOverlapsIcon)
+	readonly property bool labelSurfaceIsLight: labelBaseLuma >= 0.5
+	readonly property color readableLabelTextColor: {
+		if (labelUsesThemeForeground) {
+			return Kirigami.Theme.textColor
+		}
+		if (labelUsesImageScrim || labelNeedsInlineOutline) {
+			return Qt.rgba(1, 1, 1, 0.98)
+		}
+		return labelSurfaceIsLight
+			? Qt.rgba(0, 0, 0, 0.92)
+			: Qt.rgba(1, 1, 1, 0.96)
+	}
+	readonly property bool labelNeedsShadow: labelNeedsInlineOutline
+	readonly property color labelShadowColor: labelNeedsInlineOutline ? Qt.rgba(0, 0, 0, 0.6) : "transparent"
+	readonly property color labelOutlineDarkColor: labelNeedsInlineOutline ? Qt.rgba(0, 0, 0, 0.9) : "transparent"
 	readonly property font groupLabelFont: Qt.font({
 		family: Kirigami.Theme.defaultFont.family,
 		pointSize: Kirigami.Theme.defaultFont.pointSize + 4,
@@ -156,7 +161,7 @@ Item {
 
 			QQC2.Label {
 				id: descriptionLabelOutlineDark
-				visible: labelOverlay.visible && labelOutlineDarkOpacity > 0
+				visible: false
 				text: appObj.labelText
 				anchors.left: parent.left
 				anchors.right: parent.right
@@ -173,12 +178,12 @@ Item {
 				color: "transparent"
 				renderType: Text.QtRendering
 				style: Text.Outline
-				styleColor: labelOutlineDarkColor
+				styleColor: "transparent"
 			}
 
 			QQC2.Label {
 				id: descriptionLabelOutlineLight
-				visible: labelOverlay.visible && labelOutlineLightOpacity > 0
+				visible: false
 				text: appObj.labelText
 				anchors.left: parent.left
 				anchors.right: parent.right
@@ -195,12 +200,12 @@ Item {
 				color: "transparent"
 				renderType: Text.QtRendering
 				style: Text.Outline
-				styleColor: labelOutlineLightColor
+				styleColor: "transparent"
 			}
 
 			QQC2.Label {
 				id: descriptionLabelShadow
-				visible: labelOverlay.visible
+				visible: labelOverlay.visible && labelNeedsShadow
 				text: appObj.labelText
 				anchors.left: parent.left
 				anchors.right: parent.right
@@ -214,7 +219,7 @@ Item {
 				wrapMode: Text.Wrap
 				maximumLineCount: 2
 				elide: Text.ElideRight
-				opacity: useOverlayLabel ? 0.3 : 0.24
+				opacity: 1
 				font: appObj.isGroup ? groupLabelFont : Qt.font({ pixelSize: Kirigami.Theme.defaultFont.pixelSize, bold: false })
 				color: labelShadowColor
 				renderType: Text.QtRendering
@@ -243,7 +248,7 @@ Item {
 
 		QQC2.Label {
 			id: descriptionLabelBelowOutlineDark
-			visible: descriptionLabelBelow.visible
+			visible: false
 			text: descriptionLabelBelow.text
 			anchors.fill: descriptionLabelBelow
 			clip: true
@@ -257,12 +262,12 @@ Item {
 			color: "transparent"
 			renderType: Text.QtRendering
 			style: Text.Outline
-			styleColor: appObj.usesGroupPanelStyling ? groupTileLabelOutlineDarkColor : labelOutlineDarkColor
+			styleColor: "transparent"
 		}
 
 		QQC2.Label {
 			id: descriptionLabelBelowOutlineLight
-			visible: descriptionLabelBelow.visible && appObj.usesGroupPanelStyling
+			visible: false
 			text: descriptionLabelBelow.text
 			anchors.fill: descriptionLabelBelow
 			clip: true
@@ -276,12 +281,12 @@ Item {
 			color: "transparent"
 			renderType: Text.QtRendering
 			style: Text.Outline
-			styleColor: groupTileLabelOutlineLightColor
+			styleColor: "transparent"
 		}
 
 		QQC2.Label {
 			id: descriptionLabelBelowShadow
-			visible: descriptionLabelBelow.visible
+			visible: descriptionLabelBelow.visible && labelNeedsShadow
 			text: descriptionLabelBelow.text
 			x: descriptionLabelBelow.x + labelShadowOffset
 			y: descriptionLabelBelow.y + labelShadowOffset
@@ -295,7 +300,7 @@ Item {
 			elide: descriptionLabelBelow.elide
 			opacity: 1
 			font: descriptionLabelBelow.font
-			color: appObj.usesGroupPanelStyling ? groupTileLabelSoftShadowColor : labelShadowColor
+			color: labelShadowColor
 			renderType: Text.QtRendering
 		}
 
@@ -317,11 +322,11 @@ Item {
 			wrapMode: Text.Wrap
 			maximumLineCount: 2
 			elide: Text.ElideRight
-			opacity: appObj.usesGroupPanelStyling ? 1 : 0.92
+			opacity: 1
 			font: appObj.isGroup ? groupLabelFont : Qt.font({ pixelSize: Kirigami.Theme.defaultFont.pixelSize, bold: false })
 			style: Text.Normal
 			styleColor: "transparent"
-			color: appObj.usesGroupPanelStyling ? groupTileLabelColor : readableLabelTextColor
+			color: readableLabelTextColor
 			renderType: Text.QtRendering
 		}
 	}
