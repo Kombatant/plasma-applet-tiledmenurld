@@ -165,7 +165,6 @@ Rectangle {
 	// Wide single-row non-group tiles show inline label (icon in first cell, label in remaining cells)
 	readonly property bool useInlineLabel: !appObj.isGroup && modelData.w >= 2 && modelData.h == 1 && appObj.showLabel
 	readonly property bool useStandaloneFilledLabel: appObj.isLauncher
-		&& !appObj.inGroup
 		&& !appObj.hasExplicitBackgroundImage
 		&& appObj.backgroundColor.a > 0
 		&& appObj.showLabel
@@ -376,6 +375,60 @@ Rectangle {
 		}
 
 		PlasmaComponents3.Label {
+			id: labelOutlineDark
+			visible: label.visible && appObj.usesGroupPanelStyling
+			text: label.text
+			anchors.fill: label
+			clip: true
+			wrapMode: label.wrapMode
+			maximumLineCount: label.maximumLineCount
+			elide: label.elide
+			horizontalAlignment: label.horizontalAlignment
+			verticalAlignment: label.verticalAlignment
+			width: label.width
+			renderType: Text.QtRendering
+			color: "transparent"
+			style: Text.Outline
+			styleColor: tileItem.groupTileLabelOutlineDarkColor
+		}
+
+		PlasmaComponents3.Label {
+			id: labelOutlineLight
+			visible: label.visible && appObj.usesGroupPanelStyling
+			text: label.text
+			anchors.fill: label
+			clip: true
+			wrapMode: label.wrapMode
+			maximumLineCount: label.maximumLineCount
+			elide: label.elide
+			horizontalAlignment: label.horizontalAlignment
+			verticalAlignment: label.verticalAlignment
+			width: label.width
+			renderType: Text.QtRendering
+			color: "transparent"
+			style: Text.Outline
+			styleColor: tileItem.groupTileLabelOutlineLightColor
+		}
+
+		PlasmaComponents3.Label {
+			id: labelShadow
+			visible: label.visible && appObj.usesGroupPanelStyling
+			text: label.text
+			x: label.x + tileItem.labelShadowOffset
+			y: label.y + tileItem.labelShadowOffset
+			width: label.width
+			height: label.height
+			clip: true
+			wrapMode: label.wrapMode
+			maximumLineCount: label.maximumLineCount
+			elide: label.elide
+			horizontalAlignment: label.horizontalAlignment
+			verticalAlignment: label.verticalAlignment
+			renderType: Text.QtRendering
+			color: tileItem.groupTileLabelSoftShadowColor
+		}
+
+		PlasmaComponents3.Label {
 			id: label
 			visible: false // Label is rendered outside the tile (below) in TileItem.qml
 			text: appObj.labelText
@@ -385,15 +438,18 @@ Rectangle {
 			anchors.rightMargin: tilePadding
 			anchors.left: parent.left
 			anchors.right: parent.right
-			wrapMode: Text.Wrap
+			clip: true
+			wrapMode: tileItemView.useStandaloneFilledLabel ? Text.Wrap : Text.NoWrap
+			maximumLineCount: tileItemView.useStandaloneFilledLabel ? 2 : 1
+			elide: Text.ElideRight
 			horizontalAlignment: labelBelowIcon ? Text.AlignHCenter : labelAlignment
 			verticalAlignment: Text.AlignBottom
 			width: parent.width
 			renderType: Text.QtRendering // Fix pixelation when scaling. Plasma.Label uses NativeRendering.
 			color: appObj.usesGroupPanelStyling ? tileItem.groupTileLabelColor : Kirigami.Theme.textColor
-			style: appObj.usesGroupPanelStyling ? Text.Raised : Text.Outline
+			style: appObj.usesGroupPanelStyling ? Text.Normal : Text.Outline
 			styleColor: appObj.usesGroupPanelStyling
-				? tileItem.groupTileLabelShadowColor
+				? "transparent"
 				: (appObj.backgroundGradient ? tileItemView.gradientBottomColor : appObj.backgroundColor)
 		}
 

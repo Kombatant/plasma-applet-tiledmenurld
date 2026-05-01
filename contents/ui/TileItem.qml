@@ -54,6 +54,9 @@ Item {
 	readonly property bool groupTileLabelBgIsLight: groupTileLabelBgLuma >= 0.5
 	readonly property color groupTileLabelColor: Qt.rgba(Kirigami.Theme.textColor.r, Kirigami.Theme.textColor.g, Kirigami.Theme.textColor.b, 0.92)
 	readonly property color groupTileLabelShadowColor: groupTileLabelBgIsLight ? Qt.rgba(1, 1, 1, 0.9) : Qt.rgba(0, 0, 0, 0.75)
+	readonly property color groupTileLabelOutlineDarkColor: Qt.rgba(0, 0, 0, 0.45)
+	readonly property color groupTileLabelOutlineLightColor: Qt.rgba(1, 1, 1, 0.45)
+	readonly property color groupTileLabelSoftShadowColor: groupTileLabelBgIsLight ? Qt.rgba(0, 0, 0, 0.2) : Qt.rgba(1, 1, 1, 0.2)
 	readonly property font groupLabelFont: Qt.font({
 		family: Kirigami.Theme.defaultFont.family,
 		pointSize: Kirigami.Theme.defaultFont.pointSize + 4,
@@ -219,6 +222,64 @@ Item {
 		}
 
 		QQC2.Label {
+			id: descriptionLabelBelowOutlineDark
+			visible: descriptionLabelBelow.visible && appObj.usesGroupPanelStyling
+			text: descriptionLabelBelow.text
+			anchors.fill: descriptionLabelBelow
+			clip: true
+			horizontalAlignment: descriptionLabelBelow.horizontalAlignment
+			verticalAlignment: descriptionLabelBelow.verticalAlignment
+			wrapMode: descriptionLabelBelow.wrapMode
+			maximumLineCount: descriptionLabelBelow.maximumLineCount
+			elide: descriptionLabelBelow.elide
+			opacity: 1
+			font: descriptionLabelBelow.font
+			color: "transparent"
+			renderType: Text.QtRendering
+			style: Text.Outline
+			styleColor: groupTileLabelOutlineDarkColor
+		}
+
+		QQC2.Label {
+			id: descriptionLabelBelowOutlineLight
+			visible: descriptionLabelBelow.visible && appObj.usesGroupPanelStyling
+			text: descriptionLabelBelow.text
+			anchors.fill: descriptionLabelBelow
+			clip: true
+			horizontalAlignment: descriptionLabelBelow.horizontalAlignment
+			verticalAlignment: descriptionLabelBelow.verticalAlignment
+			wrapMode: descriptionLabelBelow.wrapMode
+			maximumLineCount: descriptionLabelBelow.maximumLineCount
+			elide: descriptionLabelBelow.elide
+			opacity: 1
+			font: descriptionLabelBelow.font
+			color: "transparent"
+			renderType: Text.QtRendering
+			style: Text.Outline
+			styleColor: groupTileLabelOutlineLightColor
+		}
+
+		QQC2.Label {
+			id: descriptionLabelBelowShadow
+			visible: descriptionLabelBelow.visible && appObj.usesGroupPanelStyling
+			text: descriptionLabelBelow.text
+			x: descriptionLabelBelow.x + labelShadowOffset
+			y: descriptionLabelBelow.y + labelShadowOffset
+			width: descriptionLabelBelow.width
+			height: descriptionLabelBelow.height
+			clip: true
+			horizontalAlignment: descriptionLabelBelow.horizontalAlignment
+			verticalAlignment: descriptionLabelBelow.verticalAlignment
+			wrapMode: descriptionLabelBelow.wrapMode
+			maximumLineCount: descriptionLabelBelow.maximumLineCount
+			elide: descriptionLabelBelow.elide
+			opacity: 1
+			font: descriptionLabelBelow.font
+			color: groupTileLabelSoftShadowColor
+			renderType: Text.QtRendering
+		}
+
+		QQC2.Label {
 			id: descriptionLabelBelow
 			// Hide when inline label is used (wide single-row non-group tiles with label)
 			visible: !appObj.isHero && !useOverlayLabel && !useStyledGroupHeader && appObj.showLabel && appObj.labelText.length > 0 && !tileItemView.useInlineLabel && !tileItemView.useStandaloneFilledLabel
@@ -238,9 +299,10 @@ Item {
 			elide: Text.ElideRight
 			opacity: appObj.usesGroupPanelStyling ? 1 : 0.92
 			font: appObj.isGroup ? groupLabelFont : Qt.font({ pixelSize: Kirigami.Theme.defaultFont.pixelSize, bold: false })
-			style: appObj.usesGroupPanelStyling ? Text.Raised : Text.Normal
-			styleColor: appObj.usesGroupPanelStyling ? groupTileLabelShadowColor : "transparent"
+			style: Text.Normal
+			styleColor: "transparent"
 			color: appObj.usesGroupPanelStyling ? groupTileLabelColor : Kirigami.Theme.textColor
+			renderType: Text.QtRendering
 		}
 	}
 
