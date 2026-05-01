@@ -99,8 +99,8 @@ Rectangle {
 		return s
 	}
 
-	// Keep static tile backgrounds bound across close/open so they do not visibly
-	// repopulate on every expand. Only the animated renderer is gated on expansion.
+	// Clear image sources when the plasmoid is closed to release cached frames/textures.
+	// Use a short delay to avoid thrash when toggling quickly.
 	// In docked sidebar mode `plasmoid.expanded` is unreliable (often false even
 	// while the sidebar is shown); fall back to `widget.expanded` which Popup.qml
 	// already uses as its expansion source of truth.
@@ -113,9 +113,10 @@ Rectangle {
 		}
 		return true
 	}
-	readonly property string normalizedBackgroundImageSource: normalizedBackgroundSource(appObj.backgroundImage)
+	property bool expandedActive: true
+	readonly property string activeBackgroundSource: expandedActive ? normalizedBackgroundSource(appObj.backgroundImage) : ""
 	property string failedBackgroundSource: ""
-	readonly property string safeBackgroundSource: normalizedBackgroundImageSource && normalizedBackgroundImageSource !== failedBackgroundSource ? normalizedBackgroundImageSource : ""
+	readonly property string safeBackgroundSource: activeBackgroundSource && activeBackgroundSource !== failedBackgroundSource ? activeBackgroundSource : ""
 	property int animatedReloadToken: 0
 	readonly property string animatedBackgroundSource: safeBackgroundSource ? (safeBackgroundSource + "#reload=" + animatedReloadToken) : ""
 	readonly property bool backgroundIsAnimated: {
@@ -125,7 +126,6 @@ Rectangle {
 	// When the animated renderer is created via the Loader, check its status
 	readonly property bool backgroundAnimatedLoadFailed: backgroundIsAnimated && (animatedLoader.item ? animatedLoader.item.status === Image.Error : false)
 	readonly property bool backgroundUseAnimatedRenderer: backgroundIsAnimated && !backgroundAnimatedLoadFailed
-	readonly property bool backgroundAnimatedReady: backgroundIsAnimated && (animatedLoader.item ? animatedLoader.item.status === Image.Ready : false)
 	readonly property bool animatedPlayOnHoverEnabled: {
 		if (plasmoid && plasmoid.configuration && typeof plasmoid.configuration.tileAnimatedPlayOnHover !== 'undefined') {
 			return !!plasmoid.configuration.tileAnimatedPlayOnHover
@@ -252,10 +252,10 @@ Rectangle {
 		Image {
 			id: backgroundImage
 			anchors.fill: parent
-			// Keep a static fallback visible until the animated renderer is actually
-			// ready, so animated backgrounds don't flash blank while spinning up.
+			// Show a static fallback (first frame) whenever there's a background image
+			// but the animated renderer is not active, or the animated load failed.
 			visible: !!safeBackgroundSource && (
-				!tileItemView.backgroundIsAnimated || tileItemView.backgroundAnimatedLoadFailed || !tileItemView.backgroundAnimatedReady
+				!tileItemView.backgroundIsAnimated || tileItemView.backgroundAnimatedLoadFailed || !animatedLoader.active
 			)
 			source: safeBackgroundSource
 			fillMode: Image.PreserveAspectCrop
@@ -269,13 +269,24 @@ Rectangle {
 			}
 		}
 
+		Timer {
+			id: unloadDelayTimer
+			interval: 250
+			repeat: false
+			onTriggered: tileItemView.expandedActive = false
+		}
+
 		// React to whichever expansion source actually toggles (widget.expanded in
 		// docked sidebar mode, plasmoid.expanded in floating popup mode).
 		Connections {
 			target: tileItemView
 			function onEffectiveExpandedChanged() {
 				if (tileItemView.effectiveExpanded) {
+					unloadDelayTimer.stop()
+					tileItemView.expandedActive = true
 					tileItemView.bumpAnimatedReload()
+				} else {
+					unloadDelayTimer.restart()
 				}
 			}
 		}
