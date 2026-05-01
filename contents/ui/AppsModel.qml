@@ -374,6 +374,7 @@ Item {
 		// Refreshes are driven by:
 		//   - rootModel.onRefreshed (above) → debouncedRefresh.restart()
 		//   - rootModel.onCountChanged (above) → debouncedRefresh.restart()
+		//   - recent apps child-model changes below → debouncedRefreshRecentApps.restart()
 		//   - explicit config changes below.
 		// The previous nested-Repeater leaf-watcher fired per-app at construction
 		// and was fully redundant with rootModel.refreshed (which fires once).
@@ -394,6 +395,18 @@ Item {
 			target: appsModel.hasConfiguration ? plasmoid.configuration : null
 			function onShowRecentAppsChanged() { debouncedRefresh.restart() }
 			function onNumRecentAppsChanged() { debouncedRefreshRecentApps.restart() }
+			function onRecentOrderingChanged() { debouncedRefreshRecentApps.restart() }
+		}
+
+		Connections {
+			target: appsModel.rootRowAvailable(rootModel.recentAppsIndex) ? rootModel.modelForRow(rootModel.recentAppsIndex) : null
+			ignoreUnknownSignals: true
+			function onDataChanged() { debouncedRefreshRecentApps.restart() }
+			function onRowsInserted() { debouncedRefreshRecentApps.restart() }
+			function onRowsRemoved() { debouncedRefreshRecentApps.restart() }
+			function onRowsMoved() { debouncedRefreshRecentApps.restart() }
+			function onModelReset() { debouncedRefreshRecentApps.restart() }
+			function onLayoutChanged() { debouncedRefreshRecentApps.restart() }
 		}
 	}
 
@@ -489,8 +502,15 @@ Item {
 				return
 			}
 			var recentAppList = getRecentApps();
-			var recentAppCount = 5
-			if (recentAppCount == recentAppList.length) {
+			var visibleRecentAppCount = 0
+			for (var visibleIndex = 0; visibleIndex < list.length; visibleIndex++) {
+				var visibleItem = list[visibleIndex]
+				if (!visibleItem || visibleItem.sectionKey !== recentAppsSectionKey) {
+					break
+				}
+				visibleRecentAppCount += 1
+			}
+			if (visibleRecentAppCount == recentAppList.length) {
 				// Do a partial update since we're only updating properties.
 				refreshing()
 
