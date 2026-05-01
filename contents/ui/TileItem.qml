@@ -221,7 +221,7 @@ Item {
 		QQC2.Label {
 			id: descriptionLabelBelow
 			// Hide when inline label is used (wide single-row non-group tiles with label)
-			visible: !appObj.isHero && !useOverlayLabel && !useStyledGroupHeader && appObj.showLabel && appObj.labelText.length > 0 && !tileItemView.useInlineLabel
+			visible: !appObj.isHero && !useOverlayLabel && !useStyledGroupHeader && appObj.showLabel && appObj.labelText.length > 0 && !tileItemView.useInlineLabel && !tileItemView.useStandaloneFilledLabel
 			text: appObj.labelText
 			anchors.top: tileItemView.bottom
 			anchors.left: parent.left

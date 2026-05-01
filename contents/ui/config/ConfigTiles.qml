@@ -46,7 +46,26 @@ LibConfig.FormKCM {
 		var raw = formLayout.cfg_tileTabStyle !== undefined ? formLayout.cfg_tileTabStyle : plasmoid.configuration.tileTabStyle
 		return raw === "pills" ? "pills" : "tabs"
 	}
+	readonly property string pendingDefaultTileColorMode: {
+		var raw = formLayout.cfg_defaultTileColorMode !== undefined ? ("" + formLayout.cfg_defaultTileColorMode) : ("" + plasmoid.configuration.defaultTileColorMode)
+		if (raw === "theme" || raw === "custom" || raw === "transparent") {
+			return raw
+		}
+		var legacyValue = formLayout.cfg_defaultTileColor !== undefined ? ("" + formLayout.cfg_defaultTileColor) : ("" + plasmoid.configuration.defaultTileColor)
+		if (legacyValue === "#00000000") {
+			return "transparent"
+		}
+		if (legacyValue.length > 0) {
+			return "custom"
+		}
+		return "theme"
+	}
 	readonly property string pendingTileTabMode: pendingUseTileTabs ? pendingTileTabStyle : "disabled"
+	readonly property string plasmaStyleLabelText: {
+		var plasmaStyleText = i18nd("kcm_desktoptheme", "Plasma Style")
+		return i18n("Follow Current %1 (%2)", plasmaStyleText, KSvg.ImageSet.imageSetName)
+	}
+	readonly property string plasmaStyleTileColorText: "" + Kirigami.Theme.highlightColor
 
 	readonly property int pendingCellBoxSize: {
 		var rawMargin = formLayout.cfg_tileMargin !== undefined ? formLayout.cfg_tileMargin : plasmoid.configuration.tileMargin
@@ -72,6 +91,16 @@ LibConfig.FormKCM {
 		ConfigUtils.setPendingValue(formLayout, "useTileTabs", enabled)
 		if (enabled) {
 			ConfigUtils.setPendingValue(formLayout, "tileTabStyle", mode === "pills" ? "pills" : "tabs")
+		}
+	}
+
+	function setPendingDefaultTileColorMode(mode) {
+		ConfigUtils.setPendingValue(formLayout, "defaultTileColorMode", mode)
+		if (mode === "custom") {
+			var currentColor = formLayout.cfg_defaultTileColor !== undefined ? ("" + formLayout.cfg_defaultTileColor) : ("" + plasmoid.configuration.defaultTileColor)
+			if (!currentColor || currentColor === "#00000000") {
+				ConfigUtils.setPendingValue(formLayout, "defaultTileColor", plasmaStyleTileColorText)
+			}
 		}
 	}
 
@@ -230,37 +259,41 @@ LibConfig.FormKCM {
 		id: tilesThemeGroup
 		Kirigami.FormData.label: i18n("Standalone Tile Background Colour")
 		spacing: 0 // "Custom Colour" has lots of spacings already
+
+		QQC2.RadioButton {
+			text: formLayout.plasmaStyleLabelText
+			QQC2.ButtonGroup.group: tilesThemeGroup.group
+			checked: formLayout.pendingDefaultTileColorMode === "theme"
+			onClicked: formLayout.setPendingDefaultTileColorMode("theme")
+		}
+
 		RowLayout {
 			QQC2.RadioButton {
 				id: defaultTileColorRadioButton
 				text: i18n("Custom Colour")
 				QQC2.ButtonGroup.group: tilesThemeGroup.group
-				checked: defaultTileColorColor.value !== "#00000000"
-				onClicked: {
-					// If we're currently in the Transparent state, switch back to a non-transparent
-					// value so this radio can remain selected.
-					if (defaultTileColorColor.value === "#00000000") {
-						defaultTileColorColor.text = ""
-					}
-				}
+				checked: formLayout.pendingDefaultTileColorMode === "custom"
+				onClicked: formLayout.setPendingDefaultTileColorMode("custom")
 			}
 			LibConfig.ColorField {
 				id: defaultTileColorColor
 				configKey: 'defaultTileColor'
-			}
-			LibConfig.CheckBox {
-				text: i18n("Gradient")
-				configKey: 'defaultTileGradient'
+				enabled: formLayout.pendingDefaultTileColorMode === "custom"
+				opacity: enabled ? 1 : 0.45
 			}
 		}
 		QQC2.RadioButton {
 			id: transparentTileColorRadioButton
 			text: i18n("Transparent")
 			QQC2.ButtonGroup.group: tilesThemeGroup.group
-			checked: defaultTileColorColor.value === "#00000000"
-			onClicked: {
-				defaultTileColorColor.text = "#00000000"
-			}
+			checked: formLayout.pendingDefaultTileColorMode === "transparent"
+			onClicked: formLayout.setPendingDefaultTileColorMode("transparent")
+		}
+		LibConfig.CheckBox {
+			text: i18n("Gradient")
+			configKey: 'defaultTileGradient'
+			enabled: formLayout.pendingDefaultTileColorMode !== "transparent"
+			opacity: enabled ? 1 : 0.45
 		}
 	}
 	LibConfig.ComboBox {

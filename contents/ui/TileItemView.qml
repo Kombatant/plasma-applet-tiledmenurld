@@ -164,10 +164,51 @@ Rectangle {
 	readonly property bool labelBelowIcon: !(modelData.w >= 2 && modelData.h == 1)
 	// Wide single-row non-group tiles show inline label (icon in first cell, label in remaining cells)
 	readonly property bool useInlineLabel: !appObj.isGroup && modelData.w >= 2 && modelData.h == 1 && appObj.showLabel
+	readonly property bool useStandaloneFilledLabel: appObj.isLauncher
+		&& !appObj.inGroup
+		&& !appObj.hasExplicitBackgroundImage
+		&& appObj.backgroundColor.a > 0
+		&& appObj.showLabel
+		&& appObj.labelText.length > 0
+		&& !useInlineLabel
+		&& modelData.h >= 2
+	readonly property real standaloneLabelRowTop: Math.max(0, (modelData.h - 1) * cellBoxSize - cellMargin)
 
 	property bool hovered: false
 
 	states: [
+		State {
+			when: useStandaloneFilledLabel
+			AnchorChanges { target: icon
+				anchors.verticalCenter: standaloneIconArea.verticalCenter
+				anchors.top: undefined
+				anchors.horizontalCenter: contentLayer.horizontalCenter
+				anchors.left: undefined
+			}
+			PropertyChanges { target: icon
+				anchors.topMargin: 0
+				anchors.leftMargin: 0
+				size: Math.max(
+					smallIconSize,
+					Math.min(
+						mediumIconSize,
+						Math.max(0, standaloneIconArea.height - tilePadding * 2)
+					)
+				)
+			}
+			PropertyChanges { target: label
+				visible: true
+				verticalAlignment: Text.AlignVCenter
+				horizontalAlignment: tileItemView.labelAlignment
+				anchors.topMargin: 0
+			}
+			AnchorChanges { target: label
+				anchors.top: standaloneIconArea.bottom
+				anchors.bottom: contentLayer.bottom
+				anchors.left: contentLayer.left
+				anchors.right: contentLayer.right
+			}
+		},
 		State {
 			when: modelData.w == 1 && modelData.h >= 1
 			PropertyChanges { target: icon; size: appObj.usesGroupPanelStyling ? Math.round(mediumIconSize * 0.92) : smallIconSize }
@@ -221,6 +262,15 @@ Rectangle {
 	Item {
 		id: contentLayer
 		anchors.fill: parent
+
+		Item {
+			id: standaloneIconArea
+			visible: false
+			anchors.left: parent.left
+			anchors.right: parent.right
+			anchors.top: parent.top
+			height: tileItemView.standaloneLabelRowTop
+		}
 
 		Component {
 			id: animatedBackgroundComponent

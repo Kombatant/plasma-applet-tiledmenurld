@@ -153,6 +153,10 @@
 		</entry>
 
 		<!-- Colors -->
+		<entry name="defaultTileColorMode" type="string">
+			<!-- enum: theme, custom, transparent -->
+			<default></default>
+		</entry>
 		<!-- Use empty string instead of color type so that we can use default colors from the color scheme. -->
 		<entry name="defaultTileColor" type="string">
 			<default></default>

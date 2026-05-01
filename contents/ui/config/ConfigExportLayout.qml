@@ -96,6 +96,8 @@ Item {
 	property var cfg_tileAnimatedPlayOnHoverDefault
 	property var cfg_showTileTooltips
 	property var cfg_showTileTooltipsDefault
+	property var cfg_defaultTileColorMode
+	property var cfg_defaultTileColorModeDefault
 	property var cfg_defaultTileColor
 	property var cfg_defaultTileColorDefault
 	property var cfg_defaultTileGradient
@@ -247,6 +249,7 @@ Item {
 		tileHoverEffect: "string",
 		tileAnimatedPlayOnHover: "bool",
 		showTileTooltips: "bool",
+		defaultTileColorMode: "string",
 		defaultTileColor: "string",
 		defaultTileGradient: "bool",
 		sidebarBackgroundColor: "string",

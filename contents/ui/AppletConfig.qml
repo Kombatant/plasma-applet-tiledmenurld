@@ -10,7 +10,7 @@ Item {
 
 	// Bump when adding new entries to ensureAllSettingsInitialized() so existing
 	// installs run the migration once, then skip on subsequent starts.
-	readonly property int currentSchemaVersion: 1
+	readonly property int currentSchemaVersion: 2
 
 	function _ensureSettingInitialized(key, defaultValue) {
 		var cur = plasmoid.configuration[key]
@@ -93,7 +93,22 @@ Item {
 		_ensureSettingInitialized('tileAnimatedPlayOnHover', true)
 		_ensureSettingInitialized('showTileTooltips', false)
 
-		// Use empty string to indicate "use theme/default".
+		// Standalone tile background colour mode.
+		var tileColorMode = plasmoid.configuration.defaultTileColorMode
+		if (tileColorMode !== "theme" && tileColorMode !== "custom" && tileColorMode !== "transparent") {
+			var legacyDefaultTileColor = "" + (plasmoid.configuration.defaultTileColor || "")
+			if (legacyDefaultTileColor === "#00000000") {
+				tileColorMode = "transparent"
+			} else if (legacyDefaultTileColor.length > 0) {
+				tileColorMode = "custom"
+			} else {
+				tileColorMode = "theme"
+			}
+			plasmoid.configuration.defaultTileColorMode = tileColorMode
+		}
+
+		// Use empty string to indicate "no stored custom colour".
+		_ensureSettingInitialized('defaultTileColorMode', tileColorMode)
 		_ensureSettingInitialized('defaultTileColor', '')
 		_ensureSettingInitialized('defaultTileGradient', false)
 		_ensureSettingInitialized('sidebarBackgroundColor', '')
@@ -603,7 +618,30 @@ Item {
 			return Kirigami.Theme.backgroundColor
 		}
 	}
-	readonly property color defaultTileColor: plasmoid.configuration.defaultTileColor || themeButtonBgColor
+	readonly property color plasmaStyleTileColor: Kirigami.Theme.highlightColor
+	readonly property string defaultTileColorMode: {
+		var value = typeof plasmoid.configuration.defaultTileColorMode !== "undefined" ? ("" + plasmoid.configuration.defaultTileColorMode) : ""
+		if (value === "theme" || value === "custom" || value === "transparent") {
+			return value
+		}
+		var legacyValue = "" + (plasmoid.configuration.defaultTileColor || "")
+		if (legacyValue === "#00000000") {
+			return "transparent"
+		}
+		if (legacyValue.length > 0) {
+			return "custom"
+		}
+		return "theme"
+	}
+	readonly property color defaultTileColor: {
+		if (defaultTileColorMode === "transparent") {
+			return "#00000000"
+		}
+		if (defaultTileColorMode === "custom") {
+			return plasmoid.configuration.defaultTileColor || plasmaStyleTileColor
+		}
+		return plasmaStyleTileColor
+	}
 	readonly property bool defaultTileGradient: plasmoid.configuration.defaultTileGradient
 	readonly property color sidebarBackgroundColor: plasmoid.configuration.sidebarBackgroundColor || Kirigami.Theme.backgroundColor
 	readonly property string surfaceStyle: {
