@@ -664,6 +664,18 @@ Item {
 		readonly property bool hasIcon: tabIcon !== ""
 		readonly property bool isHovered: hoverArea.containsMouse
 		readonly property string tabIcon: (modelData && modelData.icon) || ""
+		readonly property real _labelShadowOffset: Math.max(1, Math.round(Screen.devicePixelRatio))
+		readonly property color _labelOutlineDarkColor: Qt.rgba(0, 0, 0, 0.45)
+		readonly property color _labelOutlineLightColor: Qt.rgba(1, 1, 1, 0.45)
+		readonly property color _labelShadowColor: Qt.rgba(0, 0, 0, 0.2)
+		readonly property font _labelFont: Qt.font({
+			family: Kirigami.Theme.defaultFont.family,
+			pointSize: tabDelegate.pillsMode
+				? Kirigami.Theme.defaultFont.pointSize
+				: Math.round(Kirigami.Theme.defaultFont.pointSize * 1.05),
+			weight: tabDelegate.isActive ? Font.DemiBold : Font.Normal,
+			italic: Kirigami.Theme.defaultFont.italic
+		})
 
 		width: pillsMode
 			? Math.max(Kirigami.Units.gridUnit * 5, tabLabelMetrics.advanceWidth + (hasIcon ? tabIconItem.width + Kirigami.Units.smallSpacing : 0) + Kirigami.Units.gridUnit * 2)
@@ -672,7 +684,7 @@ Item {
 
 		TextMetrics {
 			id: tabLabelMetrics
-			font: tabLabelText.font
+			font: tabDelegate._labelFont
 			text: (tabDelegate.modelData && tabDelegate.modelData.name) || ""
 		}
 
@@ -780,24 +792,74 @@ Item {
 				id: tabIconItem
 				visible: tabDelegate.hasIcon
 				source: tabDelegate.tabIcon
-				width: visible ? tabLabelText.font.pixelSize : 0
+				width: visible ? tabDelegate._labelFont.pixelSize : 0
 				height: width
 				anchors.verticalCenter: parent.verticalCenter
 				color: tabDelegate._fgColor
 			}
 
-			QQC2.Label {
-				id: tabLabelText
-				horizontalAlignment: Text.AlignHCenter
-				verticalAlignment: Text.AlignVCenter
-				font.pointSize: tabDelegate.pillsMode
-					? Kirigami.Theme.defaultFont.pointSize
-					: Math.round(Kirigami.Theme.defaultFont.pointSize * 1.05)
-				font.weight: tabDelegate.isActive ? Font.DemiBold : Font.Normal
-				text: (tabDelegate.modelData && tabDelegate.modelData.name) || ""
-				color: tabDelegate._fgColor
-				Behavior on color { ColorAnimation { duration: 120 } }
-				elide: Text.ElideRight
+			Item {
+				width: tabLabelMetrics.advanceWidth + (tabDelegate.pillsMode ? 0 : tabDelegate._labelShadowOffset)
+				height: Math.max(tabLabelText.implicitHeight, tabLabelShadow.implicitHeight + tabDelegate._labelShadowOffset)
+
+				QQC2.Label {
+					id: tabLabelOutlineDark
+					visible: !tabDelegate.pillsMode
+					anchors.fill: parent
+					horizontalAlignment: Text.AlignHCenter
+					verticalAlignment: Text.AlignVCenter
+					font: tabDelegate._labelFont
+					text: (tabDelegate.modelData && tabDelegate.modelData.name) || ""
+					color: "transparent"
+					renderType: Text.QtRendering
+					style: Text.Outline
+					styleColor: tabDelegate._labelOutlineDarkColor
+					elide: Text.ElideRight
+				}
+
+				QQC2.Label {
+					id: tabLabelOutlineLight
+					visible: !tabDelegate.pillsMode
+					anchors.fill: parent
+					horizontalAlignment: Text.AlignHCenter
+					verticalAlignment: Text.AlignVCenter
+					font: tabDelegate._labelFont
+					text: (tabDelegate.modelData && tabDelegate.modelData.name) || ""
+					color: "transparent"
+					renderType: Text.QtRendering
+					style: Text.Outline
+					styleColor: tabDelegate._labelOutlineLightColor
+					elide: Text.ElideRight
+				}
+
+				QQC2.Label {
+					id: tabLabelShadow
+					visible: !tabDelegate.pillsMode
+					anchors.fill: parent
+					anchors.leftMargin: tabDelegate._labelShadowOffset
+					anchors.topMargin: tabDelegate._labelShadowOffset
+					horizontalAlignment: Text.AlignHCenter
+					verticalAlignment: Text.AlignVCenter
+					font: tabDelegate._labelFont
+					text: (tabDelegate.modelData && tabDelegate.modelData.name) || ""
+					color: tabDelegate._labelShadowColor
+					opacity: 1
+					renderType: Text.QtRendering
+					elide: Text.ElideRight
+				}
+
+				QQC2.Label {
+					id: tabLabelText
+					anchors.fill: parent
+					horizontalAlignment: Text.AlignHCenter
+					verticalAlignment: Text.AlignVCenter
+					font: tabDelegate._labelFont
+					text: (tabDelegate.modelData && tabDelegate.modelData.name) || ""
+					color: tabDelegate._fgColor
+					renderType: Text.QtRendering
+					Behavior on color { ColorAnimation { duration: 120 } }
+					elide: Text.ElideRight
+				}
 			}
 		}
 
