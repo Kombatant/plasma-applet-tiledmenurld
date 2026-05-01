@@ -17,13 +17,6 @@ Rectangle {
 	readonly property bool useHolographicEffect: !appObj.isGroup && plasmoid && plasmoid.configuration && plasmoid.configuration.tileHoverEffect === "holographic"
 	readonly property color holographicColor: "#00ffff" // Cyan
 	readonly property real holographicGlowOpacity: 0.5
-	scale: (useHolographicEffect && hovered) ? tileGrid.holographicHoverScale : 1.0
-	Behavior on scale {
-		NumberAnimation {
-			duration: 300
-			easing.type: Easing.OutCubic
-		}
-	}
 
 	// Glow effect layer (box-shadow emulation) - only for holographic effect
 	layer.enabled: useHolographicEffect && hovered
@@ -172,7 +165,6 @@ Rectangle {
 		&& !useInlineLabel
 		&& modelData.h >= 2
 	readonly property real standaloneLabelRowTop: Math.max(0, (modelData.h - 1) * cellBoxSize - cellMargin)
-
 	property bool hovered: false
 
 	states: [
@@ -376,7 +368,7 @@ Rectangle {
 
 		PlasmaComponents3.Label {
 			id: labelOutlineDark
-			visible: label.visible && appObj.usesGroupPanelStyling
+			visible: label.visible && (appObj.usesGroupPanelStyling || tileItem.labelOutlineDarkOpacity > 0)
 			text: label.text
 			anchors.fill: label
 			clip: true
@@ -389,12 +381,12 @@ Rectangle {
 			renderType: Text.QtRendering
 			color: "transparent"
 			style: Text.Outline
-			styleColor: tileItem.groupTileLabelOutlineDarkColor
+			styleColor: appObj.usesGroupPanelStyling ? tileItem.groupTileLabelOutlineDarkColor : tileItem.labelOutlineDarkColor
 		}
 
 		PlasmaComponents3.Label {
 			id: labelOutlineLight
-			visible: label.visible && appObj.usesGroupPanelStyling
+			visible: label.visible && (appObj.usesGroupPanelStyling || tileItem.labelOutlineLightOpacity > 0)
 			text: label.text
 			anchors.fill: label
 			clip: true
@@ -407,12 +399,12 @@ Rectangle {
 			renderType: Text.QtRendering
 			color: "transparent"
 			style: Text.Outline
-			styleColor: tileItem.groupTileLabelOutlineLightColor
+			styleColor: appObj.usesGroupPanelStyling ? tileItem.groupTileLabelOutlineLightColor : tileItem.labelOutlineLightColor
 		}
 
 		PlasmaComponents3.Label {
 			id: labelShadow
-			visible: label.visible && appObj.usesGroupPanelStyling
+			visible: label.visible
 			text: label.text
 			x: label.x + tileItem.labelShadowOffset
 			y: label.y + tileItem.labelShadowOffset
@@ -425,7 +417,7 @@ Rectangle {
 			horizontalAlignment: label.horizontalAlignment
 			verticalAlignment: label.verticalAlignment
 			renderType: Text.QtRendering
-			color: tileItem.groupTileLabelSoftShadowColor
+			color: appObj.usesGroupPanelStyling ? tileItem.groupTileLabelSoftShadowColor : tileItem.labelShadowColor
 		}
 
 		PlasmaComponents3.Label {
@@ -446,11 +438,9 @@ Rectangle {
 			verticalAlignment: Text.AlignBottom
 			width: parent.width
 			renderType: Text.QtRendering // Fix pixelation when scaling. Plasma.Label uses NativeRendering.
-			color: appObj.usesGroupPanelStyling ? tileItem.groupTileLabelColor : Kirigami.Theme.textColor
-			style: appObj.usesGroupPanelStyling ? Text.Normal : Text.Outline
-			styleColor: appObj.usesGroupPanelStyling
-				? "transparent"
-				: (appObj.backgroundGradient ? tileItemView.gradientBottomColor : appObj.backgroundColor)
+			color: appObj.usesGroupPanelStyling ? tileItem.groupTileLabelColor : tileItem.readableLabelTextColor
+			style: Text.Normal
+			styleColor: "transparent"
 		}
 
 		// Holographic sweep overlay effect

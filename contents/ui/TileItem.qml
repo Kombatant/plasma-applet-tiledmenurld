@@ -40,16 +40,16 @@ Item {
 	readonly property bool useStyledGroupHeader: appObj.isGroup
 	readonly property real labelPaddingX: cellMargin + (6 * Screen.devicePixelRatio)
 	readonly property real labelPaddingY: cellMargin + (4 * Screen.devicePixelRatio)
+	readonly property real labelScrimTopPadding: Math.max(8, Math.round(8 * Screen.devicePixelRatio))
 	readonly property real labelShadowOffset: Math.max(1, Math.round(1 * Screen.devicePixelRatio))
 	readonly property color labelBaseColor: (tileItemView && appObj.backgroundGradient ? tileItemView.gradientBottomColor : appObj.backgroundColor)
 	readonly property real labelBaseLuma: _relativeLuminance(labelBaseColor)
-	readonly property bool labelBaseIsLight: labelBaseLuma >= 0.6
-	readonly property bool labelUseDualOutline: !!appObj.backgroundImage
-	readonly property real labelOutlineDarkOpacity: labelUseDualOutline ? 0.45 : (labelBaseIsLight ? 0.6 : 0.2)
-	readonly property real labelOutlineLightOpacity: labelUseDualOutline ? 0.45 : (labelBaseIsLight ? 0.2 : 0.6)
+	readonly property real labelOutlineDarkOpacity: useOverlayLabel ? 0.88 : 0.78
+	readonly property real labelOutlineLightOpacity: 0.0
 	readonly property color labelOutlineDarkColor: Qt.rgba(0, 0, 0, labelOutlineDarkOpacity)
 	readonly property color labelOutlineLightColor: Qt.rgba(1, 1, 1, labelOutlineLightOpacity)
-	readonly property color labelShadowColor: labelBaseIsLight ? Qt.rgba(0, 0, 0, 0.3) : Qt.rgba(1, 1, 1, 0.3)
+	readonly property color labelShadowColor: useOverlayLabel ? Qt.rgba(0, 0, 0, 0.42) : Qt.rgba(0, 0, 0, 0.34)
+	readonly property color readableLabelTextColor: Qt.rgba(1, 1, 1, 0.98)
 	readonly property real groupTileLabelBgLuma: _relativeLuminance(Kirigami.Theme.backgroundColor)
 	readonly property bool groupTileLabelBgIsLight: groupTileLabelBgLuma >= 0.5
 	readonly property color groupTileLabelColor: Qt.rgba(Kirigami.Theme.textColor.r, Kirigami.Theme.textColor.g, Kirigami.Theme.textColor.b, 0.92)
@@ -81,6 +81,14 @@ Item {
 		id: tileContent
 		anchors.fill: parent
 		clip: appObj.inGroup
+		scale: (tileItemView && tileItemView.useHolographicEffect && tileMouseArea.containsMouse) ? tileGrid.holographicHoverScale : 1.0
+		transformOrigin: Item.Center
+		Behavior on scale {
+			NumberAnimation {
+				duration: 300
+				easing.type: Easing.OutCubic
+			}
+		}
 
 		HeroTileView {
 			id: heroTileView
@@ -133,6 +141,18 @@ Item {
 			anchors.rightMargin: labelPaddingX
 			anchors.bottomMargin: labelPaddingY
 			height: visible ? (descriptionLabelFontMetrics.lineSpacing * 2) : 0
+
+			Rectangle {
+				x: -labelPaddingX
+				y: -labelScrimTopPadding
+				width: parent.width + labelPaddingX * 2
+				height: parent.height + labelScrimTopPadding + labelPaddingY
+				gradient: Gradient {
+					GradientStop { position: 0.0; color: Qt.rgba(0, 0, 0, 0.0) }
+					GradientStop { position: 0.45; color: Qt.rgba(0, 0, 0, 0.18) }
+					GradientStop { position: 1.0; color: Qt.rgba(0, 0, 0, 0.82) }
+				}
+			}
 
 			QQC2.Label {
 				id: descriptionLabelOutlineDark
@@ -194,7 +214,7 @@ Item {
 				wrapMode: Text.Wrap
 				maximumLineCount: 2
 				elide: Text.ElideRight
-				opacity: labelUseDualOutline ? 0.25 : 0.2
+				opacity: useOverlayLabel ? 0.3 : 0.24
 				font: appObj.isGroup ? groupLabelFont : Qt.font({ pixelSize: Kirigami.Theme.defaultFont.pixelSize, bold: false })
 				color: labelShadowColor
 				renderType: Text.QtRendering
@@ -214,16 +234,16 @@ Item {
 				wrapMode: Text.Wrap
 				maximumLineCount: 2
 				elide: Text.ElideRight
-				opacity: 0.9
+				opacity: useOverlayLabel ? 1 : 0.9
 				font: appObj.isGroup ? groupLabelFont : Qt.font({ pixelSize: Kirigami.Theme.defaultFont.pixelSize, bold: false })
-				color: Kirigami.Theme.textColor
+				color: readableLabelTextColor
 				renderType: Text.QtRendering
 			}
 		}
 
 		QQC2.Label {
 			id: descriptionLabelBelowOutlineDark
-			visible: descriptionLabelBelow.visible && appObj.usesGroupPanelStyling
+			visible: descriptionLabelBelow.visible
 			text: descriptionLabelBelow.text
 			anchors.fill: descriptionLabelBelow
 			clip: true
@@ -237,7 +257,7 @@ Item {
 			color: "transparent"
 			renderType: Text.QtRendering
 			style: Text.Outline
-			styleColor: groupTileLabelOutlineDarkColor
+			styleColor: appObj.usesGroupPanelStyling ? groupTileLabelOutlineDarkColor : labelOutlineDarkColor
 		}
 
 		QQC2.Label {
@@ -261,7 +281,7 @@ Item {
 
 		QQC2.Label {
 			id: descriptionLabelBelowShadow
-			visible: descriptionLabelBelow.visible && appObj.usesGroupPanelStyling
+			visible: descriptionLabelBelow.visible
 			text: descriptionLabelBelow.text
 			x: descriptionLabelBelow.x + labelShadowOffset
 			y: descriptionLabelBelow.y + labelShadowOffset
@@ -275,7 +295,7 @@ Item {
 			elide: descriptionLabelBelow.elide
 			opacity: 1
 			font: descriptionLabelBelow.font
-			color: groupTileLabelSoftShadowColor
+			color: appObj.usesGroupPanelStyling ? groupTileLabelSoftShadowColor : labelShadowColor
 			renderType: Text.QtRendering
 		}
 
@@ -301,7 +321,7 @@ Item {
 			font: appObj.isGroup ? groupLabelFont : Qt.font({ pixelSize: Kirigami.Theme.defaultFont.pixelSize, bold: false })
 			style: Text.Normal
 			styleColor: "transparent"
-			color: appObj.usesGroupPanelStyling ? groupTileLabelColor : Kirigami.Theme.textColor
+			color: appObj.usesGroupPanelStyling ? groupTileLabelColor : readableLabelTextColor
 			renderType: Text.QtRendering
 		}
 	}
