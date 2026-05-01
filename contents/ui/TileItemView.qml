@@ -99,7 +99,8 @@ Rectangle {
 		return s
 	}
 
-	// Clear image sources when the plasmoid is closed to release cached frames/textures.
+	// Keep the static background source bound across close/open so tiles do not
+	// visibly repopulate. Only the animated renderer is unloaded on collapse.
 	// Use a short delay to avoid thrash when toggling quickly.
 	// In docked sidebar mode `plasmoid.expanded` is unreliable (often false even
 	// while the sidebar is shown); fall back to `widget.expanded` which Popup.qml
@@ -113,10 +114,10 @@ Rectangle {
 		}
 		return true
 	}
-	property bool expandedActive: true
-	readonly property string activeBackgroundSource: expandedActive ? normalizedBackgroundSource(appObj.backgroundImage) : ""
+	property bool animatedExpandedActive: true
+	readonly property string resolvedBackgroundSource: normalizedBackgroundSource(appObj.backgroundImage)
 	property string failedBackgroundSource: ""
-	readonly property string safeBackgroundSource: activeBackgroundSource && activeBackgroundSource !== failedBackgroundSource ? activeBackgroundSource : ""
+	readonly property string safeBackgroundSource: resolvedBackgroundSource && resolvedBackgroundSource !== failedBackgroundSource ? resolvedBackgroundSource : ""
 	property int animatedReloadToken: 0
 	readonly property string animatedBackgroundSource: safeBackgroundSource ? (safeBackgroundSource + "#reload=" + animatedReloadToken) : ""
 	readonly property bool backgroundIsAnimated: {
@@ -140,7 +141,7 @@ Rectangle {
 		animatedReloadToken = (animatedReloadToken + 1) % 1000000
 	}
 
-	onActiveBackgroundSourceChanged: {
+	onResolvedBackgroundSourceChanged: {
 		failedBackgroundSource = ""
 	}
 
@@ -241,10 +242,9 @@ Rectangle {
 			// If `tileAnimatedPlayOnHover` is enabled, create the AnimatedImage only while hovered
 			// so the instance is destroyed (and memory released) when hover ends.
 			// Also unload when the plasmoid is closed so decoded frames are released.
-			readonly property bool plasmoidExpanded: tileItemView.effectiveExpanded
 			active: tileItemView.backgroundUseAnimatedRenderer
 				&& !!safeBackgroundSource
-				&& plasmoidExpanded
+				&& tileItemView.animatedExpandedActive
 				&& (tileItemView.animatedPlayOnHoverEnabled ? tileItemView.hovered : true)
 			sourceComponent: animatedBackgroundComponent
 		}
@@ -273,7 +273,7 @@ Rectangle {
 			id: unloadDelayTimer
 			interval: 250
 			repeat: false
-			onTriggered: tileItemView.expandedActive = false
+			onTriggered: tileItemView.animatedExpandedActive = false
 		}
 
 		// React to whichever expansion source actually toggles (widget.expanded in
@@ -283,7 +283,7 @@ Rectangle {
 			function onEffectiveExpandedChanged() {
 				if (tileItemView.effectiveExpanded) {
 					unloadDelayTimer.stop()
-					tileItemView.expandedActive = true
+					tileItemView.animatedExpandedActive = true
 					tileItemView.bumpAnimatedReload()
 				} else {
 					unloadDelayTimer.restart()
