@@ -12,8 +12,11 @@ DropArea {
 	property int cellBoxSize: cellMargin + cellSize + cellMargin
 	property int hoverOutlineSize: 2 * Screen.devicePixelRatio
 	readonly property real holographicHoverScale: 1.05
+	property var hoveredTileItem: null
+	property bool hoverAnimationEnabled: true
 	property int maxHoverWidth: 1
 	property int maxHoverHeight: 1
+	readonly property int _pillMotionDuration: 420
 	readonly property real groupPanelInsetX: Math.max(cellMargin, Math.round(6 * Screen.devicePixelRatio))
 	readonly property real groupPanelInsetTop: Math.max(cellMargin, Math.round(5 * Screen.devicePixelRatio))
 	readonly property real groupPanelInsetBottom: groupPanelInsetX
@@ -27,7 +30,7 @@ DropArea {
 				var scaleOverflow = cellBoxSize * maxHoverCells * ((holographicHoverScale - 1) / 2)
 				return Math.ceil(scaleOverflow + hoverOutlineSize)
 			}
-			// Classic outline can clip at scroll edges; reserve enough for the border stroke.
+			// Non-holographic hover effects can clip at scroll edges; reserve a small allowance.
 			return Math.ceil(hoverOutlineSize)
 		}
 		return 0
@@ -69,6 +72,19 @@ DropArea {
 	property string dropPendingFavoriteId: ""
 	readonly property bool hasDrag: tileGrid.editing && dropHoverX >= 0 && dropHoverY >= 0
 	readonly property bool isDraggingGroup: hasDrag && draggedItem && draggedItem.tileType == "group"
+
+	function setHoveredTileItem(item) {
+		hoverAnimationEnabled = hoveredTileItem !== null
+		hoveredTileItem = item
+		Qt.callLater(function() {
+			hoverAnimationEnabled = true
+		})
+	}
+
+	function resetHoveredTileIndicator() {
+		hoverAnimationEnabled = false
+		hoveredTileItem = null
+	}
 
 	signal moveTileToTab(int tileIndex, string tabId)
 
@@ -546,14 +562,73 @@ DropArea {
 			}
 		}
 		
-		Item {
-			id: scrollItem
+			Item {
+				id: scrollItem
 
-			width: columns * cellBoxSize + 2 * _holoPad
-			height: rows * cellBoxSize + 2 * _holoPad
+				width: columns * cellBoxSize + 2 * _holoPad
+				height: rows * cellBoxSize + 2 * _holoPad
 
-			Repeater {
-				id: cellRepeater
+				HoverHandler {
+					id: tileGridHover
+					target: scrollItem
+					onHoveredChanged: {
+						if (!hovered) {
+							tileGrid.resetHoveredTileIndicator()
+						}
+					}
+				}
+
+				QtObject {
+					id: pillHoverStyle
+					property real highlightInset: 0
+					property real pillRadius: tileGrid.hoveredTileItem ? tileGrid.hoveredTileItem.pillHoverFrameRadius : 0
+					property color accentHighlightColor: Kirigami.Theme.highlightColor
+				}
+
+				PillHighlight {
+					id: tileHoverIndicator
+					z: 15
+					visible: !!tileGrid.hoveredTileItem
+						&& tileGrid.hoveredTileItem.usePillHoverEffect
+						&& !tileGrid.hoveredTileItem.isHeroTile
+					x: tileGrid.hoveredTileItem ? tileGrid.hoveredTileItem.x + tileGrid.hoveredTileItem.pillHoverFrameX : 0
+					y: tileGrid.hoveredTileItem ? tileGrid.hoveredTileItem.y + tileGrid.hoveredTileItem.pillHoverFrameY : 0
+					width: tileGrid.hoveredTileItem ? tileGrid.hoveredTileItem.pillHoverFrameWidth : 0
+					height: tileGrid.hoveredTileItem ? tileGrid.hoveredTileItem.pillHoverFrameHeight : 0
+					styleSource: pillHoverStyle
+					active: false
+					Behavior on x {
+						enabled: tileGrid.hoverAnimationEnabled
+						NumberAnimation {
+							duration: tileGrid._pillMotionDuration
+							easing.type: Easing.OutCubic
+						}
+					}
+					Behavior on y {
+						enabled: tileGrid.hoverAnimationEnabled
+						NumberAnimation {
+							duration: tileGrid._pillMotionDuration
+							easing.type: Easing.OutCubic
+						}
+					}
+					Behavior on width {
+						enabled: tileGrid.hoverAnimationEnabled
+						NumberAnimation {
+							duration: tileGrid._pillMotionDuration
+							easing.type: Easing.OutCubic
+						}
+					}
+					Behavior on height {
+						enabled: tileGrid.hoverAnimationEnabled
+						NumberAnimation {
+							duration: tileGrid._pillMotionDuration
+							easing.type: Easing.OutCubic
+						}
+					}
+				}
+
+				Repeater {
+					id: cellRepeater
 				readonly property int cellCount: columns * rows
 				onCellCountChanged: {
 					if (!isDragging) {

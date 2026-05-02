@@ -301,6 +301,7 @@ LibConfig.FormKCM {
 		Kirigami.FormData.label: i18n("Hover Effect")
 		model: [
 			{ value: "classic", text: i18n("Classic") },
+			{ value: "pills", text: i18n("Pills") },
 			{ value: "holographic", text: i18n("Holographic") },
 		]
 	}

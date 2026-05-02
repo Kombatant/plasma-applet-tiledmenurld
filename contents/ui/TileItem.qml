@@ -13,7 +13,7 @@ Item {
 	y: modelData.y * cellBoxSize + _holoPad
 	width: modelData.w * cellBoxSize
 	height: modelData.h * cellBoxSize
-	z: dragActive ? 20 : ((tileItemView && tileItemView.useHolographicEffect && tileMouseArea.containsMouse) ? 10 : 0)
+	z: dragActive ? 20 : ((tileItemView && tileMouseArea.containsMouse && (tileItemView.useHolographicEffect || tileItemView.usePillHoverEffect)) ? 10 : 0)
 
 	function fixCoordinateBindings() {
 		x = Qt.binding(function(){ return modelData.x * cellBoxSize + _holoPad })
@@ -28,6 +28,13 @@ Item {
 
 	readonly property bool faded: tileGrid.editing || tileMouseArea.isLeftPressed
 	readonly property int fadedWidth: width - cellPushedMargin
+	readonly property bool usePillHoverEffect: !!(tileItemView && tileItemView.usePillHoverEffect)
+	readonly property bool isHeroTile: appObj.isHero
+	readonly property real pillHoverFrameX: tileItemView.x - tileGrid.hoverOutlineSize
+	readonly property real pillHoverFrameY: tileItemView.y - tileGrid.hoverOutlineSize
+	readonly property real pillHoverFrameWidth: tileItemView.width + (tileGrid.hoverOutlineSize * 2)
+	readonly property real pillHoverFrameHeight: tileItemView.height + (tileGrid.hoverOutlineSize * 2)
+	readonly property real pillHoverFrameRadius: tileItemView.cornerRadius + tileGrid.hoverOutlineSize
 	opacity: faded ? 0.75 : 1
 	scale: faded ? fadedWidth / width : 1
 	Behavior on opacity { NumberAnimation { duration: 200 } }
@@ -396,9 +403,7 @@ Item {
 		}
 		hoverOutlineSize: tileGrid.hoverOutlineSize
 		mouseArea: tileMouseArea
-		// Only show classic hover effect when holographic is not enabled; skip group tiles
-		// (group tiles use groupEffectLoader instead and the small header rect looks disconnected)
-		visible: !appObj.isHero && !appObj.isGroup && !tileItemView.useHolographicEffect && tileMouseArea.containsMouse
+		visible: !appObj.isHero && tileItemView.useClassicHoverEffect && tileMouseArea.containsMouse
 	}
 
 	Kicker.ProcessRunner {
@@ -438,9 +443,24 @@ Item {
 			pressY = mouse.y
 			dragOutside = false
 		}
-		onPositionChanged: function(mouse) {
-			updateDragOutside(mouse)
-		}
+			onPositionChanged: function(mouse) {
+				updateDragOutside(mouse)
+			}
+			onContainsMouseChanged: {
+				if (containsMouse) {
+					if (!tileItem.usePillHoverEffect || tileItem.isHeroTile) {
+						tileGrid.resetHoveredTileIndicator()
+						return
+					}
+					tileGrid.setHoveredTileItem(tileItem)
+					return
+				}
+				Qt.callLater(function() {
+					if (tileGrid.hoveredTileItem === tileItem && !tileMouseArea.containsMouse) {
+						tileGrid.resetHoveredTileIndicator()
+					}
+				})
+			}
 
 		drag.target: plasmoid.configuration.tilesLocked ? undefined : tileItem
 
