@@ -94,7 +94,7 @@ Item {
 		id: tileContent
 		anchors.fill: parent
 		clip: appObj.inGroup && !(tileItemView && tileItemView.useHolographicEffect && tileItemView.hovered)
-		scale: (tileItemView && tileItemView.useHolographicEffect && tileMouseArea.containsMouse) ? tileGrid.holographicHoverScale : 1.0
+		scale: (!appObj.isHero && tileItemView && tileItemView.useHolographicEffect && tileMouseArea.containsMouse) ? tileGrid.holographicHoverScale : 1.0
 		transformOrigin: Item.Center
 		Behavior on scale {
 			NumberAnimation {

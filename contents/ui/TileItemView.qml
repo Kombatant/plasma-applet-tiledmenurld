@@ -21,7 +21,7 @@ Rectangle {
 	readonly property bool useHolographicEffect: !appObj.isGroup && hoverEffectStyle === "holographic"
 	readonly property bool usePillHoverEffect: !appObj.isGroup && hoverEffectStyle === "pills"
 	readonly property bool useClassicHoverEffect: !appObj.isGroup && !useHolographicEffect && !usePillHoverEffect
-	readonly property color holographicColor: "#00ffff" // Cyan
+	readonly property color holographicColor: Kirigami.Theme.highlightColor
 	readonly property real holographicGlowOpacity: 0.5
 	readonly property real holographicGlowSpread: (typeof tileGrid !== "undefined" && tileGrid && typeof tileGrid.hoverOutlineSize !== "undefined")
 		? tileGrid.hoverOutlineSize
