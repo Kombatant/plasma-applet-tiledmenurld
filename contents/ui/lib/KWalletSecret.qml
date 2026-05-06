@@ -30,6 +30,10 @@ Item {
 	readonly property string _path: "/modules/kwalletd6"
 	readonly property string _iface: "org.kde.KWallet"
 
+	// Resolved qdbus binary (qdbus6 / qdbus-qt6 / qdbus). Empty until probed.
+	property string _qdbusBin: ""
+	property bool _qdbusProbed: false
+
 	function _shellQuote(value) {
 		var s = value === null || typeof value === "undefined" ? "" : ("" + value)
 		return "'" + s.replace(/'/g, "'\"'\"'") + "'"
@@ -48,23 +52,43 @@ Item {
 		exec.connectSource(source)
 	}
 
-	function _qdbus(method, args, callback) {
-		var cmd = "qdbus " + _shellQuote(_svc) + " " + _shellQuote(_path) + " " + _shellQuote(_iface + "." + method)
-		for (var i = 0; i < args.length; i++) {
-			cmd += " " + _shellQuote("" + args[i])
+	function _probeQdbus(callback) {
+		if (_qdbusProbed) {
+			callback(_qdbusBin)
+			return
 		}
-		_runScript("qdbus-" + method, cmd, callback)
+		// Probe in KDE6-preferred order: qdbus6, qdbus-qt6, then legacy qdbus.
+		var probe = "for b in qdbus6 qdbus-qt6 qdbus; do command -v \"$b\" >/dev/null 2>&1 && { printf '%s' \"$b\"; exit 0; }; done; exit 1"
+		_runScript("probe-qdbus", probe, function(exitCode, stdout) {
+			_qdbusProbed = true
+			_qdbusBin = exitCode === 0 ? _trimOutput(stdout) : ""
+			callback(_qdbusBin)
+		})
+	}
+
+	function _qdbus(method, args, callback) {
+		_probeQdbus(function(bin) {
+			if (!bin) {
+				callback(127, "", "qdbus binary not found")
+				return
+			}
+			var cmd = _shellQuote(bin) + " " + _shellQuote(_svc) + " " + _shellQuote(_path) + " " + _shellQuote(_iface + "." + method)
+			for (var i = 0; i < args.length; i++) {
+				cmd += " " + _shellQuote("" + args[i])
+			}
+			_runScript("qdbus-" + method, cmd, callback)
+		})
 	}
 
 	// --- Availability ---
 
 	function inspectAvailability(callback) {
 		availabilityMessage = ""
-		_runScript("check-qdbus", "command -v qdbus >/dev/null 2>&1", function(exitCode) {
-			if (exitCode !== 0) {
+		_probeQdbus(function(bin) {
+			if (!bin) {
 				walletAvailable = false
 				checkedAvailability = true
-				availabilityMessage = i18n("Secure storage is unavailable because qdbus is not installed.")
+				availabilityMessage = i18n("Secure storage is unavailable because no qdbus binary (qdbus6, qdbus-qt6, or qdbus) was found.")
 				if (typeof callback === "function") {
 					callback(false)
 				}
@@ -149,15 +173,35 @@ Item {
 
 	// --- Write ---
 
+	function _ensureFolder(handle, callback) {
+		_qdbus("hasFolder", [handle, folderName, appId], function(exitCode, stdout) {
+			var has = exitCode === 0 && _trimOutput(stdout).toLowerCase() === "true"
+			if (has) {
+				callback(true)
+				return
+			}
+			_qdbus("createFolder", [handle, folderName, appId], function(exitCode2) {
+				callback(exitCode2 === 0)
+			})
+		})
+	}
+
 	function _doWrite(walletName, value, callback) {
 		_openWallet(walletName, function(handle) {
 			if (handle < 0) {
 				callback(false)
 				return
 			}
-			_qdbus("writePassword", [handle, folderName, entryName, value, appId], function(exitCode) {
-				_closeWallet(handle)
-				callback(exitCode === 0)
+			_ensureFolder(handle, function(folderOk) {
+				if (!folderOk) {
+					_closeWallet(handle)
+					callback(false)
+					return
+				}
+				_qdbus("writePassword", [handle, folderName, entryName, value, appId], function(exitCode) {
+					_closeWallet(handle)
+					callback(exitCode === 0)
+				})
 			})
 		})
 	}

@@ -44,7 +44,7 @@
 		"Name[sl]": "Meni s ploščicami",
 		"Name[tr]": "Döşeli Menü",
 		"Name[zh_TW]": "方塊磚選單",
-		"Version": "0.96.32",
+		"Version": "0.96.33",
 		"Website": "https://github.com/Kombatant/plasma-applet-tiledmenurld"
 	},
 	"X-Plasma-API-Minimum-Version": "6.0",
