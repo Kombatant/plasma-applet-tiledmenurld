@@ -294,8 +294,11 @@ Item {
 
 	ColumnLayout {
 		anchors.fill: parent
-		anchors.margins: Kirigami.Units.largeSpacing
-		spacing: aiChatView.surfaceGap
+		anchors.topMargin: Kirigami.Units.largeSpacing
+		anchors.bottomMargin: Kirigami.Units.largeSpacing
+		anchors.leftMargin: 0
+		anchors.rightMargin: 0
+		spacing: Kirigami.Units.largeSpacing
 
 		SidebarGlassCard {
 			Layout.fillWidth: true
@@ -313,6 +316,29 @@ Item {
 					Layout.fillWidth: true
 					textRole: "text"
 					model: chatMenuOptions
+					readonly property string _currentLabel: (currentIndex >= 0 && currentIndex < model.length) ? ("" + model[currentIndex].text) : ""
+					readonly property string _currentFullLabel: {
+						if (currentIndex < 0 || currentIndex >= model.length) return ""
+						var entry = model[currentIndex]
+						return "" + (entry.fullText || entry.text || "")
+					}
+					readonly property int _availableTextWidth: {
+						var indicatorW = indicator ? indicator.width : 0
+						return Math.max(0, width - indicatorW - (Kirigami.Units.smallSpacing * 3))
+					}
+					TextMetrics {
+						id: conversationComboMetrics
+						font: conversationCombo.font
+						text: conversationCombo._currentFullLabel
+					}
+					readonly property bool _isTruncated: conversationComboMetrics.width > _availableTextWidth
+					HoverHandler {
+						id: conversationComboHover
+						enabled: conversationCombo._isTruncated && conversationCombo._currentFullLabel.length > 0
+					}
+					QQC2.ToolTip.visible: conversationComboHover.hovered
+					QQC2.ToolTip.text: _currentFullLabel
+					QQC2.ToolTip.delay: 500
 					onActivated: function(index) {
 						if (!chatModel || index < 0 || index >= model.length) {
 							return

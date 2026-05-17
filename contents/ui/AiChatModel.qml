@@ -142,6 +142,19 @@ Item {
 		return i18n("New Chat")
 	}
 
+	function _conversationFullTitle(conversation) {
+		if (!conversation || !conversation.messages) {
+			return ""
+		}
+		for (var i = 0; i < conversation.messages.length; i++) {
+			var msg = conversation.messages[i]
+			if (msg && msg.role === "user" && msg.content) {
+				return ("" + msg.content).trim().replace(/\s+/g, " ")
+			}
+		}
+		return ""
+	}
+
 	function activeConversation() {
 		for (var i = 0; i < conversationList.length; i++) {
 			if (conversationList[i].id === activeConversationId) {
@@ -164,9 +177,11 @@ Item {
 		var options = []
 		for (var i = 0; i < sorted.length; i++) {
 			var c = sorted[i]
+			var fullTitle = _conversationFullTitle(c)
 			options.push({
 				value: c.id,
 				text: c.title || _conversationTitle(c),
+				fullText: fullTitle || (c.title || _conversationTitle(c)),
 			})
 		}
 		return options
