@@ -562,7 +562,16 @@ Item {
 			return classicLeftSidebarSlotWidth + appAreaWidth
 		}
 	}
-	readonly property int popupLeftSectionWidth: usesDockedSidebarLayout ? dockedSidebarSlotWidth : leftSectionWidth
+	readonly property int appAreaResizeHandleWidth: {
+		if (usesDockedSidebarLayout) {
+			return Kirigami.Units.smallSpacing
+		}
+		if (showSearch && !isEditingTile && !searchOverlayActive) {
+			return Kirigami.Units.smallSpacing * 2
+		}
+		return 0
+	}
+	readonly property int popupLeftSectionWidth: (usesDockedSidebarLayout ? dockedSidebarSlotWidth : leftSectionWidth) + appAreaResizeHandleWidth
 	readonly property int minimumPopupWidth: usesDockedSidebarLayout ? (popupLeftSectionWidth + (cellBoxSize * 3)) : minimumWidth
 
 	readonly property real tileScale: plasmoid.configuration.tileScale

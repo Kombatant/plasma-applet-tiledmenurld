@@ -1175,13 +1175,10 @@ MouseArea {
 				Item {
 					id: appAreaResizeHandle
 					Layout.fillHeight: true
-					Layout.preferredWidth: config.usesDockedSidebarLayout ? Kirigami.Units.smallSpacing : Kirigami.Units.smallSpacing * 2
-					visible: {
-						if (config.usesDockedSidebarLayout) {
-							return true // Always show resize handle in Docked Sidebar layout
-						}
-						return config.showSearch && !config.isEditingTile && !config.searchOverlayActive
-					}
+					Layout.preferredWidth: config.appAreaResizeHandleWidth
+					Layout.minimumWidth: config.appAreaResizeHandleWidth
+					Layout.maximumWidth: config.appAreaResizeHandleWidth
+					visible: config.appAreaResizeHandleWidth > 0
 					z: 1
 
 					Rectangle {
