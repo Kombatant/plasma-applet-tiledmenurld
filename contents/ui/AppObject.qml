@@ -11,7 +11,40 @@ QtObject {
 	readonly property bool isHero: tile && tile.tileType == "hero"
 	readonly property bool isLauncher: !isGroup && !isHero
 
-	readonly property color defaultBackgroundColor: (isGroup || isHero) ? "transparent" : config.defaultTileColor
+	// True when this launcher tile sits geometrically inside a group panel,
+	// regardless of the active group layout. Used to keep the "Standalone Tile
+	// Background Colour" option from leaking onto non-standalone tiles.
+	readonly property bool inGroupArea: {
+		if (!tile || isGroup || !tileGrid || !tileGrid.tileModel) {
+			return false
+		}
+		var tileX2 = tileX + tileW - 1
+		var tileY2 = tileY + tileH - 1
+		for (var i = 0; i < tileGrid.tileModel.length; i++) {
+			var candidate = tileGrid.tileModel[i]
+			if (!candidate || candidate.tileType !== "group") {
+				continue
+			}
+			var area = tileGrid.getGroupAreaRect(candidate)
+			if (tileX >= area.x1 && tileX2 <= area.x2 && tileY >= area.y1 && tileY2 <= area.y2) {
+				return true
+			}
+		}
+		return false
+	}
+
+	// Group/hero tiles have no background of their own. Launchers inside a group
+	// panel keep the theme colour so the standalone-tile option only affects
+	// standalone launchers on the main grid.
+	readonly property color defaultBackgroundColor: {
+		if (isGroup || isHero) {
+			return "transparent"
+		}
+		if (inGroupArea) {
+			return config.plasmaStyleTileColor
+		}
+		return config.defaultTileColor
+	}
 	readonly property bool defaultShowIcon: (isGroup || isHero) ? false : true
 	readonly property int defaultTileW: isHero ? 6 : (isGroup ? 6 : 2)
 	readonly property int defaultTileH: isHero ? 3 : (isGroup ? 1 : 2)
@@ -33,7 +66,17 @@ QtObject {
 	readonly property bool hasExplicitGradient: tile && typeof tile.gradient !== "undefined"
 	readonly property color backgroundColor: tile && typeof tile.backgroundColor !== "undefined" ? tile.backgroundColor : defaultBackgroundColor
 	readonly property string backgroundImage: tile && typeof tile.backgroundImage !== "undefined" ? tile.backgroundImage : ""
-	readonly property bool backgroundGradient: tile && typeof tile.gradient !== "undefined" ? tile.gradient : config.defaultTileGradient
+	// The standalone-tile gradient only applies to standalone launchers; group,
+	// hero and in-group tiles fall back to no gradient unless set per-tile.
+	readonly property bool backgroundGradient: {
+		if (tile && typeof tile.gradient !== "undefined") {
+			return tile.gradient
+		}
+		if (isGroup || isHero || inGroupArea) {
+			return false
+		}
+		return config.defaultTileGradient
+	}
 
 	readonly property int tileX: tile && typeof tile.x !== "undefined" ? tile.x : 0
 	readonly property int tileY: tile && typeof tile.y !== "undefined" ? tile.y : 0
@@ -114,6 +157,7 @@ QtObject {
 			} else {
 				appObj.parentGroupTileChanged()
 				appObj.inGroupChanged()
+				appObj.inGroupAreaChanged()
 				appObj.usesGroupPanelStylingChanged()
 			}
 		}

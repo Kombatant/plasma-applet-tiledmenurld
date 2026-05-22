@@ -7,7 +7,26 @@ import org.kde.plasma.plasmoid
 
 Rectangle {
 	id: tileItemView
-	color: (appObj.isGroup || appObj.usesGroupPanelStyling) ? "transparent" : appObj.backgroundColor
+	// A transparent standalone tile has no opaque body, so the holographic glow
+	// renders against the bare popup and its corners read as a soft square.
+	// Opaque tiles (and in-group tiles) don't have this problem. While such a
+	// tile is hovered with the holographic effect, give it the same opaque
+	// theme body in-group tiles use so the glow looks identical; it stays
+	// transparent at rest, which is all the "Transparent" setting promises.
+	readonly property bool holographicTransparentHover: useHolographicEffect
+		&& hovered
+		&& !appObj.isGroup
+		&& !appObj.usesGroupPanelStyling
+		&& appObj.backgroundColor.a <= 0.01
+	color: (appObj.isGroup || appObj.usesGroupPanelStyling)
+		? "transparent"
+		: (holographicTransparentHover ? config.plasmaStyleTileColor : appObj.backgroundColor)
+	Behavior on color {
+		ColorAnimation {
+			duration: 300
+			easing.type: Easing.OutCubic
+		}
+	}
 	radius: cornerRadius
 	clip: appObj.inGroup && !(useHolographicEffect && hovered)
 	readonly property real cornerRadius: (config && config.tileCornerRadius ? config.tileCornerRadius : 0)
@@ -154,9 +173,15 @@ Rectangle {
 	readonly property bool labelBelowIcon: !(modelData.w >= 2 && modelData.h == 1)
 	// Wide single-row non-group tiles show inline label (icon in first cell, label in remaining cells)
 	readonly property bool useInlineLabel: !appObj.isGroup && modelData.w >= 2 && modelData.h == 1 && appObj.showLabel
+	// The filled-label layout keeps the label INSIDE the tile body. It is used
+	// for tiles that have a visible body — opaque tiles, and holographic tiles
+	// (which gain an opaque body on hover). A transparent holographic tile must
+	// use it too: otherwise the label is placed outside the tile, the holo
+	// glow ends up wrapping a region the opaque hover body never fills, and the
+	// highlight reads as a square around an empty label strip.
 	readonly property bool useStandaloneFilledLabel: appObj.isLauncher
 		&& !appObj.hasExplicitBackgroundImage
-		&& appObj.backgroundColor.a > 0
+		&& (appObj.backgroundColor.a > 0 || useHolographicEffect)
 		&& appObj.showLabel
 		&& appObj.labelText.length > 0
 		&& !useInlineLabel
