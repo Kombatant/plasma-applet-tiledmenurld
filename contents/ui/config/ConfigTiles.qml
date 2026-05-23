@@ -74,7 +74,7 @@ LibConfig.FormKCM {
 		var cellSizeUnits = config.cellBoxUnits - tileMarginUnits
 		var scale = pendingTileScale || 0
 		var cellSize = Math.round(cellSizeUnits * scale * Screen.devicePixelRatio)
-		var cellMargin = cellMarginUnits * scale * Screen.devicePixelRatio
+		var cellMargin = Math.round(cellMarginUnits * scale * Screen.devicePixelRatio)
 		return Math.max(1, Math.round(cellMargin + cellSize + cellMargin))
 	}
 

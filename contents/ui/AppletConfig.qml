@@ -583,7 +583,7 @@ Item {
 	readonly property real cellMarginUnits: tileMarginUnits / 2
 	readonly property real cellSizeUnits: cellBoxUnits - tileMarginUnits
 	readonly property int cellSize: Math.round(cellSizeUnits * tileScale * Screen.devicePixelRatio)
-	readonly property real cellMargin: cellMarginUnits * tileScale * Screen.devicePixelRatio
+	readonly property int cellMargin: Math.round(cellMarginUnits * tileScale * Screen.devicePixelRatio)
 	readonly property real cellPushedMargin: cellMargin * 2
 	readonly property int cellBoxSize: Math.max(1, Math.round(cellMargin + cellSize + cellMargin))
 	readonly property int tileGridWidth: plasmoid.configuration.favGridCols * cellBoxSize
