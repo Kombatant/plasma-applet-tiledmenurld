@@ -1,5 +1,10 @@
 .pragma library
 
+function endsWith(value, suffix) {
+	value = "" + value
+	return value.length >= suffix.length && value.lastIndexOf(suffix) === value.length - suffix.length
+}
+
 function parseDropUrl(url) {
 	if (typeof url === "undefined" || url === null) {
 		return ""
@@ -10,13 +15,20 @@ function parseDropUrl(url) {
 	}
 
 	var startsWithAppsScheme = url.indexOf('applications:') === 0 // Search Results add this prefix
-	if (startsWithAppsScheme) {
+	if (url.indexOf('applications://') === 0) {
+		url = url.substr('applications://'.length)
+	} else if (startsWithAppsScheme) {
 		url = url.substr('applications:'.length)
+	}
+	if (startsWithAppsScheme) {
+		while (url.indexOf('/') === 0) {
+			url = url.substr(1)
+		}
 	}
 
 	var workingDir = Qt.resolvedUrl('.')
-	var endsWithDesktop = url.indexOf('.desktop') === url.length - '.desktop'.length
-	var isRelativeDesktopUrl = endsWithDesktop && (
+	var isDesktopUrl = endsWith(url, '.desktop')
+	var isRelativeDesktopUrl = isDesktopUrl && (
 		url.indexOf(workingDir) === 0
 		// || url.indexOf('file:///usr/share/applications/') === 0
 		// || url.indexOf('/.local/share/applications/') >= 0
@@ -44,7 +56,7 @@ function isKickerFavoriteId(url) {
 		return false
 	}
 
-	return favoriteId.indexOf(".desktop") === favoriteId.length - ".desktop".length
+	return endsWith(favoriteId, ".desktop")
 }
 
 function kickerFavoriteId(url) {

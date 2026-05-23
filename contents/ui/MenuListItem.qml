@@ -92,7 +92,7 @@ AppToolButton {
 	}
 
 	function endsWith(s, substr) {
-		return s.indexOf(substr) == s.length - substr.length
+		return s.length >= substr.length && s.lastIndexOf(substr) == s.length - substr.length
 	}
 
 	// We need to look at the js list since ListModel doesn't support item's with non primitive propeties (like an Image).

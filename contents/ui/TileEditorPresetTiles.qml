@@ -91,7 +91,7 @@ TileEditorGroupBox {
 	property string recognizedLauncherKind: ''
 
 	function endsWith(s, substr) {
-		return s.indexOf(substr) == s.length - substr.length
+		return s.length >= substr.length && s.lastIndexOf(substr) == s.length - substr.length
 	}
 
 	function _applyResolvedLauncherInfo(info) {

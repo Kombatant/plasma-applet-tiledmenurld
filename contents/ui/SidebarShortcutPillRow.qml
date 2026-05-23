@@ -164,7 +164,7 @@ PillRowSurface {
 					return ""
 				}
 				function endsWith(s, sub) {
-					return s.indexOf(sub) === s.length - sub.length
+					return s.length >= sub.length && s.lastIndexOf(sub) === s.length - sub.length
 				}
 				property string xdgDisplayName: {
 					var xdgFolder = isLocalizedFolder()

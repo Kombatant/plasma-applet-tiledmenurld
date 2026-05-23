@@ -59,7 +59,7 @@ Repeater {
 			return s.indexOf(sub) === 0
 		}
 		function endsWith(s, sub) {
-			return s.indexOf(sub) === s.length - sub.length
+			return s.length >= sub.length && s.lastIndexOf(sub) === s.length - sub.length
 		}
 		function iconValueCandidate() {
 			if (model.iconName) {
