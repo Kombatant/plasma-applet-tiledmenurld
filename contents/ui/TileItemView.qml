@@ -171,6 +171,8 @@ Rectangle {
 
 	readonly property int labelAlignment: appObj.isGroup ? config.groupLabelAlignment : config.tileLabelAlignment
 	readonly property bool labelBelowIcon: !(modelData.w >= 2 && modelData.h == 1)
+	readonly property real standaloneLabelMinHeight: Kirigami.Theme.defaultFont.pixelSize
+	readonly property real standaloneIconAreaMinHeight: mediumIconSize + tilePadding * 2
 	// Wide single-row non-group tiles show inline label (icon in first cell, label in remaining cells)
 	readonly property bool useInlineLabel: !appObj.isGroup && modelData.w >= 2 && modelData.h == 1 && appObj.showLabel
 	// The filled-label layout keeps the label INSIDE the tile body. It is used
@@ -186,7 +188,13 @@ Rectangle {
 		&& appObj.labelText.length > 0
 		&& !useInlineLabel
 		&& modelData.h >= 2
-	readonly property real standaloneLabelRowTop: Math.max(0, (modelData.h - 1) * cellBoxSize - cellMargin)
+	readonly property real standaloneLabelRowTop: Math.max(
+		0,
+		Math.min(
+			Math.max(0, height - standaloneLabelMinHeight),
+			Math.max((modelData.h - 1) * cellBoxSize - cellMargin, standaloneIconAreaMinHeight)
+		)
+	)
 	readonly property bool labelOverlapsIcon: label.visible
 		&& icon.visible
 		&& label.x < icon.x + icon.width
