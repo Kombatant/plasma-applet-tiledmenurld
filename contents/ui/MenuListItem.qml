@@ -34,6 +34,7 @@ AppToolButton {
 	property string iconName: model.iconName || ''
 	property alias iconSource: itemIcon.source
 	property int iconSize: model.largeIcon ? listView.iconSize * 2 : listView.iconSize
+	readonly property bool selectedByListView: ListView.isCurrentItem
 
 	// Tooltip: show full result text (name + description) when hovered
 	property string fullResultTooltip: (model && model.name ? model.name : '') + ((model && model.description) ? ('\n' + model.description) : '')
@@ -44,7 +45,7 @@ AppToolButton {
 		anchors.fill: parent
 		anchors.leftMargin: 0
 		anchors.rightMargin: 0
-		visible: itemDelegate.containsMouse
+		visible: itemDelegate.containsMouse || (listView.showCurrentItemHighlight && itemDelegate.selectedByListView)
 		radius: config.tileCornerRadius
 		borderOpacity: 0.9
 		glowOpacity: 0.5

@@ -12,6 +12,7 @@ ListView {
 
 	property bool showItemUrl: true
 	property bool showDesktopFileUrl: false
+	property bool showCurrentItemHighlight: false
 	property int iconSize: 36 * Screen.devicePixelRatio
 
 	section.delegate: KickerSectionHeader {}

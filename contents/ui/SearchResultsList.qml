@@ -7,6 +7,7 @@ KickerListView { // RunnerResultsList
 	property bool groupedResultsEnabled: plasmoid.configuration.searchResultsGrouped
 	property bool collapsibleGroupsEnabled: groupedResultsEnabled && !!plasmoid.configuration.sidebarCollapsibleSearchResults
 	property var collapsedSections: ({})
+	showCurrentItemHighlight: search.query.length > 0
 
 	function isSectionCollapsed(sectionName) {
 		if (!collapsibleGroupsEnabled) {
@@ -40,6 +41,17 @@ KickerListView { // RunnerResultsList
 		return nextVisibleIndex(-1, 1)
 	}
 
+	function selectFirstVisibleResult() {
+		if (search.query.length === 0 || count === 0) {
+			currentIndex = -1
+			return
+		}
+		currentIndex = firstVisibleIndex()
+		if (currentIndex >= 0) {
+			positionViewAtIndex(currentIndex, ListView.Beginning)
+		}
+	}
+
 	function ensureCurrentIndexVisible() {
 		if (count === 0) {
 			currentIndex = -1
@@ -71,7 +83,7 @@ KickerListView { // RunnerResultsList
 			}
 		}
 		collapsedSections = nextState
-		currentIndex = firstVisibleIndex()
+		selectFirstVisibleResult()
 	}
 
 	function toggleSectionCollapsed(sectionName) {
@@ -143,6 +155,15 @@ KickerListView { // RunnerResultsList
 		}
 		function onRefreshed() {
 			searchResultsList.resetSectionCollapseState()
+		}
+	}
+
+	Connections {
+		target: search
+		function onQueryChanged() {
+			if (search.query.length === 0) {
+				searchResultsList.currentIndex = -1
+			}
 		}
 	}
 
