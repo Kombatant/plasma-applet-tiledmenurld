@@ -64,6 +64,17 @@ TileEditorGroupBox {
 		function onHasIgdbMetadataSettingsChanged() {
 			tileEditorPresetTiles.maybeFetchIgdbArt()
 		}
+		function onSecretReadyChanged() {
+			// Secret finished loading from KWallet. If it was empty (no entry
+			// stored), hasIgdbMetadataSettings stays false and the change
+			// handler above never fires, so clear the "Looking up..." status
+			// and show the missing-credentials hint for relevant launchers.
+			if (metadataFetcher.secretReady && !metadataFetcher.hasIgdbMetadataSettings
+				&& (tileEditorPresetTiles.isHeroicGameLauncher || tileEditorPresetTiles.isLutrisGameLauncher)) {
+				tileEditorPresetTiles.igdbStatus = i18n("Set the IGDB Client ID and Client Secret in the Tiles settings to download artwork.")
+				tileEditorPresetTiles.checkForPreset()
+			}
+		}
 	}
 
 	visible: false
@@ -150,6 +161,16 @@ TileEditorGroupBox {
 			return
 		}
 		if (!metadataFetcher.hasIgdbMetadataSettings) {
+			// The client secret lives in KWallet and is read lazily. When a
+			// client id is configured but the secret has not been loaded yet,
+			// warm it so KWallet prompts to unlock; hasIgdbMetadataSettings then
+			// flips and the onHasIgdbMetadataSettingsChanged handler re-runs this.
+			if (metadataFetcher.igdbClientId) {
+				igdbStatus = i18n("Looking up IGDB artwork...")
+				checkForPreset()
+				metadataFetcher.warmSecret()
+				return
+			}
 			igdbStatus = i18n("Set the IGDB Client ID and Client Secret in the Tiles settings to download artwork.")
 			checkForPreset()
 			return

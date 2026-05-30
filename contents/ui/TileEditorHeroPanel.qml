@@ -27,6 +27,18 @@ ColumnLayout {
 		id: metadataFetcher
 	}
 
+	// Warm the KWallet-stored IGDB client secret as soon as the Hero editor
+	// opens (only when an IGDB client id is configured, so users who never set
+	// up IGDB aren't prompted for KWallet on every editor open). Without this
+	// the secret stays unread, hasIgdbMetadataSettings is false, and the "Show
+	// downloaded store info and tags" checkbox is permanently disabled while
+	// KWallet is never prompted to unlock.
+	Component.onCompleted: {
+		if (metadataFetcher.igdbClientId) {
+			metadataFetcher.warmSecret()
+		}
+	}
+
 	function _pages() {
 		if (!appObj || !appObj.tile || !Array.isArray(appObj.tile.subTiles)) return []
 		return appObj.tile.subTiles

@@ -63,6 +63,18 @@ Item {
 	// (resolveHeroicLutrisInfoForPage / IGDB token request). No eager warm-up
 	// at construction so opening the tile editor doesn't trigger a kwalletd
 	// qdbus round-trip until the user actually starts a metadata lookup.
+	//
+	// warmSecret() lets a caller (the Hero editor panel) trigger that read on
+	// demand, so the KWallet unlock prompt appears and hasIgdbMetadataSettings
+	// can resolve to true once the stored secret is loaded. Callers should only
+	// invoke this when the user has configured an IGDB client id, otherwise the
+	// editor would prompt for KWallet on every open.
+	function warmSecret() {
+		if (secretReady || secureIgdbClientSecret.loadedOnce || secretLoading) {
+			return
+		}
+		_ensureSecretLoaded(function() {})
+	}
 
 	function _appForPage(page) {
 		if (!page) return null
@@ -448,11 +460,15 @@ Item {
 			callback("Empty title.", null)
 			return
 		}
-		if (!igdbClientId || !igdbClientSecret) {
+		if (!igdbClientId) {
 			callback("Missing IGDB credentials.", null)
 			return
 		}
 		_ensureSecretLoaded(function() {
+			if (!igdbClientSecret) {
+				callback("Missing IGDB credentials.", null)
+				return
+			}
 			_requestIgdbToken(igdbClientId, igdbClientSecret, function(tokenErr, accessToken) {
 				if (tokenErr) {
 					callback(tokenErr, null)
@@ -484,11 +500,15 @@ Item {
 	}
 
 	function _fetchIgdbByTitle(title, callback) {
-		if (!igdbClientId || !igdbClientSecret) {
+		if (!igdbClientId) {
 			callback(false, null, i18n("Set the IGDB Client ID and Client Secret in the Tiles settings to download metadata for this launcher."))
 			return
 		}
 		_ensureSecretLoaded(function() {
+			if (!igdbClientSecret) {
+				callback(false, null, i18n("Set the IGDB Client ID and Client Secret in the Tiles settings to download metadata for this launcher."))
+				return
+			}
 			_requestIgdbToken(igdbClientId, igdbClientSecret, function(tokenErr, accessToken) {
 				if (tokenErr) {
 					callback(false, null, i18n("IGDB authentication failed."))

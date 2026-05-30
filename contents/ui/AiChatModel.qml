@@ -29,14 +29,45 @@ Item {
 	signal sendFinished(bool success)
 	signal streamingContentUpdated()
 
+	property bool secretReady: false
+	property bool secretLoading: false
+	property var _secretWaiters: []
+
 	KWalletSecret {
 		id: secureApiKey
 		onLoaded: function(success) {
-			if (!success) {
-				return
+			aiChatModel.secretLoading = false
+			aiChatModel.secretReady = true
+			if (success) {
+				aiChatModel._migrateLegacyApiKey()
 			}
-			aiChatModel._migrateLegacyApiKey()
+			aiChatModel._drainSecretWaiters()
 		}
+	}
+
+	function _drainSecretWaiters() {
+		var waiters = _secretWaiters.slice()
+		_secretWaiters = []
+		for (var i = 0; i < waiters.length; i++) {
+			waiters[i]()
+		}
+	}
+
+	// Read the KWallet-stored API key lazily, on the first action that needs it
+	// (send / model detection). This keeps the KWallet unlock prompt off the AI
+	// chat view's open path for providers that need no key (ollama, openwebui),
+	// while still triggering it the first time a key-based provider is used.
+	function _ensureSecretLoaded(callback) {
+		if (secretReady || secureApiKey.loadedOnce) {
+			callback()
+			return
+		}
+		_secretWaiters.push(callback)
+		if (secretLoading) {
+			return
+		}
+		secretLoading = true
+		secureApiKey.readSecret()
 	}
 
 	Base64JsonString {
@@ -61,7 +92,6 @@ Item {
 	}
 
 	Component.onCompleted: {
-		secureApiKey.readSecret()
 		if (!conversationList || !conversationList.length) {
 			newConversation()
 		}
@@ -295,6 +325,15 @@ Item {
 			return
 		}
 		lastError = ""
+		// Ensure the wallet-stored key is loaded before validating config, so a
+		// key in KWallet is not mistaken for a missing key (which would race the
+		// async read and wrongly tell the user to enter a key).
+		if (apiKeyRequired && !secretReady && !secureApiKey.loadedOnce) {
+			_ensureSecretLoaded(function() {
+				aiChatModel.sendMessage(text)
+			})
+			return
+		}
 		if (!_requireConfig()) {
 			sendFinished(false)
 			return
@@ -553,6 +592,14 @@ Item {
 
 	function fetchModels() {
 		lastError = ""
+		// Load the wallet-stored key first so detection works on the first use
+		// without falsely reporting a missing key (see sendMessage).
+		if (apiKeyRequired && !secretReady && !secureApiKey.loadedOnce) {
+			_ensureSecretLoaded(function() {
+				aiChatModel.fetchModels()
+			})
+			return
+		}
 		if (apiKeyRequired && !apiKey) {
 			lastError = i18n("Please enter an API key before detecting models.")
 			modelDetectionFinished(false)

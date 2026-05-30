@@ -40,6 +40,13 @@ Item {
 			return false
 		}
 		if (chatModel.apiKeyRequired && !chatModel.apiKey) {
+			// The key is read from KWallet lazily on first send. Stay enabled
+			// while the secret has not been loaded yet so the user can trigger
+			// the send that performs the read (and the KWallet unlock). Only
+			// treat the key as missing once the read has completed empty.
+			if (!chatModel.secretReady) {
+				return true
+			}
 			return false
 		}
 		return true
