@@ -208,6 +208,12 @@ LibConfig.FormKCM {
 		]
 	}
 
+	LibConfig.CheckBox {
+		text: i18n("Remember last open tab")
+		configKey: 'rememberLastOpenTab'
+		enabled: formLayout.pendingUseTileTabs
+	}
+
 	//-------------------------------------------------------
 	LibConfig.Heading {
 		text: i18n("Size & Spacing")

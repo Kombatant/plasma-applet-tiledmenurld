@@ -110,6 +110,14 @@
 			     [{id: string, name: string, tiles: [{x,y,w,h,url,...}]}] -->
 			<default></default>
 		</entry>
+		<entry name="rememberLastOpenTab" type="bool">
+			<label>Whether to reopen the menu on the last selected tab.</label>
+			<default>false</default>
+		</entry>
+		<entry name="lastOpenTab" type="int">
+			<label>Index of the last selected tab.</label>
+			<default>0</default>
+		</entry>
 
 		<!-- Base64 encoded XML -->
 		<entry name="tileModel" type="string" stringType="base64xml">

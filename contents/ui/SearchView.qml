@@ -26,7 +26,7 @@ Item {
 	readonly property bool _useExternalSearch: externalSearchField !== null
 	property alias stackView: stackView
 	property alias jumpToLetterView: jumpToLetterView
-	property alias aiChatView: aiChatView
+	readonly property var aiChatView: aiChatViewLoader.item
 	property var aiChatModel
 	property string activeSizeMemoryView: "Alphabetical"
 	readonly property bool aiChatEnabled: plasmoid.configuration.aiChatEnabled !== false
@@ -34,7 +34,7 @@ Item {
 
 	readonly property bool showingOnlyTiles: config.usesClassicLayout && !config.showSearch
 	readonly property bool showingAppList: stackView.currentItem == appsView || stackView.currentItem == jumpToLetterView
-	readonly property bool showingAiChat: (config.usesDockedSidebarLayout || config.showSearch) && stackView.currentItem == aiChatView
+	readonly property bool showingAiChat: (config.usesDockedSidebarLayout || config.showSearch) && !!aiChatView && stackView.currentItem == aiChatView
 	readonly property bool showingAppsAlphabetically: (config.usesDockedSidebarLayout || config.showSearch) && appsModel.order == "alphabetical" && showingAppList
 	readonly property bool showingAppsCategorically: (config.usesDockedSidebarLayout || config.showSearch) && appsModel.order == "categories" && showingAppList
 	readonly property bool hideSearchFieldForAiChat: config.usesClassicLayout && showingAiChat
@@ -205,6 +205,10 @@ Item {
 		// Trigger lazy AiChatModel construction in main.qml.
 		if (typeof popup !== "undefined" && popup) {
 			popup.aiChatViewRequested()
+		}
+		// Build the chat view on first use (synchronous; item ready below).
+		if (!aiChatViewLoader.active) {
+			aiChatViewLoader.active = true
 		}
 		saveCurrentSizeMemoryViewBeforeSwitch()
 		rememberView("AiChat")
@@ -423,10 +427,16 @@ Item {
 			}
 		}
 
-		AiChatView {
-			id: aiChatView
+		Loader {
+			id: aiChatViewLoader
 			visible: false
-			chatModel: aiChatModel
+			// The 661-line chat view is expensive to build; defer until the
+			// user actually opens AI chat (showAiChat activates the loader).
+			active: false
+			sourceComponent: AiChatView {
+				visible: false
+				chatModel: searchView.aiChatModel
+			}
 		}
 
 		Loader {
@@ -469,7 +479,7 @@ Item {
 			id: appsViewSlideAnim
 			target: appsViewSlideSnapshot
 			property: "x"
-			duration: 280
+			duration: 200
 			easing.type: Easing.OutCubic
 			onStopped: {
 				appsViewSlideSnapshot.visible = false
@@ -481,7 +491,7 @@ Item {
 			id: appsViewEnterAnim
 			target: appsView
 			property: "x"
-			duration: 280
+			duration: 200
 			easing.type: Easing.OutCubic
 			onStopped: appsView.x = 0
 		}

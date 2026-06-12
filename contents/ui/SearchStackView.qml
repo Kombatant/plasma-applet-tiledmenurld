@@ -16,7 +16,7 @@ QQC2.StackView {
 				property: "x"
 				from: stackView._slideEnabled ? stackView.width * stackView.slideDirection : 0
 				to: 0
-				duration: stackView._slideEnabled ? 280 : 0
+				duration: stackView._slideEnabled ? 200 : 0
 				easing.type: Easing.OutCubic
 			}
 			NumberAnimation {
@@ -34,7 +34,7 @@ QQC2.StackView {
 				property: "x"
 				from: 0
 				to: stackView._slideEnabled ? -stackView.width * stackView.slideDirection : 0
-				duration: stackView._slideEnabled ? 280 : 0
+				duration: stackView._slideEnabled ? 200 : 0
 				easing.type: Easing.OutCubic
 			}
 			NumberAnimation {

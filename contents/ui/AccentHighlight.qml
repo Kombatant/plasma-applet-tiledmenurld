@@ -22,6 +22,7 @@ Item {
 		id: canvas
 		anchors.fill: parent
 		antialiasing: true
+		renderStrategy: Canvas.Threaded
 
 		function colorWithAlpha(color, alpha) {
 			return Qt.rgba(color.r, color.g, color.b, Math.max(0, Math.min(1, alpha)))

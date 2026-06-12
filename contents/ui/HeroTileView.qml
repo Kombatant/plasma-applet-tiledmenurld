@@ -480,13 +480,13 @@ Item {
 		NumberAnimation {
 			id: pageSlideInX
 			property: "x"
-			duration: 280
+			duration: 200
 			easing.type: Easing.OutCubic
 		}
 		NumberAnimation {
 			id: pageSlideOutX
 			property: "x"
-			duration: 280
+			duration: 200
 			easing.type: Easing.OutCubic
 		}
 		NumberAnimation {
@@ -580,14 +580,11 @@ Item {
 		visible: false
 		antialiasing: true
 		smooth: true
-		layer.enabled: true
-		layer.smooth: true
 	}
 
 	ShaderEffectSource {
 		id: roundedMaskSource
 		sourceItem: roundedMask
-		recursive: true
 		live: true
 		hideSource: true
 		smooth: true
@@ -596,7 +593,6 @@ Item {
 	ShaderEffectSource {
 		id: contentSource
 		sourceItem: contentLayer
-		recursive: true
 		live: true
 		hideSource: true
 		smooth: true

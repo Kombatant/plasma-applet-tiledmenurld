@@ -9,11 +9,25 @@ Item {
 	property string query: ""
 	property bool isSearching: query.length > 0
 	onQueryChanged: {
-		runnerModel.query = search.query
 		// Clear results immediately when query is cleared.
 		// Don't trigger debouncedRefresh here - rely on onQueryFinished.
 		if (search.query.length === 0) {
+			queryDebounce.stop()
+			runnerModel.query = ""
 			resultModel.clear()
+		} else {
+			// Debounce typing so each keystroke doesn't trigger a full
+			// KRunner query + result model rebuild.
+			queryDebounce.restart()
+		}
+	}
+
+	Timer {
+		id: queryDebounce
+		interval: 120
+		repeat: false
+		onTriggered: {
+			runnerModel.query = search.query
 		}
 	}
 
@@ -22,6 +36,8 @@ Item {
 	//     find /usr/share/kservices5/ -iname "plasma-runner-*.desktop" -print0 | xargs -0 grep "PluginInfo-Name" | sort
 	property var filters: []
 	onFiltersChanged: {
+		// A pending typing debounce would stomp the requery timer chain below.
+		queryDebounce.stop()
 		// Save query and clear it first - this makes the RunnerModel clear its internal state
 		var savedQuery = search.query
 		

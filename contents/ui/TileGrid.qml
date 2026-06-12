@@ -2,10 +2,35 @@ import QtQuick
 import QtQuick.Controls as QQC2
 import org.kde.kirigami as Kirigami
 import org.kde.plasma.extras as PlasmaExtras
+import org.kde.plasma.private.kicker as Kicker
 import "Utils.js" as Utils
 
 DropArea {
 	id: tileGrid
+
+	// Shared per-grid helpers — previously instantiated once per tile,
+	// multiplying grid rebuild cost for no benefit.
+	readonly property alias processRunner: gridProcessRunner
+	Kicker.ProcessRunner {
+		id: gridProcessRunner
+	}
+	readonly property font tileLabelFont: Qt.font({ pixelSize: Kirigami.Theme.defaultFont.pixelSize, bold: false })
+	readonly property font tileGroupLabelFont: Qt.font({
+		family: Kirigami.Theme.defaultFont.family,
+		pointSize: Kirigami.Theme.defaultFont.pointSize + 4,
+		weight: Kirigami.Theme.defaultFont.weight,
+		italic: Kirigami.Theme.defaultFont.italic
+	})
+	readonly property alias tileLabelMetrics: tileLabelMetricsItem
+	readonly property alias tileGroupLabelMetrics: tileGroupLabelMetricsItem
+	FontMetrics {
+		id: tileLabelMetricsItem
+		font: tileGrid.tileLabelFont
+	}
+	FontMetrics {
+		id: tileGroupLabelMetricsItem
+		font: tileGrid.tileGroupLabelFont
+	}
 	property int cellSize: 60 * Screen.devicePixelRatio
 	property int cellMargin: Math.round(3 * Screen.devicePixelRatio)
 	property real cellPushedMargin: 6 * Screen.devicePixelRatio
@@ -171,7 +196,29 @@ DropArea {
 		)
 	}
 
+	// Every tile delegate resolves its parent group via getGroupAreaRect
+	// (through AppObject), and each call scanned the whole model twice —
+	// O(n²) per grid rebuild. Memoize per model generation. Fields of a
+	// never-reassigned JS object so binding evaluation doesn't track it.
+	readonly property var _groupRectCache: ({ map: null })
 	function getGroupAreaRect(groupTile) {
+		var cache = _groupRectCache
+		if (!cache.map) {
+			cache.map = {}
+		}
+		var key = groupTile.x + "," + groupTile.y + "," + groupTile.w + ","
+			+ (typeof groupTile.h !== "undefined" ? groupTile.h : 1) + ","
+			+ (typeof groupTile.groupAreaH !== "undefined" ? groupTile.groupAreaH : -1)
+		var hit = cache.map[key]
+		if (hit) {
+			return hit
+		}
+		var rect = _computeGroupAreaRect(groupTile)
+		cache.map[key] = rect
+		return rect
+	}
+
+	function _computeGroupAreaRect(groupTile) {
 		var x1 = groupTile.x
 		var x2 = groupTile.x + groupTile.w - 1
 		var headerH = (typeof groupTile.h !== "undefined" ? groupTile.h : 1)
@@ -420,15 +467,21 @@ DropArea {
 	function refreshTileDelegates() {
 		// When the config system reloads tileModel, the JS array is replaced.
 		// Ensure Repeater delegates are rebuilt from the new array.
+		// Panels/headers only render for group tiles — don't instantiate
+		// (invisible) delegates for every tile in the grid.
+		var groupTiles = (tileModel || []).filter(function(t) {
+			return t && t.tileType === "group"
+		})
 		groupPanelRepeater.model = 0
-		groupPanelRepeater.model = tileModel
+		groupPanelRepeater.model = groupTiles
 		tileModelRepeater.model = 0
 		tileModelRepeater.model = tileModel
 		groupHeaderSeparatorRepeater.model = 0
-		groupHeaderSeparatorRepeater.model = tileModel
+		groupHeaderSeparatorRepeater.model = groupTiles
 	}
 	onDraggedItemChanged: update()
 	onTileModelChanged: {
+		_groupRectCache.map = null
 		refreshTileDelegates()
 		update()
 	}

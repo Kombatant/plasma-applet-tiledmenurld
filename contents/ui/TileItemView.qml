@@ -421,24 +421,6 @@ Rectangle {
 		}
 
 		PlasmaComponents3.Label {
-			id: labelOutlineLight
-			visible: false
-			text: label.text
-			anchors.fill: label
-			clip: true
-			wrapMode: label.wrapMode
-			maximumLineCount: label.maximumLineCount
-			elide: label.elide
-			horizontalAlignment: label.horizontalAlignment
-			verticalAlignment: label.verticalAlignment
-			width: label.width
-			renderType: Text.QtRendering
-			color: "transparent"
-			style: Text.Outline
-			styleColor: "transparent"
-		}
-
-		PlasmaComponents3.Label {
 			id: labelShadow
 			visible: label.visible && tileItem.labelNeedsShadow
 			text: label.text
@@ -479,53 +461,60 @@ Rectangle {
 			styleColor: "transparent"
 		}
 
-		// Holographic sweep overlay effect
-		Item {
+		// Holographic sweep overlay effect — only built when the holographic
+		// hover style is selected.
+		Loader {
 			id: holographicSweep
 			anchors.fill: parent
-			clip: true
-			visible: tileItemView.useHolographicEffect
-			opacity: (tileItemView.useHolographicEffect && tileItemView.hovered) ? 1 : 0
-			Behavior on opacity {
-				NumberAnimation {
-					duration: 300
-					easing.type: Easing.OutCubic
-				}
-			}
-
-			Rectangle {
-				id: sweepGradient
-				width: parent.width * 2
-				height: parent.height * 2
-				x: tileItemView.hovered ? parent.width : -width
-				y: -parent.height * 0.5
-				rotation: -45
-				transformOrigin: Item.Center
-				opacity: 0.3
-				gradient: Gradient {
-					orientation: Gradient.Vertical
-					GradientStop { position: 0.0; color: "transparent" }
-					GradientStop { position: 0.3; color: "transparent" }
-					GradientStop { position: 0.5; color: tileItemView.holographicColor }
-					GradientStop { position: 0.7; color: "transparent" }
-					GradientStop { position: 1.0; color: "transparent" }
-				}
-
-				Behavior on x {
+			active: tileItemView.useHolographicEffect
+			sourceComponent: Item {
+				anchors.fill: parent
+				clip: true
+				opacity: (tileItemView.useHolographicEffect && tileItemView.hovered) ? 1 : 0
+				Behavior on opacity {
 					NumberAnimation {
-						duration: 500
+						duration: 300
 						easing.type: Easing.OutCubic
+					}
+				}
+
+				Rectangle {
+					id: sweepGradient
+					width: parent.width * 2
+					height: parent.height * 2
+					x: tileItemView.hovered ? parent.width : -width
+					y: -parent.height * 0.5
+					rotation: -45
+					transformOrigin: Item.Center
+					opacity: 0.3
+					gradient: Gradient {
+						orientation: Gradient.Vertical
+						GradientStop { position: 0.0; color: "transparent" }
+						GradientStop { position: 0.3; color: "transparent" }
+						GradientStop { position: 0.5; color: tileItemView.holographicColor }
+						GradientStop { position: 0.7; color: "transparent" }
+						GradientStop { position: 1.0; color: "transparent" }
+					}
+
+					Behavior on x {
+						NumberAnimation {
+							duration: 500
+							easing.type: Easing.OutCubic
+						}
 					}
 				}
 			}
 		}
 	}
 
-	QtGraphicalEffects.RectangularGlow {
+	Loader {
 		id: holographicGlow
 		anchors.fill: parent
 		anchors.margins: -tileItemView.holographicGlowSpread
-		visible: tileItemView.useHolographicEffect
+		// The glow is a shader effect; only instantiate it when the
+		// holographic hover style is selected.
+		active: tileItemView.useHolographicEffect
+		sourceComponent: QtGraphicalEffects.RectangularGlow {
 		opacity: (tileItemView.useHolographicEffect && tileItemView.hovered) ? 1 : 0
 		glowRadius: tileItemView.holographicGlowSpread * 2
 		spread: 0.2
@@ -543,41 +532,56 @@ Rectangle {
 				easing.type: Easing.OutCubic
 			}
 		}
+		}
 	}
 
-	Rectangle {
-		id: roundedMask
+	// The masked-content chain only matters when content can actually poke
+	// past the rounded body: full-bleed background images, or the holographic
+	// sweep. Plain color/gradient tiles are rounded natively by this
+	// Rectangle's radius, so skip the two texture passes + MultiEffect.
+	readonly property bool needsContentMask: cornerRadius > 0
+		&& (!!safeBackgroundSource || useHolographicEffect)
+
+	Loader {
+		active: tileItemView.needsContentMask
 		anchors.fill: parent
-		radius: tileItemView.cornerRadius
-		color: "white"
-		antialiasing: true
-		smooth: true
-	}
+		sourceComponent: Item {
+			anchors.fill: parent
 
-	ShaderEffectSource {
-		id: roundedMaskSource
-		sourceItem: roundedMask
-		recursive: true
-		live: true
-		hideSource: true
-		smooth: true
-	}
+			Rectangle {
+				id: roundedMask
+				anchors.fill: parent
+				radius: tileItemView.cornerRadius
+				color: "white"
+				visible: false
+				antialiasing: true
+				smooth: true
+			}
 
-	ShaderEffectSource {
-		id: contentSource
-		sourceItem: contentLayer
-		recursive: true
-		live: true
-		hideSource: true
-		smooth: true
-	}
+			ShaderEffectSource {
+				id: roundedMaskSource
+				sourceItem: roundedMask
+				live: true
+				hideSource: true
+				smooth: true
+			}
 
-	MultiEffect {
-		anchors.fill: parent
-		source: contentSource
-		maskEnabled: true
-		maskSource: roundedMaskSource
-		antialiasing: true
-		smooth: true
+			ShaderEffectSource {
+				id: contentSource
+				sourceItem: contentLayer
+				live: true
+				hideSource: true
+				smooth: true
+			}
+
+			MultiEffect {
+				anchors.fill: parent
+				source: contentSource
+				maskEnabled: true
+				maskSource: roundedMaskSource
+				antialiasing: true
+				smooth: true
+			}
+		}
 	}
 }

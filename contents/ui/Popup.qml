@@ -68,6 +68,9 @@ MouseArea {
 	property int _previousTabIndex: -1
 	property var tileTabsData: []   // [{id: string, name: string, tiles: [tileObj]}]
 	property bool _tabsWriting: false  // suppress config-change reload during save
+	// True while the tile model swaps due to tab navigation/load rather than a
+	// user edit — suppresses pointless re-serialization of all tabs.
+	property bool _switchingTab: false
 	property int _tabIdCounter: 0   // monotonic counter for unique tab IDs
 
 	// Keyword → icon mapping for tab name → symbolic icon.
@@ -115,6 +118,8 @@ MouseArea {
 	}
 
 	function loadTileTabs() {
+		// Loading replaces the model wholesale; that's not a user edit.
+		_switchingTab = true
 		var raw = plasmoid.configuration.tileTabs || ''
 		if (!raw) {
 			// First-time enable: migrate existing single tileModel into tab "Main"
@@ -159,11 +164,18 @@ MouseArea {
 				tileTabsData = [{id: '1', name: i18n('Main'), icon: 'go-home', tiles: []}]
 			}
 		}
+		if (plasmoid.configuration.rememberLastOpenTab) {
+			var remembered = plasmoid.configuration.lastOpenTab
+			if (remembered >= 0 && remembered < tileTabsData.length) {
+				activeTabIndex = remembered
+			}
+		}
 		if (activeTabIndex >= tileTabsData.length) {
 			activeTabIndex = 0
 		}
 		popup.normalizeGroupHeaderHeights()
 		popup.resetViewsAfterTileModelReload()
+		_switchingTab = false
 	}
 
 	function saveTileTabs() {
@@ -207,8 +219,13 @@ MouseArea {
 	function selectTab(index) {
 		if (index < 0 || index >= tileTabsData.length) return
 		if (index === activeTabIndex) return
-		// Persist current tab tiles before switching
-		popup.saveTileTabs()
+		// Persist current tab tiles before switching — only when edits are
+		// pending. An unconditional save here re-serialized every tab's tiles
+		// (JSON + Base64 + config write) on each tab click.
+		popup.flushPendingTileLayoutSave()
+		if (plasmoid.configuration.rememberLastOpenTab) {
+			plasmoid.configuration.lastOpenTab = index
+		}
 		// Close the tile editor: the tile reference belongs to the current tab and
 		// would become stale once the model switches to a different tab's tiles.
 		// Switch the stack back to the default view BEFORE destroying the editor
@@ -225,8 +242,16 @@ MouseArea {
 		if (typeof tileGridSlideContainer !== "undefined" && tileGridSlideContainer) {
 			tileGridSlideContainer.runSlide(direction, index)
 		} else {
-			activeTabIndex = index
+			setActiveTabIndexForSwitch(index)
 		}
+	}
+
+	// Change the active tab while flagging the resulting tile-model swap as
+	// navigation (not a user edit), so it doesn't queue a tab re-serialization.
+	function setActiveTabIndexForSwitch(index) {
+		_switchingTab = true
+		activeTabIndex = index
+		_switchingTab = false
 	}
 
 	function addTab() {
@@ -1282,13 +1307,13 @@ MouseArea {
 
 						function runSlide(direction, newIndex) {
 							if (!config.useTileTabs) {
-								popup.activeTabIndex = newIndex
+								popup.setActiveTabIndexForSwitch(newIndex)
 								return
 							}
 							// Skip the snapshot transition when the source has not painted
 							// yet (first open, hidden tab) — it would flash a black frame.
 							if (tileGrid.width <= 0 || tileGrid.height <= 0 || !popup.widgetExpanded) {
-								popup.activeTabIndex = newIndex
+								popup.setActiveTabIndexForSwitch(newIndex)
 								return
 							}
 							if (slideActive) {
@@ -1310,7 +1335,7 @@ MouseArea {
 								slideSnapshot.visible = true
 								tileGridSlideContainer.slideDirection = direction
 								tileGridSlideContainer.slideActive = true
-								popup.activeTabIndex = newIndex
+								popup.setActiveTabIndexForSwitch(newIndex)
 								tileGrid.x = direction * tileGridSlideContainer.width
 								snapshotSlideAnim.to = -direction * tileGridSlideContainer.width
 								snapshotSlideAnim.start()
@@ -1323,7 +1348,7 @@ MouseArea {
 							id: snapshotSlideAnim
 							target: slideSnapshot
 							property: "x"
-							duration: 280
+							duration: 200
 							easing.type: Easing.OutCubic
 							onStopped: {
 								slideSnapshot.visible = false
@@ -1336,7 +1361,7 @@ MouseArea {
 							id: gridSlideAnim
 							target: tileGrid
 							property: "x"
-							duration: 280
+							duration: 200
 							easing.type: Easing.OutCubic
 						}
 
@@ -1378,8 +1403,12 @@ MouseArea {
 
 							onTileModelChanged: {
 								if (config.useTileTabs) {
-									tileGrid._activeTabTilesSavePending = true
-									saveActiveTabTilesDebounced.restart()
+									// Tab switches swap the model without editing
+									// it — nothing to persist.
+									if (!popup._switchingTab) {
+										tileGrid._activeTabTilesSavePending = true
+										saveActiveTabTilesDebounced.restart()
+									}
 								} else {
 									tileGrid.syncConfigTileModelValue()
 									tileGrid._tileModelSavePending = true

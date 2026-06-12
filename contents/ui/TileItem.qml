@@ -25,6 +25,8 @@ Item {
 		tile: modelData
 	}
 	readonly property alias app: appObj.app
+	// Lazily created hero view (null for ordinary tiles).
+	readonly property var heroTileView: heroLoader.item
 
 	readonly property bool faded: tileGrid.editing || tileMouseArea.isLeftPressed
 	readonly property int fadedWidth: width - cellPushedMargin
@@ -103,8 +105,11 @@ Item {
 			}
 		}
 
-		HeroTileView {
-			id: heroTileView
+		Loader {
+			id: heroLoader
+			// HeroTileView is ~600 lines with its own effect chain — only hero
+			// tiles should pay its instantiation cost on grid rebuilds.
+			active: appObj.isHero
 			visible: appObj.isHero
 			anchors.fill: parent
 			// Match group-panel insets so hero-to-group gaps equal group-to-group gaps.
@@ -112,8 +117,10 @@ Item {
 			anchors.rightMargin: tileGrid.groupPanelInsetX
 			anchors.topMargin: tileGrid.groupPanelInsetTop
 			anchors.bottomMargin: tileGrid.groupPanelInsetBottom
-			cornerRadius: tileItemView.cornerRadius
-			hovered: tileMouseArea.containsMouse || heroPrevArea.containsMouse || heroNextArea.containsMouse
+			sourceComponent: HeroTileView {
+				cornerRadius: tileItemView.cornerRadius
+				hovered: tileMouseArea.containsMouse || heroPrevArea.containsMouse || heroNextArea.containsMouse
+			}
 		}
 
 		TileItemView {
@@ -139,15 +146,18 @@ Item {
 			hovered: tileMouseArea.containsMouse
 		}
 
-		FontMetrics {
-			id: descriptionLabelFontMetrics
-			font: descriptionLabel.font
-		}
+		// Shared metrics hosted on TileGrid (same fonts grid-wide) — avoids a
+		// FontMetrics instance per tile.
+		readonly property var descriptionLabelFontMetrics: appObj.isGroup ? tileGrid.tileGroupLabelMetrics : tileGrid.tileLabelMetrics
 
-		Item {
+		Loader {
 			id: labelOverlayScrim
-			visible: !appObj.isHero && useOverlayLabel && !useStyledGroupHeader && appObj.showLabel && appObj.labelText.length > 0
+			// The scrim needs a masked effect chain; only build it for tiles
+			// that actually show a label over a background image.
+			active: !appObj.isHero && useOverlayLabel && !useStyledGroupHeader && appObj.showLabel && appObj.labelText.length > 0
+			visible: active
 			anchors.fill: tileItemView
+			sourceComponent: Item {
 
 			Item {
 				id: labelOverlayScrimContent
@@ -179,7 +189,6 @@ Item {
 			ShaderEffectSource {
 				id: labelOverlayScrimMaskSource
 				sourceItem: labelOverlayScrimMask
-				recursive: true
 				live: true
 				hideSource: true
 				smooth: true
@@ -188,7 +197,6 @@ Item {
 			ShaderEffectSource {
 				id: labelOverlayScrimSource
 				sourceItem: labelOverlayScrimContent
-				recursive: true
 				live: true
 				hideSource: true
 				smooth: true
@@ -202,6 +210,7 @@ Item {
 				antialiasing: true
 				smooth: true
 			}
+			}
 		}
 
 		Item {
@@ -214,50 +223,6 @@ Item {
 			anchors.rightMargin: labelPaddingX
 			anchors.bottomMargin: labelPaddingY
 			height: visible ? (descriptionLabelFontMetrics.lineSpacing * 2) : 0
-
-			QQC2.Label {
-				id: descriptionLabelOutlineDark
-				visible: false
-				text: appObj.labelText
-				anchors.left: parent.left
-				anchors.right: parent.right
-				anchors.bottom: parent.bottom
-				height: parent.height
-				clip: true
-				horizontalAlignment: Text.AlignLeft
-				verticalAlignment: appObj.isGroup ? Text.AlignVCenter : Text.AlignBottom
-				wrapMode: Text.Wrap
-				maximumLineCount: 2
-				elide: Text.ElideRight
-				opacity: 1
-				font: appObj.isGroup ? groupLabelFont : Qt.font({ pixelSize: Kirigami.Theme.defaultFont.pixelSize, bold: false })
-				color: "transparent"
-				renderType: Text.QtRendering
-				style: Text.Outline
-				styleColor: "transparent"
-			}
-
-			QQC2.Label {
-				id: descriptionLabelOutlineLight
-				visible: false
-				text: appObj.labelText
-				anchors.left: parent.left
-				anchors.right: parent.right
-				anchors.bottom: parent.bottom
-				height: parent.height
-				clip: true
-				horizontalAlignment: Text.AlignLeft
-				verticalAlignment: appObj.isGroup ? Text.AlignVCenter : Text.AlignBottom
-				wrapMode: Text.Wrap
-				maximumLineCount: 2
-				elide: Text.ElideRight
-				opacity: 1
-				font: appObj.isGroup ? groupLabelFont : Qt.font({ pixelSize: Kirigami.Theme.defaultFont.pixelSize, bold: false })
-				color: "transparent"
-				renderType: Text.QtRendering
-				style: Text.Outline
-				styleColor: "transparent"
-			}
 
 			QQC2.Label {
 				id: descriptionLabelShadow
@@ -300,44 +265,6 @@ Item {
 				color: readableLabelTextColor
 				renderType: Text.QtRendering
 			}
-		}
-
-		QQC2.Label {
-			id: descriptionLabelBelowOutlineDark
-			visible: false
-			text: descriptionLabelBelow.text
-			anchors.fill: descriptionLabelBelow
-			clip: true
-			horizontalAlignment: descriptionLabelBelow.horizontalAlignment
-			verticalAlignment: descriptionLabelBelow.verticalAlignment
-			wrapMode: descriptionLabelBelow.wrapMode
-			maximumLineCount: descriptionLabelBelow.maximumLineCount
-			elide: descriptionLabelBelow.elide
-			opacity: 1
-			font: descriptionLabelBelow.font
-			color: "transparent"
-			renderType: Text.QtRendering
-			style: Text.Outline
-			styleColor: "transparent"
-		}
-
-		QQC2.Label {
-			id: descriptionLabelBelowOutlineLight
-			visible: false
-			text: descriptionLabelBelow.text
-			anchors.fill: descriptionLabelBelow
-			clip: true
-			horizontalAlignment: descriptionLabelBelow.horizontalAlignment
-			verticalAlignment: descriptionLabelBelow.verticalAlignment
-			wrapMode: descriptionLabelBelow.wrapMode
-			maximumLineCount: descriptionLabelBelow.maximumLineCount
-			elide: descriptionLabelBelow.elide
-			opacity: 1
-			font: descriptionLabelBelow.font
-			color: "transparent"
-			renderType: Text.QtRendering
-			style: Text.Outline
-			styleColor: "transparent"
 		}
 
 		QQC2.Label {
@@ -387,28 +314,37 @@ Item {
 		}
 	}
 
-	HoverOutlineEffect {
-		id: hoverOutlineEffect
+	Loader {
+		id: hoverOutlineEffectLoader
 		x: tileItemView.x
 		y: tileItemView.y
 		width: tileItemView.width
 		height: tileItemView.height
-		cornerRadius: tileItemView.cornerRadius
-		hoverRadius: {
-			if (appObj.isGroup) {
-				return tileItemView.maxSize
-			} else {
-				return tileItemView.minSize
+		// The outline effect carries two Qt5Compat shader items; building it
+		// per tile on grid rebuilds is wasted work. Build on first hover and
+		// keep it for subsequent hovers.
+		readonly property bool wanted: !appObj.isHero && tileItemView.useClassicHoverEffect && tileMouseArea.containsMouse
+		onWantedChanged: {
+			if (wanted && !active) {
+				active = true
 			}
 		}
-		hoverOutlineSize: tileGrid.hoverOutlineSize
-		mouseArea: tileMouseArea
-		visible: !appObj.isHero && tileItemView.useClassicHoverEffect && tileMouseArea.containsMouse
+		active: false
+		visible: wanted
+		sourceComponent: HoverOutlineEffect {
+			cornerRadius: tileItemView.cornerRadius
+			hoverRadius: {
+				if (appObj.isGroup) {
+					return tileItemView.maxSize
+				} else {
+					return tileItemView.minSize
+				}
+			}
+			hoverOutlineSize: tileGrid.hoverOutlineSize
+			mouseArea: tileMouseArea
+		}
 	}
 
-	Kicker.ProcessRunner {
-		id: tileProcessRunner
-	}
 	//--- View End
 
 	MouseArea {
@@ -421,7 +357,7 @@ Item {
 		acceptedButtons: Qt.LeftButton | Qt.RightButton
 		cursorShape: (dragActive && dragOutside)
 			? Qt.ForbiddenCursor
-			: ((appObj.isHero && heroTileView && heroTileView.containsPlayButton(tileMouseArea.mouseX - heroTileView.x, tileMouseArea.mouseY - heroTileView.y))
+			: ((appObj.isHero && heroTileView && heroTileView.containsPlayButton(tileMouseArea.mouseX - heroLoader.x, tileMouseArea.mouseY - heroLoader.y))
 				? Qt.PointingHandCursor
 				: (editing ? Qt.ClosedHandCursor : Qt.ArrowCursor))
 		readonly property bool isLeftPressed: pressedButtons & Qt.LeftButton
@@ -473,7 +409,7 @@ Item {
 				if (tileEditorView && tileEditorView.tile) {
 					openTileEditor()
 				} else if (appObj.isHero) {
-					if (heroTileView && heroTileView.containsPlayButton(mouse.x - heroTileView.x, mouse.y - heroTileView.y)) {
+					if (heroTileView && heroTileView.containsPlayButton(mouse.x - heroLoader.x, mouse.y - heroLoader.y)) {
 						heroTileView.launchCurrentPage()
 					}
 				} else if (modelData.url) {
@@ -512,7 +448,7 @@ Item {
 							}
 							if (!opened) {
 								try {
-									tileProcessRunner.runCommand('systemsettings ' + moduleId)
+									tileGrid.processRunner.runCommand('systemsettings ' + moduleId)
 									opened = true
 								} catch(e) {
 									console.warn('Tile click systemsettings command failed', moduleId, e)
@@ -525,7 +461,8 @@ Item {
 					}
 				}
 			} else if (mouse.button == Qt.RightButton) {
-				contextMenu.open(mouse.x, mouse.y)
+				contextMenuLoader.active = true
+				contextMenuLoader.item.open(mouse.x, mouse.y)
 			}
 		}
 	}
@@ -534,8 +471,8 @@ Item {
 	MouseArea {
 		id: heroPrevArea
 		visible: appObj.isHero && heroTileView && heroTileView.effectivePages.length > 1
-		x: heroTileView.x
-		y: heroTileView.y + Math.round((heroTileView.height - height) / 2)
+		x: heroLoader.x
+		y: heroLoader.y + Math.round((heroLoader.height - height) / 2)
 		width: Kirigami.Units.iconSizes.medium + Kirigami.Units.smallSpacing * 2
 		height: width
 		acceptedButtons: Qt.LeftButton
@@ -549,8 +486,8 @@ Item {
 	MouseArea {
 		id: heroNextArea
 		visible: appObj.isHero && heroTileView && heroTileView.effectivePages.length > 1
-		x: heroTileView.x + heroTileView.width - width
-		y: heroTileView.y + Math.round((heroTileView.height - height) / 2)
+		x: heroLoader.x + heroLoader.width - width
+		y: heroLoader.y + Math.round((heroLoader.height - height) / 2)
 		width: Kirigami.Units.iconSizes.medium + Kirigami.Units.smallSpacing * 2
 		height: width
 		acceptedButtons: Qt.LeftButton
@@ -591,7 +528,7 @@ Item {
 
 	QQC2.ToolTip {
 		id: control
-		visible: tileItemView.hovered && !(dragActive || contextMenu.opened) && appObj.tile.w == 1 && appObj.tile.h == 1
+		visible: tileItemView.hovered && !(dragActive || (contextMenuLoader.item && contextMenuLoader.item.opened)) && appObj.tile.w == 1 && appObj.tile.h == 1
 		text: appObj.labelText
 		delay: 0
 		x: parent.width + rightPadding
@@ -620,8 +557,12 @@ Item {
 		}
 	}
 
-	AppContextMenu {
-		id: contextMenu
+	Loader {
+		id: contextMenuLoader
+		// Menu construction per tile is wasted unless the user actually
+		// right-clicks; build it on first open.
+		active: false
+		sourceComponent: AppContextMenu {
 		tileIndex: index
 		onPopulateMenu: function(menu) {
 			if (!plasmoid.configuration.tilesLocked) {
@@ -685,6 +626,7 @@ Item {
 					menu.addMenuItem(moveItem)
 				}
 			}
+		}
 		}
 	}
 

@@ -103,29 +103,61 @@ Item {
 		return _launcherBasename(item.url) === favoriteId
 	}
 
+	// Index for getTileApp: each tile delegate resolves its app via this
+	// function, so a linear scan of all installed apps made grid rebuilds
+	// O(tiles × apps). Keyed by the same identifiers _launcherMatches accepts.
+	// The cache lives in fields of a never-reassigned JS object: mutating its
+	// fields doesn't emit change signals, so `app` bindings calling
+	// getTileApp() don't see their own cache writes as a binding loop.
+	readonly property var _tileAppCache: ({ index: null, list: null })
+	function _ensureTileAppIndex(list) {
+		var cache = _tileAppCache
+		if (cache.index && cache.list === list) {
+			return cache.index
+		}
+		var map = {}
+		// Reverse fill so earlier list entries overwrite later ones — keeps
+		// "first match wins" semantics of the old forward scan.
+		for (var i = list.length - 1; i >= 0; i--) {
+			var item = list[i]
+			if (!item) {
+				continue
+			}
+			if (item.favoriteId) {
+				map[item.favoriteId] = i
+				map[_launcherBasename(item.favoriteId)] = i
+			}
+			if (item.url) {
+				map[_launcherBasename(item.url)] = i
+			}
+		}
+		cache.index = map
+		cache.list = list
+		return map
+	}
+
 	function getTileApp(favoriteId) {
 		favoriteId = Utils.kickerFavoriteId(favoriteId)
 		if (!favoriteId || !allAppsModel || !allAppsModel.list) {
 			return null
 		}
 		var list = allAppsModel.list
-		for (var i = 0; i < list.length; i++) {
-			var item = list[i]
-			if (!_launcherMatches(item, favoriteId)) {
-				continue
-			}
-			return {
-				indexInModel: i,
-				actionListModel: allAppsModel,
-				favoriteId: favoriteId,
-				display: item.name || favoriteId,
-				decoration: item.icon || item.iconName || favoriteId,
-				description: item.description || "",
-				group: item.parentName || "",
-				url: item.url || ""
-			}
+		var index = _ensureTileAppIndex(list)
+		var i = index[favoriteId]
+		if (typeof i === "undefined") {
+			return null
 		}
-		return null
+		var item = list[i]
+		return {
+			indexInModel: i,
+			actionListModel: allAppsModel,
+			favoriteId: favoriteId,
+			display: item.name || favoriteId,
+			decoration: item.icon || item.iconName || favoriteId,
+			description: item.description || "",
+			group: item.parentName || "",
+			url: item.url || ""
+		}
 	}
 
 	function _launcherListContains(list, favoriteId) {
