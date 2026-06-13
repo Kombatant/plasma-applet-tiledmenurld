@@ -6,10 +6,21 @@ ListModel {
 	property var list: []
 	property var sectionIcons: { return {} }
 
+	// Monotonic version of `list` contents. `list` is sometimes mutated in
+	// place (refreshRecentApps does `list[i] = item`) which keeps the array
+	// identity stable, so consumers cannot rely on `===` to detect changes.
+	// Bump this on every change — full reassignment and in-place mutation —
+	// so caches (e.g. AppsModel._tileAppCache) can key on contents, not ref.
+	property int listRevision: 0
+	function bumpListRevision() {
+		listRevision = listRevision + 1
+	}
+
 	signal refreshing()
 	signal refreshed()
 
 	onListChanged: {
+		bumpListRevision()
 		clear()
 		for (var i = 0; i < list.length; i++) {
 			append(list[i])
@@ -103,13 +114,16 @@ ListModel {
 		refreshed()
 	}
 
-	// Resolve the live parentModel row for a cached item, guarding against
-	// drift: the underlying Kicker submodel can re-sort/reset its rows without
-	// our `list` (and the captured indexInParent) being rebuilt. When that
-	// happens index N in the C++ model is a *different* app than when parsed,
-	// so a blind trigger(indexInParent) launches the wrong program. We verify
-	// the favoriteId at the cached row and, on mismatch, re-find the row by
-	// favoriteId. Returns indexInParent to trigger, or -1 if unresolvable.
+	// Resolve the live parentModel row for a cached item. Safety net at the
+	// trigger boundary: the underlying Kicker submodel can re-sort/reset its
+	// rows in a window where `list` (and the captured indexInParent) hasn't
+	// been rebuilt yet — e.g. between a submodel change and the debounced
+	// refresh completing. In that window index N in the C++ model may be a
+	// *different* app than when parsed, so a blind trigger(indexInParent)
+	// would launch the wrong program. We verify the favoriteId at the cached
+	// row and, on mismatch, re-find the row by favoriteId. Returns the row to
+	// trigger, or -1 if unresolvable. (The primary correctness fix lives in
+	// AppsModel._tileAppCache, keyed on listRevision; this is belt-and-braces.)
 	function _resolveParentRow(item) {
 		if (!item || !item.parentModel) {
 			return -1

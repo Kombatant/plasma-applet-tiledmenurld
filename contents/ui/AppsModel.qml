@@ -109,10 +109,18 @@ Item {
 	// The cache lives in fields of a never-reassigned JS object: mutating its
 	// fields doesn't emit change signals, so `app` bindings calling
 	// getTileApp() don't see their own cache writes as a binding loop.
-	readonly property var _tileAppCache: ({ index: null, list: null })
+	//
+	// Keyed on (list ref, listRevision): `allAppsModel.list` is sometimes
+	// mutated IN PLACE (refreshRecentApps does `list[i] = item`), so a plain
+	// `cache.list === list` identity check stays true while the contents
+	// changed underneath — returning a stale index whose rows now hold
+	// different apps (clicking one tile launches another). listRevision is
+	// bumped on every content change, so compare it too.
+	readonly property var _tileAppCache: ({ index: null, list: null, revision: -1 })
 	function _ensureTileAppIndex(list) {
 		var cache = _tileAppCache
-		if (cache.index && cache.list === list) {
+		var revision = allAppsModel ? allAppsModel.listRevision : -1
+		if (cache.index && cache.list === list && cache.revision === revision) {
 			return cache.index
 		}
 		var map = {}
@@ -133,6 +141,7 @@ Item {
 		}
 		cache.index = map
 		cache.list = list
+		cache.revision = revision
 		return map
 	}
 
@@ -151,7 +160,7 @@ Item {
 		return {
 			indexInModel: i,
 			actionListModel: allAppsModel,
-			favoriteId: favoriteId,
+			favoriteId: item.favoriteId || favoriteId,
 			display: item.name || favoriteId,
 			decoration: item.icon || item.iconName || favoriteId,
 			description: item.description || "",
@@ -444,9 +453,9 @@ Item {
 		// Watch the all-apps submodel directly. Its rows can re-sort/reset
 		// internally (KSycoca rebuild on app install/update, locale change)
 		// without rootModel.count changing, so neither onCountChanged nor
-		// onRefreshed fire. Without this, _cachedAlphabetical keeps stale
-		// indexInParent values and triggerIndex launches the wrong app
-		// (e.g. clicking VS Code launches Heroic). A full refresh reparses
+		// onRefreshed fire. Without this, `list` (and the captured
+		// indexInParent values) can stay stale relative to the live submodel
+		// until some other event triggers a refresh. A full refresh reparses
 		// the submodel and re-aligns indexInParent with the live rows.
 		Connections {
 			target: appsModel.rootRowAvailable(rootModel.allAppsIndex) ? rootModel.modelForRow(rootModel.allAppsIndex) : null
@@ -564,12 +573,15 @@ Item {
 				// Do a partial update since we're only updating properties.
 				refreshing()
 
-				// Overwrite the exisiting items.
+				// Overwrite the exisiting items. This mutates `list` in place,
+				// so the array identity stays the same — bump listRevision so
+				// content-keyed caches (AppsModel._tileAppCache) invalidate.
 				for (var i = 0; i < recentAppList.length; i++) {
 					var item = recentAppList[i]
 					list[i] = item
 					set(i, item)
 				}
+				bumpListRevision()
 
 				refreshed()
 			} else {
