@@ -103,9 +103,52 @@ ListModel {
 		refreshed()
 	}
 
+	// Resolve the live parentModel row for a cached item, guarding against
+	// drift: the underlying Kicker submodel can re-sort/reset its rows without
+	// our `list` (and the captured indexInParent) being rebuilt. When that
+	// happens index N in the C++ model is a *different* app than when parsed,
+	// so a blind trigger(indexInParent) launches the wrong program. We verify
+	// the favoriteId at the cached row and, on mismatch, re-find the row by
+	// favoriteId. Returns indexInParent to trigger, or -1 if unresolvable.
+	function _resolveParentRow(item) {
+		if (!item || !item.parentModel) {
+			return -1
+		}
+		var FavoriteIdRole = Qt.UserRole + 3
+		var model = item.parentModel
+		var want = item.favoriteId
+		var idx = item.indexInParent
+		// Fast path: cached row still holds the expected app.
+		if (typeof idx === "number" && idx >= 0 && idx < model.count) {
+			var liveId = model.data(model.index(idx, 0), FavoriteIdRole)
+			if (!want || liveId === want) {
+				return idx
+			}
+			console.warn("[KickerListModel] index drift: row", idx,
+				"expected favoriteId=", want, "but live model has=", liveId,
+				"- re-resolving by favoriteId")
+		}
+		// Slow path: row moved. Find the app by favoriteId in the live model.
+		if (want) {
+			for (var i = 0; i < model.count; i++) {
+				if (model.data(model.index(i, 0), FavoriteIdRole) === want) {
+					return i
+				}
+			}
+			console.warn("[KickerListModel] could not re-resolve favoriteId=", want,
+				"in live parentModel (", model.count, "rows)")
+		}
+		return -1
+	}
+
 	function triggerIndex(index) {
 		var item = list[index]
-		item.parentModel.trigger(item.indexInParent, "", null)
+		var row = _resolveParentRow(item)
+		if (row < 0) {
+			console.warn("[KickerListModel] triggerIndex aborted: unresolved row for index", index)
+			return
+		}
+		item.parentModel.trigger(row, "", null)
 		itemTriggered()
 	}
 
@@ -133,7 +176,12 @@ ListModel {
 		// kicker/code/tools.js triggerAction()
 
 		var item = list[index]
-		item.parentModel.trigger(item.indexInParent, actionId, actionArgument)
+		var row = _resolveParentRow(item)
+		if (row < 0) {
+			console.warn("[KickerListModel] triggerIndexAction aborted: unresolved row for index", index)
+			return
+		}
+		item.parentModel.trigger(row, actionId, actionArgument)
 		itemTriggered()
 	}
 

@@ -440,6 +440,24 @@ Item {
 			function onModelReset() { debouncedRefreshRecentApps.restart() }
 			function onLayoutChanged() { debouncedRefreshRecentApps.restart() }
 		}
+
+		// Watch the all-apps submodel directly. Its rows can re-sort/reset
+		// internally (KSycoca rebuild on app install/update, locale change)
+		// without rootModel.count changing, so neither onCountChanged nor
+		// onRefreshed fire. Without this, _cachedAlphabetical keeps stale
+		// indexInParent values and triggerIndex launches the wrong app
+		// (e.g. clicking VS Code launches Heroic). A full refresh reparses
+		// the submodel and re-aligns indexInParent with the live rows.
+		Connections {
+			target: appsModel.rootRowAvailable(rootModel.allAppsIndex) ? rootModel.modelForRow(rootModel.allAppsIndex) : null
+			ignoreUnknownSignals: true
+			function onDataChanged() { debouncedRefresh.restart() }
+			function onRowsInserted() { debouncedRefresh.restart() }
+			function onRowsRemoved() { debouncedRefresh.restart() }
+			function onRowsMoved() { debouncedRefresh.restart() }
+			function onModelReset() { debouncedRefresh.restart() }
+			function onLayoutChanged() { debouncedRefresh.restart() }
+		}
 	}
 
 	KickerListModel {
