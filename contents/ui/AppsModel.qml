@@ -29,6 +29,16 @@ Item {
 		return row >= 0 && rootModel.count > row
 	}
 
+	// RootModel can remain stale after an application is installed, removed, or
+	// redeployed while plasmashell is running. KRunner uses its own live query
+	// model, so search may already see the new launcher while the app list and
+	// pinned tiles still hold the old tree. Refresh on popup open to bring all
+	// three paths back to the same KService snapshot.
+	function refreshApplications() {
+		rootModelRefresh.stop()
+		rootModel.refresh()
+	}
+
 	function stringListToArray(value) {
 		if (!value) {
 			return []

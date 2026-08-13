@@ -281,6 +281,7 @@ PlasmoidItem {
 	activationTogglesExpanded: true
 	onExpandedChanged: function(expanded) {
 		if (expanded) {
+			appsModel.refreshApplications()
 			avatarResolver.refresh()
 			search.query = ""
 			search.applyDefaultFilters()
