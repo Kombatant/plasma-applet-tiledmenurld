@@ -185,6 +185,32 @@ Item {
 		})
 	}
 
+	function fetchSteamArtwork(appId, callback) {
+		var normalizedAppId = ("" + (appId || "")).trim()
+		if (!normalizedAppId) {
+			callback(i18n("Could not determine the Steam app ID."), null)
+			return
+		}
+		_requestSteamDetails(normalizedAppId, function(err, data) {
+			if (err || !data) {
+				callback(err || i18n("Steam did not return store details for app %1.", normalizedAppId), null)
+				return
+			}
+			var headerImage = ("" + (data.header_image || "")).trim()
+			var capsuleImage = ("" + (data.capsule_imagev5 || "")).trim()
+			if (!headerImage && !capsuleImage) {
+				callback(i18n("Steam did not return artwork for app %1.", normalizedAppId), null)
+				return
+			}
+			callback(null, {
+				appId: normalizedAppId,
+				title: ("" + (data.name || "")).trim(),
+				headerImage: headerImage,
+				capsuleImage: capsuleImage
+			})
+		})
+	}
+
 	function _requestIgdbToken(clientId, clientSecret, callback) {
 		Requests.post({
 			url: "https://id.twitch.tv/oauth2/token",
@@ -413,7 +439,7 @@ Item {
 	function _collectIgdbArtworks(game) {
 		var coverUrls = []
 		if (game && game.cover && game.cover.image_id) {
-			coverUrls.push({ url: _igdbImageUrl(game.cover, "cover_big"), w: 1, h: 1 })
+			coverUrls.push({ url: _igdbImageUrl(game.cover, "cover_big"), image_id: game.cover.image_id, w: 1, h: 1 })
 		}
 		var artworkUrls = []
 		var arts = (game && game.artworks) || []
@@ -485,6 +511,59 @@ Item {
 							return
 						}
 						callback(null, detail)
+					})
+				})
+			})
+		})
+	}
+
+	function fetchIgdbArtworksBySteamAppId(appId, fallbackTitle, callback) {
+		var normalizedAppId = ("" + (appId || "")).trim()
+		var normalizedTitle = ("" + (fallbackTitle || "")).trim()
+		if (!normalizedAppId) {
+			callback(i18n("Could not determine the Steam app ID."), null)
+			return
+		}
+		if (!igdbClientId) {
+			callback(i18n("Missing IGDB credentials."), null)
+			return
+		}
+		_ensureSecretLoaded(function() {
+			if (!igdbClientSecret) {
+				callback(i18n("Missing IGDB credentials."), null)
+				return
+			}
+			_requestIgdbToken(igdbClientId, igdbClientSecret, function(tokenErr, accessToken) {
+				if (tokenErr) {
+					callback(tokenErr, null)
+					return
+				}
+
+				function requestDetails(gameId) {
+					_requestIgdbGameDetails(gameId, igdbClientId, accessToken, function(detailErr, detail) {
+						if (detailErr || !detail) {
+							callback(detailErr || i18n("Could not fetch IGDB details."), null)
+							return
+						}
+						callback(null, detail)
+					})
+				}
+
+				_findIgdbGameIdBySteamAppId(normalizedAppId, igdbClientId, accessToken, function(mappingErr, gameId) {
+					if (!mappingErr && gameId) {
+						requestDetails(gameId)
+						return
+					}
+					if (!normalizedTitle) {
+						callback(mappingErr || i18n("IGDB has no Steam mapping for app %1.", normalizedAppId), null)
+						return
+					}
+					_findIgdbGameIdByTitle(normalizedTitle, "", igdbClientId, accessToken, function(searchErr, fallbackGameId) {
+						if (searchErr || !fallbackGameId) {
+							callback(searchErr || mappingErr || i18n("No IGDB match for %1.", normalizedTitle), null)
+							return
+						}
+						requestDetails(fallbackGameId)
 					})
 				})
 			})

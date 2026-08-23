@@ -199,57 +199,135 @@ ColumnLayout {
 
 			readonly property int rowIndex: index
 			readonly property var page: (heroPanel._refreshToken >= 0 && heroPanel._pages()[index]) ? heroPanel._pages()[index] : ({})
-			readonly property var staticPresetSpecs: presetHelper.presetSpecsForLaunchUrl(page.launchUrl || "")
+			property string steamAppId: ""
+			property var steamPresetSpecs: []
+			property var lutrisPresetSpecs: []
 			property var igdbPresetSpecs: []
-			readonly property var presetSpecs: staticPresetSpecs.concat(igdbPresetSpecs)
-			readonly property bool canDownloadPresetImages: staticPresetSpecs.length > 0 || canDownloadHeroicLutrisMetadata
-			readonly property bool canDownloadSteamMetadata: !!metadataFetcher._steamGameIdForPage(page)
+			readonly property var presetSpecs: steamPresetSpecs.concat(lutrisPresetSpecs).concat(igdbPresetSpecs)
+			readonly property bool canDownloadPresetImages: !!steamAppId || presetSpecs.length > 0 || canDownloadHeroicLutrisMetadata
+			readonly property bool canDownloadSteamMetadata: !!steamAppId
 			property string heroicLutrisKind: ""
+			property string lutrisSlug: ""
 			readonly property bool canDownloadHeroicLutrisMetadata: heroicLutrisKind.length > 0
 			readonly property bool canDownloadMetadata: canDownloadSteamMetadata || canDownloadHeroicLutrisMetadata
 			readonly property bool hasIgdbMetadataSettings: metadataFetcher.hasIgdbMetadataSettings
 			readonly property bool canShowDownloadedInfo: (canDownloadSteamMetadata && hasIgdbMetadataSettings) || (canDownloadHeroicLutrisMetadata && hasIgdbMetadataSettings)
+			property bool steamArtworkLoading: false
+			property bool igdbArtworkLoading: false
+			readonly property bool artworkLoading: steamArtworkLoading || igdbArtworkLoading
+			property bool igdbArtworkAttempted: false
+			property int presetRequestGeneration: 0
+			property string presetRequestKey: ""
 			property bool metadataLoading: false
 			property string metadataStatus: ""
 			property int _pendingPresetSaveIndex: -1
 
-			function refreshHeroicLutrisKind(done) {
-				metadataFetcher.resolveHeroicLutrisKindForPage(page, function(kind) {
-					pageDelegate.heroicLutrisKind = kind || ""
-					if (done) {
-						done()
+			function _currentPresetRequestKey() {
+				return ("" + (page.launchUrl || "")) + "\n" + metadataFetcher._titleForPage(page) + "\n" + metadataFetcher._steamGameIdForPage(page)
+			}
+
+			function refreshPresetSources(force) {
+				var nextKey = _currentPresetRequestKey()
+				if (!force && nextKey === presetRequestKey) return
+				presetRequestKey = nextKey
+				presetRequestGeneration += 1
+				var generation = presetRequestGeneration
+				steamAppId = metadataFetcher._steamGameIdForPage(page)
+				steamPresetSpecs = []
+				lutrisPresetSpecs = []
+				igdbPresetSpecs = []
+				heroicLutrisKind = ""
+				lutrisSlug = ""
+				steamArtworkLoading = false
+				igdbArtworkLoading = false
+				igdbArtworkAttempted = false
+				_pendingPresetSaveIndex = -1
+
+				if (steamAppId) {
+					var requestedAppId = steamAppId
+					steamArtworkLoading = true
+					metadataFetcher.fetchSteamArtwork(requestedAppId, function(err, detail) {
+						if (generation !== pageDelegate.presetRequestGeneration || requestedAppId !== pageDelegate.steamAppId) return
+						steamArtworkLoading = false
+						steamPresetSpecs = (!err && detail) ? presetHelper.presetSpecsForSteamDetail(detail) : []
+					})
+					maybeFetchSteamIgdbArt()
+				}
+
+				metadataFetcher.resolveHeroicLutrisInfoForPage(page, function(info) {
+					if (generation !== pageDelegate.presetRequestGeneration) return
+					var resolved = info || ({})
+					heroicLutrisKind = resolved.kind ? ("" + resolved.kind) : ""
+					lutrisSlug = resolved.lutrisSlug ? ("" + resolved.lutrisSlug) : ""
+					lutrisPresetSpecs = presetHelper.presetSpecsForLutrisGameSlug(lutrisSlug)
+				})
+			}
+
+			function maybeFetchSteamIgdbArt() {
+				if (!steamAppId || igdbArtworkAttempted || igdbArtworkLoading || igdbPresetSpecs.length > 0) return
+				if (!hasIgdbMetadataSettings) {
+					if (metadataFetcher.igdbClientId) metadataFetcher.warmSecret()
+					return
+				}
+				var generation = presetRequestGeneration
+				var requestedAppId = steamAppId
+				var fallbackTitle = metadataFetcher._titleForPage(page)
+				igdbArtworkAttempted = true
+				igdbArtworkLoading = true
+				metadataFetcher.fetchIgdbArtworksBySteamAppId(requestedAppId, fallbackTitle, function(err, detail) {
+					if (generation !== pageDelegate.presetRequestGeneration || requestedAppId !== pageDelegate.steamAppId) return
+					igdbArtworkLoading = false
+					if (!err && detail) {
+						igdbPresetSpecs = presetHelper.presetSpecsForIgdbDetail(detail)
 					}
 				})
 			}
 
-			function downloadPresetImages() {
-				if (!staticPresetSpecs.length && !heroicLutrisKind) {
-					refreshHeroicLutrisKind(function() {
-						pageDelegate.downloadPresetImages()
-					})
+			function fetchHeroicLutrisIgdbArt(saveAfter) {
+				if (!heroicLutrisKind || !hasIgdbMetadataSettings || igdbArtworkAttempted || igdbArtworkLoading) {
+					if (saveAfter) _startPresetSave()
 					return
 				}
-				if (!canDownloadPresetImages) {
+				var title = metadataFetcher._titleForPage(page)
+				if (!title) {
+					if (saveAfter) _startPresetSave()
 					return
 				}
-				if (heroicLutrisKind && hasIgdbMetadataSettings && igdbPresetSpecs.length === 0) {
-					var title = metadataFetcher._titleForPage(page)
-					if (title) {
-						metadataStatus = i18n("Looking up IGDB artwork...")
-						metadataLoading = true
-						metadataFetcher.fetchIgdbArtworksByTitle(title, function(err, detail) {
-							metadataLoading = false
-							if (err || !detail) {
-								metadataStatus = err || i18n("No IGDB artwork found.")
-								_startPresetSave()
-								return
-							}
-							igdbPresetSpecs = presetHelper.presetSpecsForIgdbDetail(detail)
-							metadataStatus = i18n("Downloaded IGDB artwork.")
-							_startPresetSave()
-						})
-						return
+				var generation = presetRequestGeneration
+				igdbArtworkAttempted = true
+				igdbArtworkLoading = true
+				metadataStatus = i18n("Looking up IGDB artwork...")
+				metadataFetcher.fetchIgdbArtworksByTitle(title, function(err, detail) {
+					if (generation !== pageDelegate.presetRequestGeneration) return
+					igdbArtworkLoading = false
+					if (err || !detail) {
+						metadataStatus = err || i18n("No IGDB artwork found.")
+					} else {
+						igdbPresetSpecs = presetHelper.presetSpecsForIgdbDetail(detail)
+						metadataStatus = i18n("Downloaded IGDB artwork.")
 					}
+					if (saveAfter) _startPresetSave()
+				})
+			}
+
+			function removeFailedPreset(spec) {
+				if (!spec || !spec.source) return
+				var failedSource = "" + spec.source
+				if (spec.provider === 'steam') {
+					steamPresetSpecs = steamPresetSpecs.filter(function(item) { return ("" + item.source) !== failedSource })
+					maybeFetchSteamIgdbArt()
+				} else if (spec.provider === 'igdb') {
+					igdbPresetSpecs = igdbPresetSpecs.filter(function(item) { return ("" + item.source) !== failedSource })
+				} else if (spec.provider === 'lutris') {
+					lutrisPresetSpecs = lutrisPresetSpecs.filter(function(item) { return ("" + item.source) !== failedSource })
+				}
+			}
+
+			function downloadPresetImages() {
+				if (!canDownloadPresetImages || artworkLoading) return
+				if (heroicLutrisKind && hasIgdbMetadataSettings && igdbPresetSpecs.length === 0 && !igdbArtworkAttempted) {
+					fetchHeroicLutrisIgdbArt(true)
+					return
 				}
 				_startPresetSave()
 			}
@@ -274,8 +352,9 @@ ColumnLayout {
 				_pendingPresetSaveIndex = -1
 			}
 
-			Component.onCompleted: refreshHeroicLutrisKind()
-			onPageChanged: refreshHeroicLutrisKind()
+			Component.onCompleted: refreshPresetSources(true)
+			onPageChanged: refreshPresetSources(false)
+			onHasIgdbMetadataSettingsChanged: maybeFetchSteamIgdbArt()
 
 			Repeater {
 				id: presetImageRepeater
@@ -295,6 +374,9 @@ ColumnLayout {
 					asynchronous: true
 					cache: true
 					source: spec && spec.source ? spec.source : ""
+					property string _reportedErrorSource: ""
+
+					onSourceChanged: _reportedErrorSource = ""
 
 					function saveToPresetFolder(done) {
 						if (!spec || !spec.filename || !source) {
@@ -322,6 +404,11 @@ ColumnLayout {
 					}
 
 					onStatusChanged: {
+						var failedSource = "" + source
+						if (status === Image.Error && failedSource && _reportedErrorSource !== failedSource) {
+							_reportedErrorSource = failedSource
+							pageDelegate.removeFailedPreset(spec)
+						}
 						if (!_pendingCallback) {
 							return
 						}
@@ -397,10 +484,12 @@ ColumnLayout {
 					}
 					QQC2.ToolButton {
 						icon.name: "folder-download-symbolic"
-						enabled: pageDelegate.canDownloadPresetImages
+						enabled: pageDelegate.canDownloadPresetImages && !pageDelegate.artworkLoading
 						onClicked: pageDelegate.downloadPresetImages()
 						QQC2.ToolTip.visible: hovered
-						QQC2.ToolTip.text: enabled
+						QQC2.ToolTip.text: pageDelegate.artworkLoading
+							? i18n("Downloading artwork...")
+							: enabled
 							? i18n("Download all preset tile images for this entry into the preset tiles folder")
 							: i18n("No preset tile images are available for this entry")
 					}

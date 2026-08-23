@@ -1,6 +1,5 @@
 import QtQuick
 import QtQuick.Layouts
-import QtQml.Models as QtModels
 
 // Note: This references a global KCoreAddons.KUser { id: kuser }
 
@@ -16,37 +15,18 @@ TileEditorGroupBox {
 	property var iconField
 	property var tileGrid
 	property var positionSizeField
-	readonly property var steamPresetSpecs: presetHelper.presetSpecsForSteamGameId(steamGameId)
+	property var steamPresetSpecs: []
 	readonly property var lutrisPresetSpecs: presetHelper.presetSpecsForLutrisGameSlug(lutrisGameSlug)
 	property var igdbPresetSpecs: []
+	readonly property var presetSpecs: steamPresetSpecs.concat(lutrisPresetSpecs).concat(igdbPresetSpecs)
+	property bool steamLoading: false
 	property bool igdbLoading: false
+	property bool igdbAttempted: false
 	property string igdbStatus: ''
+	property int requestGeneration: 0
 
 	TilePresetImageHelper {
 		id: presetHelper
-	}
-
-	property Instantiator igdbPresetInstantiator: QtModels.Instantiator {
-		model: tileEditorPresetTiles.igdbPresetSpecs
-		delegate: TileEditorPresetTileButton {
-			parent: content
-			appObj: tileEditorPresetTiles.appObj
-			backgroundImageField: tileEditorPresetTiles.backgroundImageField
-			labelField: tileEditorPresetTiles.labelField
-			iconField: tileEditorPresetTiles.iconField
-			tileGrid: tileEditorPresetTiles.tileGrid
-			positionSizeField: tileEditorPresetTiles.positionSizeField
-			filename: modelData.filename
-			source: modelData.source
-			w: modelData.w
-			h: modelData.h
-		}
-		onObjectAdded: function() {
-			tileEditorPresetTiles.checkForPreset()
-		}
-		onObjectRemoved: function() {
-			tileEditorPresetTiles.checkForPreset()
-		}
 	}
 
 	HeroPageMetadataFetcher {
@@ -70,7 +50,7 @@ TileEditorGroupBox {
 			// handler above never fires, so clear the "Looking up..." status
 			// and show the missing-credentials hint for relevant launchers.
 			if (metadataFetcher.secretReady && !metadataFetcher.hasIgdbMetadataSettings
-				&& (tileEditorPresetTiles.isHeroicGameLauncher || tileEditorPresetTiles.isLutrisGameLauncher)) {
+				&& (tileEditorPresetTiles.isSteamGameLauncher || tileEditorPresetTiles.isHeroicGameLauncher || tileEditorPresetTiles.isLutrisGameLauncher)) {
 				tileEditorPresetTiles.igdbStatus = i18n("Set the IGDB Client ID and Client Secret in the Tiles settings to download artwork.")
 				tileEditorPresetTiles.checkForPreset()
 			}
@@ -79,16 +59,12 @@ TileEditorGroupBox {
 
 	visible: false
 	function checkForPreset() {
-		var visiblePresets = 0
-		for (var i = 0; i < content.children.length; i++) {
-			var item = content.children[i]
-			var hasImageUrl = item.source && item.source.toString()
-			if (hasImageUrl) {
-				visiblePresets += 1
-			}
-		}
-		visible = visiblePresets > 0 || igdbLoading || !!igdbStatus
+		visible = presetSpecs.length > 0 || steamLoading || igdbLoading || !!igdbStatus
 	}
+	onPresetSpecsChanged: checkForPreset()
+	onSteamLoadingChanged: checkForPreset()
+	onIgdbLoadingChanged: checkForPreset()
+	onIgdbStatusChanged: checkForPreset()
 	Component.onCompleted: {
 		checkIfRecognizedLauncher()
 	}
@@ -115,11 +91,16 @@ TileEditorGroupBox {
 	}
 
 	function resetRecognizedLaunchers() {
+		tileEditorPresetTiles.requestGeneration += 1
 		tileEditorPresetTiles.steamGameId = ''
 		tileEditorPresetTiles.lutrisGameSlug = ''
 		tileEditorPresetTiles.heroicAppName = ''
 		tileEditorPresetTiles.recognizedLauncherKind = ''
+		tileEditorPresetTiles.steamPresetSpecs = []
 		tileEditorPresetTiles.igdbPresetSpecs = []
+		tileEditorPresetTiles.steamLoading = false
+		tileEditorPresetTiles.igdbLoading = false
+		tileEditorPresetTiles.igdbAttempted = false
 		tileEditorPresetTiles.igdbStatus = ''
 	}
 
@@ -131,6 +112,7 @@ TileEditorGroupBox {
 
 	function checkIfRecognizedLauncher() {
 		resetRecognizedLaunchers()
+		var generation = requestGeneration
 		checkForPreset()
 
 		if (!appObj) {
@@ -138,13 +120,28 @@ TileEditorGroupBox {
 		}
 
 		checkIfSteamIcon(appObj.iconSource)
+		if (steamGameId) {
+			fetchSteamArt(steamGameId, generation)
+			maybeFetchIgdbArt()
+		}
 		launcherFetcher.resolveLauncherInfo(appObj.app, _launchUrlForApp(), appObj.favoriteId || '', function(info) {
+			if (generation !== tileEditorPresetTiles.requestGeneration) return
 			tileEditorPresetTiles._applyResolvedLauncherInfo(info)
 			tileEditorPresetTiles.checkForPreset()
 			tileEditorPresetTiles.maybeFetchIgdbArt()
 		})
 
 		// Lutris does not use game id in icon name. Eg: lutris_overwatch instead of lutris_game_1
+	}
+
+	function fetchSteamArt(appId, generation) {
+		steamLoading = true
+		metadataFetcher.fetchSteamArtwork(appId, function(err, detail) {
+			if (generation !== tileEditorPresetTiles.requestGeneration || appId !== tileEditorPresetTiles.steamGameId) return
+			steamLoading = false
+			steamPresetSpecs = (!err && detail) ? presetHelper.presetSpecsForSteamDetail(detail) : []
+			checkForPreset()
+		})
 	}
 
 	function _titleForApp() {
@@ -155,7 +152,7 @@ TileEditorGroupBox {
 	}
 
 	function maybeFetchIgdbArt() {
-		if (!isHeroicGameLauncher && !isLutrisGameLauncher) {
+		if (!isSteamGameLauncher && !isHeroicGameLauncher && !isLutrisGameLauncher) {
 			igdbStatus = ''
 			checkForPreset()
 			return
@@ -175,17 +172,21 @@ TileEditorGroupBox {
 			checkForPreset()
 			return
 		}
-		if (igdbPresetSpecs.length > 0 || igdbLoading) return
+		if (igdbPresetSpecs.length > 0 || igdbLoading || igdbAttempted) return
 		var title = _titleForApp()
 		if (!title) {
 			igdbStatus = i18n("Could not determine a title for this launcher.")
 			checkForPreset()
 			return
 		}
+		var generation = requestGeneration
+		var requestedSteamAppId = steamGameId
+		igdbAttempted = true
 		igdbLoading = true
 		igdbStatus = i18n("Looking up IGDB artwork...")
 		checkForPreset()
-		metadataFetcher.fetchIgdbArtworksByTitle(title, function(err, detail) {
+		var fetchCallback = function(err, detail) {
+			if (generation !== tileEditorPresetTiles.requestGeneration || requestedSteamAppId !== tileEditorPresetTiles.steamGameId) return
 			igdbLoading = false
 			if (err || !detail) {
 				igdbStatus = err || i18n("No IGDB artwork found.")
@@ -195,7 +196,24 @@ TileEditorGroupBox {
 			igdbPresetSpecs = presetHelper.presetSpecsForIgdbDetail(detail)
 			igdbStatus = ''
 			checkForPreset()
-		})
+		}
+		if (requestedSteamAppId) {
+			metadataFetcher.fetchIgdbArtworksBySteamAppId(requestedSteamAppId, title, fetchCallback)
+		} else {
+			metadataFetcher.fetchIgdbArtworksByTitle(title, fetchCallback)
+		}
+	}
+
+	function removeFailedPreset(spec) {
+		if (!spec || !spec.source) return
+		var failedSource = "" + spec.source
+		if (spec.provider === 'steam') {
+			steamPresetSpecs = steamPresetSpecs.filter(function(item) { return ("" + item.source) !== failedSource })
+			maybeFetchIgdbArt()
+		} else if (spec.provider === 'igdb') {
+			igdbPresetSpecs = igdbPresetSpecs.filter(function(item) { return ("" + item.source) !== failedSource })
+		}
+		checkForPreset()
 	}
 
 	function checkIfSteamIcon(iconSource) {
@@ -248,61 +266,24 @@ TileEditorGroupBox {
 		anchors.right: parent.right
 		columns: 2
 
-		//--- Steam
-		// 4x2
-		TileEditorPresetTileButton {
-			appObj: tileEditorPresetTiles.appObj
-			backgroundImageField: tileEditorPresetTiles.backgroundImageField
-			labelField: tileEditorPresetTiles.labelField
-			iconField: tileEditorPresetTiles.iconField
-			tileGrid: tileEditorPresetTiles.tileGrid
-			positionSizeField: tileEditorPresetTiles.positionSizeField
-			filename: tileEditorPresetTiles.steamPresetSpecs.length > 0 ? tileEditorPresetTiles.steamPresetSpecs[0].filename : ''
-			source: isSteamGameLauncher && tileEditorPresetTiles.steamPresetSpecs.length > 0 ? tileEditorPresetTiles.steamPresetSpecs[0].source : ''
-			w: tileEditorPresetTiles.steamPresetSpecs.length > 0 ? tileEditorPresetTiles.steamPresetSpecs[0].w : 0
-			h: tileEditorPresetTiles.steamPresetSpecs.length > 0 ? tileEditorPresetTiles.steamPresetSpecs[0].h : 0
-		}
-
-		// 3x1
-		TileEditorPresetTileButton {
-			appObj: tileEditorPresetTiles.appObj
-			backgroundImageField: tileEditorPresetTiles.backgroundImageField
-			labelField: tileEditorPresetTiles.labelField
-			iconField: tileEditorPresetTiles.iconField
-			tileGrid: tileEditorPresetTiles.tileGrid
-			positionSizeField: tileEditorPresetTiles.positionSizeField
-			filename: tileEditorPresetTiles.steamPresetSpecs.length > 1 ? tileEditorPresetTiles.steamPresetSpecs[1].filename : ''
-			source: isSteamGameLauncher && tileEditorPresetTiles.steamPresetSpecs.length > 1 ? tileEditorPresetTiles.steamPresetSpecs[1].source : ''
-			w: tileEditorPresetTiles.steamPresetSpecs.length > 1 ? tileEditorPresetTiles.steamPresetSpecs[1].w : 0
-			h: tileEditorPresetTiles.steamPresetSpecs.length > 1 ? tileEditorPresetTiles.steamPresetSpecs[1].h : 0
-		}
-
-		// 5x3
-		TileEditorPresetTileButton {
-			appObj: tileEditorPresetTiles.appObj
-			backgroundImageField: tileEditorPresetTiles.backgroundImageField
-			labelField: tileEditorPresetTiles.labelField
-			iconField: tileEditorPresetTiles.iconField
-			tileGrid: tileEditorPresetTiles.tileGrid
-			positionSizeField: tileEditorPresetTiles.positionSizeField
-			filename: tileEditorPresetTiles.steamPresetSpecs.length > 2 ? tileEditorPresetTiles.steamPresetSpecs[2].filename : ''
-			source: isSteamGameLauncher && tileEditorPresetTiles.steamPresetSpecs.length > 2 ? tileEditorPresetTiles.steamPresetSpecs[2].source : ''
-			w: tileEditorPresetTiles.steamPresetSpecs.length > 2 ? tileEditorPresetTiles.steamPresetSpecs[2].w : 0
-			h: tileEditorPresetTiles.steamPresetSpecs.length > 2 ? tileEditorPresetTiles.steamPresetSpecs[2].h : 0
-		}
-
-		// 5x2 or 2x1
-		TileEditorPresetTileButton {
-			appObj: tileEditorPresetTiles.appObj
-			backgroundImageField: tileEditorPresetTiles.backgroundImageField
-			labelField: tileEditorPresetTiles.labelField
-			iconField: tileEditorPresetTiles.iconField
-			tileGrid: tileEditorPresetTiles.tileGrid
-			positionSizeField: tileEditorPresetTiles.positionSizeField
-			filename: tileEditorPresetTiles.lutrisPresetSpecs.length > 0 ? tileEditorPresetTiles.lutrisPresetSpecs[0].filename : ''
-			source: isLutrisGameLauncher && tileEditorPresetTiles.lutrisPresetSpecs.length > 0 ? tileEditorPresetTiles.lutrisPresetSpecs[0].source : ''
-			w: tileEditorPresetTiles.lutrisPresetSpecs.length > 0 ? tileEditorPresetTiles.lutrisPresetSpecs[0].w : 0
-			h: tileEditorPresetTiles.lutrisPresetSpecs.length > 0 ? tileEditorPresetTiles.lutrisPresetSpecs[0].h : 0
+		Repeater {
+			model: tileEditorPresetTiles.presetSpecs
+			delegate: TileEditorPresetTileButton {
+				appObj: tileEditorPresetTiles.appObj
+				backgroundImageField: tileEditorPresetTiles.backgroundImageField
+				labelField: tileEditorPresetTiles.labelField
+				iconField: tileEditorPresetTiles.iconField
+				tileGrid: tileEditorPresetTiles.tileGrid
+				positionSizeField: tileEditorPresetTiles.positionSizeField
+				spec: modelData
+				filename: modelData.filename
+				source: modelData.source
+				w: modelData.w
+				h: modelData.h
+				onImageLoadFailed: function(failedSpec) {
+					tileEditorPresetTiles.removeFailedPreset(failedSpec)
+				}
+			}
 		}
 
 		Text {

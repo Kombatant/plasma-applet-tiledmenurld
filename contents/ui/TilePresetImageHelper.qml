@@ -141,30 +141,19 @@ QtObject {
 		return match ? match[1] : ""
 	}
 
-	function presetSpecsForSteamGameId(gameId) {
-		if (!gameId) {
+	function presetSpecsForSteamDetail(detail) {
+		if (!detail || !detail.appId) {
 			return []
 		}
-		return [
-			{
-				filename: 'steam_' + gameId + '_4x2.jpg',
-				source: 'https://steamcdn-a.akamaihd.net/steam/apps/' + gameId + '/header.jpg',
-				w: 4,
-				h: 2
-			},
-			{
-				filename: 'steam_' + gameId + '_3x1.jpg',
-				source: 'https://steamcdn-a.akamaihd.net/steam/apps/' + gameId + '/capsule_184x69.jpg',
-				w: 3,
-				h: 1
-			},
-			{
-				filename: 'steam_' + gameId + '_5x3.jpg',
-				source: 'https://steamcdn-a.akamaihd.net/steam/apps/' + gameId + '/capsule_616x353.jpg',
-				w: 5,
-				h: 3
-			}
-		]
+		var specs = []
+		var prefix = 'steam_' + detail.appId
+		if (detail.headerImage) {
+			specs.push({ filename: prefix + '_4x2.jpg', source: detail.headerImage, w: 4, h: 2, provider: 'steam' })
+		}
+		if (detail.capsuleImage) {
+			specs.push({ filename: prefix + '_3x1.jpg', source: detail.capsuleImage, w: 3, h: 1, provider: 'steam' })
+		}
+		return specs
 	}
 
 	function presetSpecsForIgdbDetail(detail) {
@@ -173,23 +162,46 @@ QtObject {
 		}
 		var specs = []
 		var prefix = 'igdb_' + detail.gameId
-		var artworks = detail.artworks || []
-		var landscapeUrl = (artworks.length > 0 && artworks[0].url) ? artworks[0].url : ""
-		if (!landscapeUrl) {
-			var shots = detail.screenshots || []
-			landscapeUrl = (shots.length > 0 && shots[0].url) ? shots[0].url : ""
+		var seen = ({})
+
+		function mediaKey(item) {
+			if (!item) return ""
+			if (item.image_id) return "id:" + item.image_id
+			return item.url ? "url:" + item.url : ""
 		}
-		if (landscapeUrl) {
-			specs.push({ filename: prefix + '_4x2.jpg', source: landscapeUrl, w: 4, h: 2 })
-			specs.push({ filename: prefix + '_3x1.jpg', source: landscapeUrl, w: 3, h: 1 })
-			specs.push({ filename: prefix + '_5x3.jpg', source: landscapeUrl, w: 5, h: 3 })
+
+		function acceptMedia(item) {
+			var key = mediaKey(item)
+			if (!key || seen[key]) return false
+			seen[key] = true
+			return true
 		}
+
+		function addLandscapeSpec(kind, itemIndex, url, w, h) {
+			var mediaPrefix = prefix + '_' + kind + '_' + itemIndex
+			specs.push({ filename: mediaPrefix + '_' + w + 'x' + h + '.jpg', source: url, w: w, h: h, provider: 'igdb' })
+		}
+
 		var covers = detail.covers || []
-		var coverUrl = (covers.length > 0 && covers[0].url) ? covers[0].url : ""
-		if (coverUrl) {
-			specs.push({ filename: prefix + '_1x1.jpg', source: coverUrl, w: 1, h: 1 })
-			specs.push({ filename: prefix + '_2x2.jpg', source: coverUrl, w: 2, h: 2 })
+		for (var coverIndex = 0; coverIndex < covers.length; coverIndex++) {
+			var cover = covers[coverIndex]
+			if (!cover || !cover.url || !acceptMedia(cover)) continue
+			specs.push({ filename: prefix + '_cover_1x1.jpg', source: cover.url, w: 1, h: 1, provider: 'igdb' })
+			break
 		}
+
+		function addMediaList(kind, items, w, h) {
+			var accepted = 0
+			for (var i = 0; i < items.length && accepted < 3; i++) {
+				var item = items[i]
+				if (!item || !item.url || !acceptMedia(item)) continue
+				accepted += 1
+				addLandscapeSpec(kind, accepted, item.url, w, h)
+			}
+		}
+
+		addMediaList('artwork', detail.artworks || [], 4, 2)
+		addMediaList('screenshot', detail.screenshots || [], 5, 3)
 		return specs
 	}
 
@@ -201,7 +213,8 @@ QtObject {
 			filename: 'lutris_' + gameSlug + '_2x1.jpg',
 			source: 'https://lutris.net/games/banner/' + gameSlug + '.jpg',
 			w: 2,
-			h: 1
+			h: 1,
+			provider: 'lutris'
 		}]
 	}
 
@@ -213,13 +226,4 @@ QtObject {
 		return appsModel.getTileApp(favoriteId)
 	}
 
-	function presetSpecsForLaunchUrl(launchUrl) {
-		var app = launcherAppForLaunchUrl(launchUrl)
-		if (!app) {
-			return []
-		}
-		var iconSource = "" + (app.decoration || "")
-		var specs = presetSpecsForSteamGameId(steamGameIdForIcon(iconSource))
-		return specs.concat(presetSpecsForLutrisGameSlug(lutrisGameSlugForIcon(iconSource)))
-	}
 }
