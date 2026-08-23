@@ -211,7 +211,8 @@ ColumnLayout {
 			readonly property bool canDownloadHeroicLutrisMetadata: heroicLutrisKind.length > 0
 			readonly property bool canDownloadMetadata: canDownloadSteamMetadata || canDownloadHeroicLutrisMetadata
 			readonly property bool hasIgdbMetadataSettings: metadataFetcher.hasIgdbMetadataSettings
-			readonly property bool canShowDownloadedInfo: (canDownloadSteamMetadata && hasIgdbMetadataSettings) || (canDownloadHeroicLutrisMetadata && hasIgdbMetadataSettings)
+			readonly property bool canAttemptIgdbMetadata: !!metadataFetcher.igdbClientId
+			readonly property bool canShowDownloadedInfo: (canDownloadSteamMetadata && canAttemptIgdbMetadata) || (canDownloadHeroicLutrisMetadata && canAttemptIgdbMetadata)
 			property bool steamArtworkLoading: false
 			property bool igdbArtworkLoading: false
 			readonly property bool artworkLoading: steamArtworkLoading || igdbArtworkLoading
@@ -265,10 +266,7 @@ ColumnLayout {
 
 			function maybeFetchSteamIgdbArt() {
 				if (!steamAppId || igdbArtworkAttempted || igdbArtworkLoading || igdbPresetSpecs.length > 0) return
-				if (!hasIgdbMetadataSettings) {
-					if (metadataFetcher.igdbClientId) metadataFetcher.warmSecret()
-					return
-				}
+				if (!canAttemptIgdbMetadata) return
 				var generation = presetRequestGeneration
 				var requestedAppId = steamAppId
 				var fallbackTitle = metadataFetcher._titleForPage(page)
@@ -284,7 +282,7 @@ ColumnLayout {
 			}
 
 			function fetchHeroicLutrisIgdbArt(saveAfter) {
-				if (!heroicLutrisKind || !hasIgdbMetadataSettings || igdbArtworkAttempted || igdbArtworkLoading) {
+				if (!heroicLutrisKind || !canAttemptIgdbMetadata || igdbArtworkAttempted || igdbArtworkLoading) {
 					if (saveAfter) _startPresetSave()
 					return
 				}
@@ -325,7 +323,7 @@ ColumnLayout {
 
 			function downloadPresetImages() {
 				if (!canDownloadPresetImages || artworkLoading) return
-				if (heroicLutrisKind && hasIgdbMetadataSettings && igdbPresetSpecs.length === 0 && !igdbArtworkAttempted) {
+				if (heroicLutrisKind && canAttemptIgdbMetadata && igdbPresetSpecs.length === 0 && !igdbArtworkAttempted) {
 					fetchHeroicLutrisIgdbArt(true)
 					return
 				}

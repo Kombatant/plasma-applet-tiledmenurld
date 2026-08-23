@@ -188,7 +188,6 @@ LibConfig.FormKCM {
 			formLayout.pendingIgdbClientSecret = (plasmoid.configuration.igdbClientSecret || "").trim()
 			formLayout.pendingIgdbClientSecretInitialized = true
 		}
-		secureIgdbClientSecret.inspectAvailability()
 		secureIgdbClientSecret.readSecret()
 	}
 

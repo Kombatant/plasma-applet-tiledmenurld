@@ -28,41 +28,36 @@ Item {
 	KWalletSecret {
 		id: secureIgdbClientSecret
 		entryName: "igdbClientSecret"
-		onLoaded: function() {
+		onLoaded: function(success) {
 			fetcher.secretLoading = false
-			fetcher.secretReady = true
-			fetcher._drainSecretWaiters()
+			fetcher.secretReady = success
+			fetcher._drainSecretWaiters(success)
 		}
 	}
 
 	property var _secretWaiters: []
 
-	function _drainSecretWaiters() {
+	function _drainSecretWaiters(success) {
 		var waiters = _secretWaiters.slice()
 		_secretWaiters = []
 		for (var i = 0; i < waiters.length; i++) {
-			waiters[i]()
+			waiters[i](success)
 		}
 	}
 
 	function _ensureSecretLoaded(callback) {
-		if (secretReady || secureIgdbClientSecret.loadedOnce) {
-			callback()
-			return
-		}
 		_secretWaiters.push(callback)
 		if (secretLoading) {
 			return
 		}
 		secretLoading = true
-		secureIgdbClientSecret.inspectAvailability()
+		secretReady = false
 		secureIgdbClientSecret.readSecret()
 	}
 
-	// KWallet secret is read lazily on the first fetch path that needs it
-	// (resolveHeroicLutrisInfoForPage / IGDB token request). No eager warm-up
-	// at construction so opening the tile editor doesn't trigger a kwalletd
-	// qdbus round-trip until the user actually starts a metadata lookup.
+	// KWallet secret is read on demand by each fetch path that needs it. Repeated
+	// reads are intentional: they return immediately while the wallet is open,
+	// but prompt again if the user locked it since the previous request.
 	//
 	// warmSecret() lets a caller (the Hero editor panel) trigger that read on
 	// demand, so the KWallet unlock prompt appears and hasIgdbMetadataSettings
@@ -70,7 +65,7 @@ Item {
 	// invoke this when the user has configured an IGDB client id, otherwise the
 	// editor would prompt for KWallet on every open.
 	function warmSecret() {
-		if (secretReady || secureIgdbClientSecret.loadedOnce || secretLoading) {
+		if (secretLoading) {
 			return
 		}
 		_ensureSecretLoaded(function() {})

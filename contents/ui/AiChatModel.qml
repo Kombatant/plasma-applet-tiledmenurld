@@ -37,36 +37,33 @@ Item {
 		id: secureApiKey
 		onLoaded: function(success) {
 			aiChatModel.secretLoading = false
-			aiChatModel.secretReady = true
+			aiChatModel.secretReady = success
 			if (success) {
 				aiChatModel._migrateLegacyApiKey()
 			}
-			aiChatModel._drainSecretWaiters()
+			aiChatModel._drainSecretWaiters(success)
 		}
 	}
 
-	function _drainSecretWaiters() {
+	function _drainSecretWaiters(success) {
 		var waiters = _secretWaiters.slice()
 		_secretWaiters = []
 		for (var i = 0; i < waiters.length; i++) {
-			waiters[i]()
+			waiters[i](success)
 		}
 	}
 
-	// Read the KWallet-stored API key lazily, on the first action that needs it
-	// (send / model detection). This keeps the KWallet unlock prompt off the AI
-	// chat view's open path for providers that need no key (ollama, openwebui),
-	// while still triggering it the first time a key-based provider is used.
+	// Re-read the KWallet-stored API key for each action that needs it. KWallet
+	// returns immediately while it is open and prompts after it has been locked.
+	// Do not use loadedOnce as a permanent cache: it would suppress retries after
+	// a cancelled unlock and leave a stale plaintext secret usable after locking.
 	function _ensureSecretLoaded(callback) {
-		if (secretReady || secureApiKey.loadedOnce) {
-			callback()
-			return
-		}
 		_secretWaiters.push(callback)
 		if (secretLoading) {
 			return
 		}
 		secretLoading = true
+		secretReady = false
 		secureApiKey.readSecret()
 	}
 
@@ -313,24 +310,23 @@ Item {
 			return false
 		}
 		if (apiKeyRequired && !apiKey) {
-			lastError = i18n("Please enter an API key in settings.")
+			lastError = secureApiKey.lastError || i18n("Please enter an API key in settings.")
 			return false
 		}
 		return true
 	}
 
-	function sendMessage(text) {
+	function sendMessage(text, secretResolved) {
 		var userText = (text || "").trim()
 		if (!userText || busy) {
 			return
 		}
 		lastError = ""
-		// Ensure the wallet-stored key is loaded before validating config, so a
-		// key in KWallet is not mistaken for a missing key (which would race the
-		// async read and wrongly tell the user to enter a key).
-		if (apiKeyRequired && !secretReady && !secureApiKey.loadedOnce) {
+		// Revalidate KWallet for every new request. The recursive call is marked
+		// resolved so it proceeds exactly once after the asynchronous read.
+		if (apiKeyRequired && !secretResolved) {
 			_ensureSecretLoaded(function() {
-				aiChatModel.sendMessage(text)
+				aiChatModel.sendMessage(text, true)
 			})
 			return
 		}
@@ -590,18 +586,18 @@ Item {
 		return text
 	}
 
-	function fetchModels() {
+	function fetchModels(secretResolved) {
 		lastError = ""
-		// Load the wallet-stored key first so detection works on the first use
-		// without falsely reporting a missing key (see sendMessage).
-		if (apiKeyRequired && !secretReady && !secureApiKey.loadedOnce) {
+		// As with sending, revalidate KWallet so locking it invalidates the
+		// long-lived model's previously cached secret.
+		if (apiKeyRequired && !secretResolved) {
 			_ensureSecretLoaded(function() {
-				aiChatModel.fetchModels()
+				aiChatModel.fetchModels(true)
 			})
 			return
 		}
 		if (apiKeyRequired && !apiKey) {
-			lastError = i18n("Please enter an API key before detecting models.")
+			lastError = secureApiKey.lastError || i18n("Please enter an API key before detecting models.")
 			modelDetectionFinished(false)
 			return
 		}

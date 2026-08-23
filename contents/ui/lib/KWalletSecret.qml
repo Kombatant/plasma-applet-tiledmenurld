@@ -242,9 +242,11 @@ Item {
 					lastError = ""
 				} else {
 					secret = ""
-					lastError = ""
+					if (!lastError) {
+						lastError = i18n("Could not read the secret from KWallet.")
+					}
 				}
-				loaded(true)
+				loaded(success)
 			})
 		})
 	}

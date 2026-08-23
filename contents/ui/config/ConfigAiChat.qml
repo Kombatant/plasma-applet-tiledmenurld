@@ -327,7 +327,6 @@ LibConfig.FormKCM {
 			form.pendingAiApiKey = (plasmoid.configuration.aiApiKey || "").trim()
 			form.pendingAiApiKeyInitialized = true
 		}
-		secureApiKey.inspectAvailability()
 		secureApiKey.readSecret()
 		_refreshProviderValueCached()
 		_disconnectProviderChange = ConfigUtils.connectConfigChange(form, "aiProvider", _refreshProviderValueCached)
