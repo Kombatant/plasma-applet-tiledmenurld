@@ -8,7 +8,6 @@ import org.kde.kirigami as Kirigami
 // Renders the Categories/Alphabetical/AI Chat entries as tabs or pills,
 // matching the TileTabBar style configured via `config.tileTabStyle`.
 // When `config.useTileTabs` is false, falls back to the classic flat icon row.
-// The Auto Resize action is shown in the trailing "+"-slot of the bar.
 Item {
 	id: root
 
@@ -17,7 +16,6 @@ Item {
 	signal categoriesClicked(int direction)
 	signal alphabeticalClicked(int direction)
 	signal aiChatClicked(int direction)
-	signal autoResizeClicked()
 
 	property bool categoriesChecked: false
 	property bool alphabeticalChecked: false
@@ -138,15 +136,6 @@ Item {
 			onClicked: root._trigger(2)
 			visible: config.aiChatEnabled
 		}
-		SidebarItem {
-			icon.name: "transform-scale"
-			text: i18n("Auto Resize")
-			tooltipText: i18n("Auto Resize")
-			Layout.fillWidth: false
-			Layout.preferredWidth: config.flatButtonSize
-			Layout.preferredHeight: config.flatButtonSize
-			onClicked: root.autoResizeClicked()
-		}
 	}
 
 	// ═════════════════════════════════════════════════════════════════════
@@ -206,7 +195,7 @@ Item {
 				id: pillsRow
 				anchors.left: parent.left
 				anchors.leftMargin: root._pillsInset
-				anchors.right: pillsAddBtn.left
+				anchors.right: parent.right
 				anchors.rightMargin: root._pillsInset
 				height: parent.height
 				spacing: Kirigami.Units.smallSpacing
@@ -249,35 +238,6 @@ Item {
 				}
 			}
 
-			Item {
-				id: pillsAddBtn
-				anchors.right: parent.right
-				width: parent.height
-				height: parent.height
-
-				Accessible.name: i18n("Auto Resize")
-				Accessible.role: Accessible.Button
-				QQC2.ToolTip.visible: pillsAddMA.containsMouse
-				QQC2.ToolTip.text: i18n("Auto Resize")
-
-				Kirigami.Icon {
-					anchors.centerIn: parent
-					source: "transform-scale"
-					width: Kirigami.Units.iconSizes.smallMedium
-					height: width
-					color: Kirigami.Theme.textColor
-					opacity: pillsAddMA.containsMouse ? 0.9 : 0.55
-					isMask: true
-				}
-
-				MouseArea {
-					id: pillsAddMA
-					anchors.fill: parent
-					hoverEnabled: true
-					cursorShape: Qt.PointingHandCursor
-					onClicked: root.autoResizeClicked()
-				}
-			}
 		}
 	}
 
@@ -306,7 +266,7 @@ Item {
 		Row {
 			id: tabsRow
 			anchors.left: parent.left
-			anchors.right: tabsAddBtn.left
+			anchors.right: parent.right
 			anchors.bottom: parent.bottom
 			height: root.tabHeight
 			spacing: 0
@@ -406,37 +366,6 @@ Item {
 					QQC2.ToolTip.visible: tabMA.containsMouse
 					QQC2.ToolTip.text: tabDelegate.modelData.label
 				}
-			}
-		}
-
-		Item {
-			id: tabsAddBtn
-			anchors.right: parent.right
-			anchors.bottom: parent.bottom
-			width: root.tabHeight
-			height: root.tabHeight
-
-			Accessible.name: i18n("Auto Resize")
-			Accessible.role: Accessible.Button
-			QQC2.ToolTip.visible: tabsAddMA.containsMouse
-			QQC2.ToolTip.text: i18n("Auto Resize")
-
-			Kirigami.Icon {
-				anchors.centerIn: parent
-				source: "transform-scale"
-				width: Kirigami.Units.iconSizes.smallMedium
-				height: width
-				color: Kirigami.Theme.textColor
-				opacity: tabsAddMA.containsMouse ? 0.9 : 0.55
-				isMask: true
-			}
-
-			MouseArea {
-				id: tabsAddMA
-				anchors.fill: parent
-				hoverEnabled: true
-				cursorShape: Qt.PointingHandCursor
-				onClicked: root.autoResizeClicked()
 			}
 		}
 

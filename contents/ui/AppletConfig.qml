@@ -525,10 +525,23 @@ Item {
 	}
 	readonly property int dockedSidebarShortcutRowMinWidth: dockedSidebarShortcutButtons * flatButtonSize
 	readonly property int dockedSidebarMinWidth: Math.max(dockedSidebarShortcutRowMinWidth, dockedSidebarPowerRowMinWidth)
-	readonly property int dockedSidebarWidth: Math.max(dockedSidebarConfiguredWidth, dockedSidebarMinWidth)
+	// While editing a tile, widen the docked sidebar if the editor content
+	// needs more room than the configured width (slot margins included).
+	readonly property int dockedSidebarWidth: Math.max(dockedSidebarConfiguredWidth, dockedSidebarMinWidth, isEditingTile ? tileEditorWidth + Kirigami.Units.smallSpacing * 2 : 0)
 	readonly property int dockedSidebarSlotWidth: dockedSidebarWidth + (sidebarCardInset * 2) + (sidebarCardContentPadding * 2)
 	readonly property int classicLeftSidebarSlotWidth: sidebarWidth + (sidebarCardInset * 2) + (sidebarCardContentPadding * 2) + sidebarPaneGap
-	readonly property int tileEditorMinWidth: Math.max(350, 350 * Screen.devicePixelRatio)
+	// Logical pixels: QML units are already DPR-scaled on Wayland, so no
+	// devicePixelRatio multiplier here (it doubled the editor width on 2x).
+	readonly property int tileEditorMinWidth: 350
+	// Measured width the tile editor content needs to fit without a horizontal
+	// scrollbar (set from TileEditorView.editorContentWidth while it is open).
+	property real tileEditorContentWidth: 0
+	// Cap at 2x the minimum as a guard against runaway measurements.
+	readonly property int tileEditorWidth: Math.min(Math.max(tileEditorMinWidth, Math.ceil(tileEditorContentWidth)), tileEditorMinWidth * 2)
+	// When the sidebar pane is wider than the editor needs (eg. a wide docked
+	// sidebar), the editor content stops stretching at its natural width so
+	// it renders the same regardless of the pane width.
+	readonly property int tileEditorMaxContentWidth: tileEditorWidth
 	readonly property int minimumWidth: {
 		return usesClassicLayout ? (sidebarHorizontal ? Math.max(leftSectionWidth, sidebarFixedHorizontalWidth) : leftSectionWidth) : 0
 	}
@@ -544,7 +557,7 @@ Item {
 	property bool isEditingTile: false
 	readonly property int appAreaWidth: {
 		if (isEditingTile) {
-			return tileEditorMinWidth
+			return tileEditorWidth
 		} else if (showSearch && !searchOverlayActive) {
 			return appListWidth
 		} else {

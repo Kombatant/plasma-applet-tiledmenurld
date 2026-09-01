@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Layouts
+import QtQuick.Controls as QQC2
 import QtQuick.Dialogs as QtDialogs
 import org.kde.kirigami as Kirigami
 import org.kde.plasma.core as PlasmaCore
@@ -493,6 +494,11 @@ MouseArea {
 		if (!config) {
 			return
 		}
+		if (config.isEditingTile || popup._pendingEditSidebarResize) {
+			// The popup width currently includes the transient tile-editor
+			// sidebar; persisting it would make the popup reopen elongated.
+			return
+		}
 
 		var dpr = effectiveDevicePixelRatio()
 		if (popup._sizeRestored && popup._lastRestoreDevicePixelRatio > 0 && Math.abs(dpr - popup._lastRestoreDevicePixelRatio) > 0.01) {
@@ -775,7 +781,10 @@ MouseArea {
 		var cellBox = tileGrid.cellBoxSize
 		var holoPad = tileGrid.holographicPaddingFor ? tileGrid.holographicPaddingFor(bounds.hoverW, bounds.hoverH) : (tileGrid._holoPad || 0)
 		var targetGridWidth = cols * cellBox + 2 * holoPad
-		var sidebarExtraHeight = (config.sidebarOnTop || config.sidebarOnBottom)
+		// The top/bottom sidebar placeholder row exists only in the Classic
+		// layout; in the Docked layout sidebarPosition is ignored, so adding
+		// its height there left an empty strip at the bottom after auto-resize.
+		var sidebarExtraHeight = (config.usesClassicLayout && (config.sidebarOnTop || config.sidebarOnBottom))
 			? (config.sidebarHeight + config.sidebarRightMargin)
 			: 0
 		// Top row hosts the tab bar; docked search lives in the left pane header.
@@ -1049,7 +1058,12 @@ MouseArea {
 			}
 			popup.scheduleRestoreForCurrentView("widget-expanded")
 		} else {
-			if (!popup._suppressPersist && popup._sizeRestored) {
+			if (config && config.isEditingTile && searchView) {
+				// Close the tile editor when the popup closes: its sidebar
+				// widened the popup, and reopening into the editor with that
+				// width persisted would leave the popup elongated.
+				searchView.showDefaultView()
+			} else if (!popup._suppressPersist && popup._sizeRestored) {
 				// The debounced saver can lose the final manual resize if the popup is
 				// closed before it fires. Persist the live size one last time on close.
 				popup.saveCurrentViewSize()
@@ -1274,9 +1288,10 @@ MouseArea {
 
 						TileTabBar {
 							id: tileTabBar
-							anchors.right: parent.right
+							anchors.left: parent.left
+							anchors.right: autoResizeTabAction.left
+							anchors.rightMargin: Kirigami.Units.smallSpacing
 							y: rightPaneTopRow._alignTopSurfaces ? 0 : Math.round((parent.height - height) / 2)
-							width: parent.width
 							height: implicitHeight
 							visible: rightPaneTopRow._showTileTabs
 							style: plasmoid.configuration.tileTabStyle || "tabs"
@@ -1292,6 +1307,48 @@ MouseArea {
 							onTabRenamed: function(index, newName) { popup.renameTab(index, newName) }
 							onTabIconChanged: function(index, newIcon) { popup.changeTabIcon(index, newIcon) }
 							onTabMoved: function(fromIndex, toIndex) { popup.moveTab(fromIndex, toIndex) }
+						}
+
+						// Auto Resize sits outside the tab surface so it reads as a
+						// grid action rather than another tab.
+						Item {
+							id: autoResizeTabAction
+							anchors.right: parent.right
+							y: tileTabBar.y
+							width: tileTabBar.surfaceHeight
+							// Match the tab surface, not the full bar, so the icon
+							// centers on the pills when the surface is top-aligned.
+							height: rightPaneTopRow._alignTopSurfaces ? tileTabBar.surfaceHeight : tileTabBar.height
+
+							Accessible.name: i18n("Auto Resize")
+							Accessible.role: Accessible.Button
+							QQC2.ToolTip.visible: autoResizeTabMA.containsMouse
+							QQC2.ToolTip.text: i18n("Auto Resize")
+
+							Kirigami.Icon {
+								anchors.centerIn: parent
+								source: "transform-scale"
+								width: Kirigami.Units.iconSizes.smallMedium
+								height: width
+								color: Kirigami.Theme.textColor
+								opacity: autoResizeTabMA.containsMouse ? 0.9 : 0.55
+								isMask: true
+							}
+
+							MouseArea {
+								id: autoResizeTabMA
+								anchors.fill: parent
+								hoverEnabled: true
+								cursorShape: Qt.PointingHandCursor
+								onClicked: tabBarAutoResizeDebounce.restart()
+							}
+
+							Timer {
+								id: tabBarAutoResizeDebounce
+								interval: 200
+								repeat: false
+								onTriggered: popup.autoResizeToContent()
+							}
 						}
 
 					}

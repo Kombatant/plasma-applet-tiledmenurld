@@ -3,6 +3,7 @@ import QtQuick.Layouts
 import QtQuick.Dialogs as QtDialogs
 import org.kde.plasma.components as PlasmaComponents3
 import org.kde.plasma.extras as PlasmaExtras
+import org.kde.kirigami as Kirigami
 import org.kde.iconthemes as KIconThemes // IconDialog
 
 ColumnLayout {
@@ -18,6 +19,19 @@ ColumnLayout {
 	}
 	property alias tile: appObj.tile
 	property var tileGrid: null
+
+	// Width the sidebar must have for the editor content to fit without a
+	// horizontal scrollbar. Text fields clamp their implicit width (they
+	// scroll internally), so this only grows for structural content
+	// (buttons, paddings, font size). Consumed via config.tileEditorContentWidth.
+	// The scrollbar allowance is a fixed unit on purpose: deriving it from
+	// scrollView.width would feed the pane width back into the measurement.
+	readonly property real editorContentWidth: Math.max(headerRow.implicitWidth, scrollContent.implicitWidth) + Kirigami.Units.gridUnit
+
+	// When the pane is wider than the editor needs (eg. a wide docked
+	// sidebar), stop the content from stretching. An explicit width is used
+	// because the StackView sizes this view to the full pane width.
+	readonly property int contentWidthCap: Math.min(width, config.tileEditorMaxContentWidth)
 
 	function resetView() {
 		tile = null
@@ -46,7 +60,9 @@ ColumnLayout {
 
 
 	RowLayout {
-		Layout.fillWidth: true
+		id: headerRow
+		Layout.fillWidth: false
+		Layout.preferredWidth: tileEditorView.contentWidthCap
 		Layout.rightMargin: scrollView.width - scrollView.availableWidth
 
 		PlasmaExtras.Heading {
@@ -72,7 +88,12 @@ ColumnLayout {
 	PlasmaComponents3.ScrollView {
 		id: scrollView
 		Layout.fillHeight: true
-		Layout.fillWidth: true
+		Layout.fillWidth: false
+		Layout.preferredWidth: tileEditorView.contentWidthCap
+		// No contentWidth override here: binding it to availableWidth loops
+		// through the scrollbar padding (phantom bars, and with a scrollbar
+		// policy set it livelocked plasmashell). The pane is instead sized to
+		// the measured content width, so nothing overflows horizontally.
 
 		ColumnLayout {
 			id: scrollContent

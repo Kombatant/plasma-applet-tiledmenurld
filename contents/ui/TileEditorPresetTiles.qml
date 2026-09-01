@@ -264,7 +264,7 @@ TileEditorGroupBox {
 		id: content
 		anchors.left: parent.left
 		anchors.right: parent.right
-		columns: 2
+		columns: 1
 
 		Repeater {
 			model: tileEditorPresetTiles.presetSpecs
@@ -287,8 +287,11 @@ TileEditorGroupBox {
 		}
 
 		Text {
-			Layout.columnSpan: 2
+			Layout.columnSpan: 1
 			Layout.fillWidth: true
+			// Wrapping text reports its unwrapped width as implicit width,
+			// which would balloon the editor's measured width.
+			Layout.preferredWidth: 0
 			visible: !!tileEditorPresetTiles.igdbStatus
 			text: tileEditorPresetTiles.igdbStatus
 			wrapMode: Text.Wrap

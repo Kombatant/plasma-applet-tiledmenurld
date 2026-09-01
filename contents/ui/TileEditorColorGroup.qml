@@ -14,7 +14,9 @@ TileEditorGroupBox {
 		id: colorField
 		showPreviewBg: false
 		anchors.left: parent.left
-		anchors.right: parent.right
+		// Compact: the field only needs to fit "#AARRGGBB" plus its side
+		// controls, so don't stretch it across a wide sidebar.
+		width: Math.min(implicitWidth, parent.width)
 		text: key && appObj.tile && appObj.tile[key] ? appObj.tile[key] : ''
 		property bool updateOnChange: false
 		onTextChanged: {

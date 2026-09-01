@@ -1,12 +1,14 @@
 import QtQuick
 import QtQuick.Layouts
+import org.kde.kirigami as Kirigami
 import org.kde.plasma.components as PlasmaComponents3
 
 PlasmaComponents3.SpinBox {
 	id: spinBox
 	property string key: ''
-	Layout.fillWidth: true
-	implicitWidth: 20
+	// Values are 1-2 digits; a compact fixed width keeps the Position/Size
+	// group from stretching across a wide sidebar.
+	Layout.preferredWidth: Kirigami.Units.gridUnit * 5
 	value: 0
 	property bool updateOnChange: false
 

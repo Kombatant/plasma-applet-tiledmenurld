@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
 import org.kde.plasma.components as PlasmaComponents3
+import org.kde.kirigami as Kirigami
 import "libconfig" as LibConfig
 
 TileEditorGroupBox {
@@ -55,6 +56,10 @@ TileEditorGroupBox {
 		LibConfig.AutocompleteTextField {
 			id: textField
 			Layout.fillWidth: true
+			// A TextField's implicit width tracks its text, so a long value
+			// (eg. a file path) would balloon the editor's measured width.
+			// Advertise a fixed base width instead; the text scrolls internally.
+			Layout.preferredWidth: Kirigami.Units.gridUnit * 14
 			text: ''
 			suggestionsProvider: tileEditorField.suggestionsProvider
 			property bool updateOnChange: false

@@ -1,11 +1,11 @@
 import QtQuick
 import QtQuick.Layouts
+import org.kde.kirigami as Kirigami
 import org.kde.plasma.components as PlasmaComponents3
 
 TileEditorGroupBox {
 	id: tileEditorRectField
 	title: i18n("Label")
-	implicitWidth: parent.implicitWidth
 	Layout.fillWidth: true
 	property int currentTileW: appObj && appObj.tile ? (appObj.tile.w || 1) : 1
 	property int currentTileH: appObj && appObj.tile ? (appObj.tile.h || 1) : 1
@@ -111,10 +111,11 @@ TileEditorGroupBox {
 
 	RowLayout {
 		anchors.fill: parent
+		spacing: Kirigami.Units.largeSpacing
 
 		GridLayout {
 			columns: 2
-			Layout.fillWidth: true
+			Layout.alignment: Qt.AlignTop
 
 			PlasmaComponents3.Label { text: i18n("x:") }
 			TileEditorSpinBox {
@@ -148,7 +149,7 @@ TileEditorGroupBox {
 
 		GridLayout {
 			id: resizeGrid
-			Layout.fillWidth: true
+			Layout.alignment: Qt.AlignTop
 			rows: 4
 			columns: 4
 
@@ -156,8 +157,9 @@ TileEditorGroupBox {
 				model: resizeGrid.rows * resizeGrid.columns
 
 				PlasmaComponents3.Button {
-					Layout.fillWidth: true
-					implicitWidth: 20
+					// Compact fixed size; the grid packs to the left instead
+					// of stretching across a wide sidebar.
+					Layout.preferredWidth: Kirigami.Units.gridUnit * 3
 					property int w: (modelData % resizeGrid.columns) + 1
 					property int h: Math.floor(modelData / resizeGrid.columns) + 1
 					text: '' + w + 'x' + h
@@ -177,6 +179,10 @@ TileEditorGroupBox {
 					}
 				}
 			}
+		}
+
+		Item { // Pack the grids to the left
+			Layout.fillWidth: true
 		}
 	}
 }

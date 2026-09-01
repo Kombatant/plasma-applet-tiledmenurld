@@ -160,7 +160,6 @@ ColumnLayout {
 			if (searchView.stackView) searchView.stackView.slideDirection = direction
 			leftPane.switchView(function() { searchView.showAiChat() })
 		}
-		onAutoResizeClicked: autoResizeDebounce.restart()
 	}
 
 	// ──────────────────────────────────────────────
@@ -299,6 +298,30 @@ ColumnLayout {
 			Layout.preferredWidth: config.flatButtonSize
 			Layout.preferredHeight: config.flatButtonSize
 			onClicked: plasmoid.internalAction("configure").trigger()
+		}
+
+		// Auto Resize lives here only while tile tabs are off; with tabs on it
+		// sits beside the tile tab bar instead.
+		Rectangle {
+			visible: !config.useTileTabs
+			Layout.preferredWidth: 1
+			Layout.preferredHeight: config.flatButtonSize * 0.6
+			Layout.alignment: Qt.AlignVCenter
+			Layout.leftMargin: Kirigami.Units.smallSpacing
+			Layout.rightMargin: Kirigami.Units.smallSpacing
+			color: Kirigami.Theme.textColor
+			opacity: 0.25
+		}
+
+		SidebarItem {
+			visible: !config.useTileTabs
+			icon.name: "transform-scale"
+			text: i18n("Auto Resize")
+			tooltipText: i18n("Auto Resize")
+			Layout.fillWidth: false
+			Layout.preferredWidth: config.flatButtonSize
+			Layout.preferredHeight: config.flatButtonSize
+			onClicked: autoResizeDebounce.restart()
 		}
 	}
 

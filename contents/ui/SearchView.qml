@@ -456,6 +456,14 @@ Item {
 			onIsCurrentViewChanged: {
 				config.isEditingTile = isCurrentView
 			}
+
+			// Feed the editor's measured content width to the config so the
+			// sidebar can widen enough to avoid a horizontal scrollbar.
+			Binding {
+				target: config
+				property: "tileEditorContentWidth"
+				value: (tileEditorViewLoader.item && tileEditorViewLoader.isCurrentView) ? tileEditorViewLoader.item.editorContentWidth : 0
+			}
 		}
 
 		SearchStackView {

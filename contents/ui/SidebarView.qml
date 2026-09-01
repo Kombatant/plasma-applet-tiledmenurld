@@ -26,8 +26,10 @@ Item {
 		return (0.2126 * r) + (0.7152 * g) + (0.0722 * b)
 	}
 
-	readonly property int _fixedHorizontalButtons: _aiChatEnabled ? 8 : 7 // auto resize + 3/4 view buttons + user + settings + power
-	readonly property int _fixedVerticalBottomButtons: 3 // user + settings + power
+	// 3/4 view buttons + user + settings + power, plus auto resize when tile tabs are off
+	readonly property int _fixedHorizontalButtons: (_aiChatEnabled ? 7 : 6) + (config.useTileTabs ? 0 : 1)
+	// user + settings + power, plus auto resize when tile tabs are off
+	readonly property int _fixedVerticalBottomButtons: 3 + (config.useTileTabs ? 0 : 1)
 	readonly property color _sidebarIconBackdrop: config.surfaceBaseColor
 	readonly property bool _sidebarIsLight: _relativeLuminance(_sidebarIconBackdrop) > 0.6
 	readonly property url settingsIconSource: Qt.resolvedUrl(_sidebarIsLight ? "assets/tiled-settings-light.png" : "assets/tiled-settings-dark.png")
@@ -209,13 +211,6 @@ Item {
 				visible: sidebarView._aiChatEnabled
 			}
 
-			SidebarItem {
-				icon.name: "transform-scale"
-				text: i18n("Auto Resize")
-				tooltipText: i18n("Auto Resize")
-				onClicked: autoResizeDebounce.restart()
-			}
-
 			Rectangle {
 				Layout.fillWidth: true
 				height: 1
@@ -267,6 +262,16 @@ Item {
 					id: userMenu
 					visualParent: userMenuButton
 				}
+			}
+
+			// Auto Resize lives below the user icon only while tile tabs are
+			// off; with tabs on it sits beside the tile tab bar instead.
+			SidebarItem {
+				visible: !config.useTileTabs
+				icon.name: "transform-scale"
+				text: i18n("Auto Resize")
+				tooltipText: i18n("Auto Resize")
+				onClicked: autoResizeDebounce.restart()
 			}
 
 			SidebarFavouritesView {
@@ -352,13 +357,6 @@ Item {
 				visible: sidebarView._aiChatEnabled
 			}
 
-			SidebarItem {
-				icon.name: "transform-scale"
-				text: i18n("Auto Resize")
-				tooltipText: i18n("Auto Resize")
-				onClicked: autoResizeDebounce.restart()
-			}
-
 			Rectangle {
 				id: sidebarMenuSeparator
 				Layout.preferredHeight: config.flatButtonSize * 0.6
@@ -433,6 +431,16 @@ Item {
 					id: userMenuHoriz
 					visualParent: userMenuButtonHoriz
 				}
+			}
+
+			// Auto Resize lives beside the user icon only while tile tabs are
+			// off; with tabs on it sits beside the tile tab bar instead.
+			SidebarItem {
+				visible: !config.useTileTabs
+				icon.name: "transform-scale"
+				text: i18n("Auto Resize")
+				tooltipText: i18n("Auto Resize")
+				onClicked: autoResizeDebounce.restart()
 			}
 
 			// Horizontal sidebar shortcuts (favourites)
