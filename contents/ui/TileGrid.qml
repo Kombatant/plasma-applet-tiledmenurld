@@ -74,8 +74,94 @@ DropArea {
 	property int maxRow: 0
 	property int maxWidth: 0
 	property int maxHeight: 0
+	// Tile model changes rebuild every delegate. Keep the carousel's UI-only
+	// position outside HeroTileView so ordinary edits do not return it to page 1.
+	property var _heroPageStates: []
+	property var _requestedHeroPageState: null
 	property int columns: Math.max(minColumns, maxColumn)
 	property int rows: Math.max(minRows, maxRow)
+
+	function rememberHeroPageIndex(tile, pageIndex) {
+		if (!tile) return
+		var nextStates = _heroPageStates.slice()
+		var normalizedIndex = Math.max(0, Math.floor(pageIndex || 0))
+		for (var i = 0; i < nextStates.length; i++) {
+			if (nextStates[i].tile === tile) {
+				nextStates[i] = { tile: tile, pageIndex: normalizedIndex }
+				_heroPageStates = nextStates
+				return
+			}
+		}
+		nextStates.push({ tile: tile, pageIndex: normalizedIndex })
+		_heroPageStates = nextStates
+	}
+
+	function rememberedHeroPageIndex(tile) {
+		if (!tile) return 0
+		for (var i = 0; i < _heroPageStates.length; i++) {
+			if (_heroPageStates[i].tile === tile) {
+				return _heroPageStates[i].pageIndex
+			}
+		}
+		return 0
+	}
+
+	function requestHeroPageIndex(tile, pageIndex) {
+		if (!tile) return
+		var normalizedIndex = Math.max(0, Math.floor(pageIndex || 0))
+		_requestedHeroPageState = {
+			tile: tile,
+			tileX: tile.x,
+			tileY: tile.y,
+			pageIndex: normalizedIndex,
+		}
+		showHeroPageIndex(tile, normalizedIndex)
+	}
+
+	function showHeroPageIndex(tile, pageIndex) {
+		if (!tile) return false
+		var normalizedIndex = Math.max(0, Math.floor(pageIndex || 0))
+		rememberHeroPageIndex(tile, normalizedIndex)
+		var tileIndex = (tileModel || []).indexOf(tile)
+		if (tileIndex < 0) {
+			for (var i = 0; i < (tileModel || []).length; i++) {
+				var candidate = tileModel[i]
+				if (candidate && candidate.tileType === "hero" && candidate.x === tile.x && candidate.y === tile.y) {
+					tileIndex = i
+					break
+				}
+			}
+		}
+		var tileDelegate = tileIndex >= 0 ? tileModelRepeater.itemAt(tileIndex) : null
+		if (tileDelegate && tileDelegate.heroTileView) {
+			var pageCount = tileDelegate.heroTileView.effectivePages.length
+			tileDelegate.heroTileView.currentIndex = Math.max(0, Math.min(normalizedIndex, pageCount - 1))
+			return true
+		}
+		return false
+	}
+
+	function takeHeroPageIndex(tile) {
+		var request = _requestedHeroPageState
+		var matchesRequest = request && tile && (request.tile === tile
+			|| (request.tileX === tile.x && request.tileY === tile.y && tile.tileType === "hero"))
+		if (matchesRequest) {
+			_requestedHeroPageState = null
+			rememberHeroPageIndex(tile, request.pageIndex)
+			return request.pageIndex
+		}
+		return rememberedHeroPageIndex(tile)
+	}
+
+	function pruneHeroPageStates() {
+		var nextStates = []
+		for (var i = 0; i < _heroPageStates.length; i++) {
+			if ((tileModel || []).indexOf(_heroPageStates[i].tile) !== -1) {
+				nextStates.push(_heroPageStates[i])
+			}
+		}
+		_heroPageStates = nextStates
+	}
 
 
 	//--- Drag and Drop properties
@@ -472,6 +558,7 @@ DropArea {
 		var groupTiles = (tileModel || []).filter(function(t) {
 			return t && t.tileType === "group"
 		})
+		pruneHeroPageStates()
 		groupPanelRepeater.model = 0
 		groupPanelRepeater.model = groupTiles
 		tileModelRepeater.model = 0

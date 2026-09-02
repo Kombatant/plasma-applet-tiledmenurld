@@ -79,6 +79,12 @@ Item {
 	property int _pageSlideDirection: 1
 	property bool _pageLayersInitialized: false
 
+	onCurrentIndexChanged: {
+		if (typeof tileGrid !== "undefined" && tileGrid && typeof tileGrid.rememberHeroPageIndex === "function") {
+			tileGrid.rememberHeroPageIndex(appObj ? appObj.tile : null, currentIndex)
+		}
+	}
+
 	readonly property var effectivePages: {
 		var arr = []
 		var src = subTiles || []
@@ -231,6 +237,11 @@ Item {
 		function onCurrentSubChanged() { heroView._commitCurrent() }
 	}
 	Component.onCompleted: {
+		if (typeof tileGrid !== "undefined" && tileGrid && typeof tileGrid.takeHeroPageIndex === "function") {
+			var restoredIndex = tileGrid.takeHeroPageIndex(appObj ? appObj.tile : null)
+			currentIndex = Math.max(0, Math.min(restoredIndex, effectivePages.length - 1))
+			tileGrid.rememberHeroPageIndex(appObj ? appObj.tile : null, currentIndex)
+		}
 		heroView._assignPage(loaderA, heroView.currentSub)
 		loaderA.x = 0
 		loaderA.opacity = heroView.currentSub ? 1 : 0

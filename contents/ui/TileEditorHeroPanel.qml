@@ -44,11 +44,35 @@ ColumnLayout {
 		return appObj.tile.subTiles
 	}
 
-	function _commit(arr) {
+	function _effectiveIndexForPage(pages, pageIndex) {
+		var effectiveIndex = -1
+		for (var i = 0; i < pages.length; i++) {
+			var page = pages[i]
+			if (!page || (!page.backgroundImage && !page.iconName)) continue
+			effectiveIndex += 1
+			if (i === pageIndex) return effectiveIndex
+		}
+		return -1
+	}
+
+	function _commit(arr, requestedHeroPageIndex) {
 		if (!appObj || !appObj.tile) return
 		appObj.tile.subTiles = arr
+		var shouldShowEditedPage = tileGrid && typeof tileGrid.requestHeroPageIndex === "function"
+			&& typeof requestedHeroPageIndex === "number" && requestedHeroPageIndex >= 0
+		var editedTile = appObj.tile
+		if (shouldShowEditedPage) {
+			tileGrid.requestHeroPageIndex(appObj.tile, requestedHeroPageIndex)
+		}
 		appObj.tileChanged()
 		if (tileGrid) tileGrid.tileModelChanged()
+		if (shouldShowEditedPage) {
+			Qt.callLater(function() {
+				if (heroPanel.tileGrid && typeof heroPanel.tileGrid.showHeroPageIndex === "function") {
+					heroPanel.tileGrid.showHeroPageIndex(editedTile, requestedHeroPageIndex)
+				}
+			})
+		}
 	}
 
 	function updatePage(index, key, value) {
@@ -57,7 +81,8 @@ ColumnLayout {
 		var p = Object.assign({}, arr[index])
 		p[key] = value
 		arr[index] = p
-		_commit(arr)
+		var requestedHeroPageIndex = key === "backgroundImage" ? _effectiveIndexForPage(arr, index) : -1
+		_commit(arr, requestedHeroPageIndex)
 	}
 
 	function updatePageFields(index, values) {
@@ -204,7 +229,9 @@ ColumnLayout {
 			property var lutrisPresetSpecs: []
 			property var igdbPresetSpecs: []
 			readonly property var presetSpecs: steamPresetSpecs.concat(lutrisPresetSpecs).concat(igdbPresetSpecs)
-			readonly property bool canDownloadPresetImages: !!steamAppId || presetSpecs.length > 0 || canDownloadHeroicLutrisMetadata
+			readonly property bool canOpenPresetPicker: presetSpecs.length > 0
+				|| artworkLoading
+				|| (canDownloadHeroicLutrisMetadata && canAttemptIgdbMetadata && !igdbArtworkAttempted)
 			readonly property bool canDownloadSteamMetadata: !!steamAppId
 			property string heroicLutrisKind: ""
 			property string lutrisSlug: ""
@@ -221,7 +248,9 @@ ColumnLayout {
 			property string presetRequestKey: ""
 			property bool metadataLoading: false
 			property string metadataStatus: ""
-			property int _pendingPresetSaveIndex: -1
+			property bool presetPickerExpanded: false
+			property bool presetSelectionSaving: false
+			property string presetSelectionStatus: ""
 
 			function _currentPresetRequestKey() {
 				return ("" + (page.launchUrl || "")) + "\n" + metadataFetcher._titleForPage(page) + "\n" + metadataFetcher._steamGameIdForPage(page)
@@ -242,7 +271,7 @@ ColumnLayout {
 				steamArtworkLoading = false
 				igdbArtworkLoading = false
 				igdbArtworkAttempted = false
-				_pendingPresetSaveIndex = -1
+				presetSelectionStatus = ""
 
 				if (steamAppId) {
 					var requestedAppId = steamAppId
@@ -281,14 +310,13 @@ ColumnLayout {
 				})
 			}
 
-			function fetchHeroicLutrisIgdbArt(saveAfter) {
+			function fetchHeroicLutrisIgdbArt() {
 				if (!heroicLutrisKind || !canAttemptIgdbMetadata || igdbArtworkAttempted || igdbArtworkLoading) {
-					if (saveAfter) _startPresetSave()
 					return
 				}
 				var title = metadataFetcher._titleForPage(page)
 				if (!title) {
-					if (saveAfter) _startPresetSave()
+					presetSelectionStatus = i18n("Could not determine a title for this launcher.")
 					return
 				}
 				var generation = presetRequestGeneration
@@ -304,7 +332,6 @@ ColumnLayout {
 						igdbPresetSpecs = presetHelper.presetSpecsForIgdbDetail(detail)
 						metadataStatus = i18n("Downloaded IGDB artwork.")
 					}
-					if (saveAfter) _startPresetSave()
 				})
 			}
 
@@ -321,105 +348,44 @@ ColumnLayout {
 				}
 			}
 
-			function downloadPresetImages() {
-				if (!canDownloadPresetImages || artworkLoading) return
+			function togglePresetPicker() {
+				if (presetSelectionSaving) return
+				presetPickerExpanded = !presetPickerExpanded
+				presetSelectionStatus = ""
+				if (!presetPickerExpanded) return
 				if (heroicLutrisKind && canAttemptIgdbMetadata && igdbPresetSpecs.length === 0 && !igdbArtworkAttempted) {
-					fetchHeroicLutrisIgdbArt(true)
+					fetchHeroicLutrisIgdbArt()
+				}
+			}
+
+			function applyPresetImage(imageItem, spec) {
+				if (!imageItem || !spec || !spec.source || presetSelectionSaving) return
+				var sourceFilepath = "" + spec.source
+				var isLocalFilepath = sourceFilepath.indexOf("file://") === 0 || sourceFilepath.indexOf("/") === 0
+				if (isLocalFilepath) {
+					heroPanel.updatePage(rowIndex, "backgroundImage", presetHelper.toFileUrl(sourceFilepath))
+					presetPickerExpanded = false
 					return
 				}
-				_startPresetSave()
-			}
 
-			function _startPresetSave() {
-				_pendingPresetSaveIndex = 0
-				_saveNextPresetImage()
-			}
-
-			function _saveNextPresetImage() {
-				while (_pendingPresetSaveIndex >= 0 && _pendingPresetSaveIndex < presetSpecs.length) {
-					var item = presetImageRepeater.itemAt(_pendingPresetSaveIndex)
-					_pendingPresetSaveIndex = _pendingPresetSaveIndex + 1
-					if (!item) {
-						continue
+				presetSelectionSaving = true
+				presetSelectionStatus = i18n("Saving selected image...")
+				imageItem.grabToImage(function(result) {
+					var localFilepath = presetHelper.saveGrabResultToPresetFolder(result, spec.filename)
+					pageDelegate.presetSelectionSaving = false
+					if (!localFilepath) {
+						pageDelegate.presetSelectionStatus = i18n("Could not save the selected image.")
+						return
 					}
-					item.saveToPresetFolder(function(){
-						pageDelegate._saveNextPresetImage()
-					})
-					return
-				}
-				_pendingPresetSaveIndex = -1
+					heroPanel.updatePage(pageDelegate.rowIndex, "backgroundImage", presetHelper.toFileUrl(localFilepath))
+					pageDelegate.presetSelectionStatus = ""
+					pageDelegate.presetPickerExpanded = false
+				}, imageItem.sourceSize)
 			}
 
 			Component.onCompleted: refreshPresetSources(true)
 			onPageChanged: refreshPresetSources(false)
 			onHasIgdbMetadataSettingsChanged: maybeFetchSteamIgdbArt()
-
-			Repeater {
-				id: presetImageRepeater
-				model: pageDelegate.presetSpecs
-
-				delegate: Image {
-					id: presetImage
-					property var spec: modelData
-					property var _pendingCallback: null
-					x: 0
-					y: 0
-					z: -1
-					opacity: 0
-					width: sourceSize.width > 0 ? sourceSize.width : 1
-					height: sourceSize.height > 0 ? sourceSize.height : 1
-					fillMode: Image.PreserveAspectFit
-					asynchronous: true
-					cache: true
-					source: spec && spec.source ? spec.source : ""
-					property string _reportedErrorSource: ""
-
-					onSourceChanged: _reportedErrorSource = ""
-
-					function saveToPresetFolder(done) {
-						if (!spec || !spec.filename || !source) {
-							if (done) {
-								done(false)
-							}
-							return
-						}
-						if (status === Image.Error || status === Image.Null) {
-							if (done) {
-								done(false)
-							}
-							return
-						}
-						if (status !== Image.Ready) {
-							_pendingCallback = done || null
-							return
-						}
-						grabToImage(function(result){
-							presetHelper.saveGrabResultToPresetFolder(result, spec.filename)
-							if (done) {
-								done(true)
-							}
-						}, sourceSize)
-					}
-
-					onStatusChanged: {
-						var failedSource = "" + source
-						if (status === Image.Error && failedSource && _reportedErrorSource !== failedSource) {
-							_reportedErrorSource = failedSource
-							pageDelegate.removeFailedPreset(spec)
-						}
-						if (!_pendingCallback) {
-							return
-						}
-						var callback = _pendingCallback
-						_pendingCallback = null
-						if (status === Image.Ready) {
-							saveToPresetFolder(callback)
-						} else if (status === Image.Error || status === Image.Null) {
-							callback(false)
-						}
-					}
-				}
-			}
 
 			ColumnLayout {
 				id: rowLayout
@@ -481,15 +447,144 @@ ColumnLayout {
 						}
 					}
 					QQC2.ToolButton {
-						icon.name: "folder-download-symbolic"
-						enabled: pageDelegate.canDownloadPresetImages && !pageDelegate.artworkLoading
-						onClicked: pageDelegate.downloadPresetImages()
+						icon.name: pageDelegate.presetPickerExpanded ? "arrow-up" : "arrow-down"
+						enabled: (pageDelegate.presetPickerExpanded || pageDelegate.canOpenPresetPicker)
+							&& !pageDelegate.presetSelectionSaving
+						checkable: true
+						checked: pageDelegate.presetPickerExpanded
+						onClicked: pageDelegate.togglePresetPicker()
+						Accessible.name: pageDelegate.presetPickerExpanded
+							? i18n("Hide preset images")
+							: i18n("Choose from preset images")
 						QQC2.ToolTip.visible: hovered
-						QQC2.ToolTip.text: pageDelegate.artworkLoading
-							? i18n("Downloading artwork...")
-							: enabled
-							? i18n("Download all preset tile images for this entry into the preset tiles folder")
+						QQC2.ToolTip.text: enabled
+							? (pageDelegate.presetPickerExpanded
+								? i18n("Hide preset images")
+								: i18n("Choose from preset images"))
 							: i18n("No preset tile images are available for this entry")
+					}
+				}
+
+				GridLayout {
+					id: presetPicker
+					Layout.fillWidth: true
+					columns: 2
+					columnSpacing: Kirigami.Units.smallSpacing
+					rowSpacing: Kirigami.Units.smallSpacing
+					visible: pageDelegate.presetPickerExpanded
+
+					Repeater {
+						model: pageDelegate.presetSpecs
+
+						delegate: Item {
+							id: presetChoice
+							Layout.fillWidth: true
+							Layout.preferredWidth: 0
+							Layout.preferredHeight: Kirigami.Units.gridUnit * 5
+							property var spec: modelData
+
+							Rectangle {
+								anchors.fill: parent
+								color: presetMouse.containsMouse
+									? Qt.rgba(Kirigami.Theme.highlightColor.r, Kirigami.Theme.highlightColor.g, Kirigami.Theme.highlightColor.b, 0.18)
+									: Qt.rgba(Kirigami.Theme.backgroundColor.r, Kirigami.Theme.backgroundColor.g, Kirigami.Theme.backgroundColor.b, 0.35)
+								border.color: presetMouse.containsMouse
+									? Kirigami.Theme.highlightColor
+									: Qt.rgba(Kirigami.Theme.textColor.r, Kirigami.Theme.textColor.g, Kirigami.Theme.textColor.b, 0.15)
+								border.width: 1
+								radius: Kirigami.Units.smallSpacing
+							}
+
+							Image {
+								id: presetImage
+								anchors.fill: parent
+								anchors.margins: Kirigami.Units.smallSpacing
+								fillMode: Image.PreserveAspectFit
+								asynchronous: true
+								cache: true
+								source: presetChoice.spec && presetChoice.spec.source ? presetChoice.spec.source : ""
+								property string _reportedErrorSource: ""
+
+								onSourceChanged: _reportedErrorSource = ""
+								onStatusChanged: {
+									var failedSource = "" + source
+									if (status === Image.Error && failedSource && _reportedErrorSource !== failedSource) {
+										_reportedErrorSource = failedSource
+										pageDelegate.removeFailedPreset(presetChoice.spec)
+									}
+								}
+							}
+
+							QQC2.BusyIndicator {
+								anchors.centerIn: parent
+								running: presetImage.status === Image.Loading
+								visible: running
+							}
+
+							Rectangle {
+								anchors.right: parent.right
+								anchors.bottom: parent.bottom
+								anchors.margins: Kirigami.Units.smallSpacing
+								width: presetSizeLabel.implicitWidth + Kirigami.Units.smallSpacing * 2
+								height: presetSizeLabel.implicitHeight + Kirigami.Units.smallSpacing
+								visible: presetChoice.spec && presetChoice.spec.w > 0 && presetChoice.spec.h > 0
+								color: "#C0000000"
+								border.color: "#80FFFFFF"
+								border.width: 1
+								radius: Kirigami.Units.smallSpacing
+
+								Text {
+									id: presetSizeLabel
+									anchors.centerIn: parent
+									text: presetChoice.spec ? presetChoice.spec.w + "×" + presetChoice.spec.h : ""
+									color: "white"
+									font.bold: true
+									font.pixelSize: 12
+								}
+							}
+
+							MouseArea {
+								id: presetMouse
+								anchors.fill: parent
+								hoverEnabled: true
+								enabled: presetImage.status === Image.Ready && !pageDelegate.presetSelectionSaving
+								cursorShape: enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
+								onClicked: pageDelegate.applyPresetImage(presetImage, presetChoice.spec)
+							}
+
+							QQC2.ToolTip.visible: presetMouse.containsMouse
+							QQC2.ToolTip.text: presetChoice.spec && presetChoice.spec.filename
+								? i18n("Use %1", presetChoice.spec.filename)
+								: i18n("Use this image")
+						}
+					}
+
+					QQC2.BusyIndicator {
+						Layout.columnSpan: 2
+						Layout.alignment: Qt.AlignHCenter
+						running: pageDelegate.artworkLoading
+						visible: running
+					}
+
+					QQC2.Label {
+						Layout.columnSpan: 2
+						Layout.fillWidth: true
+						visible: pageDelegate.presetSelectionSaving || pageDelegate.presetSelectionStatus.length > 0
+						wrapMode: Text.Wrap
+						opacity: 0.8
+						text: pageDelegate.presetSelectionStatus
+					}
+
+					QQC2.Label {
+						Layout.columnSpan: 2
+						Layout.fillWidth: true
+						visible: pageDelegate.presetSpecs.length === 0
+							&& !pageDelegate.artworkLoading
+							&& !pageDelegate.presetSelectionSaving
+							&& pageDelegate.presetSelectionStatus.length === 0
+						wrapMode: Text.Wrap
+						opacity: 0.8
+						text: i18n("No preset images are available.")
 					}
 				}
 
