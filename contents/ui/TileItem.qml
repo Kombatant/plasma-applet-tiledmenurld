@@ -112,11 +112,9 @@ Item {
 			active: appObj.isHero
 			visible: appObj.isHero
 			anchors.fill: parent
-			// Match group-panel insets so hero-to-group gaps equal group-to-group gaps.
-			anchors.leftMargin: tileGrid.groupPanelInsetX
-			anchors.rightMargin: tileGrid.groupPanelInsetX
-			anchors.topMargin: tileGrid.groupPanelInsetTop
-			anchors.bottomMargin: tileGrid.groupPanelInsetBottom
+			// Match the regular-tile inset so a hero fills its cells exactly like
+			// an ordinary tile of the same w/h.
+			anchors.margins: cellMargin
 			sourceComponent: HeroTileView {
 				cornerRadius: tileItemView.cornerRadius
 				hovered: tileMouseArea.containsMouse || heroPrevArea.containsMouse || heroNextArea.containsMouse
