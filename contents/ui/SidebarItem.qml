@@ -26,7 +26,11 @@ FlatButton {
 	property bool showBadge: false
 	property bool showHoverOutline: true
 	icon.color: forceMonochromeIcon ? (checked ? Kirigami.Theme.highlightColor : Kirigami.Theme.textColor) : "transparent"
-	layer.enabled: desaturateIcon && !hovered && !pressed
+	// A monochrome-tinted icon already carries the theme's text colour, so the
+	// desaturation pass has no saturation left to remove. Running it anyway
+	// pushes the tint through MultiEffect's premultiplied-alpha layer, which
+	// flattens it to a washed grey that disappears against a light backdrop.
+	layer.enabled: desaturateIcon && !forceMonochromeIcon && !hovered && !pressed
 	layer.effect: MultiEffect {
 		saturation: -1.0
 	}
