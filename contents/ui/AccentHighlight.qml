@@ -7,6 +7,12 @@ Item {
 
 	property color accentColor: Kirigami.Theme.highlightColor
 	property real radius: 0
+	// Per-corner overrides. Negative means "follow `radius`", so existing
+	// callers that only set `radius` keep their uniform rounding.
+	property real radiusTopLeft: -1
+	property real radiusTopRight: -1
+	property real radiusBottomRight: -1
+	property real radiusBottomLeft: -1
 	property real inset: 0
 	property real borderOpacity: 0.95
 	property real glowOpacity: 0.65
@@ -28,18 +34,29 @@ Item {
 			return Qt.rgba(color.r, color.g, color.b, Math.max(0, Math.min(1, alpha)))
 		}
 
-		function roundedRectPath(ctx, x, y, w, h, r) {
-			var rr = Math.max(0, Math.min(r, Math.min(w, h) / 2))
+		// `shrink` pulls every corner radius inward by the same amount, so the
+		// glow rings stay concentric with the body.
+		function roundedRectPath(ctx, x, y, w, h, r, shrink) {
+			var lim = Math.min(w, h) / 2
+			var pull = shrink || 0
+			function corner(override) {
+				var base = (override !== undefined && override >= 0) ? override : r
+				return Math.max(0, Math.min(base - pull, lim))
+			}
+			var tl = corner(root.radiusTopLeft)
+			var tr = corner(root.radiusTopRight)
+			var br = corner(root.radiusBottomRight)
+			var bl = corner(root.radiusBottomLeft)
 			ctx.beginPath()
-			ctx.moveTo(x + rr, y)
-			ctx.lineTo(x + w - rr, y)
-			ctx.arcTo(x + w, y, x + w, y + rr, rr)
-			ctx.lineTo(x + w, y + h - rr)
-			ctx.arcTo(x + w, y + h, x + w - rr, y + h, rr)
-			ctx.lineTo(x + rr, y + h)
-			ctx.arcTo(x, y + h, x, y + h - rr, rr)
-			ctx.lineTo(x, y + rr)
-			ctx.arcTo(x, y, x + rr, y, rr)
+			ctx.moveTo(x + tl, y)
+			ctx.lineTo(x + w - tr, y)
+			ctx.arcTo(x + w, y, x + w, y + tr, tr)
+			ctx.lineTo(x + w, y + h - br)
+			ctx.arcTo(x + w, y + h, x + w - br, y + h, br)
+			ctx.lineTo(x + bl, y + h)
+			ctx.arcTo(x, y + h, x, y + h - bl, bl)
+			ctx.lineTo(x, y + tl)
+			ctx.arcTo(x, y, x + tl, y, tl)
 			ctx.closePath()
 		}
 
@@ -61,7 +78,7 @@ Item {
 			var glowSteps = 5
 			for (var i = glowSteps; i >= 1; --i) {
 				var grow = i * bw
-				roundedRectPath(ctx, x + grow * 0.35, y + grow * 0.35, Math.max(0, w - grow * 0.7), Math.max(0, h - grow * 0.7), Math.max(0, r - grow * 0.35))
+				roundedRectPath(ctx, x + grow * 0.35, y + grow * 0.35, Math.max(0, w - grow * 0.7), Math.max(0, h - grow * 0.7), r, grow * 0.35)
 				ctx.lineWidth = bw + i
 				ctx.strokeStyle = colorWithAlpha(root.accentColor, root.glowOpacity * (0.07 + (glowSteps - i) * 0.025))
 				ctx.stroke()
@@ -113,6 +130,10 @@ Item {
 
 	onAccentColorChanged: canvas.requestPaint()
 	onRadiusChanged: canvas.requestPaint()
+	onRadiusTopLeftChanged: canvas.requestPaint()
+	onRadiusTopRightChanged: canvas.requestPaint()
+	onRadiusBottomRightChanged: canvas.requestPaint()
+	onRadiusBottomLeftChanged: canvas.requestPaint()
 	onInsetChanged: canvas.requestPaint()
 	onBorderOpacityChanged: canvas.requestPaint()
 	onGlowOpacityChanged: canvas.requestPaint()

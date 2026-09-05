@@ -16,10 +16,14 @@ Item {
 	// Array of tab descriptor objects: [{id: string, name: string, icon: string}, ...]
 	property var tabs: []
 
-	// Visual style: "tabs" (classic curved tabs) or "pills".
+	// Visual style: "tabs" (accent-lit tab), "underline", or "pills".
 	property string style: "tabs"
 	property bool alignSurfaceToTop: false
 	readonly property bool _pillsMode: style === "pills"
+	readonly property bool _underlineMode: style === "underline"
+	// "tabs" is the stored value for the Accent Tab style; anything that is
+	// neither pills nor underline falls back to it.
+	readonly property bool _tabsMode: !_pillsMode && !_underlineMode
 
 	// Emitted when the user selects a different tab.
 	signal tabSelected(int index)
@@ -34,7 +38,9 @@ Item {
 	property int _dropSlot: -1
 
 	// Proxy to the repeater of the currently active style branch.
-	readonly property var _tabRepeater: _pillsMode ? pillsBranch.tabRepeater : tabsBranch.tabRepeater
+	readonly property var _tabRepeater: _pillsMode
+		? pillsBranch.tabRepeater
+		: (_underlineMode ? underlineBranch.tabRepeater : tabsBranch.tabRepeater)
 
 	function _slotAtX(x) {
 		var rep = _tabRepeater
@@ -50,6 +56,9 @@ Item {
 
 	readonly property int tabHeight: Kirigami.Units.gridUnit * 2.5
 	readonly property int surfaceHeight: _pillsMode ? Math.round(tabHeight * 0.85) : tabHeight
+	// Shared active-tab geometry for the branch currently on screen, used by
+	// the split bottom line (Accent Tab) and by TileGrid alignment.
+	readonly property int _motionDuration: _pillMotionDuration
 	implicitHeight: tabHeight
 
 	// ── Shared context menu ─────────────────────────────────────────────────
@@ -139,15 +148,25 @@ Item {
 	readonly property int _pillMotionDuration: 420
 	readonly property int _pillScrollDuration: 320
 
-	// ── Styling — Tabs (classic) ────────────────────────────────────────────
+	// ── Styling — Accent Tab + Underline ────────────────────────────────────
 	readonly property real _borderWidth: Math.max(1, Math.round(Screen.devicePixelRatio))
-	readonly property color _borderColor: Qt.rgba(1.0, 1.0, 1.0, 0.35)
-	readonly property color _activeTopBorderColor: Kirigami.Theme.highlightColor
-	readonly property color _activeTopBorderGlowColor: Qt.rgba(
-		Kirigami.Theme.highlightColor.r,
-		Kirigami.Theme.highlightColor.g,
-		Kirigami.Theme.highlightColor.b,
-		0.25)
+	// Theme-derived so the rule reads correctly in light and dark themes.
+	readonly property color _borderColor: Qt.rgba(
+		Kirigami.Theme.textColor.r,
+		Kirigami.Theme.textColor.g,
+		Kirigami.Theme.textColor.b,
+		0.18)
+	// Top corner rounding for the Accent Tab highlight; the bottom pair stays
+	// square so the active tab merges into the grid below.
+	readonly property real _tabCornerRadius: Kirigami.Units.smallSpacing * 2.5
+	readonly property real _tabHoverBorderOpacity: 0.30
+	readonly property real _tabHoverGlowOpacity: 0.22
+	readonly property real _tabHoverFillStrength: 0.42
+	readonly property int _tabHoverMotionDuration: 220
+	readonly property int _tabFadeDuration: 140
+	// Underline style
+	readonly property real _underlineThickness: Math.max(2, Math.round(2.5 * Screen.devicePixelRatio))
+	readonly property real _underlineHoverFill: 0.08
 
 	// ═══════════════════════════════════════════════════════════════════════
 	// ── Pills branch: Flickable + list background + animated indicator ─────
@@ -419,7 +438,7 @@ Item {
 	// ═══════════════════════════════════════════════════════════════════════
 	Item {
 		id: tabsBranch
-		visible: !tabBar._pillsMode
+		visible: tabBar._tabsMode
 		anchors.fill: parent
 
 		property alias tabRepeater: tabsRepeater
@@ -433,18 +452,13 @@ Item {
 			var right = left + item.width
 			return right > 0 && left < tabsFlickable.width
 		}
-		readonly property real _activeTabLeft: {
-			void(tabsRepeater.count)
-			var item = tabsRepeater.itemAt(tabBar.activeTab)
-			if (!item) return 0
-			return tabsFlickable.x + item.x - tabsFlickable.contentX
-		}
-		readonly property real _activeTabRight: {
-			void(tabsRepeater.count)
-			var item = tabsRepeater.itemAt(tabBar.activeTab)
-			if (!item) return 0
-			return tabsFlickable.x + item.x + item.width - tabsFlickable.contentX
-		}
+		// Follow the highlight's animated geometry rather than the delegate's
+		// instant x/width, so the gap in the bottom line travels with the
+		// highlight instead of teleporting ahead of it.
+		readonly property real _activeTabLeft:
+			tabsFlickable.x + tabsActiveIndicator.x - tabsFlickable.contentX
+		readonly property real _activeTabRight:
+			tabsFlickable.x + tabsActiveIndicator.x + tabsActiveIndicator.width - tabsFlickable.contentX
 
 		Flickable {
 			id: tabsFlickable
@@ -500,10 +514,105 @@ Item {
 				}
 			}
 
+			// Hover highlight — slides between tabs, weaker than the active one.
+			PillHighlight {
+				id: tabsHoverIndicator
+				z: 0
+				styleSource: tabBar
+				active: false
+				visible: tabsRow.hoverIndex >= 0
+					&& tabsRow.hoverIndex !== tabBar.activeTab
+					&& tabBar._dragSourceIndex < 0
+				readonly property var _hoverItem: {
+					void(tabsRepeater.count)
+					return tabsRow.hoverIndex >= 0 ? tabsRepeater.itemAt(tabsRow.hoverIndex) : null
+				}
+				x: _hoverItem ? _hoverItem.x : 0
+				width: _hoverItem ? _hoverItem.width : 0
+				anchors.top: tabsRow.top
+				anchors.bottom: tabsRow.bottom
+				radiusTopLeft: tabBar._tabCornerRadius
+				radiusTopRight: tabBar._tabCornerRadius
+				radiusBottomLeft: 0
+				radiusBottomRight: 0
+				borderOpacity: tabBar._tabHoverBorderOpacity
+				glowOpacity: tabBar._tabHoverGlowOpacity
+				fillStrength: tabBar._tabHoverFillStrength
+				// Do not slide in from wherever the pointer last was: only
+				// animate while moving between adjacent hovered tabs.
+				Behavior on x {
+					enabled: tabsHoverIndicator.visible
+					NumberAnimation {
+						duration: tabBar._tabHoverMotionDuration
+						easing.type: Easing.OutCubic
+					}
+				}
+				Behavior on width {
+					enabled: tabsHoverIndicator.visible
+					NumberAnimation {
+						duration: tabBar._tabHoverMotionDuration
+						easing.type: Easing.OutCubic
+					}
+				}
+			}
+
+			// Single active highlight that slides between tabs, mirroring the
+			// motion the pills style already uses.
+			PillHighlight {
+				id: tabsActiveIndicator
+				z: 1
+				styleSource: tabBar
+				visible: tabsRepeater.count > 0 && _settled
+				readonly property var _activeItem: {
+					void(tabsRepeater.count)
+					return tabsRepeater.itemAt(tabBar.activeTab)
+				}
+				// Only animate deliberate selection changes. Delegates resolve
+				// and lay out after creation, so animating those early width/x
+				// changes makes the highlight crawl toward a moving target —
+				// which reads as jitter, and on first load leaves it visibly
+				// mis-sized. `_settled` snaps the first valid geometry into
+				// place, then hands over to the Behaviors.
+				property bool _settled: false
+				x: _activeItem ? _activeItem.x : 0
+				width: _activeItem ? _activeItem.width : 0
+				onWidthChanged: _markSettled()
+				onXChanged: _markSettled()
+				function _markSettled() {
+					if (!_settled && _activeItem && width > 0) {
+						_settled = true
+					}
+				}
+				anchors.top: tabsRow.top
+				anchors.bottom: tabsRow.bottom
+				radiusTopLeft: tabBar._tabCornerRadius
+				radiusTopRight: tabBar._tabCornerRadius
+				radiusBottomLeft: 0
+				radiusBottomRight: 0
+				Behavior on x {
+					enabled: tabsActiveIndicator._settled
+					NumberAnimation {
+						duration: tabBar._pillMotionDuration
+						easing.type: Easing.OutCubic
+					}
+				}
+				Behavior on width {
+					enabled: tabsActiveIndicator._settled
+					NumberAnimation {
+						duration: tabBar._pillMotionDuration
+						easing.type: Easing.OutCubic
+					}
+				}
+			}
+
 			Row {
 				id: tabsRow
 				height: tabsFlickable.height
 				spacing: 0
+				z: 2
+
+				// Index of the hovered tab, or -1. Drives the hover highlight.
+				property int hoverIndex: -1
 
 				Repeater {
 					id: tabsRepeater
@@ -535,13 +644,16 @@ Item {
 				height: tabBar.tabHeight
 				enabled: tabsFlickable.contentX > 0
 
-				QQC2.Label {
+				Kirigami.Icon {
 					anchors.centerIn: parent
-					text: "‹"
-					font.pixelSize: Kirigami.Units.gridUnit * 1.2
+					source: "go-previous-symbolic"
+					isMask: true
+					width: Kirigami.Units.iconSizes.small
+					height: width
 					color: Kirigami.Theme.textColor
 					opacity: !tabsScrollLeft.enabled ? 0.25
-						: tabsScrollLeftMA.containsMouse ? 0.9 : 0.55
+						: tabsScrollLeftMA.containsMouse ? 0.95 : 0.6
+					Behavior on opacity { NumberAnimation { duration: tabBar._tabFadeDuration } }
 				}
 
 				MouseArea {
@@ -565,13 +677,16 @@ Item {
 				height: tabBar.tabHeight
 				enabled: tabsFlickable.contentX < tabsTrailing._maxContentX
 
-				QQC2.Label {
+				Kirigami.Icon {
 					anchors.centerIn: parent
-					text: "›"
-					font.pixelSize: Kirigami.Units.gridUnit * 1.2
+					source: "go-next-symbolic"
+					isMask: true
+					width: Kirigami.Units.iconSizes.small
+					height: width
 					color: Kirigami.Theme.textColor
 					opacity: !tabsScrollRight.enabled ? 0.25
-						: tabsScrollRightMA.containsMouse ? 0.9 : 0.55
+						: tabsScrollRightMA.containsMouse ? 0.95 : 0.6
+					Behavior on opacity { NumberAnimation { duration: tabBar._tabFadeDuration } }
 				}
 
 				MouseArea {
@@ -598,13 +713,28 @@ Item {
 				QQC2.ToolTip.visible: tabsAddMA.containsMouse
 				QQC2.ToolTip.text: i18n("Add Tab")
 
+				Rectangle {
+					anchors.centerIn: parent
+					width: Kirigami.Units.gridUnit * 1.8
+					height: width
+					radius: height / 2
+					color: Qt.rgba(
+						Kirigami.Theme.textColor.r,
+						Kirigami.Theme.textColor.g,
+						Kirigami.Theme.textColor.b,
+						tabsAddMA.containsMouse ? 0.10 : 0.0)
+					Behavior on color { ColorAnimation { duration: tabBar._tabFadeDuration } }
+				}
+
 				Kirigami.Icon {
 					anchors.centerIn: parent
 					source: "tab-new-symbolic"
+					isMask: true
 					width: Kirigami.Units.iconSizes.smallMedium
 					height: width
 					color: Kirigami.Theme.textColor
-					opacity: tabsAddMA.containsMouse ? 0.9 : 0.55
+					opacity: tabsAddMA.containsMouse ? 0.95 : 0.55
+					Behavior on opacity { NumberAnimation { duration: tabBar._tabFadeDuration } }
 				}
 
 				MouseArea {
@@ -648,6 +778,286 @@ Item {
 	}
 
 	// ═══════════════════════════════════════════════════════════════════════
+	// ── Underline branch: flat row with a sliding accent underline ─────────
+	// ═══════════════════════════════════════════════════════════════════════
+	Item {
+		id: underlineBranch
+		visible: tabBar._underlineMode
+		anchors.fill: parent
+
+		property alias tabRepeater: underlineRepeater
+
+		Flickable {
+			id: underlineFlickable
+			anchors.left: parent.left
+			anchors.right: underlineTrailing.left
+			anchors.bottom: parent.bottom
+			height: parent.height
+			contentWidth: underlineRow.width + Kirigami.Units.smallSpacing * 2
+			contentHeight: height
+			clip: true
+			boundsBehavior: Flickable.StopAtBounds
+			flickableDirection: Flickable.HorizontalFlick
+			interactive: underlineTrailing._overflow
+
+			function ensureIndexVisible(idx) {
+				if (idx < 0 || idx >= underlineRepeater.count) return
+				var item = underlineRepeater.itemAt(idx)
+				if (!item) return
+				var left = underlineRow.x + item.x
+				var right = left + item.width
+				if (left < contentX) {
+					contentX = Math.max(0, left)
+				} else if (right > contentX + width) {
+					contentX = Math.min(Math.max(0, contentWidth - width), right - width)
+				}
+			}
+
+			onWidthChanged: {
+				var maxX = Math.max(0, contentWidth - width)
+				if (contentX > maxX) contentX = maxX
+			}
+
+			Connections {
+				target: tabBar
+				function onActiveTabChanged() {
+					if (tabBar._underlineMode) underlineFlickable.ensureIndexVisible(tabBar.activeTab)
+				}
+			}
+
+			MouseArea {
+				anchors.fill: parent
+				acceptedButtons: Qt.NoButton
+				onWheel: function(wheel) {
+					if (!underlineFlickable.interactive) { wheel.accepted = false; return }
+					var step = Kirigami.Units.gridUnit * 2
+					var dy = wheel.angleDelta.y
+					var dx = wheel.angleDelta.x
+					var delta = (Math.abs(dx) > Math.abs(dy)) ? dx : dy
+					var maxX = Math.max(0, underlineFlickable.contentWidth - underlineFlickable.width)
+					var raw = underlineFlickable.contentX - delta / 120 * step
+					underlineFlickable.contentX = Math.max(0, Math.min(maxX, raw))
+					wheel.accepted = true
+				}
+			}
+
+			Row {
+				id: underlineRow
+				x: Kirigami.Units.smallSpacing
+				height: underlineFlickable.height
+				spacing: Kirigami.Units.largeSpacing
+
+				Repeater {
+					id: underlineRepeater
+					model: tabBar.tabs
+					delegate: TabDelegate {
+						pillsMode: false
+						underlineMode: true
+						rowRef: underlineRow
+					}
+				}
+			}
+
+			// Sliding accent underline beneath the active tab.
+			Item {
+				id: activeUnderline
+				readonly property var _activeItem: {
+					void(underlineRepeater.count)
+					return underlineRepeater.itemAt(tabBar.activeTab)
+				}
+				visible: !!_activeItem && tabBar._dragSourceIndex < 0 && _settled
+				// See tabsActiveIndicator: snap the first valid geometry, then animate.
+				property bool _settled: false
+				x: (_activeItem ? underlineRow.x + _activeItem.x : 0) + Kirigami.Units.smallSpacing
+				width: Math.max(0, (_activeItem ? _activeItem.width : 0) - Kirigami.Units.smallSpacing * 2)
+				onWidthChanged: _markSettled()
+				onXChanged: _markSettled()
+				function _markSettled() {
+					if (!_settled && _activeItem && width > 0) {
+						_settled = true
+					}
+				}
+				anchors.bottom: parent.bottom
+				anchors.bottomMargin: tabBar._borderWidth
+				height: tabBar._underlineThickness
+
+				Behavior on x {
+					enabled: activeUnderline._settled
+					NumberAnimation {
+						duration: tabBar._pillMotionDuration
+						easing.type: Easing.OutCubic
+					}
+				}
+				Behavior on width {
+					enabled: activeUnderline._settled
+					NumberAnimation {
+						duration: tabBar._pillMotionDuration
+						easing.type: Easing.OutCubic
+					}
+				}
+
+				Rectangle {
+					anchors.fill: parent
+					radius: height / 2
+					color: Kirigami.Theme.highlightColor
+				}
+
+				// Soft bloom rising from the bar.
+				Rectangle {
+					anchors.horizontalCenter: parent.horizontalCenter
+					anchors.bottom: parent.bottom
+					width: parent.width
+					height: parent.height * 3
+					radius: height / 2
+					opacity: 0.35
+					gradient: Gradient {
+						GradientStop { position: 0.0; color: "transparent" }
+						GradientStop {
+							position: 1.0
+							color: Qt.rgba(
+								Kirigami.Theme.highlightColor.r,
+								Kirigami.Theme.highlightColor.g,
+								Kirigami.Theme.highlightColor.b,
+								0.5)
+						}
+					}
+				}
+			}
+		}
+
+		// ── Trailing controls: scroll chevrons + add tab ──
+		Row {
+			id: underlineTrailing
+			anchors.right: parent.right
+			anchors.bottom: parent.bottom
+			height: tabBar.tabHeight
+			spacing: 0
+
+			readonly property real _availableWidth: tabBar.width - underlineAddBtn.width
+			readonly property bool _overflow: underlineRow.width > _availableWidth
+			readonly property real _maxContentX: Math.max(0, underlineFlickable.contentWidth - underlineFlickable.width)
+
+			Item {
+				id: underlineScrollLeft
+				visible: underlineTrailing._overflow
+				width: visible ? tabBar.tabHeight : 0
+				height: tabBar.tabHeight
+				enabled: underlineFlickable.contentX > 0
+
+				Kirigami.Icon {
+					anchors.centerIn: parent
+					source: "go-previous-symbolic"
+					isMask: true
+					width: Kirigami.Units.iconSizes.small
+					height: width
+					color: Kirigami.Theme.textColor
+					opacity: !underlineScrollLeft.enabled ? 0.25
+						: underlineScrollLeftMA.containsMouse ? 0.95 : 0.6
+					Behavior on opacity { NumberAnimation { duration: tabBar._tabFadeDuration } }
+				}
+
+				MouseArea {
+					id: underlineScrollLeftMA
+					anchors.fill: parent
+					hoverEnabled: true
+					cursorShape: Qt.PointingHandCursor
+					enabled: underlineScrollLeft.enabled
+					onClicked: {
+						var step = underlineFlickable.width * 0.8
+						var maxX = underlineTrailing._maxContentX
+						underlineFlickable.contentX = Math.max(0, Math.min(maxX, underlineFlickable.contentX - step))
+					}
+				}
+			}
+
+			Item {
+				id: underlineScrollRight
+				visible: underlineTrailing._overflow
+				width: visible ? tabBar.tabHeight : 0
+				height: tabBar.tabHeight
+				enabled: underlineFlickable.contentX < underlineTrailing._maxContentX
+
+				Kirigami.Icon {
+					anchors.centerIn: parent
+					source: "go-next-symbolic"
+					isMask: true
+					width: Kirigami.Units.iconSizes.small
+					height: width
+					color: Kirigami.Theme.textColor
+					opacity: !underlineScrollRight.enabled ? 0.25
+						: underlineScrollRightMA.containsMouse ? 0.95 : 0.6
+					Behavior on opacity { NumberAnimation { duration: tabBar._tabFadeDuration } }
+				}
+
+				MouseArea {
+					id: underlineScrollRightMA
+					anchors.fill: parent
+					hoverEnabled: true
+					cursorShape: Qt.PointingHandCursor
+					enabled: underlineScrollRight.enabled
+					onClicked: {
+						var step = underlineFlickable.width * 0.8
+						var maxX = underlineTrailing._maxContentX
+						underlineFlickable.contentX = Math.max(0, Math.min(maxX, underlineFlickable.contentX + step))
+					}
+				}
+			}
+
+			Item {
+				id: underlineAddBtn
+				width: tabBar.tabHeight
+				height: tabBar.tabHeight
+
+				Accessible.name: i18n("Add Tab")
+				Accessible.role: Accessible.Button
+				QQC2.ToolTip.visible: underlineAddMA.containsMouse
+				QQC2.ToolTip.text: i18n("Add Tab")
+
+				Rectangle {
+					anchors.centerIn: parent
+					width: Kirigami.Units.gridUnit * 1.8
+					height: width
+					radius: height / 2
+					color: Qt.rgba(
+						Kirigami.Theme.textColor.r,
+						Kirigami.Theme.textColor.g,
+						Kirigami.Theme.textColor.b,
+						underlineAddMA.containsMouse ? 0.10 : 0.0)
+					Behavior on color { ColorAnimation { duration: tabBar._tabFadeDuration } }
+				}
+
+				Kirigami.Icon {
+					anchors.centerIn: parent
+					source: "tab-new-symbolic"
+					isMask: true
+					width: Kirigami.Units.iconSizes.smallMedium
+					height: width
+					color: Kirigami.Theme.textColor
+					opacity: underlineAddMA.containsMouse ? 0.95 : 0.55
+					Behavior on opacity { NumberAnimation { duration: tabBar._tabFadeDuration } }
+				}
+
+				MouseArea {
+					id: underlineAddMA
+					anchors.fill: parent
+					hoverEnabled: true
+					cursorShape: Qt.PointingHandCursor
+					onClicked: tabBar.tabAdded()
+				}
+			}
+		}
+
+		// Full-width rule — nothing merges into the grid in this style.
+		Rectangle {
+			anchors.left: parent.left
+			anchors.right: parent.right
+			anchors.bottom: parent.bottom
+			height: tabBar._borderWidth
+			color: tabBar._borderColor
+		}
+	}
+
+	// ═══════════════════════════════════════════════════════════════════════
 	// ── Shared tab delegate component ──────────────────────────────────────
 	// ═══════════════════════════════════════════════════════════════════════
 	component TabDelegate: Item {
@@ -656,6 +1066,8 @@ Item {
 		required property int index
 		required property var modelData
 		property bool pillsMode: false
+		// Underline style: no tab body, content-hugging width, sliding underline.
+		property bool underlineMode: false
 		property Item rowRef: null
 
 		readonly property bool isActive: tabBar.activeTab === index
@@ -664,27 +1076,51 @@ Item {
 		readonly property bool hasIcon: tabIcon !== ""
 		readonly property bool isHovered: hoverArea.containsMouse
 		readonly property string tabIcon: (modelData && modelData.icon) || ""
-		readonly property real _labelShadowOffset: Math.max(1, Math.round(Screen.devicePixelRatio))
-		readonly property color _labelOutlineDarkColor: Qt.rgba(0, 0, 0, 0.45)
-		readonly property color _labelOutlineLightColor: Qt.rgba(1, 1, 1, 0.45)
-		readonly property color _labelShadowColor: Qt.rgba(0, 0, 0, 0.2)
+		// Only symbolic (single-colour) icons may be recoloured to follow the
+		// tab foreground. Masking a full-colour icon throws away its colours
+		// and repaints its alpha coverage flat, turning it into a solid block.
+		readonly property bool _tabIconIsSymbolic: tabIcon.endsWith("-symbolic")
 		readonly property font _labelFont: Qt.font({
 			family: Kirigami.Theme.defaultFont.family,
-			pointSize: tabDelegate.pillsMode
-				? Kirigami.Theme.defaultFont.pointSize
-				: Math.round(Kirigami.Theme.defaultFont.pointSize * 1.05),
+			pointSize: Kirigami.Theme.defaultFont.pointSize,
 			weight: tabDelegate.isActive ? Font.DemiBold : Font.Normal,
 			italic: Kirigami.Theme.defaultFont.italic
 		})
+		// Widths are measured at the heaviest weight the label can take, so
+		// selecting a tab does not reflow the row while the highlight slides
+		// over it. Measuring with _labelFont instead makes every tab resize the
+		// moment its weight flips, which reads as jitter.
+		readonly property font _metricsFont: Qt.font({
+			family: Kirigami.Theme.defaultFont.family,
+			pointSize: Kirigami.Theme.defaultFont.pointSize,
+			weight: Font.DemiBold,
+			italic: Kirigami.Theme.defaultFont.italic
+		})
 
-		width: pillsMode
-			? Math.max(Kirigami.Units.gridUnit * 5, tabLabelMetrics.advanceWidth + (hasIcon ? tabIconItem.width + Kirigami.Units.smallSpacing : 0) + Kirigami.Units.gridUnit * 2)
-			: Math.max(Kirigami.Units.gridUnit * 6, tabLabelMetrics.advanceWidth + (hasIcon ? tabIconItem.width + Kirigami.Units.smallSpacing : 0) + Kirigami.Units.gridUnit * 3)
+		readonly property real _iconAllowance: hasIcon
+			? tabIconItem.width + Kirigami.Units.smallSpacing
+			: 0
+
+		width: {
+			if (pillsMode) {
+				return Math.max(Kirigami.Units.gridUnit * 5,
+					tabLabelMetrics.advanceWidth + _iconAllowance + Kirigami.Units.gridUnit * 2)
+			}
+			if (underlineMode) {
+				// Hugs its content — no slab minimum.
+				return tabLabelMetrics.advanceWidth + _iconAllowance + Kirigami.Units.gridUnit * 1.2
+			}
+			// Accent Tab: tighter than the old gridUnit*6 / *3 slab, and capped
+			// so one long name cannot eat the whole bar.
+			return Math.min(Kirigami.Units.gridUnit * 11,
+				Math.max(Kirigami.Units.gridUnit * 5,
+					tabLabelMetrics.advanceWidth + _iconAllowance + Kirigami.Units.gridUnit * 2.2))
+		}
 		height: rowRef ? rowRef.height : 0
 
 		TextMetrics {
 			id: tabLabelMetrics
-			font: tabDelegate._labelFont
+			font: tabDelegate._metricsFont
 			text: (tabDelegate.modelData && tabDelegate.modelData.name) || ""
 		}
 
@@ -704,69 +1140,22 @@ Item {
 			tabDelegate.isEditing = false
 		}
 
-		// ── Curved tab shape (tabs style only) ──
-		Canvas {
-			id: tabShape
-			visible: !tabDelegate.pillsMode && tabDelegate.isActive
+		// The Accent Tab body is drawn once by the sliding PillHighlight in the
+		// tabs branch, so the delegate itself paints no shape.
+
+		// ── Hover chrome (underline style only) ──
+		Rectangle {
+			visible: tabDelegate.underlineMode && !tabDelegate.isActive
 			anchors.fill: parent
-
-			readonly property real r: Kirigami.Units.smallSpacing * 2
-			readonly property real bw: tabBar._borderWidth
-			readonly property color bc: tabBar._borderColor
-			readonly property color topBorderColor: tabBar._activeTopBorderColor
-			readonly property color topBorderGlowColor: tabBar._activeTopBorderGlowColor
-
-			onPaint: {
-				var ctx = getContext("2d")
-				ctx.clearRect(0, 0, width, height)
-				var w = width, h = height
-
-				ctx.beginPath()
-				ctx.moveTo(0, h)
-				ctx.lineTo(0, r)
-				ctx.arcTo(0, 0, r, 0, r)
-				ctx.lineTo(w - r, 0)
-				ctx.arcTo(w, 0, w, r, r)
-				ctx.lineTo(w, h)
-				ctx.closePath()
-
-				var grad = ctx.createLinearGradient(0, 0, 0, h)
-				grad.addColorStop(0.0, Qt.rgba(1.0, 1.0, 1.0, 0.08))
-				grad.addColorStop(1.0, "transparent")
-				ctx.fillStyle = grad
-				ctx.fill()
-
-				ctx.beginPath()
-				ctx.moveTo(0, h)
-				ctx.lineTo(0, r)
-				ctx.arcTo(0, 0, r, 0, r)
-				ctx.lineTo(w - r, 0)
-				ctx.arcTo(w, 0, w, r, r)
-				ctx.lineTo(w, h)
-				ctx.lineWidth = bw
-				ctx.strokeStyle = bc
-				ctx.stroke()
-
-				ctx.beginPath()
-				ctx.moveTo(r, bw * 0.5)
-				ctx.lineTo(w - r, bw * 0.5)
-				ctx.lineWidth = bw
-				ctx.strokeStyle = topBorderColor
-				ctx.stroke()
-
-				ctx.beginPath()
-				ctx.moveTo(r, bw * 1.5)
-				ctx.lineTo(w - r, bw * 1.5)
-				ctx.lineWidth = bw
-				ctx.strokeStyle = topBorderGlowColor
-				ctx.stroke()
-			}
-
-			onWidthChanged: requestPaint()
-			onHeightChanged: requestPaint()
-			onBcChanged: requestPaint()
-			onTopBorderColorChanged: requestPaint()
-			onTopBorderGlowColorChanged: requestPaint()
+			anchors.topMargin: Math.round(Kirigami.Units.smallSpacing * 0.5)
+			anchors.bottomMargin: Math.round(Kirigami.Units.smallSpacing * 1.5)
+			radius: config.tileCornerRadius
+			color: Qt.rgba(
+				Kirigami.Theme.textColor.r,
+				Kirigami.Theme.textColor.g,
+				Kirigami.Theme.textColor.b,
+				tabDelegate.isHovered ? tabBar._underlineHoverFill : 0.0)
+			Behavior on color { ColorAnimation { duration: tabBar._tabFadeDuration } }
 		}
 
 		// ── Icon + Label ─────────────────────────────────────────
@@ -779,91 +1168,72 @@ Item {
 		Row {
 			id: tabLabelRow
 			anchors.centerIn: parent
-			spacing: tabDelegate.pillsMode ? Kirigami.Units.smallSpacing : Kirigami.Units.largeSpacing
+			// Underline sits below the label, so nudge content up to keep the
+			// text optically centred in the tab.
+			anchors.verticalCenterOffset: tabDelegate.underlineMode
+				? -Math.round(Kirigami.Units.smallSpacing * 0.5)
+				: 0
+			spacing: Kirigami.Units.smallSpacing
 			visible: !tabDelegate.isEditing
-			opacity: tabDelegate.pillsMode
-				? ((tabBar._dragSourceIndex === tabDelegate.index) ? 0.3 : 1.0)
-				: ((tabBar._dragSourceIndex === tabDelegate.index) ? 0.3
-					: tabDelegate.isActive ? 1.0
-					: hoverArea.containsMouse ? 0.85 : 0.55)
+			width: Math.min(
+				tabDelegate.width - Kirigami.Units.gridUnit,
+				tabDelegate._iconAllowance + tabLabelText.implicitWidth)
+			opacity: (tabBar._dragSourceIndex === tabDelegate.index) ? 0.3 : 1.0
 			Behavior on opacity { NumberAnimation { duration: 100 } }
 
 			Kirigami.Icon {
 				id: tabIconItem
 				visible: tabDelegate.hasIcon
 				source: tabDelegate.tabIcon
+				isMask: tabDelegate._tabIconIsSymbolic
 				width: visible ? tabDelegate._labelFont.pixelSize : 0
 				height: width
 				anchors.verticalCenter: parent.verticalCenter
-				color: tabDelegate._fgColor
+				color: tabDelegate.underlineMode && tabDelegate.isActive
+					? Kirigami.Theme.highlightColor
+					: tabDelegate._fgColor
+				opacity: tabDelegate.pillsMode
+					? 1.0
+					: (tabDelegate.isActive ? 1.0 : (tabDelegate.isHovered ? 0.9 : 0.62))
+				Behavior on opacity { NumberAnimation { duration: tabBar._tabFadeDuration } }
+				Behavior on color { ColorAnimation { duration: tabBar._tabFadeDuration } }
 			}
 
-			Item {
-				width: tabLabelMetrics.advanceWidth + (tabDelegate.pillsMode ? 0 : tabDelegate._labelShadowOffset)
-				height: Math.max(tabLabelText.implicitHeight, tabLabelShadow.implicitHeight + tabDelegate._labelShadowOffset)
-
-				QQC2.Label {
-					id: tabLabelOutlineDark
-					visible: !tabDelegate.pillsMode
-					anchors.fill: parent
-					horizontalAlignment: Text.AlignHCenter
-					verticalAlignment: Text.AlignVCenter
-					font: tabDelegate._labelFont
-					text: (tabDelegate.modelData && tabDelegate.modelData.name) || ""
-					color: "transparent"
-					renderType: Text.QtRendering
-					style: Text.Outline
-					styleColor: tabDelegate._labelOutlineDarkColor
-					elide: Text.ElideRight
-				}
-
-				QQC2.Label {
-					id: tabLabelOutlineLight
-					visible: !tabDelegate.pillsMode
-					anchors.fill: parent
-					horizontalAlignment: Text.AlignHCenter
-					verticalAlignment: Text.AlignVCenter
-					font: tabDelegate._labelFont
-					text: (tabDelegate.modelData && tabDelegate.modelData.name) || ""
-					color: "transparent"
-					renderType: Text.QtRendering
-					style: Text.Outline
-					styleColor: tabDelegate._labelOutlineLightColor
-					elide: Text.ElideRight
-				}
-
-				QQC2.Label {
-					id: tabLabelShadow
-					visible: !tabDelegate.pillsMode
-					anchors.fill: parent
-					anchors.leftMargin: tabDelegate._labelShadowOffset
-					anchors.topMargin: tabDelegate._labelShadowOffset
-					horizontalAlignment: Text.AlignHCenter
-					verticalAlignment: Text.AlignVCenter
-					font: tabDelegate._labelFont
-					text: (tabDelegate.modelData && tabDelegate.modelData.name) || ""
-					color: tabDelegate._labelShadowColor
-					opacity: 1
-					renderType: Text.QtRendering
-					elide: Text.ElideRight
-				}
-
-				QQC2.Label {
-					id: tabLabelText
-					anchors.fill: parent
-					horizontalAlignment: Text.AlignHCenter
-					verticalAlignment: Text.AlignVCenter
-					font: tabDelegate._labelFont
-					text: (tabDelegate.modelData && tabDelegate.modelData.name) || ""
-					color: tabDelegate._fgColor
-					renderType: Text.QtRendering
-					Behavior on color { ColorAnimation { duration: 120 } }
-					elide: Text.ElideRight
-				}
+			// One label. The old stack of four (two outlines plus a shadow under
+			// the real text) cancelled into a muddy halo and cost 4x the nodes;
+			// the highlight behind the tab supplies the contrast instead.
+			QQC2.Label {
+				id: tabLabelText
+				anchors.verticalCenter: parent.verticalCenter
+				width: Math.min(implicitWidth,
+					Math.max(0, parent.width - tabDelegate._iconAllowance))
+				horizontalAlignment: Text.AlignHCenter
+				verticalAlignment: Text.AlignVCenter
+				font: tabDelegate._labelFont
+				text: (tabDelegate.modelData && tabDelegate.modelData.name) || ""
+				color: tabDelegate._fgColor
+				renderType: Text.QtRendering
+				elide: Text.ElideRight
+				opacity: tabDelegate.pillsMode
+					? 1.0
+					: (tabDelegate.isActive ? 1.0 : (tabDelegate.isHovered ? 0.9 : 0.62))
+				Behavior on color { ColorAnimation { duration: 120 } }
+				Behavior on opacity { NumberAnimation { duration: tabBar._tabFadeDuration } }
 			}
 		}
 
 		// ── Edit input ───────────────────────────────────────────
+		// Background so the field reads as editable against the tab behind it.
+		Rectangle {
+			visible: tabDelegate.isEditing
+			anchors.fill: parent
+			anchors.margins: Math.round(Kirigami.Units.smallSpacing * 0.5)
+			radius: config.tileCornerRadius
+			color: Kirigami.Theme.backgroundColor
+			border.width: tabBar._borderWidth
+			border.color: Kirigami.Theme.highlightColor
+		}
+
 		TextInput {
 			id: tabInput
 			anchors.fill: parent
@@ -871,8 +1241,10 @@ Item {
 			anchors.rightMargin: Kirigami.Units.largeSpacing
 			horizontalAlignment: TextInput.AlignHCenter
 			verticalAlignment: TextInput.AlignVCenter
-			font.pointSize: Math.round(Kirigami.Theme.defaultFont.pointSize * 1.05)
+			font: tabDelegate._labelFont
 			color: Kirigami.Theme.textColor
+			selectionColor: Kirigami.Theme.highlightColor
+			selectedTextColor: Kirigami.Theme.highlightedTextColor
 			visible: tabDelegate.isEditing
 			clip: true
 
@@ -896,6 +1268,18 @@ Item {
 
 			property point _pressPos
 			property bool _didDrag: false
+
+			// Feed the Accent Tab sliding hover highlight.
+			onEntered: {
+				if (tabDelegate.rowRef && tabDelegate.rowRef.hoverIndex !== undefined) {
+					tabDelegate.rowRef.hoverIndex = tabDelegate.index
+				}
+			}
+			onExited: {
+				if (tabDelegate.rowRef && tabDelegate.rowRef.hoverIndex === tabDelegate.index) {
+					tabDelegate.rowRef.hoverIndex = -1
+				}
+			}
 
 			onPressed: function(mouse) {
 				_didDrag = false

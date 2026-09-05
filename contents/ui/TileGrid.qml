@@ -61,7 +61,17 @@ DropArea {
 		return 0
 	}
 	readonly property int _holoPad: holographicPaddingFor(maxHoverWidth, maxHoverHeight)
+	// _holoPad scales with the largest tile in the CURRENT tab, so it changes
+	// whenever the tab switches. Chrome aligned to the grid (the tab bar) must
+	// not inherit that, or the whole bar jumps sideways on every tab change.
+	// This variant reserves the same allowance for a single cell, which is
+	// constant across tabs.
+	readonly property int _stableHoloPad: holographicPaddingFor(1, 1)
 	readonly property real contentLeftInset: _holoPad + groupPanelInsetX
+	// Content-independent counterpart of contentLeftInset/contentRightInset,
+	// for chrome that sits above the grid and must stay put between tabs.
+	readonly property real chromeLeftInset: _stableHoloPad + groupPanelInsetX
+	readonly property real chromeRightInset: _stableHoloPad + groupPanelInsetX
 	readonly property real contentRightInset: Math.max(
 		groupPanelInsetX,
 		width - (_holoPad + columns * cellBoxSize - groupPanelInsetX)

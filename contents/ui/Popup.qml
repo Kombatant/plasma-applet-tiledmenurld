@@ -1276,8 +1276,11 @@ MouseArea {
 						id: rightPaneTopRow
 						Layout.fillWidth: true
 						Layout.topMargin: _alignTopSurfaces ? config.sidebarCardInset : Kirigami.Units.largeSpacing
-						Layout.leftMargin: tileGrid.contentLeftInset
-						Layout.rightMargin: tileGrid.contentRightInset
+						// Deliberately the chrome insets, not contentLeft/RightInset:
+						// those scale with the largest tile in the active tab, so the
+						// whole tab bar would shift sideways on every tab change.
+						Layout.leftMargin: tileGrid.chromeLeftInset
+						Layout.rightMargin: tileGrid.chromeRightInset
 						Layout.bottomMargin: Kirigami.Units.smallSpacing
 						visible: _showTileTabs
 						implicitHeight: _showTileTabs ? tileTabBar.implicitHeight : 0
@@ -1325,14 +1328,29 @@ MouseArea {
 							QQC2.ToolTip.visible: autoResizeTabMA.containsMouse
 							QQC2.ToolTip.text: i18n("Auto Resize")
 
+							// Matches the tab bar's add-tab button hover chrome.
+							Rectangle {
+								anchors.centerIn: parent
+								width: Kirigami.Units.gridUnit * 1.8
+								height: width
+								radius: height / 2
+								color: Qt.rgba(
+									Kirigami.Theme.textColor.r,
+									Kirigami.Theme.textColor.g,
+									Kirigami.Theme.textColor.b,
+									autoResizeTabMA.containsMouse ? 0.10 : 0.0)
+								Behavior on color { ColorAnimation { duration: 140 } }
+							}
+
 							Kirigami.Icon {
 								anchors.centerIn: parent
 								source: "transform-scale"
 								width: Kirigami.Units.iconSizes.smallMedium
 								height: width
 								color: Kirigami.Theme.textColor
-								opacity: autoResizeTabMA.containsMouse ? 0.9 : 0.55
+								opacity: autoResizeTabMA.containsMouse ? 0.95 : 0.55
 								isMask: true
+								Behavior on opacity { NumberAnimation { duration: 140 } }
 							}
 
 							MouseArea {

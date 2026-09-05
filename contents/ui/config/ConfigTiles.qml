@@ -44,7 +44,9 @@ LibConfig.FormKCM {
 	readonly property bool pendingUseTileTabs: !!(formLayout.cfg_useTileTabs !== undefined ? formLayout.cfg_useTileTabs : plasmoid.configuration.useTileTabs)
 	readonly property string pendingTileTabStyle: {
 		var raw = formLayout.cfg_tileTabStyle !== undefined ? formLayout.cfg_tileTabStyle : plasmoid.configuration.tileTabStyle
-		return raw === "pills" ? "pills" : "tabs"
+		if (raw === "pills") return "pills"
+		if (raw === "underline") return "underline"
+		return "tabs"
 	}
 	readonly property string pendingDefaultTileColorMode: {
 		var raw = formLayout.cfg_defaultTileColorMode !== undefined ? ("" + formLayout.cfg_defaultTileColorMode) : ("" + plasmoid.configuration.defaultTileColorMode)
@@ -90,7 +92,8 @@ LibConfig.FormKCM {
 		var enabled = mode !== "disabled"
 		ConfigUtils.setPendingValue(formLayout, "useTileTabs", enabled)
 		if (enabled) {
-			ConfigUtils.setPendingValue(formLayout, "tileTabStyle", mode === "pills" ? "pills" : "tabs")
+			var style = (mode === "pills" || mode === "underline") ? mode : "tabs"
+			ConfigUtils.setPendingValue(formLayout, "tileTabStyle", style)
 		}
 	}
 
@@ -202,7 +205,8 @@ LibConfig.FormKCM {
 		onActivated: formLayout.setPendingTileTabMode(currentItem.value)
 		model: [
 			{ value: "disabled", text: i18n("Disable Tabs") },
-			{ value: "tabs", text: i18n("Tabs") },
+			{ value: "tabs", text: i18n("Accent Tab") },
+			{ value: "underline", text: i18n("Underline") },
 			{ value: "pills", text: i18n("Pills") },
 		]
 	}

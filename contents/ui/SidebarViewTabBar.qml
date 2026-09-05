@@ -24,7 +24,9 @@ Item {
 	readonly property bool _tabsEnabled: !!config.useTileTabs
 	readonly property string _style: (plasmoid.configuration.tileTabStyle || "tabs")
 	readonly property bool _pillsMode: _tabsEnabled && _style === "pills"
-	readonly property bool _tabsMode: _tabsEnabled && _style === "tabs"
+	readonly property bool _underlineMode: _tabsEnabled && _style === "underline"
+	// "tabs" is the stored value for the Accent Tab style.
+	readonly property bool _tabsMode: _tabsEnabled && !_pillsMode && !_underlineMode
 	readonly property bool _flatMode: !_tabsEnabled
 
 	readonly property int tabHeight: Kirigami.Units.gridUnit * 2.5
@@ -82,13 +84,21 @@ Item {
 	readonly property color _hoverTextColor: Qt.rgba(Kirigami.Theme.textColor.r, Kirigami.Theme.textColor.g, Kirigami.Theme.textColor.b, 0.88)
 	readonly property color _idleTextColor: Qt.rgba(Kirigami.Theme.textColor.r, Kirigami.Theme.textColor.g, Kirigami.Theme.textColor.b, 0.72)
 	readonly property real _borderWidth: Math.max(1, Math.round(Screen.devicePixelRatio))
-	readonly property color _borderColor: Qt.rgba(1.0, 1.0, 1.0, 0.35)
-	readonly property color _activeTopBorderColor: Kirigami.Theme.highlightColor
-	readonly property color _activeTopBorderGlowColor: Qt.rgba(
-		Kirigami.Theme.highlightColor.r,
-		Kirigami.Theme.highlightColor.g,
-		Kirigami.Theme.highlightColor.b,
-		0.25)
+	// Theme-derived so the rule reads correctly in light and dark themes.
+	readonly property color _borderColor: Qt.rgba(
+		Kirigami.Theme.textColor.r,
+		Kirigami.Theme.textColor.g,
+		Kirigami.Theme.textColor.b,
+		0.18)
+	// Matches TileTabBar's Accent Tab styling.
+	readonly property real _tabCornerRadius: Kirigami.Units.smallSpacing * 2.5
+	readonly property real _tabHoverBorderOpacity: 0.30
+	readonly property real _tabHoverGlowOpacity: 0.22
+	readonly property real _tabHoverFillStrength: 0.42
+	readonly property int _tabHoverMotionDuration: 220
+	readonly property int _tabFadeDuration: 140
+	readonly property real _underlineThickness: Math.max(2, Math.round(2.5 * Screen.devicePixelRatio))
+	readonly property real _underlineHoverFill: 0.08
 	readonly property int _pillMotionDuration: 420
 
 	// ═════════════════════════════════════════════════════════════════════
@@ -249,19 +259,78 @@ Item {
 		visible: root._tabsMode
 		anchors.fill: parent
 
-		readonly property real _activeTabLeft: {
-			void(tabsRepeater.count)
-			var item = tabsRepeater.itemAt(root._activeIndex)
-			if (!item) return 0
-			return tabsRow.x + item.x
+		// Follow the highlight's animated geometry rather than the delegate's
+		// instant x/width, so the gap in the bottom line travels with the
+		// highlight instead of teleporting ahead of it.
+		readonly property real _activeTabLeft: tabsActiveIndicator.x
+		readonly property real _activeTabRight: tabsActiveIndicator.x + tabsActiveIndicator.width
+		readonly property bool _activeReady: root._activeIndex >= 0
+
+		// Hover highlight — slides between tabs, weaker than the active one.
+		PillHighlight {
+			id: tabsHoverIndicator
+			z: 0
+			styleSource: root
+			active: false
+			visible: tabsRow.hoverIndex >= 0 && tabsRow.hoverIndex !== root._activeIndex
+			readonly property var _hoverItem: tabsRow.hoverItem
+			x: _hoverItem ? tabsRow.x + _hoverItem.x : 0
+			width: _hoverItem ? _hoverItem.width : 0
+			anchors.top: tabsRow.top
+			anchors.bottom: tabsRow.bottom
+			radiusTopLeft: root._tabCornerRadius
+			radiusTopRight: root._tabCornerRadius
+			radiusBottomLeft: 0
+			radiusBottomRight: 0
+			borderOpacity: root._tabHoverBorderOpacity
+			glowOpacity: root._tabHoverGlowOpacity
+			fillStrength: root._tabHoverFillStrength
+			// Do not slide in from wherever the pointer last was.
+			Behavior on x {
+				enabled: tabsHoverIndicator.visible
+				NumberAnimation {
+					duration: root._tabHoverMotionDuration
+					easing.type: Easing.OutCubic
+				}
+			}
+			Behavior on width {
+				enabled: tabsHoverIndicator.visible
+				NumberAnimation {
+					duration: root._tabHoverMotionDuration
+					easing.type: Easing.OutCubic
+				}
+			}
 		}
-		readonly property real _activeTabRight: {
-			void(tabsRepeater.count)
-			var item = tabsRepeater.itemAt(root._activeIndex)
-			if (!item) return 0
-			return tabsRow.x + item.x + item.width
+
+		// Single active highlight that slides between tabs.
+		PillHighlight {
+			id: tabsActiveIndicator
+			z: 1
+			styleSource: root
+			visible: tabsBranch._activeReady
+			// tabsRow.activeItem is assigned by the delegates themselves, so it
+			// updates when they are created. A binding calling itemAt() here
+			// would evaluate once during construction and never re-run.
+			readonly property var _activeItem: tabsRow.activeItem
+			x: _activeItem ? tabsRow.x + _activeItem.x : 0
+			width: _activeItem ? _activeItem.width : 0
+			anchors.top: tabsRow.top
+			anchors.bottom: tabsRow.bottom
+			radiusTopLeft: root._tabCornerRadius
+			radiusTopRight: root._tabCornerRadius
+			radiusBottomLeft: 0
+			radiusBottomRight: 0
+			Behavior on x {
+				enabled: tabsRow.primed
+				NumberAnimation {
+					duration: root._pillMotionDuration
+					easing.type: Easing.OutCubic
+				}
+			}
+			// Width is deliberately not animated: sidebar entries are equal
+			// width, so it only ever changes while delegates are still laying
+			// out — animating it made the highlight crawl open on load.
 		}
-		readonly property bool _activeReady: root._activeIndex >= 0 && tabsRepeater.itemAt(root._activeIndex)
 
 		Row {
 			id: tabsRow
@@ -270,6 +339,54 @@ Item {
 			anchors.bottom: parent.bottom
 			height: root.tabHeight
 			spacing: 0
+			z: 2
+
+			// Index of the hovered tab, or -1. Drives the hover highlight.
+			property int hoverIndex: -1
+
+			// Resolved delegates for the active/hovered entries. Delegates call
+			// refreshItems() as they are created and destroyed; a binding that
+			// called tabsRepeater.itemAt() instead would evaluate once during
+			// construction and never re-run, leaving the highlight hidden.
+			property Item activeItem: null
+			property Item hoverItem: null
+			// False until the active delegate resolves for the first time. The
+			// indicator's Behaviors stay disabled until then, so its initial
+			// geometry snaps into place rather than animating up from zero
+			// (which reads as the highlight crawling out on load).
+			property bool primed: false
+
+			function refreshItems() {
+				var act = null
+				var hov = null
+				for (var i = 0; i < tabsRepeater.count; i++) {
+					var item = tabsRepeater.itemAt(i)
+					if (!item) continue
+					if (item.itemIdx === root._activeIndex) act = item
+					if (i === hoverIndex) hov = item
+				}
+				activeItem = act
+				hoverItem = hov
+				if (!primed && tabsRepeater.count > 0 && width > 0) {
+					// Let the snapped geometry apply, then allow animation.
+					primeTimer.restart()
+				}
+			}
+
+			onWidthChanged: refreshItems()
+
+			Timer {
+				id: primeTimer
+				interval: 0
+				onTriggered: tabsRow.primed = true
+			}
+
+			onHoverIndexChanged: refreshItems()
+
+			Connections {
+				target: root
+				function on_ActiveIndexChanged() { tabsRow.refreshItems() }
+			}
 
 			Repeater {
 				id: tabsRepeater
@@ -280,69 +397,12 @@ Item {
 					readonly property int itemIdx: modelData.idx
 					readonly property bool isActive: root._activeIndex === itemIdx
 					readonly property bool isHovered: tabMA.containsMouse
+					required property int index
 					width: Math.max(0, tabsRow.width / tabsRepeater.count)
 					height: tabsRow.height
 
-					Canvas {
-						id: tabShape
-						visible: tabDelegate.isActive
-						anchors.fill: parent
-
-						readonly property real r: Kirigami.Units.smallSpacing * 2
-						readonly property real bw: root._borderWidth
-						readonly property color bc: root._borderColor
-						readonly property color topBorderColor: root._activeTopBorderColor
-						readonly property color topBorderGlowColor: root._activeTopBorderGlowColor
-
-						onPaint: {
-							var ctx = getContext("2d")
-							ctx.clearRect(0, 0, width, height)
-							var w = width, h = height
-							ctx.beginPath()
-							ctx.moveTo(0, h)
-							ctx.lineTo(0, r)
-							ctx.arcTo(0, 0, r, 0, r)
-							ctx.lineTo(w - r, 0)
-							ctx.arcTo(w, 0, w, r, r)
-							ctx.lineTo(w, h)
-							ctx.closePath()
-							var grad = ctx.createLinearGradient(0, 0, 0, h)
-							grad.addColorStop(0.0, Qt.rgba(1.0, 1.0, 1.0, 0.08))
-							grad.addColorStop(1.0, "transparent")
-							ctx.fillStyle = grad
-							ctx.fill()
-
-							ctx.beginPath()
-							ctx.moveTo(0, h)
-							ctx.lineTo(0, r)
-							ctx.arcTo(0, 0, r, 0, r)
-							ctx.lineTo(w - r, 0)
-							ctx.arcTo(w, 0, w, r, r)
-							ctx.lineTo(w, h)
-							ctx.lineWidth = bw
-							ctx.strokeStyle = bc
-							ctx.stroke()
-
-							ctx.beginPath()
-							ctx.moveTo(r, bw * 0.5)
-							ctx.lineTo(w - r, bw * 0.5)
-							ctx.lineWidth = bw
-							ctx.strokeStyle = topBorderColor
-							ctx.stroke()
-
-							ctx.beginPath()
-							ctx.moveTo(r, bw * 1.5)
-							ctx.lineTo(w - r, bw * 1.5)
-							ctx.lineWidth = bw
-							ctx.strokeStyle = topBorderGlowColor
-							ctx.stroke()
-						}
-						onWidthChanged: requestPaint()
-						onHeightChanged: requestPaint()
-						onBcChanged: requestPaint()
-						onTopBorderColorChanged: requestPaint()
-						onTopBorderGlowColorChanged: requestPaint()
-					}
+					Component.onCompleted: tabsRow.refreshItems()
+					Component.onDestruction: tabsRow.refreshItems()
 
 					Kirigami.Icon {
 						anchors.centerIn: parent
@@ -350,8 +410,8 @@ Item {
 						width: Kirigami.Units.iconSizes.smallMedium
 						height: width
 						color: Kirigami.Theme.textColor
-						opacity: tabDelegate.isActive ? 1.0 : (tabDelegate.isHovered ? 0.85 : 0.55)
-						Behavior on opacity { NumberAnimation { duration: 100 } }
+						opacity: tabDelegate.isActive ? 1.0 : (tabDelegate.isHovered ? 0.9 : 0.62)
+						Behavior on opacity { NumberAnimation { duration: root._tabFadeDuration } }
 						isMask: true
 					}
 
@@ -361,6 +421,8 @@ Item {
 						hoverEnabled: true
 						cursorShape: Qt.PointingHandCursor
 						onClicked: root._trigger(tabDelegate.itemIdx)
+						onEntered: tabsRow.hoverIndex = tabDelegate.index
+						onExited: if (tabsRow.hoverIndex === tabDelegate.index) tabsRow.hoverIndex = -1
 					}
 
 					QQC2.ToolTip.visible: tabMA.containsMouse
@@ -392,6 +454,171 @@ Item {
 			x: tabsBranch._activeTabRight
 			anchors.bottom: parent.bottom
 			width: Math.max(0, parent.width - x)
+			height: root._borderWidth
+			color: root._borderColor
+		}
+	}
+
+	// ═════════════════════════════════════════════════════════════════════
+	// Underline branch
+	// ═════════════════════════════════════════════════════════════════════
+	Item {
+		id: underlineBranch
+		visible: root._underlineMode
+		anchors.fill: parent
+
+		readonly property bool _activeReady: root._activeIndex >= 0
+
+		Row {
+			id: underlineRow
+			anchors.left: parent.left
+			anchors.right: parent.right
+			anchors.bottom: parent.bottom
+			height: root.tabHeight
+			spacing: 0
+
+			// See tabsRow.refreshItems().
+			property Item activeItem: null
+			// See tabsRow.primed.
+			property bool primed: false
+
+			function refreshItems() {
+				var act = null
+				for (var i = 0; i < underlineRepeater.count; i++) {
+					var item = underlineRepeater.itemAt(i)
+					if (item && item.itemIdx === root._activeIndex) act = item
+				}
+				activeItem = act
+				if (!primed && underlineRepeater.count > 0 && width > 0) {
+					underlinePrimeTimer.restart()
+				}
+			}
+
+			onWidthChanged: refreshItems()
+
+			Timer {
+				id: underlinePrimeTimer
+				interval: 0
+				onTriggered: underlineRow.primed = true
+			}
+
+			Connections {
+				target: root
+				function on_ActiveIndexChanged() { underlineRow.refreshItems() }
+			}
+
+			Repeater {
+				id: underlineRepeater
+				model: root._items
+				delegate: Item {
+					id: underlineDelegate
+					required property var modelData
+					required property int index
+					readonly property int itemIdx: modelData.idx
+					readonly property bool isActive: root._activeIndex === itemIdx
+					readonly property bool isHovered: underlineMA.containsMouse
+					width: Math.max(0, underlineRow.width / underlineRepeater.count)
+					height: underlineRow.height
+
+					Component.onCompleted: underlineRow.refreshItems()
+					Component.onDestruction: underlineRow.refreshItems()
+
+					Rectangle {
+						visible: !underlineDelegate.isActive
+						anchors.fill: parent
+						anchors.topMargin: Math.round(Kirigami.Units.smallSpacing * 0.5)
+						anchors.bottomMargin: Math.round(Kirigami.Units.smallSpacing * 1.5)
+						radius: config.tileCornerRadius
+						color: Qt.rgba(
+							Kirigami.Theme.textColor.r,
+							Kirigami.Theme.textColor.g,
+							Kirigami.Theme.textColor.b,
+							underlineDelegate.isHovered ? root._underlineHoverFill : 0.0)
+						Behavior on color { ColorAnimation { duration: root._tabFadeDuration } }
+					}
+
+					Kirigami.Icon {
+						anchors.centerIn: parent
+						anchors.verticalCenterOffset: -Math.round(Kirigami.Units.smallSpacing * 0.5)
+						source: underlineDelegate.modelData.icon
+						width: Kirigami.Units.iconSizes.smallMedium
+						height: width
+						isMask: true
+						color: underlineDelegate.isActive
+							? Kirigami.Theme.highlightColor
+							: Kirigami.Theme.textColor
+						opacity: underlineDelegate.isActive ? 1.0 : (underlineDelegate.isHovered ? 0.9 : 0.62)
+						Behavior on opacity { NumberAnimation { duration: root._tabFadeDuration } }
+						Behavior on color { ColorAnimation { duration: root._tabFadeDuration } }
+					}
+
+					MouseArea {
+						id: underlineMA
+						anchors.fill: parent
+						hoverEnabled: true
+						cursorShape: Qt.PointingHandCursor
+						onClicked: root._trigger(underlineDelegate.itemIdx)
+					}
+
+					QQC2.ToolTip.visible: underlineMA.containsMouse
+					QQC2.ToolTip.text: underlineDelegate.modelData.label
+				}
+			}
+		}
+
+		// Sliding accent underline beneath the active entry.
+		Item {
+			id: activeUnderline
+			readonly property var _activeItem: underlineRow.activeItem
+			visible: underlineBranch._activeReady
+			x: (_activeItem ? underlineRow.x + _activeItem.x : 0) + Kirigami.Units.smallSpacing
+			width: Math.max(0, (_activeItem ? _activeItem.width : 0) - Kirigami.Units.smallSpacing * 2)
+			anchors.bottom: parent.bottom
+			anchors.bottomMargin: root._borderWidth
+			height: root._underlineThickness
+
+			Behavior on x {
+				enabled: underlineRow.primed
+				NumberAnimation {
+					duration: root._pillMotionDuration
+					easing.type: Easing.OutCubic
+				}
+			}
+			// See tabsActiveIndicator: width is intentionally not animated.
+
+			Rectangle {
+				anchors.fill: parent
+				radius: height / 2
+				color: Kirigami.Theme.highlightColor
+			}
+
+			// Soft bloom rising from the bar.
+			Rectangle {
+				anchors.horizontalCenter: parent.horizontalCenter
+				anchors.bottom: parent.bottom
+				width: parent.width
+				height: parent.height * 3
+				radius: height / 2
+				opacity: 0.35
+				gradient: Gradient {
+					GradientStop { position: 0.0; color: "transparent" }
+					GradientStop {
+						position: 1.0
+						color: Qt.rgba(
+							Kirigami.Theme.highlightColor.r,
+							Kirigami.Theme.highlightColor.g,
+							Kirigami.Theme.highlightColor.b,
+							0.5)
+					}
+				}
+			}
+		}
+
+		// Full-width rule — nothing merges into the content in this style.
+		Rectangle {
+			anchors.left: parent.left
+			anchors.right: parent.right
+			anchors.bottom: parent.bottom
 			height: root._borderWidth
 			color: root._borderColor
 		}

@@ -101,7 +101,7 @@
 			<default>false</default>
 		</entry>
 		<entry name="tileTabStyle" type="string">
-			<!-- enum: tabs, pills -->
+			<!-- enum: tabs (Accent Tab), underline, pills -->
 			<label>Visual style for the tile tab bar.</label>
 			<default>tabs</default>
 		</entry>
