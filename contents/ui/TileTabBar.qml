@@ -165,7 +165,7 @@ Item {
 	readonly property int _tabHoverMotionDuration: 220
 	readonly property int _tabFadeDuration: 140
 	// Underline style
-	readonly property real _underlineThickness: Math.max(2, Math.round(2.5 * Screen.devicePixelRatio))
+	readonly property real _underlineThickness: 2
 	readonly property real _underlineHoverFill: 0.08
 
 	// ═══════════════════════════════════════════════════════════════════════
@@ -1145,7 +1145,7 @@ Item {
 
 		// ── Hover chrome (underline style only) ──
 		Rectangle {
-			visible: tabDelegate.underlineMode && !tabDelegate.isActive
+			visible: tabDelegate.underlineMode
 			anchors.fill: parent
 			anchors.topMargin: Math.round(Kirigami.Units.smallSpacing * 0.5)
 			anchors.bottomMargin: Math.round(Kirigami.Units.smallSpacing * 1.5)

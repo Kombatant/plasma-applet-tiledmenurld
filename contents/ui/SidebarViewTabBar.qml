@@ -97,7 +97,7 @@ Item {
 	readonly property real _tabHoverFillStrength: 0.42
 	readonly property int _tabHoverMotionDuration: 220
 	readonly property int _tabFadeDuration: 140
-	readonly property real _underlineThickness: Math.max(2, Math.round(2.5 * Screen.devicePixelRatio))
+	readonly property real _underlineThickness: 2
 	readonly property real _underlineHoverFill: 0.08
 	readonly property int _pillMotionDuration: 420
 
@@ -524,7 +524,6 @@ Item {
 					Component.onDestruction: underlineRow.refreshItems()
 
 					Rectangle {
-						visible: !underlineDelegate.isActive
 						anchors.fill: parent
 						anchors.topMargin: Math.round(Kirigami.Units.smallSpacing * 0.5)
 						anchors.bottomMargin: Math.round(Kirigami.Units.smallSpacing * 1.5)
