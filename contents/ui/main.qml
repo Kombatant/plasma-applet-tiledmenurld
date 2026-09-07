@@ -236,6 +236,12 @@ PlasmoidItem {
 		id: config
 	}
 
+	// Keep launches alive when a context menu or its delegate is destroyed.
+	RootAppLauncher {
+		id: rootAppLauncher
+		showTerminal: plasmoid.configuration.runAsRootInTerminal
+	}
+
 	// Lazy: avoid HTTP fetch to GitHub at plasmoid construction. Loader is activated
 	// after the first popup expand idle tick (see onExpandedChanged).
 	Loader {

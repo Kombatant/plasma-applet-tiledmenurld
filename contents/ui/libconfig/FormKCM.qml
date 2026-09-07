@@ -65,6 +65,8 @@ Item {
 	property var cfg_aiStreamChat
 	property var cfg_aiStreamChatDefault
 	property var cfg_terminalApp
+	property var cfg_runAsRootInTerminal
+	property var cfg_runAsRootInTerminalDefault
 	property var cfg_terminalAppDefault
 	property var cfg_taskManagerApp
 	property var cfg_taskManagerAppDefault

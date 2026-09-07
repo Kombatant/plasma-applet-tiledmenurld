@@ -295,6 +295,10 @@ LibConfig.FormKCM {
 	LibConfig.Heading {
 		text: i18n("Right Click Menu")
 	}
+	LibConfig.CheckBox {
+		configKey: 'runAsRootInTerminal'
+		text: i18n("Show a terminal when running as root")
+	}
 	LibConfig.AutocompleteTextField {
 		configKey: 'terminalApp'
 		Kirigami.FormData.label: i18n("Terminal")

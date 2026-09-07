@@ -73,6 +73,21 @@ Item {
 				return Qt.createQmlObject("import org.kde.plasma.extras as PlasmaExtras; PlasmaExtras.MenuItem {}", contextMenu)
 			}
 
+			function addRunAsRootAction(launcherUrl) {
+				if (!Utils.isApplicationLauncher(launcherUrl)) {
+					return
+				}
+				var menuItem = menu.newMenuItem()
+				menuItem.text = i18n("Run as Root")
+				menuItem.icon = "system-run"
+				menuItem.clicked.connect(function() {
+					rootAppLauncher.launch(launcherUrl)
+					plasmoid.expanded = false
+				})
+				menu.addMenuItem(menuItem)
+				menu.addMenuItem(menu.newSeperator())
+			}
+
 			function addPinToMenuAction(favoriteId, meta) {
 				if (!favoriteId) {
 					return

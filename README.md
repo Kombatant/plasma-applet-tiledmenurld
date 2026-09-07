@@ -87,6 +87,7 @@ Add the applet: right-click your application launcher, choose "Show Alternatives
 
 ## Usage
 - Pin items: right‑click an application or file and select "Pin" or drag it to the tile grid.
+- Run as root: right-click an application in the app list, search results, or tile grid and select "Run as Root" to authenticate with `kdesu`. Requires Python 3 and `kdesu`. To show a terminal, enable "Show a terminal when running as root" under General → Right Click Menu (disabled by default; requires Konsole). Applications that refuse root execution may still decline to start.
 - Edit tiles: use the tile editor to change label, icon, background image, size, and placement.
 - Groups: create a new group from the grid context menu; drag tiles into groups and use the group header to sort.
 - Resize the launcher panes using the resize handle between the app list and tile area, or use the Auto Resize button in the sidebar.

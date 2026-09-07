@@ -10,7 +10,7 @@ Item {
 
 	// Bump when adding new entries to ensureAllSettingsInitialized() so existing
 	// installs run the migration once, then skip on subsequent starts.
-	readonly property int currentSchemaVersion: 2
+	readonly property int currentSchemaVersion: 3
 
 	function _ensureSettingInitialized(key, defaultValue) {
 		var cur = plasmoid.configuration[key]
@@ -73,6 +73,7 @@ Item {
 		_ensureSettingInitialized('aiStreamChat', false)
 
 		_ensureSettingInitialized('terminalApp', 'org.kde.konsole.desktop')
+		_ensureSettingInitialized('runAsRootInTerminal', false)
 		_ensureSettingInitialized('taskManagerApp', 'org.kde.plasma-systemmonitor.desktop')
 		_ensureSettingInitialized('fileManagerApp', 'org.kde.dolphin.desktop')
 

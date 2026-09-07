@@ -85,6 +85,10 @@
 		</entry>
 
 		<!-- Apps -->
+		<entry name="runAsRootInTerminal" type="bool">
+			<label>Show a terminal when running an application as root.</label>
+			<default>false</default>
+		</entry>
 		<entry name="terminalApp" type="string">
 			<default>org.kde.konsole.desktop</default>
 		</entry>

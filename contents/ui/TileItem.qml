@@ -563,6 +563,9 @@ Item {
 		sourceComponent: AppContextMenu {
 		tileIndex: index
 		onPopulateMenu: function(menu) {
+			if (appObj.isLauncher) {
+				menu.addRunAsRootAction(appObj.appUrl || appObj.favoriteId)
+			}
 			if (!plasmoid.configuration.tilesLocked) {
 				menu.addPinToMenuAction(modelData.url)
 

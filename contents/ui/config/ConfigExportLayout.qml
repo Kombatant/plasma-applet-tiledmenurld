@@ -65,6 +65,8 @@ Item {
 	property var cfg_aiStreamChat
 	property var cfg_aiStreamChatDefault
 	property var cfg_terminalApp
+	property var cfg_runAsRootInTerminal
+	property var cfg_runAsRootInTerminalDefault
 	property var cfg_terminalAppDefault
 	property var cfg_taskManagerApp
 	property var cfg_taskManagerAppDefault
@@ -236,6 +238,7 @@ Item {
 		aiChatHistory: "string",
 		aiStreamChat: "bool",
 		terminalApp: "string",
+		runAsRootInTerminal: "bool",
 		taskManagerApp: "string",
 		fileManagerApp: "string",
 		useTileTabs: "bool",
@@ -522,7 +525,7 @@ Item {
 		if (configKey.indexOf("appList") === 0 || configKey === "appDescription" || configKey === "defaultAppListView" || configKey === "lastUsedAppListView" || configKey === "showRecentApps" || configKey === "recentOrdering" || configKey === "numRecentApps") {
 			return "Application List"
 		}
-		if (configKey.indexOf("popupHeight") === 0 || configKey.indexOf("popupWidth") === 0 || configKey === "icon" || configKey === "fixedPanelIcon" || configKey === "terminalApp" || configKey === "taskManagerApp" || configKey === "fileManagerApp" || configKey === "presetTilesFolder") {
+		if (configKey.indexOf("popupHeight") === 0 || configKey.indexOf("popupWidth") === 0 || configKey === "icon" || configKey === "fixedPanelIcon" || configKey === "terminalApp" || configKey === "runAsRootInTerminal" || configKey === "taskManagerApp" || configKey === "fileManagerApp" || configKey === "presetTilesFolder") {
 			return "General"
 		}
 		return "Other"

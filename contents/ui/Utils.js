@@ -1,5 +1,19 @@
 .pragma library
 
+function shellQuote(value) {
+	return "'" + ("" + value).replace(/'/g, "'\\''") + "'"
+}
+
+function isApplicationLauncher(value) {
+	var url = "" + (value || "")
+	return endsWith(url, ".desktop") && (
+		url.indexOf("applications:") === 0
+		|| url.indexOf("file:///") === 0
+		|| url.indexOf("/") === 0
+		|| (url.indexOf(":") < 0 && url.indexOf("/") < 0 && url.indexOf("\\") < 0)
+	)
+}
+
 function endsWith(value, suffix) {
 	value = "" + value
 	return value.length >= suffix.length && value.lastIndexOf(suffix) === value.length - suffix.length

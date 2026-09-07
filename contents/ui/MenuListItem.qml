@@ -426,6 +426,7 @@ AppToolButton {
 	AppContextMenu {
 		id: contextMenu
 		onPopulateMenu: function(menu) {
+			menu.addRunAsRootAction(model.url || launcherUrl)
 			var targetModel = contextMenuModel()
 			var isSearchResultsModel = (typeof search !== "undefined" && targetModel === search.results)
 			var copyableValueRunnerIds = [
