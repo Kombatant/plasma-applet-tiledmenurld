@@ -79,7 +79,7 @@ Item {
 				}
 				var menuItem = menu.newMenuItem()
 				menuItem.text = i18n("Run as Root")
-				menuItem.icon = "system-run"
+				menuItem.icon = "irc-channel-active"
 				menuItem.clicked.connect(function() {
 					rootAppLauncher.launch(launcherUrl)
 					plasmoid.expanded = false
