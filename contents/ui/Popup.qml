@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls as QQC2
 import QtQuick.Dialogs as QtDialogs
+import QtQuick.Effects
 import org.kde.kirigami as Kirigami
 import org.kde.plasma.core as PlasmaCore
 import "lib/Base64.js" as Base64
@@ -52,6 +53,7 @@ MouseArea {
 	property alias tileEditorView: searchView.tileEditorView
 	property alias tileEditorViewLoader: searchView.tileEditorViewLoader
 	property alias tileGrid: tileGrid
+	property alias powerSessionModal: powerSessionModal
 	property var aiChatModel
 	signal aiChatViewRequested()
 	property real _lastKnownDevicePixelRatio: 1
@@ -1058,6 +1060,8 @@ MouseArea {
 			}
 			popup.scheduleRestoreForCurrentView("widget-expanded")
 		} else {
+			// Don't leave the session modal open across a close/reopen cycle.
+			powerSessionModal.closeImmediately()
 			if (config && config.isEditingTile && searchView) {
 				// Close the tile editor when the popup closes: its sidebar
 				// widened the popup, and reopening into the editor with that
@@ -1139,456 +1143,482 @@ MouseArea {
 		}
 	}
 
-	RowLayout {
+	// All popup content lives in this container so the session modal can blur it
+	// as one texture. KWin blur cannot reach inside a window, so the blur has to
+	// be done in-scene; the layer is only enabled while the modal is open.
+	Item {
+		id: popupContent
 		anchors.fill: parent
-		spacing: 0
 
-		// === Docked Sidebar layout: Left pane ===
-		Item {
-			id: leftPaneSlot
-			visible: config.usesDockedSidebarLayout
-			Layout.preferredWidth: config.usesDockedSidebarLayout ? config.dockedSidebarSlotWidth : 0
-			Layout.minimumWidth: config.usesDockedSidebarLayout ? config.dockedSidebarSlotWidth : 0
-			Layout.maximumWidth: config.usesDockedSidebarLayout ? config.dockedSidebarSlotWidth : 0
-			Layout.fillHeight: true
-
-			SidebarGlassCard {
-				anchors.fill: parent
-				anchors.leftMargin: config.sidebarCardInset
-				anchors.rightMargin: 0
-				anchors.topMargin: config.sidebarCardInset
-				anchors.bottomMargin: config.sidebarCardInset
-
-				LeftPaneView {
-					id: leftPaneView
-					anchors.fill: parent
-				}
-			}
+		layer.enabled: powerSessionModal.blurBackdropActive
+		layer.effect: MultiEffect {
+			blurEnabled: true
+			blur: powerSessionModal.blurAmount
+			blurMax: 48
+			autoPaddingEnabled: false
 		}
 
-		// === Classic layout: sidebar placeholder ===
-		Item {
-			id: sidebarPlaceholder
-			Layout.preferredWidth: config.classicLeftSidebarSlotWidth
-			Layout.minimumWidth: config.classicLeftSidebarSlotWidth
-			Layout.maximumWidth: config.classicLeftSidebarSlotWidth
-			Layout.fillHeight: true
-			visible: config.usesClassicLayout && config.sidebarOnLeft
-		}
-
-		ColumnLayout {
-			id: mainColumnLayout
-			Layout.fillWidth: true
-			Layout.fillHeight: true
+		RowLayout {
+			anchors.fill: parent
 			spacing: 0
 
-			// Top sidebar placeholder (Classic layout only)
+			// === Docked Sidebar layout: Left pane ===
 			Item {
-				id: topSidebarPlaceholder
-				Layout.preferredHeight: config.sidebarHeight
-				Layout.minimumHeight: config.sidebarHeight
-				Layout.maximumHeight: config.sidebarHeight
-				Layout.fillWidth: true
-				Layout.bottomMargin: config.sidebarRightMargin
-				visible: config.usesClassicLayout && config.sidebarOnTop
+				id: leftPaneSlot
+				visible: config.usesDockedSidebarLayout
+				Layout.preferredWidth: config.usesDockedSidebarLayout ? config.dockedSidebarSlotWidth : 0
+				Layout.minimumWidth: config.usesDockedSidebarLayout ? config.dockedSidebarSlotWidth : 0
+				Layout.maximumWidth: config.usesDockedSidebarLayout ? config.dockedSidebarSlotWidth : 0
+				Layout.fillHeight: true
+
+				SidebarGlassCard {
+					anchors.fill: parent
+					anchors.leftMargin: config.sidebarCardInset
+					anchors.rightMargin: 0
+					anchors.topMargin: config.sidebarCardInset
+					anchors.bottomMargin: config.sidebarCardInset
+
+					LeftPaneView {
+						id: leftPaneView
+						anchors.fill: parent
+					}
+				}
 			}
 
-			RowLayout {
-				id: contentRowLayout
+			// === Classic layout: sidebar placeholder ===
+			Item {
+				id: sidebarPlaceholder
+				Layout.preferredWidth: config.classicLeftSidebarSlotWidth
+				Layout.minimumWidth: config.classicLeftSidebarSlotWidth
+				Layout.maximumWidth: config.classicLeftSidebarSlotWidth
+				Layout.fillHeight: true
+				visible: config.usesClassicLayout && config.sidebarOnLeft
+			}
+
+			ColumnLayout {
+				id: mainColumnLayout
 				Layout.fillWidth: true
 				Layout.fillHeight: true
 				spacing: 0
 
-				// Classic layout: SearchView slot
+				// Top sidebar placeholder (Classic layout only)
 				Item {
-					id: searchViewSlot
-					Layout.fillHeight: true
-					Layout.preferredWidth: config.appAreaWidth
-					Layout.minimumWidth: 0
-					Layout.maximumWidth: config.appAreaWidth > 0 ? -1 : 0
-					implicitWidth: config.appAreaWidth
-					visible: config.usesClassicLayout && config.appAreaWidth > 0
+					id: topSidebarPlaceholder
+					Layout.preferredHeight: config.sidebarHeight
+					Layout.minimumHeight: config.sidebarHeight
+					Layout.maximumHeight: config.sidebarHeight
+					Layout.fillWidth: true
+					Layout.bottomMargin: config.sidebarRightMargin
+					visible: config.usesClassicLayout && config.sidebarOnTop
 				}
 
-				// Drag handle for resizing the app area width
-				Item {
-					id: appAreaResizeHandle
-					Layout.fillHeight: true
-					Layout.preferredWidth: config.appAreaResizeHandleWidth
-					Layout.minimumWidth: config.appAreaResizeHandleWidth
-					Layout.maximumWidth: config.appAreaResizeHandleWidth
-					visible: config.appAreaResizeHandleWidth > 0
-					z: 1
-
-					Rectangle {
-						anchors.centerIn: parent
-						width: Math.max(2, Math.round(1 * Screen.devicePixelRatio))
-						height: Math.min(parent.height * 0.3, 48 * Screen.devicePixelRatio)
-						radius: width / 2
-						color: Kirigami.Theme.textColor
-						opacity: appAreaResizeMouseArea.containsMouse || appAreaResizeMouseArea.pressed ? 0.6 : 0
-						Behavior on opacity {
-							NumberAnimation { duration: 150 }
-						}
-					}
-
-					MouseArea {
-						id: appAreaResizeMouseArea
-						anchors.fill: parent
-						anchors.leftMargin: 0
-						anchors.rightMargin: -Kirigami.Units.smallSpacing * 2
-						cursorShape: Qt.SplitHCursor
-						hoverEnabled: true
-						preventStealing: true
-
-						property real dragStartX: 0
-						property int dragStartConfigWidth: 0
-
-						onPressed: function(mouse) {
-							dragStartX = mapToItem(popup, mouse.x, 0).x
-							dragStartConfigWidth = config.usesDockedSidebarLayout ? (plasmoid.configuration.dockedSidebarWidth || 350) : plasmoid.configuration.appListWidth
-						}
-
-						onPositionChanged: function(mouse) {
-											if (!pressed) return
-											var currentX = mapToItem(popup, mouse.x, 0).x
-											var dpr = Screen.devicePixelRatio || 1
-											var delta = (currentX - dragStartX) / dpr
-											var minWidth = config.usesDockedSidebarLayout ? Math.ceil(config.dockedSidebarMinWidth / dpr) : 120
-											var newWidth = Math.max(minWidth, Math.round(dragStartConfigWidth + delta))
-											if (config.usesDockedSidebarLayout) {
-												if (plasmoid.configuration.dockedSidebarWidth !== newWidth) {
-													plasmoid.configuration.dockedSidebarWidth = newWidth
-												}
-											} else if (plasmoid.configuration.appListWidth !== newWidth) {
-												plasmoid.configuration.appListWidth = newWidth
-											}
-										}
-					}
-				}
-
-				ColumnLayout {
+				RowLayout {
+					id: contentRowLayout
 					Layout.fillWidth: true
 					Layout.fillHeight: true
 					spacing: 0
 
+					// Classic layout: SearchView slot
 					Item {
-						id: rightPaneTopRow
-						Layout.fillWidth: true
-						Layout.topMargin: _alignTopSurfaces ? config.sidebarCardInset : Kirigami.Units.largeSpacing
-						// Deliberately the chrome insets, not contentLeft/RightInset:
-						// those scale with the largest tile in the active tab, so the
-						// whole tab bar would shift sideways on every tab change.
-						Layout.leftMargin: tileGrid.chromeLeftInset
-						Layout.rightMargin: tileGrid.chromeRightInset
-						Layout.bottomMargin: Kirigami.Units.smallSpacing
-						visible: _showTileTabs
-						implicitHeight: _showTileTabs ? tileTabBar.implicitHeight : 0
-
-						readonly property bool _showTileTabs: config.useTileTabs
-						readonly property bool _alignTopSurfaces: config.usesDockedSidebarLayout
-							|| (config.usesClassicLayout && config.sidebarOnLeft)
-
-						TileTabBar {
-							id: tileTabBar
-							anchors.left: parent.left
-							anchors.right: autoResizeTabAction.left
-							anchors.rightMargin: Kirigami.Units.smallSpacing
-							y: rightPaneTopRow._alignTopSurfaces ? 0 : Math.round((parent.height - height) / 2)
-							height: implicitHeight
-							visible: rightPaneTopRow._showTileTabs
-							style: plasmoid.configuration.tileTabStyle || "tabs"
-							alignSurfaceToTop: rightPaneTopRow._alignTopSurfaces
-							activeTab: popup.activeTabIndex
-							tabs: popup.tileTabsData.map(function(t) {
-								return {id: t.id, name: t.name, icon: t.icon || ""}
-							})
-
-							onTabSelected: function(index) { popup.selectTab(index) }
-							onTabAdded: popup.addTab()
-							onTabDeleted: function(index) { popup.deleteTab(index) }
-							onTabRenamed: function(index, newName) { popup.renameTab(index, newName) }
-							onTabIconChanged: function(index, newIcon) { popup.changeTabIcon(index, newIcon) }
-							onTabMoved: function(fromIndex, toIndex) { popup.moveTab(fromIndex, toIndex) }
-						}
-
-						// Auto Resize sits outside the tab surface so it reads as a
-						// grid action rather than another tab.
-						Item {
-							id: autoResizeTabAction
-							anchors.right: parent.right
-							y: tileTabBar.y
-							width: tileTabBar.surfaceHeight
-							// Match the tab surface, not the full bar, so the icon
-							// centers on the pills when the surface is top-aligned.
-							height: rightPaneTopRow._alignTopSurfaces ? tileTabBar.surfaceHeight : tileTabBar.height
-
-							Accessible.name: i18n("Auto Resize")
-							Accessible.role: Accessible.Button
-							QQC2.ToolTip.visible: autoResizeTabMA.containsMouse
-							QQC2.ToolTip.text: i18n("Auto Resize")
-
-							// Matches the tab bar's add-tab button hover chrome.
-							Rectangle {
-								anchors.centerIn: parent
-								width: Kirigami.Units.gridUnit * 1.8
-								height: width
-								radius: height / 2
-								color: Qt.rgba(
-									Kirigami.Theme.textColor.r,
-									Kirigami.Theme.textColor.g,
-									Kirigami.Theme.textColor.b,
-									autoResizeTabMA.containsMouse ? 0.10 : 0.0)
-								Behavior on color { ColorAnimation { duration: 140 } }
-							}
-
-							Kirigami.Icon {
-								anchors.centerIn: parent
-								source: "transform-scale"
-								width: Kirigami.Units.iconSizes.smallMedium
-								height: width
-								color: Kirigami.Theme.textColor
-								opacity: autoResizeTabMA.containsMouse ? 0.95 : 0.55
-								isMask: true
-								Behavior on opacity { NumberAnimation { duration: 140 } }
-							}
-
-							MouseArea {
-								id: autoResizeTabMA
-								anchors.fill: parent
-								hoverEnabled: true
-								cursorShape: Qt.PointingHandCursor
-								onClicked: tabBarAutoResizeDebounce.restart()
-							}
-
-							Timer {
-								id: tabBarAutoResizeDebounce
-								interval: 200
-								repeat: false
-								onTriggered: popup.autoResizeToContent()
-							}
-						}
-
+						id: searchViewSlot
+						Layout.fillHeight: true
+						Layout.preferredWidth: config.appAreaWidth
+						Layout.minimumWidth: 0
+						Layout.maximumWidth: config.appAreaWidth > 0 ? -1 : 0
+						implicitWidth: config.appAreaWidth
+						visible: config.usesClassicLayout && config.appAreaWidth > 0
 					}
 
+					// Drag handle for resizing the app area width
 					Item {
-						id: tileGridSlideContainer
+						id: appAreaResizeHandle
+						Layout.fillHeight: true
+						Layout.preferredWidth: config.appAreaResizeHandleWidth
+						Layout.minimumWidth: config.appAreaResizeHandleWidth
+						Layout.maximumWidth: config.appAreaResizeHandleWidth
+						visible: config.appAreaResizeHandleWidth > 0
+						z: 1
+
+						Rectangle {
+							anchors.centerIn: parent
+							width: Math.max(2, Math.round(1 * Screen.devicePixelRatio))
+							height: Math.min(parent.height * 0.3, 48 * Screen.devicePixelRatio)
+							radius: width / 2
+							color: Kirigami.Theme.textColor
+							opacity: appAreaResizeMouseArea.containsMouse || appAreaResizeMouseArea.pressed ? 0.6 : 0
+							Behavior on opacity {
+								NumberAnimation { duration: 150 }
+							}
+						}
+
+						MouseArea {
+							id: appAreaResizeMouseArea
+							anchors.fill: parent
+							anchors.leftMargin: 0
+							anchors.rightMargin: -Kirigami.Units.smallSpacing * 2
+							cursorShape: Qt.SplitHCursor
+							hoverEnabled: true
+							preventStealing: true
+
+							property real dragStartX: 0
+							property int dragStartConfigWidth: 0
+
+							onPressed: function(mouse) {
+								dragStartX = mapToItem(popup, mouse.x, 0).x
+								dragStartConfigWidth = config.usesDockedSidebarLayout ? (plasmoid.configuration.dockedSidebarWidth || 350) : plasmoid.configuration.appListWidth
+							}
+
+							onPositionChanged: function(mouse) {
+												if (!pressed) return
+												var currentX = mapToItem(popup, mouse.x, 0).x
+												var dpr = Screen.devicePixelRatio || 1
+												var delta = (currentX - dragStartX) / dpr
+												var minWidth = config.usesDockedSidebarLayout ? Math.ceil(config.dockedSidebarMinWidth / dpr) : 120
+												var newWidth = Math.max(minWidth, Math.round(dragStartConfigWidth + delta))
+												if (config.usesDockedSidebarLayout) {
+													if (plasmoid.configuration.dockedSidebarWidth !== newWidth) {
+														plasmoid.configuration.dockedSidebarWidth = newWidth
+													}
+												} else if (plasmoid.configuration.appListWidth !== newWidth) {
+													plasmoid.configuration.appListWidth = newWidth
+												}
+											}
+						}
+					}
+
+					ColumnLayout {
 						Layout.fillWidth: true
 						Layout.fillHeight: true
-						clip: true
+						spacing: 0
 
-						property int slideDirection: 0
-						property bool slideActive: false
+						Item {
+							id: rightPaneTopRow
+							Layout.fillWidth: true
+							Layout.topMargin: _alignTopSurfaces ? config.sidebarCardInset : Kirigami.Units.largeSpacing
+							// Deliberately the chrome insets, not contentLeft/RightInset:
+							// those scale with the largest tile in the active tab, so the
+							// whole tab bar would shift sideways on every tab change.
+							Layout.leftMargin: tileGrid.chromeLeftInset
+							Layout.rightMargin: tileGrid.chromeRightInset
+							Layout.bottomMargin: Kirigami.Units.smallSpacing
+							visible: _showTileTabs
+							implicitHeight: _showTileTabs ? tileTabBar.implicitHeight : 0
 
-						function runSlide(direction, newIndex) {
-							if (!config.useTileTabs) {
-								popup.setActiveTabIndexForSwitch(newIndex)
-								return
+							readonly property bool _showTileTabs: config.useTileTabs
+							readonly property bool _alignTopSurfaces: config.usesDockedSidebarLayout
+								|| (config.usesClassicLayout && config.sidebarOnLeft)
+
+							TileTabBar {
+								id: tileTabBar
+								anchors.left: parent.left
+								anchors.right: autoResizeTabAction.left
+								anchors.rightMargin: Kirigami.Units.smallSpacing
+								y: rightPaneTopRow._alignTopSurfaces ? 0 : Math.round((parent.height - height) / 2)
+								height: implicitHeight
+								visible: rightPaneTopRow._showTileTabs
+								style: plasmoid.configuration.tileTabStyle || "tabs"
+								alignSurfaceToTop: rightPaneTopRow._alignTopSurfaces
+								activeTab: popup.activeTabIndex
+								tabs: popup.tileTabsData.map(function(t) {
+									return {id: t.id, name: t.name, icon: t.icon || ""}
+								})
+
+								onTabSelected: function(index) { popup.selectTab(index) }
+								onTabAdded: popup.addTab()
+								onTabDeleted: function(index) { popup.deleteTab(index) }
+								onTabRenamed: function(index, newName) { popup.renameTab(index, newName) }
+								onTabIconChanged: function(index, newIcon) { popup.changeTabIcon(index, newIcon) }
+								onTabMoved: function(fromIndex, toIndex) { popup.moveTab(fromIndex, toIndex) }
 							}
-							// Skip the snapshot transition when the source has not painted
-							// yet (first open, hidden tab) — it would flash a black frame.
-							if (tileGrid.width <= 0 || tileGrid.height <= 0 || !popup.widgetExpanded) {
-								popup.setActiveTabIndexForSwitch(newIndex)
-								return
+
+							// Auto Resize sits outside the tab surface so it reads as a
+							// grid action rather than another tab.
+							Item {
+								id: autoResizeTabAction
+								anchors.right: parent.right
+								y: tileTabBar.y
+								width: tileTabBar.surfaceHeight
+								// Match the tab surface, not the full bar, so the icon
+								// centers on the pills when the surface is top-aligned.
+								height: rightPaneTopRow._alignTopSurfaces ? tileTabBar.surfaceHeight : tileTabBar.height
+
+								Accessible.name: i18n("Auto Resize")
+								Accessible.role: Accessible.Button
+								QQC2.ToolTip.visible: autoResizeTabMA.containsMouse
+								QQC2.ToolTip.text: i18n("Auto Resize")
+
+								// Matches the tab bar's add-tab button hover chrome.
+								Rectangle {
+									anchors.centerIn: parent
+									width: Kirigami.Units.gridUnit * 1.8
+									height: width
+									radius: height / 2
+									color: Qt.rgba(
+										Kirigami.Theme.textColor.r,
+										Kirigami.Theme.textColor.g,
+										Kirigami.Theme.textColor.b,
+										autoResizeTabMA.containsMouse ? 0.10 : 0.0)
+									Behavior on color { ColorAnimation { duration: 140 } }
+								}
+
+								Kirigami.Icon {
+									anchors.centerIn: parent
+									source: "transform-scale"
+									width: Kirigami.Units.iconSizes.smallMedium
+									height: width
+									color: Kirigami.Theme.textColor
+									opacity: autoResizeTabMA.containsMouse ? 0.95 : 0.55
+									isMask: true
+									Behavior on opacity { NumberAnimation { duration: 140 } }
+								}
+
+								MouseArea {
+									id: autoResizeTabMA
+									anchors.fill: parent
+									hoverEnabled: true
+									cursorShape: Qt.PointingHandCursor
+									onClicked: tabBarAutoResizeDebounce.restart()
+								}
+
+								Timer {
+									id: tabBarAutoResizeDebounce
+									interval: 200
+									repeat: false
+									onTriggered: popup.autoResizeToContent()
+								}
 							}
-							if (slideActive) {
-								snapshotSlideAnim.stop()
-								gridSlideAnim.stop()
-								tileGrid.x = 0
-								slideSnapshot.visible = false
-								slideActive = false
-							}
-							var dpr = Screen.devicePixelRatio || 1
-							var grabW = Math.max(1, Math.round(tileGrid.width * dpr))
-							var grabH = Math.max(1, Math.round(tileGrid.height * dpr))
-							tileGrid.grabToImage(function(result) {
-								slideSnapshot.source = result.url
-								slideSnapshot.width = tileGrid.width
-								slideSnapshot.height = tileGrid.height
-								slideSnapshot.x = 0
-								slideSnapshot.y = 0
-								slideSnapshot.visible = true
-								tileGridSlideContainer.slideDirection = direction
-								tileGridSlideContainer.slideActive = true
-								popup.setActiveTabIndexForSwitch(newIndex)
-								tileGrid.x = direction * tileGridSlideContainer.width
-								snapshotSlideAnim.to = -direction * tileGridSlideContainer.width
-								snapshotSlideAnim.start()
-								gridSlideAnim.to = 0
-								gridSlideAnim.start()
-							}, Qt.size(grabW, grabH))
+
 						}
 
-						NumberAnimation {
-							id: snapshotSlideAnim
-							target: slideSnapshot
-							property: "x"
-							duration: 200
-							easing.type: Easing.OutCubic
-							onStopped: {
-								slideSnapshot.visible = false
-								slideSnapshot.source = ""
-								tileGridSlideContainer.slideActive = false
-							}
-						}
+						Item {
+							id: tileGridSlideContainer
+							Layout.fillWidth: true
+							Layout.fillHeight: true
+							clip: true
 
-						NumberAnimation {
-							id: gridSlideAnim
-							target: tileGrid
-							property: "x"
-							duration: 200
-							easing.type: Easing.OutCubic
-						}
+							property int slideDirection: 0
+							property bool slideActive: false
 
-						TileGrid {
-							id: tileGrid
-							width: tileGridSlideContainer.width
-							height: tileGridSlideContainer.height
-
-							cellSize: config.cellSize
-							cellMargin: config.cellMargin
-							cellPushedMargin: config.cellPushedMargin
-
-							tileModel: config.useTileTabs ? popup.activeTabTiles : config.tileModel.value
-							property bool _tileModelSavePending: false
-							property bool _activeTabTilesSavePending: false
-
-							onEditTile: function(tile) { tileEditorViewLoader.open(tile, tileGrid) }
-							onMoveTileToTab: function(tileIndex, tabId) { popup.moveTileToTab(tileIndex, tabId) }
-
-							function syncConfigTileModelValue() {
+							function runSlide(direction, newIndex) {
 								if (!config.useTileTabs) {
-									config.tileModel.value = tileGrid.tileModel
+									popup.setActiveTabIndexForSwitch(newIndex)
+									return
+								}
+								// Skip the snapshot transition when the source has not painted
+								// yet (first open, hidden tab) — it would flash a black frame.
+								if (tileGrid.width <= 0 || tileGrid.height <= 0 || !popup.widgetExpanded) {
+									popup.setActiveTabIndexForSwitch(newIndex)
+									return
+								}
+								if (slideActive) {
+									snapshotSlideAnim.stop()
+									gridSlideAnim.stop()
+									tileGrid.x = 0
+									slideSnapshot.visible = false
+									slideActive = false
+								}
+								var dpr = Screen.devicePixelRatio || 1
+								var grabW = Math.max(1, Math.round(tileGrid.width * dpr))
+								var grabH = Math.max(1, Math.round(tileGrid.height * dpr))
+								tileGrid.grabToImage(function(result) {
+									slideSnapshot.source = result.url
+									slideSnapshot.width = tileGrid.width
+									slideSnapshot.height = tileGrid.height
+									slideSnapshot.x = 0
+									slideSnapshot.y = 0
+									slideSnapshot.visible = true
+									tileGridSlideContainer.slideDirection = direction
+									tileGridSlideContainer.slideActive = true
+									popup.setActiveTabIndexForSwitch(newIndex)
+									tileGrid.x = direction * tileGridSlideContainer.width
+									snapshotSlideAnim.to = -direction * tileGridSlideContainer.width
+									snapshotSlideAnim.start()
+									gridSlideAnim.to = 0
+									gridSlideAnim.start()
+								}, Qt.size(grabW, grabH))
+							}
+
+							NumberAnimation {
+								id: snapshotSlideAnim
+								target: slideSnapshot
+								property: "x"
+								duration: 200
+								easing.type: Easing.OutCubic
+								onStopped: {
+									slideSnapshot.visible = false
+									slideSnapshot.source = ""
+									tileGridSlideContainer.slideActive = false
 								}
 							}
 
-							function flushPendingTileLayoutSave() {
-								if (tileGrid._tileModelSavePending) {
-									saveTileModel.stop()
-									tileGrid._tileModelSavePending = false
-									tileGrid.syncConfigTileModelValue()
-									config.tileModel.save()
-								}
-								if (tileGrid._activeTabTilesSavePending) {
-									saveActiveTabTilesDebounced.stop()
-									tileGrid._activeTabTilesSavePending = false
-									popup.saveTileTabsImmediate()
-								}
+							NumberAnimation {
+								id: gridSlideAnim
+								target: tileGrid
+								property: "x"
+								duration: 200
+								easing.type: Easing.OutCubic
 							}
 
-							onTileModelChanged: {
-								if (config.useTileTabs) {
-									// Tab switches swap the model without editing
-									// it — nothing to persist.
-									if (!popup._switchingTab) {
-										tileGrid._activeTabTilesSavePending = true
-										saveActiveTabTilesDebounced.restart()
+							TileGrid {
+								id: tileGrid
+								width: tileGridSlideContainer.width
+								height: tileGridSlideContainer.height
+
+								cellSize: config.cellSize
+								cellMargin: config.cellMargin
+								cellPushedMargin: config.cellPushedMargin
+
+								tileModel: config.useTileTabs ? popup.activeTabTiles : config.tileModel.value
+								property bool _tileModelSavePending: false
+								property bool _activeTabTilesSavePending: false
+
+								onEditTile: function(tile) { tileEditorViewLoader.open(tile, tileGrid) }
+								onMoveTileToTab: function(tileIndex, tabId) { popup.moveTileToTab(tileIndex, tabId) }
+
+								function syncConfigTileModelValue() {
+									if (!config.useTileTabs) {
+										config.tileModel.value = tileGrid.tileModel
 									}
-								} else {
-									tileGrid.syncConfigTileModelValue()
-									tileGrid._tileModelSavePending = true
-									saveTileModel.restart()
 								}
-							}
-							Component.onDestruction: flushPendingTileLayoutSave()
-							Timer {
-								id: saveTileModel
-								interval: 2000
-								onTriggered: {
-									tileGrid._tileModelSavePending = false
-									tileGrid.syncConfigTileModelValue()
-									config.tileModel.save()
-								}
-							}
-							Timer {
-								id: saveActiveTabTilesDebounced
-								interval: 2000
-								onTriggered: {
-									tileGrid._activeTabTilesSavePending = false
-									if (config.useTileTabs) {
+
+								function flushPendingTileLayoutSave() {
+									if (tileGrid._tileModelSavePending) {
+										saveTileModel.stop()
+										tileGrid._tileModelSavePending = false
+										tileGrid.syncConfigTileModelValue()
+										config.tileModel.save()
+									}
+									if (tileGrid._activeTabTilesSavePending) {
+										saveActiveTabTilesDebounced.stop()
+										tileGrid._activeTabTilesSavePending = false
 										popup.saveTileTabsImmediate()
 									}
 								}
-							}
-						}
 
-						Image {
-							id: slideSnapshot
-							visible: false
-							smooth: true
-							cache: false
-							fillMode: Image.Stretch
-							y: 0
-							z: 1
+								onTileModelChanged: {
+									if (config.useTileTabs) {
+										// Tab switches swap the model without editing
+										// it — nothing to persist.
+										if (!popup._switchingTab) {
+											tileGrid._activeTabTilesSavePending = true
+											saveActiveTabTilesDebounced.restart()
+										}
+									} else {
+										tileGrid.syncConfigTileModelValue()
+										tileGrid._tileModelSavePending = true
+										saveTileModel.restart()
+									}
+								}
+								Component.onDestruction: flushPendingTileLayoutSave()
+								Timer {
+									id: saveTileModel
+									interval: 2000
+									onTriggered: {
+										tileGrid._tileModelSavePending = false
+										tileGrid.syncConfigTileModelValue()
+										config.tileModel.save()
+									}
+								}
+								Timer {
+									id: saveActiveTabTilesDebounced
+									interval: 2000
+									onTriggered: {
+										tileGrid._activeTabTilesSavePending = false
+										if (config.useTileTabs) {
+											popup.saveTileTabsImmediate()
+										}
+									}
+								}
+							}
+
+							Image {
+								id: slideSnapshot
+								visible: false
+								smooth: true
+								cache: false
+								fillMode: Image.Stretch
+								y: 0
+								z: 1
+							}
 						}
 					}
 				}
-			}
 
-			// Bottom sidebar placeholder (Classic layout only)
-			Item {
-				id: bottomSidebarPlaceholder
-				Layout.preferredHeight: config.sidebarHeight + config.sidebarRightMargin
-				Layout.minimumHeight: config.sidebarHeight + config.sidebarRightMargin
-				Layout.maximumHeight: config.sidebarHeight + config.sidebarRightMargin
-				Layout.fillWidth: true
-				visible: config.usesClassicLayout && config.sidebarOnBottom
+				// Bottom sidebar placeholder (Classic layout only)
+				Item {
+					id: bottomSidebarPlaceholder
+					Layout.preferredHeight: config.sidebarHeight + config.sidebarRightMargin
+					Layout.minimumHeight: config.sidebarHeight + config.sidebarRightMargin
+					Layout.maximumHeight: config.sidebarHeight + config.sidebarRightMargin
+					Layout.fillWidth: true
+					visible: config.usesClassicLayout && config.sidebarOnBottom
+				}
 			}
 		}
-	}
 
-	// Search overlay drawer for TilesOnly mode (Classic layout only)
-	Item {
-		id: searchOverlayContainer
-		visible: config.usesClassicLayout && config.searchOverlayActive
-		z: 2
-		anchors.top: parent.top
-		anchors.bottom: parent.bottom
-		anchors.topMargin: config.sidebarOnTop ? (config.sidebarHeight + config.sidebarRightMargin) : 0
-		anchors.bottomMargin: config.sidebarOnBottom ? (config.sidebarHeight + config.sidebarRightMargin) : 0
-		x: config.sidebarOnLeft ? config.classicLeftSidebarSlotWidth : 0
-		width: config.appListWidth
+		// Search overlay drawer for TilesOnly mode (Classic layout only)
+		Item {
+			id: searchOverlayContainer
+			visible: config.usesClassicLayout && config.searchOverlayActive
+			z: 2
+			anchors.top: parent.top
+			anchors.bottom: parent.bottom
+			anchors.topMargin: config.sidebarOnTop ? (config.sidebarHeight + config.sidebarRightMargin) : 0
+			anchors.bottomMargin: config.sidebarOnBottom ? (config.sidebarHeight + config.sidebarRightMargin) : 0
+			x: config.sidebarOnLeft ? config.classicLeftSidebarSlotWidth : 0
+			width: config.appListWidth
 
+			Rectangle {
+				anchors.fill: parent
+				color: Kirigami.Theme.backgroundColor
+			}
+		}
+
+		// Scrim behind the search overlay (Classic layout only)
 		Rectangle {
-			anchors.fill: parent
-			color: Kirigami.Theme.backgroundColor
-		}
-	}
+			id: searchOverlayScrim
+			visible: config.usesClassicLayout && config.searchOverlayActive
+			z: 1
+			anchors.top: searchOverlayContainer.top
+			anchors.bottom: searchOverlayContainer.bottom
+			anchors.left: searchOverlayContainer.right
+			anchors.right: parent.right
+			color: "#40000000"
 
-	// Scrim behind the search overlay (Classic layout only)
-	Rectangle {
-		id: searchOverlayScrim
-		visible: config.usesClassicLayout && config.searchOverlayActive
-		z: 1
-		anchors.top: searchOverlayContainer.top
-		anchors.bottom: searchOverlayContainer.bottom
-		anchors.left: searchOverlayContainer.right
-		anchors.right: parent.right
-		color: "#40000000"
-
-		MouseArea {
-			anchors.fill: parent
-			onClicked: searchView.showTilesOnly()
-		}
-	}
-
-	SearchView {
-		id: searchView
-		aiChatModel: popup.aiChatModel
-		parent: {
-			if (config.usesDockedSidebarLayout) {
-				return leftPaneView.searchViewSlot
+			MouseArea {
+				anchors.fill: parent
+				onClicked: searchView.showTilesOnly()
 			}
-			return config.searchOverlayActive ? searchOverlayContainer : searchViewSlot
 		}
-		anchors.fill: parent
-		externalSearchField: config.usesDockedSidebarLayout ? leftPaneView.dockedSearchField : null
+
+		SearchView {
+			id: searchView
+			aiChatModel: popup.aiChatModel
+			parent: {
+				if (config.usesDockedSidebarLayout) {
+					return leftPaneView.searchViewSlot
+				}
+				return config.searchOverlayActive ? searchOverlayContainer : searchViewSlot
+			}
+			anchors.fill: parent
+			externalSearchField: config.usesDockedSidebarLayout ? leftPaneView.dockedSearchField : null
+		}
+
+		SidebarView {
+			id: sidebarView
+			visible: config.usesClassicLayout
+			popup: popup
+		}
 	}
 
-	SidebarView {
-		id: sidebarView
-		visible: config.usesClassicLayout
-		popup: popup
+
+	// Session modal ("Breeze Refined"): lives at popup level so it can cover the
+	// whole menu and centre itself, instead of dropping out of the sidebar button.
+	PowerSessionModal {
+		id: powerSessionModal
+		anchors.fill: parent
+		z: 100
+		model: appsModel.powerActionsModel
 	}
 
 	onClicked: searchView.focusPrimaryInput()

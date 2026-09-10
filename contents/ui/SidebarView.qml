@@ -13,6 +13,12 @@ Item {
 	id: sidebarView
 	property var popup
 	z: 1
+
+	function togglePowerSessionModal() {
+		if (popup && popup.powerSessionModal) {
+			popup.powerSessionModal.toggleOpen()
+		}
+	}
 	property int _horizontalSearchWidth: config.appListWidth
 	readonly property bool _aiChatEnabled: plasmoid.configuration.aiChatEnabled !== false
 	
@@ -299,12 +305,7 @@ Item {
 				text: i18n("Power")
 				tooltipText: i18n("Power")
 				onClicked: {
-					powerMenu.toggleOpen()
-				}
-				SidebarContextMenu {
-					id: powerMenu
-					visualParent: powerMenuButton
-					model: appsModel.powerActionsModel
+					sidebarView.togglePowerSessionModal()
 				}
 			}
 		}
@@ -586,12 +587,7 @@ Item {
 				text: i18n("Power")
 				tooltipText: i18n("Power")
 				onClicked: {
-					powerMenuHoriz.toggleOpen()
-				}
-				SidebarContextMenu {
-					id: powerMenuHoriz
-					visualParent: powerMenuButtonHoriz
-					model: appsModel.powerActionsModel
+					sidebarView.togglePowerSessionModal()
 				}
 			}
 		}

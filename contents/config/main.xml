@@ -180,6 +180,10 @@
 			<label>Custom colour used by shared surfaces.</label>
 			<default></default>
 		</entry>
+		<entry name="sessionModalBlurBackdrop" type="bool">
+			<label>Blur the popup content behind the session modal.</label>
+			<default>true</default>
+		</entry>
 		<entry name="surfaceStyle" type="string">
 			<!-- enum: empty legacy value, theme, custom, frosted -->
 			<label>Visual treatment used by shared surfaces.</label>

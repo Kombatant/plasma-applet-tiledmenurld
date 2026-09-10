@@ -113,6 +113,7 @@ Item {
 		_ensureSettingInitialized('defaultTileColor', '')
 		_ensureSettingInitialized('defaultTileGradient', false)
 		_ensureSettingInitialized('sidebarBackgroundColor', '')
+		_ensureSettingInitialized('sessionModalBlurBackdrop', true)
 		_ensureSettingInitialized('surfaceStyle', '')
 		_ensureSettingInitialized('surfaceShadowDarkness', 'normal')
 		_ensureSettingInitialized('surfaceShadowSize', 'normal')
@@ -674,6 +675,7 @@ Item {
 		}
 		return plasmoid.configuration.sidebarFollowsTheme ? "theme" : "custom"
 	}
+	readonly property bool sessionModalBlurBackdrop: plasmoid.configuration.sessionModalBlurBackdrop !== false
 	readonly property bool surfaceUsesFrostedGlass: surfaceStyle === "frosted"
 	readonly property bool surfaceUsesThemeBase: surfaceStyle === "theme" || surfaceStyle === "frosted"
 	readonly property color surfaceBaseColor: surfaceUsesThemeBase ? Kirigami.Theme.backgroundColor : sidebarBackgroundColor

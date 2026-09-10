@@ -97,6 +97,12 @@ LibConfig.FormKCM {
 		configKey: 'sidebarHideBorder'
 	}
 
+	LibConfig.CheckBox {
+		Kirigami.FormData.label: i18n("Session Modal")
+		text: i18n("Blur the menu behind the session modal")
+		configKey: 'sessionModalBlurBackdrop'
+	}
+
 	RowLayout {
 		Kirigami.FormData.label: i18n("Surface Shadows")
 
