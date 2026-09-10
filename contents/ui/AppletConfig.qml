@@ -10,7 +10,7 @@ Item {
 
 	// Bump when adding new entries to ensureAllSettingsInitialized() so existing
 	// installs run the migration once, then skip on subsequent starts.
-	readonly property int currentSchemaVersion: 3
+	readonly property int currentSchemaVersion: 4
 
 	function _ensureSettingInitialized(key, defaultValue) {
 		var cur = plasmoid.configuration[key]
@@ -113,6 +113,17 @@ Item {
 		_ensureSettingInitialized('defaultTileColor', '')
 		_ensureSettingInitialized('defaultTileGradient', false)
 		_ensureSettingInitialized('sidebarBackgroundColor', '')
+		// Docked Sidebar compact power defaults to on for new installs, but must not
+		// silently change the layout of an install that predates the setting. KConfig
+		// returns main.xml's default (true) rather than undefined for a key the user
+		// never stored, so _ensureSettingInitialized cannot distinguish the two cases
+		// here; configSchemaVersion can. Anything already initialised (>= 1) is an
+		// existing install and keeps the old layout unless it opts in.
+		if ((plasmoid.configuration.configSchemaVersion || 0) > 0
+				&& (plasmoid.configuration.configSchemaVersion || 0) < 4) {
+			plasmoid.configuration.dockedSidebarCompactPower = false
+		}
+		_ensureSettingInitialized('dockedSidebarCompactPower', true)
 		_ensureSettingInitialized('sessionModalBlurBackdrop', true)
 		_ensureSettingInitialized('surfaceStyle', '')
 		_ensureSettingInitialized('surfaceShadowDarkness', 'normal')
@@ -675,6 +686,7 @@ Item {
 		}
 		return plasmoid.configuration.sidebarFollowsTheme ? "theme" : "custom"
 	}
+	readonly property bool dockedSidebarCompactPower: plasmoid.configuration.dockedSidebarCompactPower !== false
 	readonly property bool sessionModalBlurBackdrop: plasmoid.configuration.sessionModalBlurBackdrop !== false
 	readonly property bool surfaceUsesFrostedGlass: surfaceStyle === "frosted"
 	readonly property bool surfaceUsesThemeBase: surfaceStyle === "theme" || surfaceStyle === "frosted"

@@ -7,6 +7,10 @@ PillRowSurface {
 	id: root
 
 	property url settingsIconSource
+	signal powerButtonClicked()
+	readonly property int _lastPillIndex: powerPill.visible
+		? shortcutPillsRepeater.count + 1
+		: shortcutPillsRepeater.count
 	property int hoveredShortcutIndex: -1
 	property bool hoverAnimationEnabled: true
 	readonly property int _pillMotionDuration: 420
@@ -49,14 +53,19 @@ PillRowSurface {
 			if (root.hoveredShortcutIndex < shortcutPillsRepeater.count) {
 				return shortcutPillsRepeater.itemAt(root.hoveredShortcutIndex)
 			}
-			return root.hoveredShortcutIndex === shortcutPillsRepeater.count ? settingsPill : null
+			if (root.hoveredShortcutIndex === shortcutPillsRepeater.count) {
+				return settingsPill
+			}
+			return (root.hoveredShortcutIndex === shortcutPillsRepeater.count + 1 && powerPill.visible)
+				? powerPill
+				: null
 		}
 		x: _hoveredItem ? shortcutPills.x + _hoveredItem.x : 0
 		anchors.top: shortcutPills.top
 		anchors.bottom: shortcutPills.bottom
 		width: _hoveredItem ? _hoveredItem.width : 0
 		flushLeft: root.hoveredShortcutIndex === 0
-		flushRight: root.hoveredShortcutIndex === shortcutPillsRepeater.count
+		flushRight: root.hoveredShortcutIndex === root._lastPillIndex
 		Behavior on x {
 			enabled: root.hoverAnimationEnabled
 			NumberAnimation {
@@ -236,6 +245,41 @@ PillRowSurface {
 				onEntered: root.setHoveredShortcutIndex(shortcutPillsRepeater.count)
 				onExited: {
 					if (root.hoveredShortcutIndex === shortcutPillsRepeater.count && !shortcutRowHover.hovered) {
+						root.resetHoverIndicator()
+					}
+				}
+			}
+		}
+
+		// Replaces the separate power actions row when compact power is enabled.
+		Item {
+			id: powerPill
+			visible: config.dockedSidebarCompactPower
+			Layout.fillWidth: visible
+			Layout.fillHeight: true
+			Layout.minimumWidth: 0
+			Layout.preferredWidth: visible ? -1 : 0
+
+			readonly property int pillIndex: shortcutPillsRepeater.count + 1
+
+			SidebarItem {
+				anchors.fill: parent
+				hoverEnabled: false
+				down: false
+				icon.name: "system-shutdown-symbolic"
+				text: i18n("Power")
+				showHoverOutline: false
+				tooltipText: i18n("Power")
+				onClicked: root.powerButtonClicked()
+			}
+
+			MouseArea {
+				anchors.fill: parent
+				acceptedButtons: Qt.NoButton
+				hoverEnabled: true
+				onEntered: root.setHoveredShortcutIndex(powerPill.pillIndex)
+				onExited: {
+					if (root.hoveredShortcutIndex === powerPill.pillIndex && !shortcutRowHover.hovered) {
 						root.resetHoverIndicator()
 					}
 				}

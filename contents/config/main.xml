@@ -180,6 +180,10 @@
 			<label>Custom colour used by shared surfaces.</label>
 			<default></default>
 		</entry>
+		<entry name="dockedSidebarCompactPower" type="bool">
+			<label>In Docked Sidebar mode, drop the power actions row and put a power button beside Settings instead.</label>
+			<default>true</default>
+		</entry>
 		<entry name="sessionModalBlurBackdrop" type="bool">
 			<label>Blur the popup content behind the session modal.</label>
 			<default>true</default>

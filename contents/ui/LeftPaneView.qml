@@ -50,6 +50,12 @@ ColumnLayout {
 	readonly property url settingsIconSource: Qt.resolvedUrl(_bgIsLight ? "assets/tiled-settings-light.png" : "assets/tiled-settings-dark.png")
 	readonly property bool pillRowsEnabled: !!config.useTileTabs && (plasmoid.configuration.tileTabStyle || "tabs") === "pills"
 
+	function togglePowerSessionModal() {
+		if (popup && popup.powerSessionModal) {
+			popup.powerSessionModal.toggleOpen()
+		}
+	}
+
 	// ──────────────────────────────────────────────
 	// 1. Compact user profile header with search
 	// ──────────────────────────────────────────────
@@ -179,6 +185,9 @@ ColumnLayout {
 	RowLayout {
 		Layout.alignment: Qt.AlignHCenter
 		Layout.fillWidth: true
+		// With compact power on there is no power row below, so this row is the
+		// bottom row and needs its own breathing space against the edge.
+		Layout.bottomMargin: config.dockedSidebarCompactPower ? Kirigami.Units.smallSpacing : 0
 		spacing: 0
 		visible: !leftPane.pillRowsEnabled
 
@@ -300,6 +309,18 @@ ColumnLayout {
 			onClicked: plasmoid.internalAction("configure").trigger()
 		}
 
+		// Replaces the separate power actions row when compact power is enabled.
+		SidebarItem {
+			visible: config.dockedSidebarCompactPower
+			icon.name: "system-shutdown-symbolic"
+			text: i18n("Power")
+			tooltipText: i18n("Power")
+			Layout.fillWidth: false
+			Layout.preferredWidth: config.flatButtonSize
+			Layout.preferredHeight: config.flatButtonSize
+			onClicked: leftPane.togglePowerSessionModal()
+		}
+
 		// Auto Resize lives here only while tile tabs are off; with tabs on it
 		// sits beside the tile tab bar instead.
 		Rectangle {
@@ -341,8 +362,10 @@ ColumnLayout {
 		Layout.leftMargin: Kirigami.Units.smallSpacing
 		Layout.rightMargin: Kirigami.Units.smallSpacing
 		Layout.preferredHeight: viewTabBar.surfaceHeight
+		Layout.bottomMargin: config.dockedSidebarCompactPower ? Kirigami.Units.smallSpacing : 0
 		surfaceHeight: viewTabBar.surfaceHeight
 		settingsIconSource: leftPane.settingsIconSource
+		onPowerButtonClicked: leftPane.togglePowerSessionModal()
 	}
 
 	// ──────────────────────────────────────────────
@@ -356,7 +379,7 @@ ColumnLayout {
 		Layout.bottomMargin: Kirigami.Units.smallSpacing
 		Layout.topMargin: Kirigami.Units.smallSpacing
 		spacing: Kirigami.Units.smallSpacing
-		visible: !leftPane.pillRowsEnabled
+		visible: !leftPane.pillRowsEnabled && !config.dockedSidebarCompactPower
 
 		Repeater {
 			model: appsModel.powerActionsModel
@@ -418,7 +441,7 @@ ColumnLayout {
 	}
 
 	PowerActionPillRow {
-		visible: leftPane.pillRowsEnabled
+		visible: leftPane.pillRowsEnabled && !config.dockedSidebarCompactPower
 		Layout.fillWidth: true
 		Layout.leftMargin: Kirigami.Units.smallSpacing
 		Layout.rightMargin: Kirigami.Units.smallSpacing
