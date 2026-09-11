@@ -113,8 +113,9 @@ Item {
 		_ensureSettingInitialized('defaultTileColor', '')
 		_ensureSettingInitialized('defaultTileGradient', false)
 		_ensureSettingInitialized('sidebarBackgroundColor', '')
-		// Docked Sidebar compact power defaults to on for new installs, but must not
-		// silently change the layout of an install that predates the setting. KConfig
+		// The session modal defaults to on for new installs, but must not silently
+		// change the layout of an install that predates the setting: in Docked Sidebar
+		// mode it also swaps the power actions row for a compact power button. KConfig
 		// returns main.xml's default (true) rather than undefined for a key the user
 		// never stored, so _ensureSettingInitialized cannot distinguish the two cases
 		// here; configSchemaVersion can. Anything already initialised (>= 1) is an
@@ -124,7 +125,6 @@ Item {
 			plasmoid.configuration.dockedSidebarCompactPower = false
 		}
 		_ensureSettingInitialized('dockedSidebarCompactPower', true)
-		_ensureSettingInitialized('sessionModalBlurBackdrop', true)
 		_ensureSettingInitialized('surfaceStyle', '')
 		_ensureSettingInitialized('surfaceShadowDarkness', 'normal')
 		_ensureSettingInitialized('surfaceShadowSize', 'normal')
@@ -687,7 +687,6 @@ Item {
 		return plasmoid.configuration.sidebarFollowsTheme ? "theme" : "custom"
 	}
 	readonly property bool dockedSidebarCompactPower: plasmoid.configuration.dockedSidebarCompactPower !== false
-	readonly property bool sessionModalBlurBackdrop: plasmoid.configuration.sessionModalBlurBackdrop !== false
 	readonly property bool surfaceUsesFrostedGlass: surfaceStyle === "frosted"
 	readonly property bool surfaceUsesThemeBase: surfaceStyle === "theme" || surfaceStyle === "frosted"
 	readonly property color surfaceBaseColor: surfaceUsesThemeBase ? Kirigami.Theme.backgroundColor : sidebarBackgroundColor

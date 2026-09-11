@@ -124,8 +124,6 @@ Item {
 	property var cfg_sidebarHideBorderDefault
 	property var cfg_dockedSidebarCompactPower
 	property var cfg_dockedSidebarCompactPowerDefault
-	property var cfg_sessionModalBlurBackdrop
-	property var cfg_sessionModalBlurBackdropDefault
 	property var cfg_tileLabelAlignment
 	property var cfg_tileLabelAlignmentDefault
 	property var cfg_groupLabelAlignment

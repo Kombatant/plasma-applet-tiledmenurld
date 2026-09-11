@@ -28,10 +28,7 @@ Item {
 	// cannot reach elements drawn inside this window, so the popup content is
 	// blurred as a texture layer instead. The layer costs two full-surface passes,
 	// so it is only enabled while the modal is actually on screen.
-	property bool blurBackdrop: (typeof config !== "undefined" && config
-		&& typeof config.sessionModalBlurBackdrop !== "undefined")
-		? config.sessionModalBlurBackdrop
-		: true
+	property bool blurBackdrop: true
 	readonly property bool blurBackdropActive: blurBackdrop && visible
 	property real blurStrength: 0.65
 	property real blurAmount: open ? blurStrength : 0

@@ -124,8 +124,6 @@ Item {
 	property var cfg_sidebarHideBorderDefault
 	property var cfg_dockedSidebarCompactPower
 	property var cfg_dockedSidebarCompactPowerDefault
-	property var cfg_sessionModalBlurBackdrop
-	property var cfg_sessionModalBlurBackdropDefault
 	property var cfg_tileLabelAlignment
 	property var cfg_tileLabelAlignmentDefault
 	property var cfg_groupLabelAlignment
@@ -269,7 +267,6 @@ Item {
 		sidebarFollowsTheme: "bool",
 		sidebarHideBorder: "bool",
 		dockedSidebarCompactPower: "bool",
-		sessionModalBlurBackdrop: "bool",
 		tileLabelAlignment: "string",
 		groupLabelAlignment: "string",
 		tileGroupLayout: "string",
@@ -516,7 +513,7 @@ Item {
 		if (configKey.indexOf("ai") === 0) {
 			return "AI Chat"
 		}
-		if (configKey === "tileRoundedCorners" || configKey === "tileCornerRadius" || configKey === "sidebarHideBorder" || configKey === "sidebarFollowsTheme" || configKey === "sidebarBackgroundColor" || configKey === "surfaceStyle" || configKey === "surfaceShadowDarkness" || configKey === "surfaceShadowSize" || configKey === "dockedSidebarCompactPower" || configKey === "sessionModalBlurBackdrop") {
+		if (configKey === "tileRoundedCorners" || configKey === "tileCornerRadius" || configKey === "sidebarHideBorder" || configKey === "sidebarFollowsTheme" || configKey === "sidebarBackgroundColor" || configKey === "surfaceStyle" || configKey === "surfaceShadowDarkness" || configKey === "surfaceShadowSize" || configKey === "dockedSidebarCompactPower") {
 			return "Appearance"
 		}
 		if (configKey.indexOf("tile") === 0 || configKey.indexOf("favGridCols") === 0 || configKey === "tilesLocked" || configKey === "showTileTooltips" || configKey.indexOf("defaultTile") === 0) {

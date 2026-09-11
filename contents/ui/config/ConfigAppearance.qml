@@ -98,15 +98,9 @@ LibConfig.FormKCM {
 	}
 
 	LibConfig.CheckBox {
-		Kirigami.FormData.label: i18n("Docked Sidebar")
-		text: i18n("Replace the power row with a power button beside Settings")
-		configKey: 'dockedSidebarCompactPower'
-	}
-
-	LibConfig.CheckBox {
 		Kirigami.FormData.label: i18n("Session Modal")
-		text: i18n("Blur the menu behind the session modal")
-		configKey: 'sessionModalBlurBackdrop'
+		text: i18n("Use the session modal for power actions")
+		configKey: 'dockedSidebarCompactPower'
 	}
 
 	RowLayout {

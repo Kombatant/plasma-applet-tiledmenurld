@@ -14,9 +14,15 @@ Item {
 	property var popup
 	z: 1
 
-	function togglePowerSessionModal() {
-		if (popup && popup.powerSessionModal) {
-			popup.powerSessionModal.toggleOpen()
+	// With the session modal disabled the power button falls back to the classic
+	// drop-out context menu it used before the modal existed.
+	function togglePowerActions(fallbackMenu) {
+		if (config.dockedSidebarCompactPower) {
+			if (popup && popup.powerSessionModal) {
+				popup.powerSessionModal.toggleOpen()
+			}
+		} else if (fallbackMenu) {
+			fallbackMenu.toggleOpen()
 		}
 	}
 	property int _horizontalSearchWidth: config.appListWidth
@@ -305,7 +311,12 @@ Item {
 				text: i18n("Power")
 				tooltipText: i18n("Power")
 				onClicked: {
-					sidebarView.togglePowerSessionModal()
+					sidebarView.togglePowerActions(powerMenu)
+				}
+				SidebarContextMenu {
+					id: powerMenu
+					visualParent: powerMenuButton
+					model: appsModel.powerActionsModel
 				}
 			}
 		}
@@ -587,7 +598,12 @@ Item {
 				text: i18n("Power")
 				tooltipText: i18n("Power")
 				onClicked: {
-					sidebarView.togglePowerSessionModal()
+					sidebarView.togglePowerActions(powerMenuHoriz)
+				}
+				SidebarContextMenu {
+					id: powerMenuHoriz
+					visualParent: powerMenuButtonHoriz
+					model: appsModel.powerActionsModel
 				}
 			}
 		}
