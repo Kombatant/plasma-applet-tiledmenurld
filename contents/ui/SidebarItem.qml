@@ -26,11 +26,14 @@ FlatButton {
 	property bool showBadge: false
 	property bool showHoverOutline: true
 	icon.color: forceMonochromeIcon ? (checked ? Kirigami.Theme.highlightColor : Kirigami.Theme.textColor) : "transparent"
-	// A monochrome-tinted icon already carries the theme's text colour, so the
-	// desaturation pass has no saturation left to remove. Running it anyway
-	// pushes the tint through MultiEffect's premultiplied-alpha layer, which
-	// flattens it to a washed grey that disappears against a light backdrop.
-	layer.enabled: desaturateIcon && !forceMonochromeIcon && !hovered && !pressed
+	// icon.color only tints icons the theme can mask (those drawn with
+	// currentColor). Apps whose theme has no symbolic variant - vscode.svg is
+	// hardcoded blue - ignore the tint entirely and stay in colour, so they
+	// still need this pass. Running it on an already-tinted icon is harmless:
+	// the theme's near-neutral text colour is its own luminance, so
+	// desaturating it is a no-op. Skip only when checked, where the tint is
+	// highlightColor and desaturating would flatten the blue to a mid-grey.
+	layer.enabled: desaturateIcon && !checked && !hovered && !pressed
 	layer.effect: MultiEffect {
 		saturation: -1.0
 	}
