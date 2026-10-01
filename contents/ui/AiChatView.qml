@@ -6,7 +6,6 @@ import org.kde.kquickcontrolsaddons as KQuickControlsAddons
 
 Item {
 	id: aiChatView
-	clip: true
 
 	property var chatModel
 	property var conversationOptions: []
@@ -42,6 +41,16 @@ Item {
 		// Do not disable sending based on the in-memory key. The send action is
 		// what revalidates KWallet, prompts when locked, and reports a missing key.
 		return true
+	}
+	// Request in flight but no streamed token yet: show the typing indicator.
+	readonly property bool awaitingReply: !!chatModel && chatModel.canStopResponse && !streamingText
+
+	onAwaitingReplyChanged: {
+		Qt.callLater(function() {
+			if (messageList) {
+				messageList.positionViewAtEnd()
+			}
+		})
 	}
 
 	property var listView: messageList
@@ -216,11 +225,7 @@ Item {
 		if (!conversationCombo || !conversationCombo.model || conversationCombo.currentIndex < 0 || conversationCombo.currentIndex >= conversationCombo.model.length) {
 			return ""
 		}
-		var selected = conversationCombo.model[conversationCombo.currentIndex].value
-		if (selected === "__new__") {
-			return ""
-		}
-		return selected
+		return conversationCombo.model[conversationCombo.currentIndex].value
 	}
 
 	Component.onCompleted: {
@@ -275,17 +280,6 @@ Item {
 		})
 	}
 
-	readonly property var chatMenuOptions: {
-		var options = [{
-			value: "__new__",
-			text: i18n("+ Start New Chat"),
-		}]
-		for (var i = 0; i < conversationOptions.length; i++) {
-			options.push(conversationOptions[i])
-		}
-		return options
-	}
-
 	Rectangle {
 		anchors.fill: parent
 		color: "transparent"
@@ -314,7 +308,7 @@ Item {
 					id: conversationCombo
 					Layout.fillWidth: true
 					textRole: "text"
-					model: chatMenuOptions
+					model: conversationOptions
 					readonly property string _currentLabel: (currentIndex >= 0 && currentIndex < model.length) ? ("" + model[currentIndex].text) : ""
 					readonly property string _currentFullLabel: {
 						if (currentIndex < 0 || currentIndex >= model.length) return ""
@@ -342,15 +336,7 @@ Item {
 						if (!chatModel || index < 0 || index >= model.length) {
 							return
 						}
-						var selected = model[index].value
-						if (selected === "__new__") {
-							chatModel.newConversation()
-							Qt.callLater(function() {
-								conversationCombo.refreshCurrentIndex()
-							})
-							return
-						}
-						chatModel.setActiveConversation(selected)
+						chatModel.setActiveConversation(model[index].value)
 					}
 					Component.onCompleted: refreshCurrentIndex()
 					function refreshCurrentIndex() {
@@ -371,6 +357,21 @@ Item {
 							conversationCombo.refreshCurrentIndex()
 						}
 					}
+				}
+
+				QQC2.ToolButton {
+					icon.name: "list-add"
+					enabled: !!chatModel
+					display: QQC2.AbstractButton.IconOnly
+					onClicked: {
+						if (!chatModel) {
+							return
+						}
+						chatModel.newConversation()
+						aiChatView.focusComposer()
+					}
+					QQC2.ToolTip.visible: hovered
+					QQC2.ToolTip.text: i18n("Start New Chat")
 				}
 
 				QQC2.ToolButton {
@@ -485,6 +486,64 @@ Item {
 							onClicked: aiChatView.copyAssistantMessage(index, displayContent)
 							QQC2.ToolTip.visible: hovered
 							QQC2.ToolTip.text: aiChatView.copiedMessageIndex === index ? i18n("Copied") : i18n("Copy")
+						}
+					}
+				}
+
+				footer: Item {
+					width: Math.max(0, messageList.width - messageList.scrollBarGutter)
+					height: aiChatView.awaitingReply ? (typingLabel.implicitHeight + typingBubble.height + Kirigami.Units.smallSpacing * 0.35 + messageList.spacing) : 0
+					visible: aiChatView.awaitingReply
+
+					QQC2.Label {
+						id: typingLabel
+						anchors.top: parent.top
+						anchors.topMargin: messageList.spacing
+						anchors.left: parent.left
+						text: i18n("Assistant")
+						font.pixelSize: Math.round(Kirigami.Theme.defaultFont.pixelSize * 0.88)
+						opacity: 0.55
+					}
+
+					Rectangle {
+						id: typingBubble
+						readonly property real dotSize: Math.round(Kirigami.Units.gridUnit * 0.4)
+						anchors.top: typingLabel.bottom
+						anchors.topMargin: Kirigami.Units.smallSpacing * 0.35
+						anchors.left: parent.left
+						width: typingDots.implicitWidth + Kirigami.Units.largeSpacing * 2
+						height: dotSize + Kirigami.Units.smallSpacing * 1.2 * 2 + Kirigami.Units.smallSpacing
+						radius: Kirigami.Units.largeSpacing * 0.7
+						color: Qt.rgba(Kirigami.Theme.textColor.r, Kirigami.Theme.textColor.g, Kirigami.Theme.textColor.b, 0.04)
+						border.width: 1
+						border.color: Qt.rgba(Kirigami.Theme.textColor.r, Kirigami.Theme.textColor.g, Kirigami.Theme.textColor.b, 0.11)
+
+						Row {
+							id: typingDots
+							anchors.centerIn: parent
+							spacing: Math.round(typingBubble.dotSize * 0.7)
+
+							Repeater {
+								model: 3
+								delegate: Rectangle {
+									required property int index
+									width: typingBubble.dotSize
+									height: width
+									radius: width / 2
+									color: Kirigami.Theme.textColor
+									opacity: 0.25
+
+									// Equal total loop length per dot keeps the stagger in phase.
+									SequentialAnimation on opacity {
+										running: aiChatView.awaitingReply
+										loops: Animation.Infinite
+										PauseAnimation { duration: index * 180 }
+										NumberAnimation { to: 0.85; duration: 300; easing.type: Easing.InOutQuad }
+										NumberAnimation { to: 0.25; duration: 300; easing.type: Easing.InOutQuad }
+										PauseAnimation { duration: (2 - index) * 180 + 240 }
+									}
+								}
+							}
 						}
 					}
 				}

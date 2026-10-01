@@ -15,7 +15,10 @@ Item {
 			}
 		}
 	}
-	clip: true
+	// No root clip: the search field and AI chat cards cast shadows past these
+	// bounds, and clipping them leaves hard dark edges. The stack clips its own
+	// views, except AI chat once it has finished sliding in.
+	readonly property bool _unclipForAiChat: showingAiChat && !stackView.busy
 
 	property alias searchResultsView: searchResultsView
 	property alias appsView: appsView
@@ -272,6 +275,8 @@ Item {
 	Item {
 		id: stackViewContainer
 		anchors.fill: parent
+		// The slide snapshot animates outside the stack bounds.
+		clip: appsViewSlideSnapshot.visible
 
 	     
 
@@ -469,6 +474,7 @@ Item {
 		SearchStackView {
 			id: stackView
 			anchors.fill: parent
+			clip: !searchView._unclipForAiChat
 			initialItem: appsView
 		}
 
