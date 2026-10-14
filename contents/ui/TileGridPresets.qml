@@ -171,7 +171,7 @@ PlasmaExtras.MenuItem {
 			text: i18n("Gmail")
 			onClicked: {
 				var tile = presetMenuItem.addGmail(cellContextMenu.cellX, cellContextMenu.cellY)
-				tileGrid.editTile(tile)
+				tileGrid.requestEditTile(tile)
 			}
 		}
 	}

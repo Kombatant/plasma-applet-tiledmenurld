@@ -632,7 +632,7 @@ Item {
 	}
 
 	function openTileEditor() {
-		tileGrid.editTile(tileGrid.tileModel[index])
+		tileGrid.editTile(index)
 	}
 	function closeTileEditor() {
 

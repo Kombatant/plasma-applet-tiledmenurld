@@ -1472,7 +1472,7 @@ MouseArea {
 								property bool _tileModelSavePending: false
 								property bool _activeTabTilesSavePending: false
 
-								onEditTile: function(tile) { tileEditorViewLoader.open(tile, tileGrid) }
+								onEditTile: function(tileIndex) { tileEditorViewLoader.open(tileGrid.tileModel[tileIndex], tileGrid) }
 								onMoveTileToTab: function(tileIndex, tabId) { popup.moveTileToTab(tileIndex, tabId) }
 
 								function syncConfigTileModelValue() {

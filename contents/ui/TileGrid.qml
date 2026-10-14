@@ -859,7 +859,7 @@ DropArea {
 					visible: !plasmoid.configuration.tilesLocked
 					onClicked: {
 						var tile = tileGrid.addGroup(cellContextMenu.cellX, cellContextMenu.cellY)
-						tileGrid.editTile(tile)
+						tileGrid.requestEditTile(tile)
 					}
 				}
 
@@ -869,7 +869,7 @@ DropArea {
 					visible: !plasmoid.configuration.tilesLocked
 					onClicked: {
 						var tile = tileGrid.addHeroTile(cellContextMenu.cellX, cellContextMenu.cellY)
-						tileGrid.editTile(tile)
+						tileGrid.requestEditTile(tile)
 					}
 				}
 
@@ -1355,5 +1355,15 @@ DropArea {
 		tileGridPresets.addDefault()
 	}
 
-	signal editTile(var tile)
+	// Emits the tile's index rather than the tile: a JS object passed through a
+	// `var` signal parameter arrives as a copy, so the editor would edit a tile
+	// detached from tileModel and none of its changes would reach the grid.
+	function requestEditTile(tile) {
+		var tileIndex = tileModel.indexOf(tile)
+		if (tileIndex >= 0) {
+			editTile(tileIndex)
+		}
+	}
+
+	signal editTile(int tileIndex)
 }
