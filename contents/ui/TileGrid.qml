@@ -223,7 +223,7 @@ DropArea {
 	onPositionChanged: drag => {
 		dragTick(drag)
 	}
-	onExited: drag => {
+	onExited: {
 		resetDragHover()
 	}
 

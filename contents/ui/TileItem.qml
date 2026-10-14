@@ -165,7 +165,7 @@ Item {
 					anchors.left: parent.left
 					anchors.right: parent.right
 					anchors.bottom: parent.bottom
-					height: (descriptionLabelFontMetrics.lineSpacing * 2) + labelScrimTopPadding + labelPaddingY
+					height: (tileContent.descriptionLabelFontMetrics.lineSpacing * 2) + labelScrimTopPadding + labelPaddingY
 					visible: height > 0
 					gradient: Gradient {
 						GradientStop { position: 0.0; color: Qt.rgba(0, 0, 0, 0.0) }
@@ -220,7 +220,7 @@ Item {
 			anchors.leftMargin: labelPaddingX
 			anchors.rightMargin: labelPaddingX
 			anchors.bottomMargin: labelPaddingY
-			height: visible ? (descriptionLabelFontMetrics.lineSpacing * 2) : 0
+			height: visible ? (tileContent.descriptionLabelFontMetrics.lineSpacing * 2) : 0
 
 			QQC2.Label {
 				id: descriptionLabelShadow
@@ -296,7 +296,7 @@ Item {
 			anchors.leftMargin: appObj.inGroup ? tileItemView.anchors.leftMargin : 0
 			anchors.rightMargin: appObj.inGroup ? tileItemView.anchors.rightMargin : 0
 			anchors.topMargin: descriptionSpacing
-			height: visible ? (descriptionLabelFontMetrics.lineSpacing * maximumLineCount) : 0
+			height: visible ? (tileContent.descriptionLabelFontMetrics.lineSpacing * maximumLineCount) : 0
 			clip: true
 			horizontalAlignment: appObj.usesGroupPanelStyling ? Text.AlignHCenter : tileItemView.labelAlignment
 			verticalAlignment: appObj.isGroup ? Text.AlignVCenter : Text.AlignTop

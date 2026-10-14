@@ -31,8 +31,7 @@ AppToolButton {
 	property bool hoverScrollDescriptions: !showItemUrl
 	property int hoverScrollPixelsPerSecond: 45
 	property string launcherUrl: model.favoriteId || model.url
-	property string iconName: model.iconName || ''
-	property alias iconSource: itemIcon.source
+	iconName: model.iconName || ''
 	property int iconSize: model.largeIcon ? listView.iconSize * 2 : listView.iconSize
 	readonly property bool selectedByListView: ListView.isCurrentItem
 
@@ -117,7 +116,7 @@ AppToolButton {
 	function startDrag() {
 		// Note that we fallback from url to favoriteId for "Most Used" apps.
 		
-		var dragIcon = iconSource
+		var dragIcon = itemIcon.source
 		dragHelper.startDrag(widget, model.url || model.favoriteId, dragIcon, "favoriteId", model.favoriteId)
 
 		resetDragState()
@@ -142,7 +141,7 @@ AppToolButton {
 			contextMenu.open(mouse.x, mouse.y)
 		}
 	}
-	onContainsMouseChanged: function(containsMouse) {
+	onContainsMouseChanged: {
 		if (!containsMouse) {
 			resetDragState()
 		}
@@ -172,7 +171,7 @@ AppToolButton {
 				implicitWidth: implicitHeight
 
 				animated: true
-				source: itemDelegate.iconName || itemDelegate.iconInstance
+				source: itemDelegate.iconSource || itemDelegate.iconName || itemDelegate.iconInstance
 			}
 		}
 

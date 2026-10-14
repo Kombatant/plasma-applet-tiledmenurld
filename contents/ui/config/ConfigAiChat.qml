@@ -366,8 +366,6 @@ LibConfig.FormKCM {
 		configKey: "aiProvider"
 		Kirigami.FormData.label: i18n("AI Provider")
 		model: form.providerOptions
-		property bool _initialized: false
-		Component.onCompleted: Qt.callLater(function() { _initialized = true })
 		onValueChanged: {
 			form._refreshProviderValueCached()
 			if (!_initialized) {
