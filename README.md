@@ -61,7 +61,7 @@ With tabs enabled (Settings → Tiles → Tabs), click the statistics button nex
 
 ### Option A — Using kpackagetool6 (recommended)
 
-1. Download and extract the release zip, then from inside the extracted folder run:
+1. Download and extract the code zip, then from inside the extracted folder run:
 
     ```bash
     kpackagetool6 --type Plasma/Applet --install .
