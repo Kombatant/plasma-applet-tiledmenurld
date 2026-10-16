@@ -209,6 +209,16 @@ DropArea {
 
 	signal moveTileToTab(int tileIndex, string tabId)
 
+	// Read-only grids (the automatic "Popular" tab) still launch
+	// apps and show app actions, but reject every layout mutation regardless
+	// of the user's tile lock. effectiveLocked folds both into one check for
+	// UI controls; the mutation functions below also guard on readOnly.
+	property bool readOnly: false
+	readonly property bool effectiveLocked: readOnly || !!plasmoid.configuration.tilesLocked
+	// Shown instead of the presets/add-tile splash when a read-only grid is empty.
+	property string emptyPlaceholderText: ""
+	property string emptyPlaceholderExplanation: ""
+
 	readonly property var draggedGroupRect: {
 		if (isDraggingGroup) {
 			return getGroupAreaRect(draggedItem)
@@ -230,6 +240,10 @@ DropArea {
 
 
 		onDropped: drop => {
+		if (tileGrid.readOnly) {
+			tileGrid.resetDrag()
+			return
+		}
 		 dragTick(drop)
 		if (canDrop) {
 		if (dropTargetHeroTile) {
@@ -364,6 +378,7 @@ DropArea {
 	}
 
 	function moveGroup(groupTile, deltaX, deltaY) {
+		if (readOnly) return
 		var area = getGroupAreaRect(groupTile)
 
 		// Move tiles below group label
@@ -380,6 +395,7 @@ DropArea {
 	}
 
 	function moveTile(tile, cellX, cellY) {
+		if (readOnly) return
 		if (tile.tileType == "group") {
 			moveGroup(tile, cellX - tile.x, cellY - tile.y)
 		}
@@ -391,6 +407,13 @@ DropArea {
 	// QQuickDropEvent
 	// https://github.com/qt/qtdeclarative/blob/a4aa8d9ade44d75cb5a1d84bd7c1773fadc73095/src/quick/items/qquickdroparea_p.h#L63
 	function dragTick(event) {
+		if (readOnly) {
+			// No drop highlight or drop target on generated content.
+			canDrop = false
+			dropHoverX = -1
+			dropHoverY = -1
+			return
+		}
 
 		dropTargetHeroTile = null
 		dropPendingUrl = ""
@@ -637,6 +660,7 @@ DropArea {
 		}
 	}
 	function sortGroupTiles(groupTile) {
+		if (readOnly) return
 		var area = getGroupAreaRect(groupTile)
 		var tileList = getTilesInArea(area)
 
@@ -838,6 +862,9 @@ DropArea {
 						acceptedButtons: Qt.RightButton
 						onClicked: function(mouse) {
 							if (mouse.button == Qt.RightButton) {
+								if (tileGrid.readOnly) {
+									return
+								}
 								cellContextMenu.cellX = cellItem.modelX
 								cellContextMenu.cellY = cellItem.modelY
 								var pos = mapToItem(scrollItem, mouse.x, mouse.y) // cellContextMenu is a child of scrollItem
@@ -856,7 +883,7 @@ DropArea {
 				PlasmaExtras.MenuItem {
 					icon: "group-new"
 					text: i18n("New Group")
-					visible: !plasmoid.configuration.tilesLocked
+					visible: !tileGrid.effectiveLocked
 					onClicked: {
 						var tile = tileGrid.addGroup(cellContextMenu.cellX, cellContextMenu.cellY)
 						tileGrid.requestEditTile(tile)
@@ -866,7 +893,7 @@ DropArea {
 				PlasmaExtras.MenuItem {
 					icon: "view-presentation"
 					text: i18n("New Hero Tile")
-					visible: !plasmoid.configuration.tilesLocked
+					visible: !tileGrid.effectiveLocked
 					onClicked: {
 						var tile = tileGrid.addHeroTile(cellContextMenu.cellX, cellContextMenu.cellY)
 						tileGrid.requestEditTile(tile)
@@ -875,12 +902,14 @@ DropArea {
 
 				TileGridPresets {
 					id: tileGridPresets
-					visible: !plasmoid.configuration.tilesLocked
+					visible: !tileGrid.effectiveLocked
 				}
 
 				PlasmaExtras.MenuItem {
 					icon: plasmoid.configuration.tilesLocked ? "object-unlocked" : "object-locked"
 					text: plasmoid.configuration.tilesLocked ? i18n("Unlock Tiles") : i18n("Lock Tiles")
+					// The global lock means nothing on generated content.
+					visible: !tileGrid.readOnly
 					onClicked: {
 						plasmoid.configuration.tilesLocked = !plasmoid.configuration.tilesLocked
 					}
@@ -966,7 +995,7 @@ DropArea {
 								readonly property real separatorSpacing: Kirigami.Units.largeSpacing
 								readonly property real minimumSeparatorWidth: Kirigami.Units.gridUnit * 2
 								readonly property bool reversed: plasmoid.configuration.groupLabelAlignment === "right"
-								readonly property real countWidth: countLabel.implicitWidth
+								readonly property real countWidth: countLabel.visible ? countLabel.implicitWidth : 0
 								readonly property real titleWidth: Math.min(
 									titleLabel.implicitWidth,
 									parent.parent.isCardLayout
@@ -991,6 +1020,8 @@ DropArea {
 
 						QQC2.Label {
 							id: countLabel
+							visible: !(tile && tile.hideCount)
+							width: visible ? implicitWidth : 0
 							x: headerRow.reversed ? 0 : headerRow.width - width
 							y: (parent.height - height) / 2
 							text: i18np("%1 tile", "%1 tiles", parent.parent.itemCount)
@@ -1046,11 +1077,20 @@ DropArea {
 	Loader {
 		id: tileGridSplashLoader
 		anchors.centerIn: parent
-		active: tileModel.length == 0 && !tileGrid.editing
+		active: tileModel.length == 0 && !tileGrid.editing && !tileGrid.readOnly
 		visible: active && width <= parent.width
 		source: "TileGridSplash.qml"
 		property alias tileGridPresets: tileGridPresets
 		property int maxWidth: parent.width
+	}
+
+	Kirigami.PlaceholderMessage {
+		anchors.centerIn: parent
+		width: parent.width - Kirigami.Units.gridUnit * 4
+		visible: tileGrid.readOnly && tileModel.length == 0
+		icon.name: "view-statistics"
+		text: tileGrid.emptyPlaceholderText
+		explanation: tileGrid.emptyPlaceholderExplanation
 	}
 
 	/* Scroll on hover with drag */
@@ -1159,6 +1199,7 @@ DropArea {
 	}
 
 	function removeIndex(i) {
+		if (readOnly) return
 		var target = tileModel[i]
 		if (target && target.tileType === "group") {
 			var area = getGroupAreaRect(target)
@@ -1178,6 +1219,7 @@ DropArea {
 	}
 
 	function removeApp(url) {
+		if (readOnly) return
 		url = "" + url
 		var removedCount = 0
 		for (var i = tileModel.length - 1; i >= 0; i--) {
@@ -1225,6 +1267,7 @@ DropArea {
 		}
 	}
 	function addApp(url, x, y, props) {
+		if (readOnly) return null
 		var tile = newAppTile(url, props)
 		parseTileXY(tile, x, y)
 		tileModel.push(tile)
@@ -1248,6 +1291,7 @@ DropArea {
 	}
 
 	function addTile(x, y, props) {
+		if (readOnly) return null
 		var tile = newTile("")
 		parseTileXY(tile, x, y)
 		if (typeof props !== "undefined") {
@@ -1312,6 +1356,7 @@ DropArea {
 	}
 
 	function appendHeroPage(tile, url, favoriteId) {
+		if (readOnly) return
 		if (!tile || tile.tileType !== "hero") return
 		var resolvedFav = favoriteId || Utils.parseDropUrl(url || "")
 		var app = (resolvedFav && appsModel) ? appsModel.getTileApp(resolvedFav) : null
@@ -1352,6 +1397,7 @@ DropArea {
 
 	// Use for quickly testing on widget load
 	function addDefaultTiles() {
+		if (readOnly) return
 		tileGridPresets.addDefault()
 	}
 
@@ -1359,6 +1405,7 @@ DropArea {
 	// `var` signal parameter arrives as a copy, so the editor would edit a tile
 	// detached from tileModel and none of its changes would reach the grid.
 	function requestEditTile(tile) {
+		if (readOnly) return
 		var tileIndex = tileModel.indexOf(tile)
 		if (tileIndex >= 0) {
 			editTile(tileIndex)

@@ -100,6 +100,11 @@ Item {
 					}
 					return
 				}
+				// The active grid is the automatic Popular tab: it can't take
+				// pins, and its generated tiles can't be unpinned.
+				if (grid.readOnly) {
+					return
+				}
 				var menuItem = menu.newMenuItem()
 				var hasTile = grid.hasAppTile(parsedFavoriteId) || grid.hasAppTile(favoriteId)
 				if (hasTile) {

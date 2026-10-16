@@ -6,6 +6,7 @@ import org.kde.kirigami as Kirigami
 import Qt.labs.platform as QtLabsPlatform
 import "../libconfig/ConfigUtils.js" as ConfigUtils
 import "../lib/Base64.js" as Base64
+import "../lib/TileTabs.js" as TileTabs
 import "../Utils.js" as Utils
 
 import ".." as TiledMenu
@@ -78,6 +79,8 @@ Item {
 	property var cfg_tileTabStyleDefault
 	property var cfg_tileTabs
 	property var cfg_tileTabsDefault
+	property var cfg_numMostUsedApps
+	property var cfg_numMostUsedAppsDefault
 	property var cfg_tileModel
 	property var cfg_tileModelDefault
 	property var cfg_tileScale
@@ -246,6 +249,7 @@ Item {
 		useTileTabs: "bool",
 		tileTabStyle: "string",
 		tileTabs: "tiletabs",
+		numMostUsedApps: "int",
 		tileModel: "tilemodel",
 		tileScale: "double",
 		tileIconSize: "int",
@@ -516,7 +520,7 @@ Item {
 		if (configKey === "tileRoundedCorners" || configKey === "tileCornerRadius" || configKey === "sidebarHideBorder" || configKey === "sidebarFollowsTheme" || configKey === "sidebarBackgroundColor" || configKey === "surfaceStyle" || configKey === "surfaceShadowDarkness" || configKey === "surfaceShadowSize" || configKey === "dockedSidebarCompactPower") {
 			return "Appearance"
 		}
-		if (configKey.indexOf("tile") === 0 || configKey.indexOf("favGridCols") === 0 || configKey === "tilesLocked" || configKey === "showTileTooltips" || configKey.indexOf("defaultTile") === 0) {
+		if (configKey.indexOf("tile") === 0 || configKey.indexOf("favGridCols") === 0 || configKey === "tilesLocked" || configKey === "showTileTooltips" || configKey === "numMostUsedApps" || configKey.indexOf("defaultTile") === 0) {
 			return "Tiles"
 		}
 		if (configKey.indexOf("sidebar") === 0 || configKey === "dockedSidebarWidth") {
@@ -611,20 +615,7 @@ Item {
 			}
 		}
 
-		var out = []
-		for (var i = 0; i < tabs.length; i++) {
-			var tab = tabs[i]
-			if (!tab || typeof tab !== "object") {
-				continue
-			}
-			out.push({
-				id: (typeof tab.id === "undefined" || tab.id === null) ? "" : ("" + tab.id),
-				name: (typeof tab.name === "undefined" || tab.name === null) ? "" : ("" + tab.name),
-				icon: (typeof tab.icon === "undefined" || tab.icon === null) ? "" : ("" + tab.icon),
-				tiles: Array.isArray(tab.tiles) ? tab.tiles : [],
-			})
-		}
-		return out
+		return TileTabs.normalizeForExport(tabs)
 	}
 
 	function _encodeTileTabs(tabs) {
@@ -821,7 +812,8 @@ Item {
 		lines.push("      <tabs>")
 		for (var i = 0; i < tabs.length; i++) {
 			var tab = tabs[i]
-			lines.push("        <tab id=\"" + _escapeXml(tab.id) + "\" name=\"" + _escapeXml(tab.name) + "\" icon=\"" + _escapeXml(tab.icon) + "\">")
+			var kindAttr = tab.kind === "mostUsed" ? " kind=\"mostUsed\"" : ""
+			lines.push("        <tab id=\"" + _escapeXml(tab.id) + "\" name=\"" + _escapeXml(tab.name) + "\" icon=\"" + _escapeXml(tab.icon) + "\"" + kindAttr + ">")
 			var tileLines = _buildTilesXmlLines(tab.tiles, "          ")
 			for (var ti = 0; ti < tileLines.length; ti++) {
 				lines.push(tileLines[ti])
@@ -883,10 +875,11 @@ Item {
 				id: _xmlAttribute(attrs, "id", ""),
 				name: _xmlAttribute(attrs, "name", ""),
 				icon: _xmlAttribute(attrs, "icon", ""),
+				kind: _xmlAttribute(attrs, "kind", "manual"),
 				tiles: tilesMatch ? _parseTileModelXml(tilesMatch[0]) : [],
 			})
 		}
-		return out
+		return _normalizeTileTabs(out)
 	}
 
 	function buildExportXml() {

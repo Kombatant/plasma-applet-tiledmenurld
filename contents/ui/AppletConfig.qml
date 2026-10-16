@@ -81,6 +81,7 @@ Item {
 		_ensureSettingInitialized('useTileTabs', false)
 		_ensureSettingInitialized('tileTabStyle', 'tabs')
 		_ensureSettingInitialized('tileTabs', '')
+		_ensureSettingInitialized('numMostUsedApps', 10)
 
 		// Base64 encoded XML string; empty string means "use default".
 		_ensureSettingInitialized('tileModel', '')

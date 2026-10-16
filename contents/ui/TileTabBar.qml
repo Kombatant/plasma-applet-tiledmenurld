@@ -15,6 +15,9 @@ Item {
 
 	// Array of tab descriptor objects: [{id: string, name: string, icon: string}, ...]
 	property var tabs: []
+	// False once the automatic Popular tab exists (one per
+	// instance); hides its add button and context menu entry.
+	property bool canAddMostUsedTab: true
 
 	// Visual style: "tabs" (accent-lit tab), "underline", or "pills".
 	property string style: "tabs"
@@ -28,6 +31,7 @@ Item {
 	// Emitted when the user selects a different tab.
 	signal tabSelected(int index)
 	signal tabAdded()
+	signal mostUsedTabAdded()
 	signal tabDeleted(int index)
 	signal tabRenamed(int index, string newName)
 	signal tabMoved(int fromIndex, int toIndex)
@@ -99,6 +103,13 @@ Item {
 			icon: "list-add"
 			text: i18n("Add Tab")
 			onClicked: tabBar.tabAdded()
+		}
+
+		PlasmaExtras.MenuItem {
+			icon: "view-statistics"
+			text: i18n("Add Popular Tab")
+			visible: tabBar.canAddMostUsedTab
+			onClicked: tabBar.mostUsedTabAdded()
 		}
 
 		PlasmaExtras.MenuItem {
@@ -339,7 +350,7 @@ Item {
 				spacing: 0
 
 				readonly property real _controlHeight: parent.height
-				readonly property real _availableWidth: Math.max(0, pillsSurface.width - pillsAddBtn.width - Kirigami.Units.smallSpacing)
+				readonly property real _availableWidth: Math.max(0, pillsSurface.width - pillsAddBtn.width - pillsMostUsedBtn.width - Kirigami.Units.smallSpacing)
 				readonly property real _tabsContentWidth: pillsRow.width + tabBar._pillsInset * 2
 				readonly property bool _overflow: _tabsContentWidth > _availableWidth
 				readonly property real _maxContentX: Math.max(0, tabFlickable.contentWidth - tabFlickable.width)
@@ -427,6 +438,35 @@ Item {
 						hoverEnabled: true
 						cursorShape: Qt.PointingHandCursor
 						onClicked: tabBar.tabAdded()
+					}
+				}
+
+				Item {
+					id: pillsMostUsedBtn
+					visible: tabBar.canAddMostUsedTab
+					width: visible ? pillsTrailing._controlHeight : 0
+					height: pillsTrailing._controlHeight
+
+					Accessible.name: i18n("Add Popular Tab")
+					Accessible.role: Accessible.Button
+					QQC2.ToolTip.visible: pillsMostUsedMA.containsMouse
+					QQC2.ToolTip.text: i18n("Add Popular Tab")
+
+					Kirigami.Icon {
+						anchors.centerIn: parent
+						source: "view-statistics"
+						width: Kirigami.Units.iconSizes.smallMedium
+						height: width
+						color: Kirigami.Theme.textColor
+						opacity: pillsMostUsedMA.containsMouse ? 0.9 : 0.55
+					}
+
+					MouseArea {
+						id: pillsMostUsedMA
+						anchors.fill: parent
+						hoverEnabled: true
+						cursorShape: Qt.PointingHandCursor
+						onClicked: tabBar.mostUsedTabAdded()
 					}
 				}
 			}
@@ -633,7 +673,7 @@ Item {
 			height: tabBar.tabHeight
 			spacing: 0
 
-			readonly property real _availableWidth: tabBar.width - tabsAddBtn.width
+			readonly property real _availableWidth: tabBar.width - tabsAddBtn.width - tabsMostUsedBtn.width
 			readonly property bool _overflow: tabsRow.width > _availableWidth
 			readonly property real _maxContentX: Math.max(0, tabsFlickable.contentWidth - tabsFlickable.width)
 
@@ -743,6 +783,50 @@ Item {
 					hoverEnabled: true
 					cursorShape: Qt.PointingHandCursor
 					onClicked: tabBar.tabAdded()
+				}
+			}
+
+			Item {
+				id: tabsMostUsedBtn
+				visible: tabBar.canAddMostUsedTab
+				width: visible ? tabBar.tabHeight : 0
+				height: tabBar.tabHeight
+
+				Accessible.name: i18n("Add Popular Tab")
+				Accessible.role: Accessible.Button
+				QQC2.ToolTip.visible: tabsMostUsedMA.containsMouse
+				QQC2.ToolTip.text: i18n("Add Popular Tab")
+
+				Rectangle {
+					anchors.centerIn: parent
+					width: Kirigami.Units.gridUnit * 1.8
+					height: width
+					radius: height / 2
+					color: Qt.rgba(
+						Kirigami.Theme.textColor.r,
+						Kirigami.Theme.textColor.g,
+						Kirigami.Theme.textColor.b,
+						tabsMostUsedMA.containsMouse ? 0.10 : 0.0)
+					Behavior on color { ColorAnimation { duration: tabBar._tabFadeDuration } }
+				}
+
+				Kirigami.Icon {
+					anchors.centerIn: parent
+					source: "view-statistics"
+					isMask: true
+					width: Kirigami.Units.iconSizes.smallMedium
+					height: width
+					color: Kirigami.Theme.textColor
+					opacity: tabsMostUsedMA.containsMouse ? 0.95 : 0.55
+					Behavior on opacity { NumberAnimation { duration: tabBar._tabFadeDuration } }
+				}
+
+				MouseArea {
+					id: tabsMostUsedMA
+					anchors.fill: parent
+					hoverEnabled: true
+					cursorShape: Qt.PointingHandCursor
+					onClicked: tabBar.mostUsedTabAdded()
 				}
 			}
 		}
@@ -933,7 +1017,7 @@ Item {
 			height: tabBar.tabHeight
 			spacing: 0
 
-			readonly property real _availableWidth: tabBar.width - underlineAddBtn.width
+			readonly property real _availableWidth: tabBar.width - underlineAddBtn.width - underlineMostUsedBtn.width
 			readonly property bool _overflow: underlineRow.width > _availableWidth
 			readonly property real _maxContentX: Math.max(0, underlineFlickable.contentWidth - underlineFlickable.width)
 
@@ -1043,6 +1127,50 @@ Item {
 					hoverEnabled: true
 					cursorShape: Qt.PointingHandCursor
 					onClicked: tabBar.tabAdded()
+				}
+			}
+
+			Item {
+				id: underlineMostUsedBtn
+				visible: tabBar.canAddMostUsedTab
+				width: visible ? tabBar.tabHeight : 0
+				height: tabBar.tabHeight
+
+				Accessible.name: i18n("Add Popular Tab")
+				Accessible.role: Accessible.Button
+				QQC2.ToolTip.visible: underlineMostUsedMA.containsMouse
+				QQC2.ToolTip.text: i18n("Add Popular Tab")
+
+				Rectangle {
+					anchors.centerIn: parent
+					width: Kirigami.Units.gridUnit * 1.8
+					height: width
+					radius: height / 2
+					color: Qt.rgba(
+						Kirigami.Theme.textColor.r,
+						Kirigami.Theme.textColor.g,
+						Kirigami.Theme.textColor.b,
+						underlineMostUsedMA.containsMouse ? 0.10 : 0.0)
+					Behavior on color { ColorAnimation { duration: tabBar._tabFadeDuration } }
+				}
+
+				Kirigami.Icon {
+					anchors.centerIn: parent
+					source: "view-statistics"
+					isMask: true
+					width: Kirigami.Units.iconSizes.smallMedium
+					height: width
+					color: Kirigami.Theme.textColor
+					opacity: underlineMostUsedMA.containsMouse ? 0.95 : 0.55
+					Behavior on opacity { NumberAnimation { duration: tabBar._tabFadeDuration } }
+				}
+
+				MouseArea {
+					id: underlineMostUsedMA
+					anchors.fill: parent
+					hoverEnabled: true
+					cursorShape: Qt.PointingHandCursor
+					onClicked: tabBar.mostUsedTabAdded()
 				}
 			}
 		}

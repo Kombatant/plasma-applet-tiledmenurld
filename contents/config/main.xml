@@ -111,7 +111,9 @@
 		</entry>
 		<entry name="tileTabs" type="string">
 			<!-- Base64-encoded JSON array:
-			     [{id: string, name: string, tiles: [{x,y,w,h,url,...}]}] -->
+			     [{id: string, name: string, icon: string, kind: "manual"|"mostUsed", tiles: [{x,y,w,h,url,...}]}]
+			     A missing kind means "manual". A "mostUsed" tab is saved with tiles: [];
+			     its tiles are generated at runtime and never persisted. -->
 			<default></default>
 		</entry>
 		<entry name="rememberLastOpenTab" type="bool">
@@ -121,6 +123,12 @@
 		<entry name="lastOpenTab" type="int">
 			<label>Index of the last selected tab.</label>
 			<default>0</default>
+		</entry>
+		<entry name="numMostUsedApps" type="int">
+			<label>Number of applications shown in the automatic Popular tab (KDE's popularity model returns at most 15).</label>
+			<default>10</default>
+			<min>1</min>
+			<max>15</max>
 		</entry>
 
 		<!-- Base64 encoded XML -->

@@ -78,6 +78,8 @@ Item {
 	property var cfg_tileTabStyleDefault
 	property var cfg_tileTabs
 	property var cfg_tileTabsDefault
+	property var cfg_numMostUsedApps
+	property var cfg_numMostUsedAppsDefault
 	property var cfg_tileModel
 	property var cfg_tileModelDefault
 	property var cfg_tileScale

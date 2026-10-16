@@ -396,7 +396,7 @@ Item {
 				})
 			}
 
-		drag.target: plasmoid.configuration.tilesLocked ? undefined : tileItem
+		drag.target: tileGrid.effectiveLocked ? undefined : tileItem
 
 		// This MouseArea will spam "QQuickItem::ungrabMouse(): Item is not the mouse grabber."
 		// but there's no other way of having a clickable drag area.
@@ -517,7 +517,7 @@ Item {
 				Qt.callLater(tileItem.fixCoordinateBindings)
 			}
 			Drag.drop() // Breaks QML context.
-			if (removeOnDrop && !plasmoid.configuration.tilesLocked) {
+			if (removeOnDrop && !tileGrid.effectiveLocked) {
 				tileGrid.removeIndex(index)
 			}
 			// We need to use callLater to call functions after Drag.drop().
@@ -566,7 +566,7 @@ Item {
 			if (appObj.isLauncher) {
 				menu.addRunAsRootAction(appObj.appUrl || appObj.favoriteId)
 			}
-			if (!plasmoid.configuration.tilesLocked) {
+			if (!tileGrid.effectiveLocked) {
 				menu.addPinToMenuAction(modelData.url)
 
 				if (modelData.tileType == "group" || modelData.tileType == "hero") {
@@ -582,7 +582,7 @@ Item {
 
 			appObj.addActionList(menu)
 
-			if (!plasmoid.configuration.tilesLocked) {
+			if (!tileGrid.effectiveLocked) {
 				if (modelData.tileType == "group") {
 					var menuItem = menu.newMenuItem()
 					menuItem.text = i18n("Sort Tiles")
@@ -600,9 +600,16 @@ Item {
 				})
 				menu.addMenuItem(menuItem)
 
-				// "Move to" submenu — only when tabs are enabled and >1 tab
-				if (config.useTileTabs
-						&& popup.tileTabsData.length > 1) {
+				// "Move to" submenu — only when tabs are enabled and there is
+				// another manual tab (the automatic tab can't receive tiles).
+				var moveTargets = []
+				if (config.useTileTabs) {
+					for (var t = 0; t < popup.tileTabsData.length; t++) {
+						if (t === popup.activeTabIndex || popup.isMostUsedTab(popup.tileTabsData[t])) continue
+						moveTargets.push(popup.tileTabsData[t])
+					}
+				}
+				if (moveTargets.length > 0) {
 					var moveItem = menu.newMenuItem()
 					moveItem.text = i18n("Move to")
 					moveItem.icon = 'tab-duplicate'
@@ -610,9 +617,8 @@ Item {
 						"import org.kde.plasma.extras as PlasmaExtras; PlasmaExtras.Menu {}",
 						moveItem)
 					subMenu.visualParent = moveItem.action
-					for (var t = 0; t < popup.tileTabsData.length; t++) {
-						if (t === popup.activeTabIndex) continue
-						var tab = popup.tileTabsData[t]
+					for (var mt = 0; mt < moveTargets.length; mt++) {
+						var tab = moveTargets[mt]
 						var tabItem = Qt.createQmlObject(
 							"import org.kde.plasma.extras as PlasmaExtras; PlasmaExtras.MenuItem {}",
 							subMenu)

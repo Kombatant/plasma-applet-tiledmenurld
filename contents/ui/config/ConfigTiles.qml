@@ -217,6 +217,21 @@ LibConfig.FormKCM {
 		enabled: formLayout.pendingUseTileTabs
 	}
 
+	LibConfig.SpinBox {
+		Kirigami.FormData.label: i18n("Popular applications to display:")
+		configKey: 'numMostUsedApps'
+		enabled: formLayout.pendingUseTileTabs
+		minimumValue: 1
+		maximumValue: 15
+	}
+
+	QQC2.Label {
+		Layout.fillWidth: true
+		wrapMode: Text.Wrap
+		opacity: 0.8
+		text: i18n("The Popular tab ranks applications using KDE's application history for the current Activity. Its Most Recent group shows recently launched applications that aren't already listed, using the App History count from the General page. KDE keeps that history; deleting the tab doesn't clear it.")
+	}
+
 	//-------------------------------------------------------
 	LibConfig.Heading {
 		text: i18n("Size & Spacing")

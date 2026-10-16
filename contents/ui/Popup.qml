@@ -6,6 +6,8 @@ import QtQuick.Effects
 import org.kde.kirigami as Kirigami
 import org.kde.plasma.core as PlasmaCore
 import "lib/Base64.js" as Base64
+import "lib/MostUsedLayout.js" as MostUsedLayout
+import "lib/TileTabs.js" as TileTabs
 
 MouseArea {
 	id: popup
@@ -69,7 +71,7 @@ MouseArea {
 	// ── Tile Tabs ─────────────────────────────────────────────────────────────
 	property int activeTabIndex: 0
 	property int _previousTabIndex: -1
-	property var tileTabsData: []   // [{id: string, name: string, tiles: [tileObj]}]
+	property var tileTabsData: []   // [{id: string, name: string, icon: string, kind?: "mostUsed", tiles: [tileObj]}]
 	property bool _tabsWriting: false  // suppress config-change reload during save
 	// True while the tile model swaps due to tab navigation/load rather than a
 	// user edit — suppresses pointless re-serialization of all tabs.
@@ -117,7 +119,61 @@ MouseArea {
 		if (idx < 0) {
 			return []
 		}
+		if (isMostUsedTab(tileTabsData[idx])) {
+			return mostUsedTiles
+		}
 		return tileTabsData[idx].tiles || []
+	}
+
+	// ── Popular tab ───────────────────────────────────────────────────────────
+	// The automatic tab is identified by kind, never by name. Its descriptor is
+	// persisted with tiles: []; the generated tiles live only in memory.
+	function isMostUsedTab(tab) {
+		return TileTabs.isMostUsed(tab)
+	}
+	readonly property int mostUsedTabIndex: {
+		for (var i = 0; i < tileTabsData.length; i++) {
+			if (isMostUsedTab(tileTabsData[i])) {
+				return i
+			}
+		}
+		return -1
+	}
+	readonly property bool activeTabIsMostUsed: config.useTileTabs
+		&& mostUsedTabIndex >= 0
+		&& Math.min(activeTabIndex, tileTabsData.length - 1) === mostUsedTabIndex
+	// Column budget for the generated layout: the widest manual tab, so the
+	// automatic tab never drives the popup size (it is excluded from
+	// contentBounds() and scrolls instead).
+	readonly property int mostUsedColumns: {
+		var cols = 0
+		for (var i = 0; i < tileTabsData.length; i++) {
+			if (!isMostUsedTab(tileTabsData[i])) {
+				cols = Math.max(cols, modelBounds(tileTabsData[i].tiles).cols)
+			}
+		}
+		if (cols < 2 && tileGrid) {
+			cols = tileGrid.minColumns
+		}
+		return Math.max(2, cols)
+	}
+	readonly property var mostUsedTiles: MostUsedLayout.buildTiles(
+		appsModel.mostUsedEntries,
+		mostUsedColumns,
+		i18nc("Popular tab group for apps without a menu category", "Other"),
+		{
+			label: i18nc("group of recently launched applications in the Popular tab", "Most Recent"),
+			favoriteIds: appsModel.mostRecentIds,
+		})
+
+	// Dedupes tab ids and seeds _tabIdCounter past the highest saved tab_N
+	// (it used to restart at 0 each session, so new tabs could reuse an
+	// existing id and "Move to" would target the wrong tab). Also keeps only
+	// the first automatic tab and strips tiles stored on it.
+	function sanitizeLoadedTabs(tabs) {
+		var result = TileTabs.sanitizeTabs(tabs, _tabIdCounter)
+		_tabIdCounter = result.idCounter
+		return result
 	}
 
 	function loadTileTabs() {
@@ -145,13 +201,14 @@ MouseArea {
 				} else {
 					var normalizedParsed = config.normalizeImportedValue(parsed)
 					var normalizedPaths = config.lastPathNormalizationCount
-					tileTabsData = normalizedParsed
+					var sanitized = popup.sanitizeLoadedTabs(normalizedParsed)
+					tileTabsData = sanitized.tabs
 					if (normalizedPaths > 0) {
 						console.warn("[TiledMenu] normalized", normalizedPaths, "legacy path(s) in tileTabs")
 					}
 					// Backfill icons for tabs saved before icon support was added.
 					// Preserve icon: "" because that is the user's explicit "Clear Icon" state.
-					var dirty = normalizedPaths > 0
+					var dirty = normalizedPaths > 0 || sanitized.changed
 					for (var i = 0; i < tileTabsData.length; i++) {
 						if (typeof tileTabsData[i].icon === "undefined") {
 							var inferred = popup.inferTabIcon(tileTabsData[i].name)
@@ -257,13 +314,31 @@ MouseArea {
 		_switchingTab = false
 	}
 
-	function addTab() {
+	// kind: "manual" (default) or "mostUsed". Only one automatic tab may
+	// exist; asking for a second one selects the existing tab instead.
+	function addTab(kind) {
+		var isMostUsed = kind === "mostUsed"
+		if (isMostUsed && mostUsedTabIndex >= 0) {
+			selectTab(mostUsedTabIndex)
+			return
+		}
 		_tabIdCounter++
 		var newId = 'tab_' + _tabIdCounter
 		var newTabs = tileTabsData.slice()
-		var newTabName = i18n('New Tab')
-		var newTabIcon = popup.inferTabIcon(newTabName)
-		newTabs.push({id: newId, name: newTabName, icon: newTabIcon, tiles: []})
+		var newTab
+		if (isMostUsed) {
+			newTab = {
+				id: newId,
+				name: i18n('Popular'),
+				icon: 'view-statistics',
+				kind: 'mostUsed',
+				tiles: [],
+			}
+		} else {
+			var newTabName = i18n('New Tab')
+			newTab = {id: newId, name: newTabName, icon: popup.inferTabIcon(newTabName), tiles: []}
+		}
+		newTabs.push(newTab)
 		tileTabsData = newTabs
 		popup.saveTileTabs()
 		selectTab(newTabs.length - 1)
@@ -355,12 +430,10 @@ MouseArea {
 	function renameTab(index, newName) {
 		if (index < 0 || index >= tileTabsData.length) return
 		var newTabs = tileTabsData.slice()
-		newTabs[index] = {
-			id: newTabs[index].id,
+		newTabs[index] = TileTabs.copyTab(newTabs[index], {
 			name: newName,
 			icon: newTabs[index].icon || "",
-			tiles: newTabs[index].tiles,
-		}
+		})
 		tileTabsData = newTabs
 		popup.saveTileTabs()
 	}
@@ -368,12 +441,7 @@ MouseArea {
 	function changeTabIcon(index, newIcon) {
 		if (index < 0 || index >= tileTabsData.length) return
 		var newTabs = tileTabsData.slice()
-		newTabs[index] = {
-			id: newTabs[index].id,
-			name: newTabs[index].name,
-			icon: newIcon,
-			tiles: newTabs[index].tiles,
-		}
+		newTabs[index] = TileTabs.copyTab(newTabs[index], { icon: newIcon })
 		tileTabsData = newTabs
 		popup.saveTileTabs()
 	}
@@ -387,6 +455,9 @@ MouseArea {
 			if (tileTabsData[i].id === tabId) { destIdx = i; break }
 		}
 		if (destIdx < 0 || destIdx === activeTabIndex) return
+		// Generated tiles can't leave the automatic tab, and it can't receive
+		// manual tiles.
+		if (isMostUsedTab(tileTabsData[activeTabIndex]) || isMostUsedTab(tileTabsData[destIdx])) return
 
 		// Close tile editor — references belong to the current tab's model.
 		// Switch stack to default view first so the loader isn't destroyed while
@@ -759,6 +830,9 @@ MouseArea {
 			var c = 0, r = 0
 			var hoverW = 1, hoverH = 1
 			for (var ti = 0; ti < tileTabsData.length; ti++) {
+				// The automatic tab fits into the manual tabs' size and
+				// scrolls, so usage changes never resize the popup.
+				if (isMostUsedTab(tileTabsData[ti])) continue
 				var b = modelBounds(tileTabsData[ti].tiles)
 				c = Math.max(c, b.cols)
 				r = Math.max(r, b.rows)
@@ -1093,7 +1167,19 @@ MouseArea {
 			} else {
 				// Restore the active tab's tiles back to the single tileModel so
 				// the user doesn't lose their work when they disable tabs.
+				// Generated tiles are never copied into an editable layout: from
+				// the automatic tab, fall back to the first manual tab, or keep
+				// the saved single-grid layout when there is none.
 				var idx = Math.min(popup.activeTabIndex, popup.tileTabsData.length - 1)
+				if (idx >= 0 && popup.isMostUsedTab(popup.tileTabsData[idx])) {
+					idx = -1
+					for (var mi = 0; mi < popup.tileTabsData.length; mi++) {
+						if (!popup.isMostUsedTab(popup.tileTabsData[mi])) {
+							idx = mi
+							break
+						}
+					}
+				}
 				if (idx >= 0 && popup.tileTabsData.length > 0) {
 					var activeTiles = popup.tileTabsData[idx].tiles || []
 					if (activeTiles.length > 0) {
@@ -1322,9 +1408,11 @@ MouseArea {
 								tabs: popup.tileTabsData.map(function(t) {
 									return {id: t.id, name: t.name, icon: t.icon || ""}
 								})
+								canAddMostUsedTab: popup.mostUsedTabIndex < 0
 
 								onTabSelected: function(index) { popup.selectTab(index) }
 								onTabAdded: popup.addTab()
+								onMostUsedTabAdded: popup.addTab("mostUsed")
 								onTabDeleted: function(index) { popup.deleteTab(index) }
 								onTabRenamed: function(index, newName) { popup.renameTab(index, newName) }
 								onTabIconChanged: function(index, newIcon) { popup.changeTabIcon(index, newIcon) }
@@ -1469,10 +1557,18 @@ MouseArea {
 								cellPushedMargin: config.cellPushedMargin
 
 								tileModel: config.useTileTabs ? popup.activeTabTiles : config.tileModel.value
+								// Generated content of the automatic tab: launchable,
+								// but never edited or saved.
+								readOnly: popup.activeTabIsMostUsed
+								emptyPlaceholderText: i18n("No application history yet")
+								emptyPlaceholderExplanation: i18n("This tab shows your most used and most recent applications from KDE's application history for the current Activity. Launch some applications and they will appear here.")
 								property bool _tileModelSavePending: false
 								property bool _activeTabTilesSavePending: false
 
-								onEditTile: function(tileIndex) { tileEditorViewLoader.open(tileGrid.tileModel[tileIndex], tileGrid) }
+								onEditTile: function(tileIndex) {
+									if (tileGrid.readOnly) return
+									tileEditorViewLoader.open(tileGrid.tileModel[tileIndex], tileGrid)
+								}
 								onMoveTileToTab: function(tileIndex, tabId) { popup.moveTileToTab(tileIndex, tabId) }
 
 								function syncConfigTileModelValue() {
@@ -1498,8 +1594,9 @@ MouseArea {
 								onTileModelChanged: {
 									if (config.useTileTabs) {
 										// Tab switches swap the model without editing
-										// it — nothing to persist.
-										if (!popup._switchingTab) {
+										// it — nothing to persist. Generated updates of
+										// the automatic tab are never saved either.
+										if (!popup._switchingTab && !tileGrid.readOnly) {
 											tileGrid._activeTabTilesSavePending = true
 											saveActiveTabTilesDebounced.restart()
 										}

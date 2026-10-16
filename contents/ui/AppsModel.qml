@@ -1,6 +1,7 @@
 import QtQuick
 import org.kde.plasma.private.kicker as Kicker
 import "Utils.js" as Utils
+import "lib/MostUsedLayout.js" as MostUsedLayout
 
 Item {
 	id: appsModel
@@ -10,6 +11,8 @@ Item {
 	property alias favoritesModel: favoritesModel
 	property alias tileGridModel: tileGridModel
 	property alias sidebarModel: sidebarModel
+	property alias mostUsedModel: mostUsedModel
+	property alias mostRecentModel: mostRecentModel
 
 	property string order: "categories"
 	onOrderChanged: {
@@ -333,6 +336,24 @@ Item {
 			id: tileGridModel
 		}
 
+		// Popularity feed for the automatic "Popular" tab,
+		// independent of the app list's recentOrdering/numRecentApps. Kept a
+		// child of RootModel for the appletInterface lookup described above;
+		// only the id/url roles are read from it.
+		property var mostUsedModel: Kicker.RecentUsageModel {
+			id: mostUsedModel
+			ordering: Kicker.RecentUsageModel.Popular
+			shownItems: Kicker.RecentUsageModel.OnlyApps
+		}
+
+		// Recency feed for the same tab's leading "Most Recent" group, always
+		// ordered by last launch regardless of the app list's recentOrdering.
+		property var mostRecentModel: Kicker.RecentUsageModel {
+			id: mostRecentModel
+			ordering: Kicker.RecentUsageModel.Recent
+			shownItems: Kicker.RecentUsageModel.OnlyApps
+		}
+
 		property var sidebarModel: KickerAppModel {
 			id: sidebarModel
 			property bool syncingFromConfiguration: false
@@ -442,11 +463,54 @@ Item {
 			onTriggered: allAppsModel.refreshRecentApps()
 		}
 
+		Timer {
+			id: debouncedRefreshMostUsed
+			interval: debouncedRefresh.interval
+			onTriggered: appsModel.refreshMostUsed()
+		}
+
 		Connections {
 			target: appsModel.hasConfiguration ? plasmoid.configuration : null
 			function onShowRecentAppsChanged() { debouncedRefresh.restart() }
-			function onNumRecentAppsChanged() { debouncedRefreshRecentApps.restart() }
+			function onNumRecentAppsChanged() {
+				debouncedRefreshRecentApps.restart()
+				debouncedRefreshMostUsed.restart()
+			}
 			function onRecentOrderingChanged() { debouncedRefreshRecentApps.restart() }
+			function onNumMostUsedAppsChanged() { debouncedRefreshMostUsed.restart() }
+		}
+
+		// RecentUsageModel follows the current Activity and the KActivities
+		// database live, so its own row signals cover launches and Activity
+		// switches. allAppsModel.refreshed covers installs/removals (and runs
+		// on every popup open via refreshApplications()).
+		Connections {
+			target: mostUsedModel
+			ignoreUnknownSignals: true
+			function onCountChanged() { debouncedRefreshMostUsed.restart() }
+			function onDataChanged() { debouncedRefreshMostUsed.restart() }
+			function onRowsInserted() { debouncedRefreshMostUsed.restart() }
+			function onRowsRemoved() { debouncedRefreshMostUsed.restart() }
+			function onRowsMoved() { debouncedRefreshMostUsed.restart() }
+			function onModelReset() { debouncedRefreshMostUsed.restart() }
+			function onLayoutChanged() { debouncedRefreshMostUsed.restart() }
+		}
+
+		Connections {
+			target: mostRecentModel
+			ignoreUnknownSignals: true
+			function onCountChanged() { debouncedRefreshMostUsed.restart() }
+			function onDataChanged() { debouncedRefreshMostUsed.restart() }
+			function onRowsInserted() { debouncedRefreshMostUsed.restart() }
+			function onRowsRemoved() { debouncedRefreshMostUsed.restart() }
+			function onRowsMoved() { debouncedRefreshMostUsed.restart() }
+			function onModelReset() { debouncedRefreshMostUsed.restart() }
+			function onLayoutChanged() { debouncedRefreshMostUsed.restart() }
+		}
+
+		Connections {
+			target: allAppsModel
+			function onRefreshed() { debouncedRefreshMostUsed.restart() }
 		}
 
 		Connections {
@@ -727,6 +791,92 @@ Item {
 			return
 		}
 		favoritesModel.favorites = unique
+	}
+
+	// ── Popular tab ─────────────────────────────────────────────────────────
+	// [{favoriteId, category}] in popularity order. Reassigned only when the
+	// selection actually changes so bound tile grids don't rebuild needlessly.
+	property var mostUsedEntries: []
+	// favoriteIds for the leading "Most Recent" group, most recent first.
+	property var mostRecentIds: []
+	property string _mostUsedKey: ""
+
+	// favoriteId → first category label in menu order. Rebuilt only when
+	// allAppsModel replaces its category snapshot. Fields of a never-reassigned
+	// object so reads inside bindings don't register as dependencies.
+	readonly property var _mostUsedCategoryCache: ({ source: null, map: null })
+	function _mostUsedCategoryMap() {
+		var cache = _mostUsedCategoryCache
+		var source = allAppsModel._cachedCategories
+		if (cache.map && cache.source === source) {
+			return cache.map
+		}
+		var map = {}
+		var list = source || []
+		for (var i = 0; i < list.length; i++) {
+			var item = list[i]
+			if (!item || !item.sectionKey) {
+				continue
+			}
+			var keys = [Utils.kickerFavoriteId(item.favoriteId), _launcherBasename(item.url)]
+			for (var k = 0; k < keys.length; k++) {
+				if (keys[k] && !map.hasOwnProperty(keys[k])) {
+					map[keys[k]] = "" + item.sectionKey
+				}
+			}
+		}
+		cache.source = source
+		cache.map = map
+		return map
+	}
+
+	function _rankedFavoriteIds(model) {
+		var FavoriteIdRole = Qt.UserRole + 3
+		var UrlRole = Qt.UserRole + 10
+		var ranked = []
+		var count = model.count || 0
+		for (var i = 0; i < count; i++) {
+			var modelIndex = model.index(i, 0)
+			var id = model.data(modelIndex, FavoriteIdRole)
+			if (!id) {
+				id = model.data(modelIndex, UrlRole)
+			}
+			ranked.push(id ? ("" + id) : "")
+		}
+		return ranked
+	}
+
+	function refreshMostUsed() {
+		var categories = _mostUsedCategoryMap()
+		var normalize = function(value) { return Utils.kickerFavoriteId(value) }
+		var isInstalled = function(favoriteId) { return !!getTileApp(favoriteId) }
+		var limit = (hasConfiguration && plasmoid.configuration.numMostUsedApps > 0)
+			? plasmoid.configuration.numMostUsedApps
+			: 10
+		var entries = MostUsedLayout.selectEntries(_rankedFavoriteIds(mostUsedModel), {
+			limit: limit,
+			normalize: normalize,
+			isInstalled: isInstalled,
+			categoryOf: function(favoriteId) { return categories[favoriteId] || "" },
+		})
+		// "Most Recent" shares the App History count and skips apps that
+		// already have a tile in a category group, so no app appears twice.
+		var recentLimit = (hasConfiguration && plasmoid.configuration.numRecentApps > 0)
+			? plasmoid.configuration.numRecentApps
+			: 5
+		var recentIds = MostUsedLayout.selectEntries(_rankedFavoriteIds(mostRecentModel), {
+			limit: recentLimit,
+			normalize: normalize,
+			isInstalled: isInstalled,
+			exclude: entries.map(function(entry) { return entry.favoriteId }),
+		}).map(function(entry) { return entry.favoriteId })
+		var key = MostUsedLayout.entriesKey(entries, recentIds)
+		if (key === _mostUsedKey) {
+			return
+		}
+		_mostUsedKey = key
+		mostRecentIds = recentIds
+		mostUsedEntries = entries
 	}
 
 	function endsWith(s, substr) {
