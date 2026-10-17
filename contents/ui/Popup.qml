@@ -157,6 +157,10 @@ MouseArea {
 		}
 		return Math.max(2, cols)
 	}
+	// {groupKey: {x, y}} for groups the user dragged on the automatic tab.
+	readonly property var mostUsedGroupPositions: mostUsedTabIndex >= 0
+		? (tileTabsData[mostUsedTabIndex].groupPositions || null)
+		: null
 	readonly property var mostUsedTiles: MostUsedLayout.buildTiles(
 		appsModel.mostUsedEntries,
 		mostUsedColumns,
@@ -164,7 +168,40 @@ MouseArea {
 		{
 			label: i18nc("group of recently launched applications in the Popular tab", "Most Recent"),
 			favoriteIds: appsModel.mostRecentIds,
-		})
+		},
+		mostUsedGroupPositions)
+
+	// positions: [{index, x, y}] for every group header after a drag (the
+	// dragged group plus any it pushed aside). Pins all of them so later usage
+	// changes don't reshuffle the groups.
+	function moveMostUsedGroups(positions) {
+		var idx = mostUsedTabIndex
+		if (idx < 0) return
+		var saved = {}
+		var changed = false
+		for (var i = 0; i < (positions || []).length; i++) {
+			var tile = mostUsedTiles[positions[i].index]
+			if (!tile || tile.tileType !== "group" || !tile.groupKey) continue
+			saved[tile.groupKey] = { x: positions[i].x, y: positions[i].y }
+			changed = changed || tile.x !== positions[i].x || tile.y !== positions[i].y
+		}
+		if (!changed) return
+		var newTabs = tileTabsData.slice()
+		newTabs[idx] = TileTabs.copyTab(newTabs[idx], { groupPositions: saved })
+		tileTabsData = newTabs
+		popup.saveTileTabs()
+	}
+
+	function resetMostUsedGroupPositions() {
+		var idx = mostUsedTabIndex
+		if (idx < 0 || !tileTabsData[idx].groupPositions) return
+		var newTabs = tileTabsData.slice()
+		var tab = TileTabs.copyTab(newTabs[idx], {})
+		delete tab.groupPositions
+		newTabs[idx] = tab
+		tileTabsData = newTabs
+		popup.saveTileTabs()
+	}
 
 	// Dedupes tab ids and seeds _tabIdCounter past the highest saved tab_N
 	// (it used to restart at 0 each session, so new tabs could reuse an
@@ -1560,6 +1597,10 @@ MouseArea {
 								// Generated content of the automatic tab: launchable,
 								// but never edited or saved.
 								readOnly: popup.activeTabIsMostUsed
+								// Its groups can still be dragged; positions are saved on the tab.
+								movableGroups: popup.activeTabIsMostUsed
+								// Pushed groups must stay within the columns the layout packs into.
+								reflowColumns: popup.activeTabIsMostUsed ? popup.mostUsedColumns : tileGrid.columns
 								emptyPlaceholderText: i18n("No application history yet")
 								emptyPlaceholderExplanation: i18n("This tab shows your most used and most recent applications from KDE's application history for the current Activity. Launch some applications and they will appear here.")
 								property bool _tileModelSavePending: false
@@ -1570,6 +1611,7 @@ MouseArea {
 									tileEditorViewLoader.open(tileGrid.tileModel[tileIndex], tileGrid)
 								}
 								onMoveTileToTab: function(tileIndex, tabId) { popup.moveTileToTab(tileIndex, tabId) }
+								onGroupMoveRequested: function(positions) { popup.moveMostUsedGroups(positions) }
 
 								function syncConfigTileModelValue() {
 									if (!config.useTileTabs) {

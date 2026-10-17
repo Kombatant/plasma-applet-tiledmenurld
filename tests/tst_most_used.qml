@@ -214,6 +214,98 @@ TestCase {
 		compare(groupTiles(tiles)[0].w, 2)
 	}
 
+	function assertNoOverlap(tiles) {
+		var seen = {}
+		for (var j = 0; j < tiles.length; j++) {
+			var t = tiles[j]
+			for (var y = t.y; y < t.y + t.h; y++) {
+				for (var x = t.x; x < t.x + t.w; x++) {
+					var key = x + "," + y
+					verify(!seen[key], "overlap at " + key)
+					seen[key] = true
+				}
+			}
+		}
+	}
+
+	function test_groupKeys() {
+		var groups = MostUsedLayout.groupEntries([
+			{ favoriteId: "a.desktop", category: "A" },
+			{ favoriteId: "b.desktop", category: "" },
+		], "Other", { label: "Most Recent", favoriteIds: ["r.desktop"] })
+		compare(groups.map(function(g) { return g.key }), ["recent", "category/A", "other"])
+		var tiles = MostUsedLayout.layoutGroups(groups, 6)
+		compare(groupTiles(tiles).map(function(g) { return g.groupKey }), ["recent", "category/A", "other"])
+	}
+
+	function test_savedPositionsKeepGroupsInPlace() {
+		var entries = [
+			{ favoriteId: "a1.desktop", category: "A" },
+			{ favoriteId: "b1.desktop", category: "B" },
+		]
+		// B (at 2,0) dragged below A.
+		var positions = { "category/A": { x: 0, y: 0 }, "category/B": { x: 0, y: 4 } }
+		var tiles = MostUsedLayout.buildTiles(entries, 6, "Other", null, positions)
+		var groups = groupTiles(tiles)
+		compare([groups[0].x, groups[0].y], [0, 0])
+		compare([groups[1].x, groups[1].y], [0, 4])
+		// B's app follows its header.
+		compare([appTiles(tiles)[1].x, appTiles(tiles)[1].y], [0, 5])
+		// A gains apps and grows to 3 rows: B is pushed down, not overlapped.
+		var grown = entries.concat([
+			{ favoriteId: "a2.desktop", category: "A" },
+			{ favoriteId: "a3.desktop", category: "A" },
+			{ favoriteId: "a4.desktop", category: "A" },
+			{ favoriteId: "a5.desktop", category: "A" },
+			{ favoriteId: "a6.desktop", category: "A" },
+			{ favoriteId: "a7.desktop", category: "A" },
+		])
+		var grownTiles = MostUsedLayout.buildTiles(grown, 6, "Other", null, positions)
+		assertNoOverlap(grownTiles)
+		var grownGroups = groupTiles(grownTiles)
+		compare([grownGroups[0].x, grownGroups[0].y, grownGroups[0].w], [0, 0, 6])
+		compare([grownGroups[1].x, grownGroups[1].y], [0, 7])
+	}
+
+	function test_unsavedGroupsTakeFirstFreeSpot() {
+		var positions = { "category/A": { x: 0, y: 0 } }
+		var tiles = MostUsedLayout.buildTiles([
+			{ favoriteId: "a1.desktop", category: "A" },
+			{ favoriteId: "c1.desktop", category: "C" },
+		], 6, "Other", null, positions)
+		assertNoOverlap(tiles)
+		var groups = groupTiles(tiles)
+		compare([groups[1].x, groups[1].y], [2, 0])
+	}
+
+	function test_savedPositionClampedIntoColumns() {
+		var tiles = MostUsedLayout.buildTiles([
+			{ favoriteId: "a1.desktop", category: "A" },
+			{ favoriteId: "a2.desktop", category: "A" },
+		], 6, "Other", null, { "category/A": { x: 5, y: 2 } })
+		var group = groupTiles(tiles)[0]
+		compare([group.x, group.y, group.w], [2, 2, 4])
+	}
+
+	function test_groupPositionsPersistOnMostUsedTabOnly() {
+		var result = TileTabs.sanitizeTabs([
+			{ id: "tab_1", name: "Main", tiles: [], groupPositions: { a: { x: 1, y: 1 } } },
+			{ id: "tab_2", name: "Used", kind: "mostUsed", tiles: [], groupPositions: { good: { x: 2, y: 3 }, bad: { x: "q" }, neg: { x: -1, y: 0 } } },
+		], 0)
+		verify(result.changed)
+		verify(typeof result.tabs[0].groupPositions === "undefined")
+		compare(JSON.stringify(result.tabs[1].groupPositions), JSON.stringify({ good: { x: 2, y: 3 } }))
+		var clean = TileTabs.sanitizeTabs([
+			{ id: "tab_2", name: "Used", kind: "mostUsed", tiles: [], groupPositions: { good: { x: 2, y: 3 } } },
+		], 0)
+		verify(!clean.changed)
+		var exported = TileTabs.normalizeForExport(result.tabs)
+		verify(typeof exported[0].groupPositions === "undefined")
+		compare(JSON.stringify(exported[1].groupPositions), JSON.stringify({ good: { x: 2, y: 3 } }))
+		var copied = TileTabs.copyTab(result.tabs[1], { name: "Popular" })
+		compare(copied.groupPositions.good.y, 3)
+	}
+
 	function test_entriesKey() {
 		var a = [{ favoriteId: "a.desktop", category: "A" }]
 		var b = [{ favoriteId: "a.desktop", category: "B" }]

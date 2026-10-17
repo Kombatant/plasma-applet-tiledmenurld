@@ -9,15 +9,25 @@ import "Utils.js" as Utils
 
 Item {
 	id: tileItem
-	x: modelData.x * cellBoxSize + _holoPad
-	y: modelData.y * cellBoxSize + _holoPad
+	// previewX/Y: where a group drag elsewhere is pushing this tile.
+	x: tileGrid.previewX(index, modelData) * cellBoxSize + _holoPad
+	y: tileGrid.previewY(index, modelData) * cellBoxSize + _holoPad
+	// Only tiles making room animate; the dragged one tracks the pointer.
+	Behavior on x {
+		enabled: tileGrid.isDragging && tileGrid.draggedIndex !== index
+		NumberAnimation { duration: tileGrid.reflowAnimationDuration; easing.type: Easing.OutCubic }
+	}
+	Behavior on y {
+		enabled: tileGrid.isDragging && tileGrid.draggedIndex !== index
+		NumberAnimation { duration: tileGrid.reflowAnimationDuration; easing.type: Easing.OutCubic }
+	}
 	width: modelData.w * cellBoxSize
 	height: modelData.h * cellBoxSize
 	z: dragActive ? 20 : ((tileItemView && tileMouseArea.containsMouse && (tileItemView.useHolographicEffect || tileItemView.usePillHoverEffect)) ? 10 : 0)
 
 	function fixCoordinateBindings() {
-		x = Qt.binding(function(){ return modelData.x * cellBoxSize + _holoPad })
-		y = Qt.binding(function(){ return modelData.y * cellBoxSize + _holoPad })
+		x = Qt.binding(function(){ return tileGrid.previewX(index, modelData) * cellBoxSize + _holoPad })
+		y = Qt.binding(function(){ return tileGrid.previewY(index, modelData) * cellBoxSize + _holoPad })
 	}
 
 	AppObject {
@@ -396,7 +406,7 @@ Item {
 				})
 			}
 
-		drag.target: tileGrid.effectiveLocked ? undefined : tileItem
+		drag.target: tileGrid.canDragTile(modelData) ? tileItem : undefined
 
 		// This MouseArea will spam "QQuickItem::ungrabMouse(): Item is not the mouse grabber."
 		// but there's no other way of having a clickable drag area.
@@ -507,8 +517,8 @@ Item {
 		if (dragActive) {
 			tileMouseArea.dragOutside = false
 			tileGrid.startDrag(index)
-			 tileGrid.dropOffsetX = 0
-			// tileGrid.dropOffsetY = 0
+			// No grab offset: internal drag events already report this item's
+			// top-left (Drag.hotSpot 0,0), not the pointer.
 			Drag.start()
 		} else {
 			var removeOnDrop = tileMouseArea.dragOutside
@@ -581,6 +591,16 @@ Item {
 			}
 
 			appObj.addActionList(menu)
+
+			if (tileGrid.movableGroups && modelData.tileType == "group" && popup.mostUsedGroupPositions) {
+				var resetItem = menu.newMenuItem()
+				resetItem.text = i18n("Reset Group Positions")
+				resetItem.icon = 'edit-undo'
+				resetItem.clicked.connect(function() {
+					popup.resetMostUsedGroupPositions()
+				})
+				menu.addMenuItem(resetItem)
+			}
 
 			if (!tileGrid.effectiveLocked) {
 				if (modelData.tileType == "group") {

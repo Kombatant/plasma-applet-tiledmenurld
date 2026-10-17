@@ -70,14 +70,10 @@ TileEditorGroupBox {
 			appObj.tile.groupAreaH = 1
 			changed = true
 		}
-
-		var areaNow = tileGrid.getGroupAreaRect(appObj.tile)
-		var h = areaNow && typeof areaNow.h !== "undefined" ? areaNow.h : 1
-		var desiredH = Math.max(1, h)
-		if (appObj.tile.groupAreaH < desiredH) {
-			appObj.tile.groupAreaH = desiredH
-			changed = true
-		}
+		// groupAreaH is only a minimum the user picks in the size grid; the
+		// area already grows with its tiles (effectiveTileH shows the larger).
+		// Raising it to the current height here pinned temporary sizes, e.g.
+		// a group briefly grown by a drag while its editor was open.
 		if (changed) {
 			appObj.tileChanged()
 			tileGrid.tileModelChanged()

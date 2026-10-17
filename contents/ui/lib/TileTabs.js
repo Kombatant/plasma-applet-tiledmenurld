@@ -1,9 +1,10 @@
 .pragma library
 
 // Pure helpers for tile tab descriptors:
-// {id, name, icon, kind?: "mostUsed", tiles}. A missing kind means a manual
-// tab. The automatic "mostUsed" tab is identified by kind, never by name;
-// only one may exist and it is always stored with tiles: [].
+// {id, name, icon, kind?: "mostUsed", groupPositions?, tiles}. A missing kind
+// means a manual tab. The automatic "mostUsed" tab is identified by kind,
+// never by name; only one may exist and it is always stored with tiles: [].
+// Its optional groupPositions {groupKey: {x, y}} remembers dragged groups.
 
 function normalizeKind(kind) {
 	return kind === "mostUsed" ? "mostUsed" : "manual"
@@ -11,6 +12,25 @@ function normalizeKind(kind) {
 
 function isMostUsed(tab) {
 	return !!tab && tab.kind === "mostUsed"
+}
+
+// Copy of saved group positions keeping only well-formed {x, y} cells, or
+// null when there are none.
+function cleanGroupPositions(positions) {
+	if (!positions || typeof positions !== "object" || Array.isArray(positions)) {
+		return null
+	}
+	var out = {}
+	var any = false
+	var keys = Object.keys(positions)
+	for (var i = 0; i < keys.length; i++) {
+		var pos = positions[keys[i]]
+		if (pos && isFinite(pos.x) && isFinite(pos.y) && pos.x >= 0 && pos.y >= 0) {
+			out[keys[i]] = { x: Math.floor(pos.x), y: Math.floor(pos.y) }
+			any = true
+		}
+	}
+	return any ? out : null
 }
 
 // Shallow copy of a descriptor with overrides, so fields this code doesn't
@@ -66,6 +86,20 @@ function sanitizeTabs(tabs, idCounter) {
 				changed = true
 			}
 			tab.tiles = []
+			if (typeof tab.groupPositions !== "undefined") {
+				var positions = cleanGroupPositions(tab.groupPositions)
+				if (JSON.stringify(positions) !== JSON.stringify(tab.groupPositions)) {
+					changed = true
+				}
+				if (positions) {
+					tab.groupPositions = positions
+				} else {
+					delete tab.groupPositions
+				}
+			}
+		} else if (typeof tab.groupPositions !== "undefined") {
+			delete tab.groupPositions
+			changed = true
 		}
 		var id = (typeof tab.id === "undefined" || tab.id === null) ? "" : ("" + tab.id)
 		if (!id || seenIds[id]) {
@@ -105,6 +139,10 @@ function normalizeForExport(tabs) {
 		}
 		if (kind !== "manual") {
 			normalized.kind = kind
+			var positions = cleanGroupPositions(tab.groupPositions)
+			if (positions) {
+				normalized.groupPositions = positions
+			}
 		}
 		out.push(normalized)
 	}
