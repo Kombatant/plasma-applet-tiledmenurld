@@ -18,8 +18,8 @@ Tiled Menu Reloaded is a Plasma applet that provides a tiled launcher loosely in
 - Support modern Qt6/Plasma 6 environments.
 
 ## Highlights
-- **New with 0.99 version**: Optional **Popular** tab, filled automatically from KDE's application history with your most used and most recent applications ([see below](#popular-tab)). Also fixes tiles moved with **Move to** sometimes landing in the wrong tab after a restart.
-- **New with 0.96 version**: Update notifications, UI design refinements and optimizations.
+- **New with 0.99 version**: Implemented Reflow when moving tiles and groups around, and an optional **Popular** tab, filled automatically from KDE's application history with your most used and most recent applications ([see below](#popular-tab)). 
+- Update notifications, UI design refinements and optimizations.
 - Hero carousel tiles, including support for IGDB game metadata fetching. Support for Steam, Heroic and Lutris game entries.
 - Docked Sidebar layout - with support for custom user avatars (animated or static).
 - Tabs support in the tile area.
@@ -41,7 +41,7 @@ With tabs enabled (Settings → Tiles → Tabs), click the statistics button nex
 - **Where the data comes from:** KDE's application history (popularity ranking) for the current Activity. KDE keeps the history; the tab doesn't keep its own launch counts, so launches recorded by other KDE launchers count too.
 - **How many apps:** set **Popular applications to display** under Settings → Tiles → Tabs (1–15, default 10). KDE's model returns at most 15 applications. The Most Recent group uses the **App History** count under Settings → General.
 - **What you can change:** rename the tab, change its icon, reorder it or delete it, like any other tab. Deleting it doesn't clear KDE's history, and you can add it again. Only one Popular tab can exist per menu.
-- **What you can't change:** its tiles are read-only. You can launch apps and use their context actions, but you can't pin, drop, move, edit or remove tiles there. The tab fits into the size of your other tabs and scrolls if it needs more room.
+- **What you can't change:** its tiles are read-only. You can launch apps and use their context actions, but you can't pin, drop, edit or remove tiles there. The tab fits into the size of your other tabs and scrolls if it needs more room.
 
 <details>
 <summary><h2>Click here for more screenshots</h2></summary>
