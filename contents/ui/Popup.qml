@@ -562,6 +562,12 @@ MouseArea {
 		return 1
 	}
 
+	// While all outputs are gone (e.g. over suspend) Qt parks the popup window
+	// on a placeholder screen: no name, 0x0, DPR 1.
+	function onPlaceholderScreen() {
+		return !(Screen.width > 0 && Screen.height > 0)
+	}
+
 	function normalizedSizeMemoryView(viewName) {
 		if (viewName === "AiChat" || viewName === "TilesOnly" || viewName === "Categories") {
 			return viewName
@@ -609,8 +615,23 @@ MouseArea {
 			// sidebar; persisting it would make the popup reopen elongated.
 			return
 		}
+		var win = popup.Window.window
+		if (!win || !win.visible || onPlaceholderScreen()) {
+			// A hidden window isn't resized by restores, so its live size can be
+			// from another DPR. Seen on resume: the close-time save stored the
+			// DPR 2 size divided by the placeholder's DPR 1, doubling it.
+			return
+		}
 
 		var dpr = effectiveDevicePixelRatio()
+		var panelDpr = config.screenDevicePixelRatio
+		if (panelDpr > 0 && Math.abs(dpr - panelDpr) > 0.01) {
+			// The popup always opens next to the panel, so a DPR mismatch means the
+			// window still reports its previous screen. Seen after resume and on the
+			// first open after plasmashell starts (DP-2 at DPR 1 instead of DP-3 at
+			// 2 for ~90ms). Skipping keeps the last good size.
+			return
+		}
 		if (popup._sizeRestored && popup._lastRestoreDevicePixelRatio > 0 && Math.abs(dpr - popup._lastRestoreDevicePixelRatio) > 0.01) {
 			popup.scheduleDprSyncRestore()
 			return
@@ -1120,6 +1141,12 @@ MouseArea {
 				popup._restoreQueuedWhileCollapsed = true
 				return
 			}
+			if (popup.onPlaceholderScreen()) {
+				// Its DPR is meaningless; restoring with it records a wrong
+				// _lastRestoreDevicePixelRatio. Retry once a real screen is back.
+				popup._pendingDprSyncRestore = true
+				return
+			}
 			var targetView = popup._pendingRestoreView || popup.currentSizeMemoryView()
 			popup._restoreQueuedWhileCollapsed = false
 			popup.performRestoreRememberedSizeForView(targetView)
@@ -1160,6 +1187,13 @@ MouseArea {
 		if (Math.abs(currentDpr - popup._lastKnownDevicePixelRatio) > 0.01) {
 			popup._lastKnownDevicePixelRatio = currentDpr
 			popup.scheduleDprSyncRestore()
+		}
+	}
+	Screen.onNameChanged: {
+		// Run a restore deferred while the window sat on the placeholder screen
+		// (the DPR handler doesn't fire when the real screen has DPR 1 too).
+		if (popup._pendingDprSyncRestore && !popup.onPlaceholderScreen()) {
+			dprSyncDebounced.restart()
 		}
 	}
 	onWidgetExpandedChanged: {

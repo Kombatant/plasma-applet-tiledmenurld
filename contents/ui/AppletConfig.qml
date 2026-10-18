@@ -618,6 +618,10 @@ Item {
 
 	readonly property int searchFieldHeight: plasmoid.configuration.searchFieldHeight * Screen.devicePixelRatio
 
+	// DPR of the screen the panel side is on. Popup.qml only saves its size
+	// when its own window reports the same DPR.
+	readonly property real screenDevicePixelRatio: Screen.devicePixelRatio
+
 	readonly property int popupWidth: popupLeftSectionWidth + tileGridWidth
 	readonly property int popupHeight: Math.floor((plasmoid.configuration.popupHeight || 620) * Screen.devicePixelRatio)
 	readonly property int appListIconSize: plasmoid.configuration.appListIconSize * Screen.devicePixelRatio
