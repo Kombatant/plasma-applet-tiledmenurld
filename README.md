@@ -36,11 +36,11 @@ Tiled Menu Reloaded is a Plasma applet that provides a tiled launcher loosely in
 
 ## Popular tab
 
-With tabs enabled (Settings → Tiles → Tabs), click the statistics button next to **+** in the tab bar, or right-click a tab and choose **Add Popular Tab**. The new tab shows your most used applications as standard 2×2 tiles, grouped by menu category and ordered by popularity. A **Most Recent** group comes first, with recently launched applications that aren't already in a category group, so a new app appears straight away even before it ranks as most used.
+With tabs enabled, turn on **Add a Popular tab** under Settings → Tiles → Tabs (off by default). The tab shows your most used applications as standard 2×2 tiles, grouped by menu category and ordered by popularity. A **Most Recent** group comes first, with recently launched applications that aren't already in a category group, so a new app appears straight away even before it ranks as most used.
 
 - **Where the data comes from:** KDE's application history (popularity ranking) for the current Activity. KDE keeps the history; the tab doesn't keep its own launch counts, so launches recorded by other KDE launchers count too.
 - **How many apps:** set **Popular applications to display** under Settings → Tiles → Tabs (1–15, default 10). KDE's model returns at most 15 applications. The Most Recent group uses the **App History** count under Settings → General.
-- **What you can change:** rename the tab, change its icon, reorder it or delete it, like any other tab. Deleting it doesn't clear KDE's history, and you can add it again. Only one Popular tab can exist per menu.
+- **What you can change:** rename the tab, change its icon or reorder it, like any other tab. Deleting it from the tab bar turns the setting off; turning the setting off removes the tab. Neither clears KDE's history. Only one Popular tab can exist per menu.
 - **What you can't change:** its tiles are read-only. You can launch apps and use their context actions, but you can't pin, drop, edit or remove tiles there. The tab fits into the size of your other tabs and scrolls if it needs more room.
 
 <details>
@@ -99,7 +99,7 @@ Add the applet: right-click your application launcher, choose "Show Alternatives
 - Pin items: right‑click an application or file and select "Pin" or drag it to the tile grid.
 - Run as root: right-click an application in the app list, search results, or tile grid and select "Run as Root" to authenticate with `kdesu`. Requires Python 3 and `kdesu`. To show a terminal, enable "Show a terminal when running as root" under General → Right Click Menu (disabled by default; requires Konsole). Applications that refuse root execution may still decline to start.
 - Edit tiles: use the tile editor to change label, icon, background image, size, and placement.
-- Groups: create a new group from the grid context menu; drag tiles into groups and use the group header to sort.
+- Groups: create a new group from the grid context menu; drag tiles into groups and use the group header to sort. Tiles inside a group show the group panel behind them by default; set **Grouped Tile Background** to **Same as standalone tiles** (Settings → Tiles → Appearance) to give them the standalone tile colour, transparency and gradient.
 - Resize the launcher panes using the resize handle between the app list and tile area, or use the Auto Resize button in the sidebar.
 
 ## Configuration

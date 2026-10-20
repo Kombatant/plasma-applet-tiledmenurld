@@ -273,6 +273,7 @@ MouseArea {
 		popup.normalizeGroupHeaderHeights()
 		popup.resetViewsAfterTileModelReload()
 		_switchingTab = false
+		popup.syncPopularTab()
 	}
 
 	function saveTileTabs() {
@@ -351,39 +352,61 @@ MouseArea {
 		_switchingTab = false
 	}
 
-	// kind: "manual" (default) or "mostUsed". Only one automatic tab may
-	// exist; asking for a second one selects the existing tab instead.
-	function addTab(kind) {
-		var isMostUsed = kind === "mostUsed"
-		if (isMostUsed && mostUsedTabIndex >= 0) {
-			selectTab(mostUsedTabIndex)
-			return
-		}
+	function addTab() {
 		_tabIdCounter++
-		var newId = 'tab_' + _tabIdCounter
 		var newTabs = tileTabsData.slice()
-		var newTab
-		if (isMostUsed) {
-			newTab = {
-				id: newId,
-				name: i18n('Popular'),
-				icon: 'view-statistics',
-				kind: 'mostUsed',
-				tiles: [],
-			}
-		} else {
-			var newTabName = i18n('New Tab')
-			newTab = {id: newId, name: newTabName, icon: popup.inferTabIcon(newTabName), tiles: []}
-		}
-		newTabs.push(newTab)
+		var newTabName = i18n('New Tab')
+		newTabs.push({id: 'tab_' + _tabIdCounter, name: newTabName, icon: popup.inferTabIcon(newTabName), tiles: []})
 		tileTabsData = newTabs
 		popup.saveTileTabs()
 		selectTab(newTabs.length - 1)
 	}
 
+	// Reconciles the automatic Popular tab with the showPopularTab setting.
+	// Tabs the setting manages are stamped `managed`. An unstamped Popular tab
+	// was added with the old tab-bar button before the setting existed, so it
+	// turns the setting on instead of being removed.
+	function syncPopularTab() {
+		if (!config.useTileTabs) return
+		var wanted = !!plasmoid.configuration.showPopularTab
+		var idx = mostUsedTabIndex
+		if (idx >= 0 && !tileTabsData[idx].managed) {
+			var stampedTabs = tileTabsData.slice()
+			stampedTabs[idx] = TileTabs.copyTab(stampedTabs[idx], { managed: true })
+			tileTabsData = stampedTabs
+			popup.saveTileTabs()
+			if (!wanted) {
+				plasmoid.configuration.showPopularTab = true
+				return
+			}
+		}
+		if (wanted && idx < 0) {
+			_tabIdCounter++
+			var newTabs = tileTabsData.slice()
+			newTabs.push({
+				id: 'tab_' + _tabIdCounter,
+				name: i18n('Popular'),
+				icon: 'view-statistics',
+				kind: 'mostUsed',
+				managed: true,
+				tiles: [],
+			})
+			tileTabsData = newTabs
+			popup.saveTileTabs()
+		} else if (!wanted && idx >= 0) {
+			_doDeleteTab(idx)
+		}
+	}
+
 	function deleteTab(index) {
 		if (index < 0 || index >= tileTabsData.length) return
 		var tab = tileTabsData[index]
+		if (isMostUsedTab(tab) && plasmoid.configuration.showPopularTab) {
+			// Turning the setting off removes the tab through syncPopularTab(),
+			// keeping the settings page in step with the tab bar.
+			plasmoid.configuration.showPopularTab = false
+			return
+		}
 		var tiles = tab.tiles || []
 		var hasTiles = false
 		for (var i = 0; i < tiles.length; i++) {
@@ -1269,6 +1292,9 @@ MouseArea {
 				popup.loadTileTabs()
 			}
 		}
+		function onShowPopularTabChanged() {
+			popup.syncPopularTab()
+		}
 	}
 
 	Timer {
@@ -1479,11 +1505,9 @@ MouseArea {
 								tabs: popup.tileTabsData.map(function(t) {
 									return {id: t.id, name: t.name, icon: t.icon || ""}
 								})
-								canAddMostUsedTab: popup.mostUsedTabIndex < 0
 
 								onTabSelected: function(index) { popup.selectTab(index) }
 								onTabAdded: popup.addTab()
-								onMostUsedTabAdded: popup.addTab("mostUsed")
 								onTabDeleted: function(index) { popup.deleteTab(index) }
 								onTabRenamed: function(index, newName) { popup.renameTab(index, newName) }
 								onTabIconChanged: function(index, newIcon) { popup.changeTabIcon(index, newIcon) }

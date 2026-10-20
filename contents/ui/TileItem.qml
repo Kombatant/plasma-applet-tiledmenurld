@@ -308,7 +308,7 @@ Item {
 			anchors.topMargin: descriptionSpacing
 			height: visible ? (tileContent.descriptionLabelFontMetrics.lineSpacing * maximumLineCount) : 0
 			clip: true
-			horizontalAlignment: appObj.usesGroupPanelStyling ? Text.AlignHCenter : tileItemView.labelAlignment
+			horizontalAlignment: tileItemView.labelAlignment
 			verticalAlignment: appObj.isGroup ? Text.AlignVCenter : Text.AlignTop
 			wrapMode: Text.Wrap
 			maximumLineCount: 2

@@ -13,7 +13,8 @@ QtObject {
 
 	// True when this launcher tile sits geometrically inside a group panel,
 	// regardless of the active group layout. Used to keep the "Standalone Tile
-	// Background Colour" option from leaking onto non-standalone tiles.
+	// Background Colour" option from leaking onto non-standalone tiles, unless
+	// "Grouped Tile Background" is set to follow it.
 	readonly property bool inGroupArea: {
 		if (!tile || isGroup || !tileGrid || !tileGrid.tileModel) {
 			return false
@@ -35,12 +36,14 @@ QtObject {
 
 	// Group/hero tiles have no background of their own. Launchers inside a group
 	// panel keep the theme colour so the standalone-tile option only affects
-	// standalone launchers on the main grid.
+	// standalone launchers on the main grid, unless grouped tiles are set to
+	// follow it.
+	readonly property bool followsStandaloneBackground: !inGroupArea || config.groupedTilesUseStandaloneBackground
 	readonly property color defaultBackgroundColor: {
 		if (isGroup || isHero) {
 			return "transparent"
 		}
-		if (inGroupArea) {
+		if (!followsStandaloneBackground) {
 			return config.plasmaStyleTileColor
 		}
 		return config.defaultTileColor
@@ -66,13 +69,14 @@ QtObject {
 	readonly property bool hasExplicitGradient: tile && typeof tile.gradient !== "undefined"
 	readonly property color backgroundColor: tile && typeof tile.backgroundColor !== "undefined" ? tile.backgroundColor : defaultBackgroundColor
 	readonly property string backgroundImage: tile && typeof tile.backgroundImage !== "undefined" ? tile.backgroundImage : ""
-	// The standalone-tile gradient only applies to standalone launchers; group,
-	// hero and in-group tiles fall back to no gradient unless set per-tile.
+	// The standalone-tile gradient only applies to launchers that follow the
+	// standalone background; group, hero and other in-group tiles fall back to
+	// no gradient unless set per-tile.
 	readonly property bool backgroundGradient: {
 		if (tile && typeof tile.gradient !== "undefined") {
 			return tile.gradient
 		}
-		if (isGroup || isHero || inGroupArea) {
+		if (isGroup || isHero || !followsStandaloneBackground) {
 			return false
 		}
 		return config.defaultTileGradient
@@ -139,7 +143,7 @@ QtObject {
 		return null
 	}
 	readonly property bool inGroup: !!parentGroupTile
-	readonly property bool usesGroupPanelStyling: inGroup && !hasExplicitBackgroundColor && !hasExplicitBackgroundImage && !hasExplicitGradient
+	readonly property bool usesGroupPanelStyling: inGroup && !config.groupedTilesUseStandaloneBackground && !hasExplicitBackgroundColor && !hasExplicitBackgroundImage && !hasExplicitGradient
 
 	// Edge flags: true when this tile sits at the boundary of its parent group panel
 	readonly property bool atGroupLeft: inGroup && parentGroupTile && tileX === parentGroupTile.x

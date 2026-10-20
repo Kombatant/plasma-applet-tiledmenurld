@@ -81,6 +81,8 @@ Item {
 	property var cfg_tileTabsDefault
 	property var cfg_numMostUsedApps
 	property var cfg_numMostUsedAppsDefault
+	property var cfg_showPopularTab
+	property var cfg_showPopularTabDefault
 	property var cfg_tileModel
 	property var cfg_tileModelDefault
 	property var cfg_tileScale
@@ -107,6 +109,8 @@ Item {
 	property var cfg_defaultTileColorDefault
 	property var cfg_defaultTileGradient
 	property var cfg_defaultTileGradientDefault
+	property var cfg_groupedTileBackground
+	property var cfg_groupedTileBackgroundDefault
 	property var cfg_sidebarBackgroundColor
 	property var cfg_sidebarBackgroundColorDefault
 	property var cfg_surfaceStyle
@@ -250,6 +254,7 @@ Item {
 		tileTabStyle: "string",
 		tileTabs: "tiletabs",
 		numMostUsedApps: "int",
+		showPopularTab: "bool",
 		tileModel: "tilemodel",
 		tileScale: "double",
 		tileIconSize: "int",
@@ -261,6 +266,7 @@ Item {
 		defaultTileColorMode: "string",
 		defaultTileColor: "string",
 		defaultTileGradient: "bool",
+		groupedTileBackground: "string",
 		sidebarBackgroundColor: "string",
 		surfaceStyle: "string",
 		surfaceShadowDarkness: "string",
@@ -520,7 +526,7 @@ Item {
 		if (configKey === "tileRoundedCorners" || configKey === "tileCornerRadius" || configKey === "sidebarHideBorder" || configKey === "sidebarFollowsTheme" || configKey === "sidebarBackgroundColor" || configKey === "surfaceStyle" || configKey === "surfaceShadowDarkness" || configKey === "surfaceShadowSize" || configKey === "dockedSidebarCompactPower") {
 			return "Appearance"
 		}
-		if (configKey.indexOf("tile") === 0 || configKey.indexOf("favGridCols") === 0 || configKey === "tilesLocked" || configKey === "showTileTooltips" || configKey === "numMostUsedApps" || configKey.indexOf("defaultTile") === 0) {
+		if (configKey.indexOf("tile") === 0 || configKey.indexOf("favGridCols") === 0 || configKey === "tilesLocked" || configKey === "showTileTooltips" || configKey === "numMostUsedApps" || configKey === "showPopularTab" || configKey === "groupedTileBackground" || configKey.indexOf("defaultTile") === 0) {
 			return "Tiles"
 		}
 		if (configKey.indexOf("sidebar") === 0 || configKey === "dockedSidebarWidth") {

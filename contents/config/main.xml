@@ -130,6 +130,10 @@
 			<min>1</min>
 			<max>15</max>
 		</entry>
+		<entry name="showPopularTab" type="bool">
+			<label>Whether the automatic Popular tab is shown in the tab bar.</label>
+			<default>false</default>
+		</entry>
 
 		<!-- Base64 encoded XML -->
 		<entry name="tileModel" type="string" stringType="base64xml">
@@ -183,6 +187,11 @@
 		</entry>
 		<entry name="defaultTileGradient" type="bool">
 			<default>false</default>
+		</entry>
+		<entry name="groupedTileBackground" type="string">
+			<!-- enum: panel, standalone -->
+			<label>Background used by tiles inside a group: the group panel, or the standalone tile background.</label>
+			<default>panel</default>
 		</entry>
 		<entry name="sidebarBackgroundColor" type="string">
 			<label>Custom colour used by shared surfaces.</label>

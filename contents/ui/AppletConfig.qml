@@ -82,6 +82,7 @@ Item {
 		_ensureSettingInitialized('tileTabStyle', 'tabs')
 		_ensureSettingInitialized('tileTabs', '')
 		_ensureSettingInitialized('numMostUsedApps', 10)
+		_ensureSettingInitialized('showPopularTab', false)
 
 		// Base64 encoded XML string; empty string means "use default".
 		_ensureSettingInitialized('tileModel', '')
@@ -113,6 +114,7 @@ Item {
 		_ensureSettingInitialized('defaultTileColorMode', tileColorMode)
 		_ensureSettingInitialized('defaultTileColor', '')
 		_ensureSettingInitialized('defaultTileGradient', false)
+		_ensureSettingInitialized('groupedTileBackground', 'panel')
 		_ensureSettingInitialized('sidebarBackgroundColor', '')
 		// The session modal defaults to on for new installs, but must not silently
 		// change the layout of an install that predates the setting: in Docked Sidebar
@@ -683,6 +685,9 @@ Item {
 		return plasmaStyleTileColor
 	}
 	readonly property bool defaultTileGradient: plasmoid.configuration.defaultTileGradient
+	// "standalone" makes tiles inside a group use the standalone tile colour
+	// and gradient instead of letting the group panel show through.
+	readonly property bool groupedTilesUseStandaloneBackground: plasmoid.configuration.groupedTileBackground === "standalone"
 	readonly property color sidebarBackgroundColor: plasmoid.configuration.sidebarBackgroundColor || Kirigami.Theme.backgroundColor
 	readonly property string surfaceStyle: {
 		var value = typeof plasmoid.configuration.surfaceStyle !== "undefined" ? ("" + plasmoid.configuration.surfaceStyle) : ""

@@ -32,6 +32,9 @@ Rectangle {
 	readonly property real cornerRadius: (config && config.tileCornerRadius ? config.tileCornerRadius : 0)
 	property color gradientBottomColor: Qt.darker(appObj.backgroundColor, 2.0)
 	readonly property bool usesPanelBackground: !appObj.isGroup && !appObj.usesGroupPanelStyling
+	// The body colour as drawn at rest. Tiles styled by their group panel are
+	// transparent even though appObj.backgroundColor reports the theme colour.
+	readonly property color renderedBodyColor: usesPanelBackground ? appObj.backgroundColor : "transparent"
 
 	readonly property string hoverEffectStyle: (plasmoid && plasmoid.configuration && plasmoid.configuration.tileHoverEffect)
 		? plasmoid.configuration.tileHoverEffect
@@ -183,7 +186,7 @@ Rectangle {
 	// highlight reads as a square around an empty label strip.
 	readonly property bool useStandaloneFilledLabel: appObj.isLauncher
 		&& !appObj.hasExplicitBackgroundImage
-		&& (appObj.backgroundColor.a > 0 || useHolographicEffect)
+		&& (renderedBodyColor.a > 0 || useHolographicEffect)
 		&& appObj.showLabel
 		&& appObj.labelText.length > 0
 		&& !useInlineLabel
@@ -238,7 +241,7 @@ Rectangle {
 		},
 		State {
 			when: modelData.w == 1 && modelData.h >= 1
-			PropertyChanges { target: icon; size: appObj.usesGroupPanelStyling ? Math.round(mediumIconSize * 0.92) : smallIconSize }
+			PropertyChanges { target: icon; size: smallIconSize }
 			PropertyChanges { target: label; visible: false }
 		},
 		State {
@@ -383,9 +386,7 @@ Rectangle {
 			source: appObj.iconSource
 			anchors.verticalCenter: parent.verticalCenter
 			anchors.horizontalCenter: parent.horizontalCenter
-			property int size: appObj.usesGroupPanelStyling
-				? Math.min(parent.width, parent.height) * 0.50
-				: Math.min(parent.width, parent.height) / 2
+			property int size: Math.min(parent.width, parent.height) / 2
 			width: appObj.showIcon ? size : 0
 			height: appObj.showIcon ? size : 0
 			anchors.fill: appObj.iconFill ? parent : null

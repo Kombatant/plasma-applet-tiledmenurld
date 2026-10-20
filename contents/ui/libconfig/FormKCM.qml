@@ -80,6 +80,8 @@ Item {
 	property var cfg_tileTabsDefault
 	property var cfg_numMostUsedApps
 	property var cfg_numMostUsedAppsDefault
+	property var cfg_showPopularTab
+	property var cfg_showPopularTabDefault
 	property var cfg_tileModel
 	property var cfg_tileModelDefault
 	property var cfg_tileScale
@@ -106,6 +108,8 @@ Item {
 	property var cfg_defaultTileColorDefault
 	property var cfg_defaultTileGradient
 	property var cfg_defaultTileGradientDefault
+	property var cfg_groupedTileBackground
+	property var cfg_groupedTileBackgroundDefault
 	property var cfg_sidebarBackgroundColor
 	property var cfg_sidebarBackgroundColorDefault
 	property var cfg_surfaceStyle

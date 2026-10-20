@@ -5,6 +5,7 @@
 // means a manual tab. The automatic "mostUsed" tab is identified by kind,
 // never by name; only one may exist and it is always stored with tiles: [].
 // Its optional groupPositions {groupKey: {x, y}} remembers dragged groups.
+// managed: true marks a Popular tab that follows the showPopularTab setting.
 
 function normalizeKind(kind) {
 	return kind === "mostUsed" ? "mostUsed" : "manual"
