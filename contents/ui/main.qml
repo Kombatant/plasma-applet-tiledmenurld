@@ -16,6 +16,9 @@ PlasmoidItem {
 	property string systemTerminalApp: ""
 	property string systemFileManagerApp: ""
 	property bool suppressHideOnWindowDeactivate: false
+	// Pinned keeps the popup open after launches and focus loss. The stored
+	// pin state is ignored while the pin button is hidden.
+	readonly property bool pinned: !!plasmoid.configuration.showPinButton && !!plasmoid.configuration.pinPopupOpen
 	readonly property bool updateAvailable: updateCheckerLoader.item ? updateCheckerLoader.item.updateAvailable : false
 	readonly property url userAvatarSource: avatarResolver.avatarSource
 	readonly property bool hasUserAvatar: ("" + userAvatarSource)
@@ -283,7 +286,7 @@ PlasmoidItem {
 		iconSource: plasmoid.configuration.icon || "tiled_rld"
 	}
 
-	hideOnWindowDeactivate: !widget.userConfiguring && !widget.suppressHideOnWindowDeactivate
+	hideOnWindowDeactivate: !widget.userConfiguring && !widget.suppressHideOnWindowDeactivate && !widget.pinned
 	activationTogglesExpanded: true
 	onExpandedChanged: function(expanded) {
 		if (expanded) {

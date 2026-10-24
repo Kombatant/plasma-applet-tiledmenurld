@@ -10,6 +10,14 @@
 		<entry name="fixedPanelIcon" type="bool">
 			<default>true</default>
 		</entry>
+		<entry name="showPinButton" type="bool">
+			<label>Whether the pin button that keeps the popup open after launching apps is shown.</label>
+			<default>false</default>
+		</entry>
+		<entry name="pinPopupOpen" type="bool">
+			<label>Whether the popup stays open after launching apps or losing focus. Only applies while showPinButton is enabled.</label>
+			<default>false</default>
+		</entry>
 		<entry name="searchResultsGrouped" type="bool">
 			<default>true</default>
 		</entry>

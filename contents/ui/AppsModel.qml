@@ -589,7 +589,9 @@ Item {
 	KickerListModel {
 		id: allAppsModel
 		onItemTriggered: {
-			plasmoid.expanded = false
+			if (!(typeof widget !== "undefined" && widget && widget.pinned)) {
+				plasmoid.expanded = false
+			}
 		}
 
 		// Cache of the parsed/sorted app lists. Both orderings come from the same

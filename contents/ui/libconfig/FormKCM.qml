@@ -22,6 +22,10 @@ Item {
 	property var cfg_iconDefault
 	property var cfg_fixedPanelIcon
 	property var cfg_fixedPanelIconDefault
+	property var cfg_showPinButton
+	property var cfg_showPinButtonDefault
+	property var cfg_pinPopupOpen
+	property var cfg_pinPopupOpenDefault
 	property var cfg_searchResultsGrouped
 	property var cfg_searchResultsGroupedDefault
 	property var cfg_searchDefaultFilters

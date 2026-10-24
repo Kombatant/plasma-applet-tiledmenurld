@@ -23,6 +23,10 @@ Item {
 	property var cfg_iconDefault
 	property var cfg_fixedPanelIcon
 	property var cfg_fixedPanelIconDefault
+	property var cfg_showPinButton
+	property var cfg_showPinButtonDefault
+	property var cfg_pinPopupOpen
+	property var cfg_pinPopupOpenDefault
 	property var cfg_searchResultsGrouped
 	property var cfg_searchResultsGroupedDefault
 	property var cfg_searchDefaultFilters
@@ -225,6 +229,8 @@ Item {
 	readonly property var settingsSchema: ({
 		icon: "string",
 		fixedPanelIcon: "bool",
+		showPinButton: "bool",
+		pinPopupOpen: "bool",
 		searchResultsGrouped: "bool",
 		searchDefaultFilters: "stringlist",
 		showRecentApps: "bool",
@@ -538,7 +544,7 @@ Item {
 		if (configKey.indexOf("appList") === 0 || configKey === "appDescription" || configKey === "defaultAppListView" || configKey === "lastUsedAppListView" || configKey === "showRecentApps" || configKey === "recentOrdering" || configKey === "numRecentApps") {
 			return "Application List"
 		}
-		if (configKey.indexOf("popupHeight") === 0 || configKey.indexOf("popupWidth") === 0 || configKey === "icon" || configKey === "fixedPanelIcon" || configKey === "terminalApp" || configKey === "runAsRootInTerminal" || configKey === "taskManagerApp" || configKey === "fileManagerApp" || configKey === "presetTilesFolder") {
+		if (configKey.indexOf("popupHeight") === 0 || configKey.indexOf("popupWidth") === 0 || configKey === "icon" || configKey === "fixedPanelIcon" || configKey === "showPinButton" || configKey === "pinPopupOpen" || configKey === "terminalApp" || configKey === "runAsRootInTerminal" || configKey === "taskManagerApp" || configKey === "fileManagerApp" || configKey === "presetTilesFolder") {
 			return "General"
 		}
 		return "Other"

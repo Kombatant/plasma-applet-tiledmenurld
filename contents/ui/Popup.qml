@@ -946,7 +946,7 @@ MouseArea {
 			: 0
 		// Top row hosts the tab bar; docked search lives in the left pane header.
 		var dpr = Screen.devicePixelRatio || 1
-		var tabRowTabsHeight = (config.useTileTabs && tileTabBar) ? tileTabBar.implicitHeight : 0
+		var tabRowTabsHeight = ((config.useTileTabs || plasmoid.configuration.showPinButton) && tileTabBar) ? tileTabBar.implicitHeight : 0
 		var tabRowContentHeight = tabRowTabsHeight
 		var tabRowTopMargin = (config.usesDockedSidebarLayout || (config.usesClassicLayout && config.sidebarOnLeft))
 			? config.sidebarCardInset
@@ -1484,10 +1484,11 @@ MouseArea {
 							Layout.leftMargin: tileGrid.chromeLeftInset
 							Layout.rightMargin: tileGrid.chromeRightInset
 							Layout.bottomMargin: Kirigami.Units.smallSpacing
-							visible: _showTileTabs
-							implicitHeight: _showTileTabs ? tileTabBar.implicitHeight : 0
+							visible: _showTileTabs || _showPinButton
+							implicitHeight: (_showTileTabs || _showPinButton) ? tileTabBar.implicitHeight : 0
 
 							readonly property bool _showTileTabs: config.useTileTabs
+							readonly property bool _showPinButton: !!plasmoid.configuration.showPinButton
 							readonly property bool _alignTopSurfaces: config.usesDockedSidebarLayout
 								|| (config.usesClassicLayout && config.sidebarOnLeft)
 
@@ -1518,8 +1519,9 @@ MouseArea {
 							// grid action rather than another tab.
 							Item {
 								id: autoResizeTabAction
-								anchors.right: parent.right
+								anchors.right: pinPopupAction.visible ? pinPopupAction.left : parent.right
 								y: tileTabBar.y
+								visible: rightPaneTopRow._showTileTabs
 								width: tileTabBar.surfaceHeight
 								// Match the tab surface, not the full bar, so the icon
 								// centers on the pills when the surface is top-aligned.
@@ -1568,6 +1570,66 @@ MouseArea {
 									interval: 200
 									repeat: false
 									onTriggered: popup.autoResizeToContent()
+								}
+							}
+
+							// Keeps the popup open after launching apps or losing focus.
+							Item {
+								id: pinPopupAction
+								anchors.right: parent.right
+								y: tileTabBar.y
+								width: visible ? tileTabBar.surfaceHeight : 0
+								height: autoResizeTabAction.height
+								visible: rightPaneTopRow._showPinButton
+
+								readonly property bool pinned: !!plasmoid.configuration.pinPopupOpen
+
+								Accessible.name: pinned ? i18n("Unpin") : i18n("Keep Open")
+								Accessible.role: Accessible.CheckBox
+								Accessible.checkable: true
+								Accessible.checked: pinned
+								QQC2.ToolTip.visible: pinPopupMA.containsMouse
+								QQC2.ToolTip.text: pinned ? i18n("Unpin") : i18n("Keep Open")
+
+								Rectangle {
+									anchors.centerIn: parent
+									width: Kirigami.Units.gridUnit * 1.8
+									height: width
+									radius: height / 2
+									color: pinPopupAction.pinned
+										? Qt.rgba(
+											Kirigami.Theme.highlightColor.r,
+											Kirigami.Theme.highlightColor.g,
+											Kirigami.Theme.highlightColor.b,
+											pinPopupMA.containsMouse ? 0.35 : 0.25)
+										: Qt.rgba(
+											Kirigami.Theme.textColor.r,
+											Kirigami.Theme.textColor.g,
+											Kirigami.Theme.textColor.b,
+											pinPopupMA.containsMouse ? 0.10 : 0.0)
+									Behavior on color { ColorAnimation { duration: 140 } }
+								}
+
+								Kirigami.Icon {
+									anchors.centerIn: parent
+									source: "window-pin"
+									width: Kirigami.Units.iconSizes.smallMedium
+									height: width
+									color: Kirigami.Theme.textColor
+									opacity: (pinPopupAction.pinned || pinPopupMA.containsMouse) ? 0.95 : 0.55
+									// Breeze draws the pin diagonally; tilting it upright reads as "pushed in".
+									rotation: pinPopupAction.pinned ? 45 : 0
+									isMask: true
+									Behavior on opacity { NumberAnimation { duration: 140 } }
+									Behavior on rotation { NumberAnimation { duration: 180; easing.type: Easing.OutCubic } }
+								}
+
+								MouseArea {
+									id: pinPopupMA
+									anchors.fill: parent
+									hoverEnabled: true
+									cursorShape: Qt.PointingHandCursor
+									onClicked: plasmoid.configuration.pinPopupOpen = !pinPopupAction.pinned
 								}
 							}
 

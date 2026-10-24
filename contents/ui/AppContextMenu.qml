@@ -82,7 +82,9 @@ Item {
 				menuItem.icon = "irc-channel-active"
 				menuItem.clicked.connect(function() {
 					rootAppLauncher.launch(launcherUrl)
-					plasmoid.expanded = false
+					if (!(typeof widget !== "undefined" && widget && widget.pinned)) {
+						plasmoid.expanded = false
+					}
 				})
 				menu.addMenuItem(menuItem)
 				menu.addMenuItem(menu.newSeperator())

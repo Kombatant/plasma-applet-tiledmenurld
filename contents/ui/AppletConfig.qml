@@ -34,6 +34,8 @@ Item {
 		}
 
 		_ensureSettingInitialized('fixedPanelIcon', true)
+		_ensureSettingInitialized('showPinButton', false)
+		_ensureSettingInitialized('pinPopupOpen', false)
 		_ensureSettingInitialized('searchResultsGrouped', true)
 		_ensureSettingInitialized('searchDefaultFilters', [
 			'krunner_systemsettings',

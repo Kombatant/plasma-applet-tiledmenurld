@@ -214,6 +214,16 @@ LibConfig.FormKCM {
 
 	//-------------------------------------------------------
 	LibConfig.Heading {
+		text: i18n("Popup")
+	}
+
+	LibConfig.CheckBox {
+		configKey: 'showPinButton'
+		text: i18n("Show a pin button to keep the menu open while launching apps")
+	}
+
+	//-------------------------------------------------------
+	LibConfig.Heading {
 		text: i18n("Application List")
 	}
 

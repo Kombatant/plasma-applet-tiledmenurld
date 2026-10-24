@@ -18,7 +18,7 @@ Kicker.SimpleFavoritesModel {
 			}
 			return false
 		}
-		if (closeRequested) {
+		if (closeRequested && !(typeof widget !== "undefined" && widget && widget.pinned)) {
 			plasmoid.expanded = false
 		}
 		return closeRequested
@@ -35,7 +35,7 @@ Kicker.SimpleFavoritesModel {
 			}
 			return false
 		}
-		if (closeRequested) {
+		if (closeRequested && !(typeof widget !== "undefined" && widget && widget.pinned)) {
 			plasmoid.expanded = false
 		}
 		return closeRequested

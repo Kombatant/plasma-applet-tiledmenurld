@@ -155,7 +155,7 @@ ListModel {
 				logger.warn('SearchResultsModel.triggerIndex exception', index, e)
 			}
 		}
-		if (closeRequested) {
+		if (closeRequested && !(typeof widget !== "undefined" && widget && widget.pinned)) {
 			plasmoid.expanded = false
 		}
 		itemTriggered()
@@ -201,7 +201,7 @@ ListModel {
 				logger.warn('SearchResultsModel.triggerIndexAction exception', index, actionId, e)
 			}
 		}
-		if (closeRequested) {
+		if (closeRequested && !(typeof widget !== "undefined" && widget && widget.pinned)) {
 			plasmoid.expanded = false
 		}
 		itemTriggered()
