@@ -113,6 +113,13 @@ Item {
 		if (item.favoriteId === favoriteId || _launcherBasename(item.favoriteId) === favoriteId) {
 			return true
 		}
+		// Kicker's favoriteId is "applications:<storageId>" while tiles store the
+		// bare storageId. The url basename can't stand in for it: Kicker reports
+		// the resolved file, so a symlinked entry (libreoffice-writer.desktop ->
+		// .../xdg/writer.desktop) has a basename unrelated to its storageId.
+		if (Utils.kickerFavoriteId(item.favoriteId) === favoriteId) {
+			return true
+		}
 		return _launcherBasename(item.url) === favoriteId
 	}
 
@@ -147,6 +154,10 @@ Item {
 			if (item.favoriteId) {
 				map[item.favoriteId] = i
 				map[_launcherBasename(item.favoriteId)] = i
+				var storageId = Utils.kickerFavoriteId(item.favoriteId)
+				if (storageId) {
+					map[storageId] = i
+				}
 			}
 			if (item.url) {
 				map[_launcherBasename(item.url)] = i
