@@ -1693,7 +1693,8 @@ DropArea {
 		var groupProps = {
 			tileType: "group",
 			label: i18nc("default group label", "Group"),
-			w: limit(2, columns-x, 6), // 6 unless we have less columns.
+			// 4 (the widest size the editor's size grid offers) unless we have less columns.
+			w: limit(2, columns-x, 4),
 			h: 1,
 		}
 		if (typeof props !== "undefined") {
