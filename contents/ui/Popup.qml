@@ -848,6 +848,20 @@ MouseArea {
 			&& tile.y <= y2)
 	}
 
+	function groupHasTiles(model, groupTile) {
+		var x1 = groupTile.x
+		var x2 = groupTile.x + groupTile.w - 1
+		var y1 = groupTile.y + (typeof groupTile.h !== "undefined" ? groupTile.h : 1)
+		var y2 = groupBottomRow(model, groupTile)
+		for (var i = 0; i < model.length; i++) {
+			var t = model[i]
+			if (t && t !== groupTile && t.tileType !== "group" && tileWithinBounds(t, x1, y1, x2, y2)) {
+				return true
+			}
+		}
+		return false
+	}
+
 	function groupBottomRow(model, groupTile) {
 		var x1 = groupTile.x
 		var x2 = groupTile.x + groupTile.w - 1
@@ -888,7 +902,13 @@ MouseArea {
 				if (t.tileType === "group") {
 					// Group headers only drive row count (h is typically 1),
 					// not column count — their w may exceed child content.
+					// An empty group has no children to drive columns, so its
+					// header width counts; otherwise a new group past the
+					// rightmost tile is cut off by auto-resize.
 					r = Math.max(r, groupBottomRow(model, t) + 1)
+					if (!groupHasTiles(model, t)) {
+						c = Math.max(c, t.x + t.w)
+					}
 					continue
 				}
 				c = Math.max(c, t.x + t.w)
