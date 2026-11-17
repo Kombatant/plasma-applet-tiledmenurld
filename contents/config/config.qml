@@ -1,16 +1,19 @@
 import QtQuick
 import org.kde.plasma.configuration
 
+// Each category is a hub; most split their settings into in-page tabs
+// (see LibConfig.FormTab). Tabs per page:
+//   Menu:             Layout | App List | Search
+//   Tiles:            Tabs | Size & Spacing | Colours & Effects | Labels & Groups
+//   Sidebar:          Shortcuts | Options
+//   Theme:            (single form, no tab bar)
+//   Services:         AI Chat | Game Metadata | Default Apps
+//   Backup & Updates: Import / Export | Updates
 ConfigModel {
 	ConfigCategory {
-		name: i18n("General")
-		icon: "configure"
-		source: "config/ConfigGeneral.qml"
-	}
-	ConfigCategory {
-		name: i18n("Appearance")
-		icon: "appearance-symbolic"
-		source: "config/ConfigAppearance.qml"
+		name: i18n("Menu")
+		icon: "view-app-grid-symbolic"
+		source: "config/ConfigMenu.qml"
 	}
 	ConfigCategory {
 		name: i18n("Tiles")
@@ -23,18 +26,18 @@ ConfigModel {
 		source: "config/ConfigSidebar.qml"
 	}
 	ConfigCategory {
-		name: i18n("Search")
-		icon: "edit-find"
-		source: "config/ConfigSearch.qml"
+		name: i18n("Theme")
+		icon: "contrast-symbolic"
+		source: "config/ConfigAppearance.qml"
 	}
 	ConfigCategory {
-		name: i18n("AI Chat")
-		icon: "dialog-messages"
-		source: "config/ConfigAiChat.qml"
+		name: i18n("Services")
+		icon: "plugins-symbolic"
+		source: "config/ConfigServices.qml"
 	}
 	ConfigCategory {
-		name: i18n("Import/Export Layout")
-		icon: "grid-rectangular"
+		name: i18n("Backup & Updates")
+		icon: "package-symbolic"
 		source: "config/ConfigExportLayout.qml"
 	}
 	// Keyboard Shortcuts and About are provided automatically by Plasma.

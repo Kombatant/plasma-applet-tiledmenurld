@@ -1,7 +1,6 @@
-// Version 6
+// Version 7
 
 import QtQuick
-import QtQuick.Controls as QQC2
 import QtQuick.Layouts
 import org.kde.kirigami as Kirigami
 
@@ -10,61 +9,40 @@ import org.kde.kirigami as Kirigami
 **
 import './libconfig' as LibConfig
 LibConfig.Heading {
-	text: i18n("SpinBox (Double)")
+	text: i18n("Panel icon")
 }
 */
 
-// While the following Kirigami is very simple:
-// Kirigami.Separator {
-//     Kirigami.FormData.label: "Heading"
-//     Kirigami.FormData.isSection: true
-// }
+// Section heading for a settings form: a small bold title with a rule under
+// it, spanning both the label and the control column.
 //
-// I want to be able to adjust the label size and make it bold.
-// Kirigami's buddy Heading is level=3, which does not stand out
-// very well. I also want to center the heading.
-// Since we can't access the Heading in the buddy component, we
-// need to make sure the Heading has no text, and draw our own.
+// Kirigami's own section header (FormData.isSection with a label) is centred
+// and has no rule, so the label is left empty and the heading drawn here.
 ColumnLayout {
 	id: heading
-	spacing: 0
+	spacing: Kirigami.Units.smallSpacing
 
 	property string text: ""
 	property alias separator: separator
 	property alias label: label
 	property bool useThickTopMargin: true
 
-	property Item __formLayout: {
-		if (parent && typeof parent.wideMode === 'boolean') {
-			return parent
-		} else if (typeof formLayout !== 'undefined' && typeof formLayout.wideMode === 'boolean') {
-			return formLayout
-		} else if (typeof page !== 'undefined' && typeof page.wideMode === 'boolean') {
-			return page
-		} else {
-			return null
-		}
-	}
-
+	Kirigami.FormData.isSection: true
 	Layout.fillWidth: true
-	Kirigami.MnemonicData.controlType: Kirigami.MnemonicData.FormLabel
-
-	Kirigami.Separator {
-		id: separator
-		visible: false
-		Layout.fillWidth: true
-		Layout.topMargin: Kirigami.Units.largeSpacing
-		Layout.bottomMargin: Kirigami.Units.largeSpacing
-	}
 
 	Kirigami.Heading {
 		id: label
-		Layout.topMargin: useThickTopMargin ? Kirigami.Units.largeSpacing * 3 : Kirigami.Units.largeSpacing
-		Layout.bottomMargin: Kirigami.Units.smallSpacing
+		Layout.topMargin: heading.useThickTopMargin ? Kirigami.Units.largeSpacing : 0
 		Layout.fillWidth: true
 		text: heading.text
-		level: 1
-		font.weight: Font.Bold
-		verticalAlignment: (!__formLayout || __formLayout.wideMode) ? Text.AlignVCenter : Text.AlignBottom
+		level: 4
+		font.weight: Font.DemiBold
+		elide: Text.ElideRight
+	}
+
+	Kirigami.Separator {
+		id: separator
+		Layout.fillWidth: true
+		Layout.bottomMargin: Kirigami.Units.smallSpacing
 	}
 }

@@ -19,39 +19,125 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Poedit 3.0\n"
 
-#: ../contents/ui/config/ConfigGeneral.qml
-msgid "Group header style"
-msgstr "Groepskopstijl"
-
-#: ../contents/ui/config/ConfigGeneral.qml
-msgid "Plain"
-msgstr "Eenvoudig"
-
-#: ../contents/ui/config/ConfigGeneral.qml
-msgid "Section header"
-msgstr "Sectiekop"
-
-#: ../metadata.json
-msgid "Tiled Menu"
-msgstr "Tegelmenu"
-
-#: ../metadata.json
-msgid "A menu based on Windows 10's Start Menu."
-msgstr "Een menu a la het Windows 10-startmenu."
+#: ../contents/config/config.qml
+msgid "Menu"
+msgstr "Menu"
 
 #: ../contents/config/config.qml
-msgid "General"
-msgstr "Algemeen"
+msgid "Tiles"
+msgstr "Tegels"
 
 #: ../contents/config/config.qml
-msgid "Import/Export Layout"
-msgstr "Indeling importeren/exporteren"
+msgid "Sidebar"
+msgstr "Zijbalk"
 
 #: ../contents/config/config.qml
-msgid "Advanced"
-msgstr "Geavanceerd"
+msgid "Theme"
+msgstr "Thema"
 
-#: ../contents/ui/AppContextMenu.qml
+#: ../contents/config/config.qml
+msgid "Services"
+msgstr "Diensten"
+
+#: ../contents/config/config.qml
+msgid "Backup & Updates"
+msgstr "Back-up en updates"
+
+#: ../contents/ui/AiChatModel.qml
+msgid "New Chat"
+msgstr "Nieuwe chat"
+
+#: ../contents/ui/AiChatModel.qml
+msgid "Please choose a model in settings."
+msgstr "Kies een model in de instellingen."
+
+#: ../contents/ui/AiChatModel.qml
+msgid "Please enter an API key in settings."
+msgstr "Voer een API-sleutel in de instellingen in."
+
+#: ../contents/ui/AiChatModel.qml
+msgid "Waiting for response..."
+msgstr "Wachten op reactie..."
+
+#: ../contents/ui/AiChatModel.qml
+msgid "The provider returned an empty response."
+msgstr "De provider heeft een leeg antwoord geretourneerd."
+
+#: ../contents/ui/AiChatModel.qml
+msgid "Please enter an API key before detecting models."
+msgstr "Voer een API-sleutel in voordat u modellen detecteert."
+
+#: ../contents/ui/AiChatModel.qml ../contents/ui/config/ConfigServices.qml
+msgid "Detecting models..."
+msgstr "Modellen detecteren..."
+
+#: ../contents/ui/AiChatModel.qml
+msgid "No models were detected for this provider."
+msgstr "Er zijn geen modellen gevonden voor deze aanbieder."
+
+#: ../contents/ui/AiChatModel.qml
+msgid "Invalid JSON response from provider."
+msgstr "Ongeldig JSON-antwoord van provider."
+
+#: ../contents/ui/AiChatModel.qml
+msgid "Request failed (%1)."
+msgstr "Verzoek mislukt (%1)."
+
+#: ../contents/ui/AiChatModel.qml
+msgid "Request failed (%1): %2"
+msgstr "Verzoek mislukt (%1): %2"
+
+#: ../contents/ui/AiChatView.qml
+msgid "Start New Chat"
+msgstr ""
+
+#: ../contents/ui/AiChatView.qml
+msgid "Delete This Conversation"
+msgstr "Verwijder dit gesprek"
+
+#: ../contents/ui/AiChatView.qml
+msgid "You"
+msgstr "Jij"
+
+#: ../contents/ui/AiChatView.qml
+msgid "Assistant"
+msgstr "Assistent"
+
+#: ../contents/ui/AiChatView.qml
+msgid "Copied"
+msgstr ""
+
+#: ../contents/ui/AiChatView.qml ../contents/ui/MenuListItem.qml
+msgid "Copy"
+msgstr ""
+
+#: ../contents/ui/AiChatView.qml
+msgid "Start a new conversation"
+msgstr "Begin een nieuw gesprek"
+
+#: ../contents/ui/AiChatView.qml
+msgid "Configure provider, API key and model in settings before sending."
+msgstr ""
+"Configureer provider, API-sleutel en model in de instellingen voordat u "
+"verzendt."
+
+#: ../contents/ui/AiChatView.qml
+msgid "Ask anything... (Enter to send, Shift+Enter for newline)"
+msgstr "Alles vragen... (Enter om te verzenden, Shift+Enter voor nieuwe regel)"
+
+#: ../contents/ui/AiChatView.qml
+msgid "Stop Response"
+msgstr ""
+
+#: ../contents/ui/AiChatView.qml
+msgid "Send Message"
+msgstr ""
+
+#: ../contents/ui/AppContextMenu.qml ../contents/ui/RootAppLauncher.qml
+msgid "Run as Root"
+msgstr ""
+
+#: ../contents/ui/AppContextMenu.qml ../contents/ui/TileItem.qml
 msgid "Unpin from Menu"
 msgstr "Losmaken"
 
@@ -59,239 +145,1071 @@ msgstr "Losmaken"
 msgid "Pin to Menu"
 msgstr "Vastmaken aan menu"
 
-#: ../contents/ui/AppContextMenu.qml
-msgid "Pin to Taskbar"
-msgstr "Vastmaken aan taakbalk"
+#: ../contents/ui/AppContextMenu.qml ../contents/ui/MenuListItem.qml
+msgid "Pin to Task Manager"
+msgstr ""
 
 #: ../contents/ui/AppsModel.qml
 msgid "Recent Apps"
 msgstr "Onlangs gebruikt"
 
 #: ../contents/ui/AppsModel.qml
-msgid "Most Used"
+msgid "Most Used "
 msgstr "Meest gebruikt"
 
-#: ../contents/ui/config/ConfigGeneral.qml
-msgid "Popup"
-msgstr "Pop-up"
+#: ../contents/ui/AppsView.qml
+msgid "Clear"
+msgstr ""
 
-#: ../contents/ui/config/ConfigGeneral.qml
-msgid "Fullscreen"
-msgstr "Volledig scherm"
+#: ../contents/ui/AppsView.qml
+msgid "Clear Recent Apps"
+msgstr ""
 
-#: ../contents/ui/config/ConfigGeneral.qml
-msgid "Grid Columns"
-msgstr "Roosterkolommen"
+#: ../contents/ui/AppsView.qml
+msgid "Forget all recent applications?"
+msgstr ""
 
-#: ../contents/ui/config/ConfigGeneral.qml
+#: ../contents/ui/config/ConfigAppearance.qml
+#: ../contents/ui/config/ConfigMenu.qml ../contents/ui/config/ConfigTiles.qml
+msgid "Follow current %1 (%2)"
+msgstr "Huidige %1 volgen (%2)"
+
+#: ../contents/ui/config/ConfigAppearance.qml
+msgid "Shared surfaces"
+msgstr "Gedeelde oppervlakken"
+
+#: ../contents/ui/config/ConfigAppearance.qml
+msgid "Surface style:"
+msgstr "Oppervlakstijl:"
+
+#: ../contents/ui/config/ConfigAppearance.qml
+#: ../contents/ui/config/ConfigTiles.qml
+msgid "Custom colour"
+msgstr "Aangepaste kleur"
+
+#: ../contents/ui/config/ConfigAppearance.qml
+msgid "Frosted glass"
+msgstr "Matglas"
+
+#: ../contents/ui/config/ConfigAppearance.qml
+msgid "Surface corners:"
+msgstr "Oppervlakhoeken:"
+
+#: ../contents/ui/config/ConfigAppearance.qml
+msgid "Rounded corners"
+msgstr "Afgeronde hoeken"
+
+#: ../contents/ui/config/ConfigAppearance.qml
+#: ../contents/ui/config/ConfigMenu.qml ../contents/ui/config/ConfigSidebar.qml
+#: ../contents/ui/config/ConfigTiles.qml
 msgid "px"
 msgstr "px"
 
-#: ../contents/ui/config/ConfigGeneral.qml
-msgid "Panel Icon"
-msgstr "Paneelpictogram"
+#: ../contents/ui/config/ConfigAppearance.qml
+msgid "Corner radius"
+msgstr "Hoekradius"
 
-#: ../contents/ui/config/ConfigGeneral.qml
-msgid "Fixed Size"
-msgstr "Vaste grootte"
+#: ../contents/ui/config/ConfigAppearance.qml
+msgid "Surface borders:"
+msgstr "Oppervlakranden:"
 
-#: ../contents/ui/config/ConfigGeneral.qml
-msgid "Tiles"
-msgstr "Tegels"
+#: ../contents/ui/config/ConfigAppearance.qml
+msgid "Hide surface borders"
+msgstr "Hide surface borders"
 
-#: ../contents/ui/config/ConfigGeneral.qml
-msgid "Tile Size"
-msgstr "Tegelgrootte"
+#: ../contents/ui/config/ConfigAppearance.qml
+msgid "Surface shadows:"
+msgstr "Oppervlakschaduwen:"
 
-#: ../contents/ui/config/ConfigGeneral.qml
-msgid "Tile Margin"
-msgstr "Tegelruimte"
+#: ../contents/ui/config/ConfigAppearance.qml
+msgid "Normal"
+msgstr "Normaal"
 
-#: ../contents/ui/config/ConfigGeneral.qml ../contents/ui/TileEditorView.qml
-msgid "Background Colour"
-msgstr "Achtergrondkleur"
+#: ../contents/ui/config/ConfigAppearance.qml
+msgid "Dark"
+msgstr "Donker"
 
-#: ../contents/ui/config/ConfigGeneral.qml
-msgid "Gradient"
-msgstr "Kleurverloop"
+#: ../contents/ui/config/ConfigAppearance.qml
+msgid "Darker"
+msgstr "Donkerder"
 
-#: ../contents/ui/config/ConfigGeneral.qml
-msgid "Transparent"
-msgstr "Doorzichtig"
+#: ../contents/ui/config/ConfigAppearance.qml
+msgid "Large"
+msgstr "Groot"
 
-#: ../contents/ui/config/ConfigGeneral.qml
-msgid "Text Alignment"
-msgstr "Tekstuitlijning"
+#: ../contents/ui/config/ConfigAppearance.qml
+msgid "Extra Large"
+msgstr "Extra groot"
 
-#: ../contents/ui/config/ConfigGeneral.qml
-msgid "Left"
-msgstr "Links"
+#: ../contents/ui/config/ConfigAppearance.qml
+msgid ""
+"Applies to tiles, group panels, sidebar cards, search box, and pill tab bar "
+"surfaces."
+msgstr ""
+"Applies to tiles, group panels, sidebar cards, search box, and pill tab bar "
+"surfaces."
 
-#: ../contents/ui/config/ConfigGeneral.qml
-msgid "Center"
-msgstr "Gecentreerd"
+#: ../contents/ui/config/ConfigExportLayout.qml
+msgid "Invalid tile property JSON"
+msgstr "Invalid tile property JSON"
 
-#: ../contents/ui/config/ConfigGeneral.qml
-msgid "Right"
-msgstr "Rechts"
+#: ../contents/ui/config/ConfigExportLayout.qml
+msgid "Applied tile model (%1 tiles)"
+msgstr "Applied tile model (%1 tiles)"
 
-#: ../contents/ui/config/ConfigGeneral.qml
-msgid "Group Text Alignment"
-msgstr "Uitlijning van groepstekst"
+#: ../contents/ui/config/ConfigExportLayout.qml
+msgid "Failed to save file"
+msgstr "Failed to save file"
 
-#: ../contents/ui/config/ConfigGeneral.qml
-msgid "Sidebar"
-msgstr "Zijbalk"
+#: ../contents/ui/config/ConfigExportLayout.qml
+msgid "Failed to import file"
+msgstr "Failed to import file"
 
-#: ../contents/ui/config/ConfigGeneral.qml
-msgid "Width"
-msgstr "Breedte"
+#: ../contents/ui/config/ConfigExportLayout.qml
+msgid "Import produced no data"
+msgstr "Import produced no data"
 
-#: ../contents/ui/config/ConfigGeneral.qml
-msgid "Icon Size"
-msgstr "Pictogramgrootte"
+#: ../contents/ui/config/ConfigExportLayout.qml
+msgid "Failed to decode imported file"
+msgstr "Failed to decode imported file"
 
-#: ../contents/ui/config/ConfigGeneral.qml
-msgid "Popup Button Height"
-msgstr "Hoogte van pop-upknop"
+#: ../contents/ui/config/ConfigExportLayout.qml
+msgid "Imported from %1"
+msgstr "Imported from %1"
 
-#: ../contents/ui/config/ConfigGeneral.qml
-msgid "Theme"
-msgstr "Thema"
+#: ../contents/ui/config/ConfigExportLayout.qml
+msgid "Failed to import settings"
+msgstr "Failed to import settings"
 
-#: ../contents/ui/config/ConfigGeneral.qml
-msgid "Sidebar Shortcuts"
-msgstr "Snelkoppelingen op zijbalk"
+#: ../contents/ui/config/ConfigExportLayout.qml
+msgid "Save Layout"
+msgstr "Save Layout"
 
-#: ../contents/ui/config/ConfigSearch.qml
-msgid "Collapse Search Result Groups"
-msgstr "Zoekresultaatgroepen samenvouwen"
+#: ../contents/ui/config/ConfigExportLayout.qml
+msgid "Layout Files (*.xml)"
+msgstr "Layout Files (*.xml)"
 
-#: ../contents/ui/config/ConfigGeneral.qml
-msgid "Add Default"
-msgstr "Standaard toevoegen"
+#: ../contents/ui/config/ConfigExportLayout.qml
+msgid "All Files (*)"
+msgstr "Alle bestanden (*)"
 
-#: ../contents/ui/config/ConfigGeneral.qml
-msgid "Search Box"
-msgstr "Zoekvak"
+#: ../contents/ui/config/ConfigExportLayout.qml
+msgid "Import Layout"
+msgstr "Import Layout"
 
-#: ../contents/ui/config/ConfigGeneral.qml
-msgid "Hide Search Field"
-msgstr "Zoekvak verbergen"
+#: ../contents/ui/config/ConfigExportLayout.qml
+msgid "Saved to %1"
+msgstr "Saved to %1"
 
-#: ../contents/ui/config/ConfigGeneral.qml
-msgid "Search Field Height"
-msgstr "Hoogte van zoekvak"
+#: ../contents/ui/config/ConfigExportLayout.qml
+msgid "Import / Export"
+msgstr "Importeren / exporteren"
 
-#: ../contents/ui/config/ConfigGeneral.qml
-msgid "Search Box Theme"
-msgstr "Zoekvakthema"
+#: ../contents/ui/config/ConfigExportLayout.qml
+msgid "Updates"
+msgstr "Updates"
 
-#: ../contents/ui/config/ConfigGeneral.qml
-msgid "Windows (White)"
-msgstr "Windows (wit)"
+#: ../contents/ui/config/ConfigExportLayout.qml
+msgid "Application Launcher XML layout"
+msgstr "Application Launcher XML layout"
 
-#: ../contents/ui/config/ConfigGeneral.qml
-msgid "App List"
-msgstr "Programmalijst"
+#: ../contents/ui/config/ConfigExportLayout.qml
+msgid ""
+"These are all the settings and variables for this application launcher. Be "
+"careful when changing things by hand, because mistakes here can break the "
+"layout or configuration."
+msgstr ""
+"These are all the settings and variables for this application launcher. Be "
+"careful when changing things by hand, because mistakes here can break the "
+"layout or configuration."
 
-#: ../contents/ui/config/ConfigGeneral.qml
-msgid "App List Area Width"
-msgstr "Breedte van programmalijst"
+#: ../contents/ui/config/ConfigExportLayout.qml
+msgid "Import XML"
+msgstr "Import XML"
 
-#: ../contents/ui/config/ConfigGeneral.qml
-msgid "Default View"
-msgstr "Standaardweergave"
+#: ../contents/ui/config/ConfigExportLayout.qml
+msgid "Export XML"
+msgstr "Export XML"
 
-#: ../contents/ui/config/ConfigGeneral.qml ../contents/ui/SidebarView.qml
+#: ../contents/ui/config/ConfigExportLayout.qml
+msgid "Unknown"
+msgstr "Onbekend"
+
+#: ../contents/ui/config/ConfigExportLayout.qml
+msgid "Installed version: %1"
+msgstr "Geïnstalleerde versie: %1"
+
+#: ../contents/ui/config/ConfigExportLayout.qml
+msgid "Checking for updates…"
+msgstr "Zoeken naar updates…"
+
+#: ../contents/ui/config/ConfigExportLayout.qml
+msgid ""
+"A new version (%1) is available. Visit the project page on GitHub to upgrade."
+msgstr ""
+"Er is een nieuwe versie (%1) beschikbaar. Ga naar de projectpagina op GitHub "
+"om bij te werken."
+
+#: ../contents/ui/config/ConfigExportLayout.qml
+msgid "Open GitHub"
+msgstr "GitHub openen"
+
+#: ../contents/ui/config/ConfigExportLayout.qml
+msgid "You are running the latest version."
+msgstr "U gebruikt de nieuwste versie."
+
+#: ../contents/ui/config/ConfigExportLayout.qml
+msgid "Could not check for updates. Check your internet connection."
+msgstr "Kan niet naar updates zoeken. Controleer uw internetverbinding."
+
+#: ../contents/ui/config/ConfigExportLayout.qml
+msgid "Check Again"
+msgstr "Opnieuw controleren"
+
+#: ../contents/ui/config/ConfigMenu.qml
+msgid "Layout"
+msgstr "Indeling"
+
+#: ../contents/ui/config/ConfigMenu.qml
+msgid "Layout mode:"
+msgstr "Indelingsmodus:"
+
+#: ../contents/ui/config/ConfigMenu.qml
+msgid "Docked Sidebar Layout"
+msgstr "Docked Sidebar Layout"
+
+#: ../contents/ui/config/ConfigMenu.qml
+msgid "Classic Layout"
+msgstr "Classic Layout"
+
+#: ../contents/ui/config/ConfigMenu.qml
+msgid "Docked sidebar width:"
+msgstr "Breedte van vastgezette zijbalk:"
+
+#: ../contents/ui/config/ConfigMenu.qml
+msgid "Docked layout only"
+msgstr "Alleen vastgezette indeling"
+
+#: ../contents/ui/config/ConfigMenu.qml
+msgid "App list width:"
+msgstr "Breedte van programmalijst:"
+
+#: ../contents/ui/config/ConfigMenu.qml ../contents/ui/config/ConfigSidebar.qml
+msgid "Classic layout only"
+msgstr "Alleen klassieke indeling"
+
+#: ../contents/ui/config/ConfigMenu.qml
+msgid "Default view:"
+msgstr "Standaardweergave:"
+
+#: ../contents/ui/config/ConfigMenu.qml ../contents/ui/SidebarView.qml
+#: ../contents/ui/SidebarViewTabBar.qml
 msgid "Alphabetical"
 msgstr "Alfabetisch"
 
-#: ../contents/ui/config/ConfigGeneral.qml ../contents/ui/SidebarView.qml
+#: ../contents/ui/config/ConfigMenu.qml ../contents/ui/SidebarView.qml
+#: ../contents/ui/SidebarViewTabBar.qml
 msgid "Categories"
 msgstr "Categorieën"
 
-#: ../contents/ui/config/ConfigGeneral.qml
+#: ../contents/ui/config/ConfigMenu.qml
+msgid "Last Used View"
+msgstr "Last Used View"
+
+#: ../contents/ui/config/ConfigMenu.qml
 msgid "Jump To Letter"
 msgstr "Ga naar letter"
 
-#: ../contents/ui/config/ConfigGeneral.qml
+#: ../contents/ui/config/ConfigMenu.qml
 msgid "Jump To Category"
 msgstr "Ga naar categorie"
 
-#: ../contents/ui/config/ConfigGeneral.qml ../contents/ui/SidebarView.qml
+#: ../contents/ui/config/ConfigMenu.qml ../contents/ui/SidebarView.qml
 msgid "Tiles Only"
 msgstr "Alleen tegels"
 
-#: ../contents/ui/config/ConfigGeneral.qml
-msgid "App Description"
-msgstr "Beschrijving"
+#: ../contents/ui/config/ConfigMenu.qml
+#: ../contents/ui/config/ConfigServices.qml ../contents/ui/SidebarView.qml
+#: ../contents/ui/SidebarViewTabBar.qml
+msgid "AI Chat"
+msgstr "AI-chat"
 
-#: ../contents/ui/config/ConfigGeneral.qml
+#: ../contents/ui/config/ConfigMenu.qml
+msgid "Show a pin button to keep the menu open while launching apps"
+msgstr ""
+"Een vastzetknop tonen om het menu open te houden bij het starten van "
+"programma's"
+
+#: ../contents/ui/config/ConfigMenu.qml
+msgid "Panel icon"
+msgstr "Paneelpictogram"
+
+#: ../contents/ui/config/ConfigMenu.qml
+msgid "Panel icon:"
+msgstr "Paneelpictogram:"
+
+#: ../contents/ui/config/ConfigMenu.qml
+msgid "Fixed size"
+msgstr "Vaste grootte"
+
+#: ../contents/ui/config/ConfigMenu.qml
+msgid "App List"
+msgstr "Programmalijst"
+
+#: ../contents/ui/config/ConfigMenu.qml
+msgid "App list icon size:"
+msgstr "Pictogramgrootte van programmalijst:"
+
+#: ../contents/ui/config/ConfigMenu.qml
+msgid "App description:"
+msgstr "Beschrijving:"
+
+#: ../contents/ui/config/ConfigMenu.qml
 msgid "Hidden"
 msgstr "Verborgen"
 
-#: ../contents/ui/config/ConfigGeneral.qml
+#: ../contents/ui/config/ConfigMenu.qml
 msgid "After"
 msgstr "Naast"
 
-#: ../contents/ui/config/ConfigGeneral.qml
+#: ../contents/ui/config/ConfigMenu.qml
 msgid "Below"
 msgstr "Onder"
 
-#: ../contents/ui/config/ConfigGeneral.qml
-msgid "App History"
-msgstr "Programmageschiedenis"
+#: ../contents/ui/config/ConfigMenu.qml
+msgid "App history:"
+msgstr "Programmageschiedenis:"
 
-#: ../contents/ui/config/ConfigGeneral.qml
+#: ../contents/ui/config/ConfigMenu.qml
 msgid "Show:"
 msgstr "Tonen:"
 
-#: ../contents/ui/config/ConfigGeneral.qml
+#: ../contents/ui/config/ConfigMenu.qml
 msgid "Recent applications"
 msgstr "Onlangs gebruikte programma's"
 
-#: ../contents/ui/config/ConfigGeneral.qml
+#: ../contents/ui/config/ConfigMenu.qml
 msgid "Often used applications"
 msgstr "Veelgebruikte programma's"
 
-#: ../contents/ui/config/ConfigGeneral.qml
-msgid "Search Results"
-msgstr "Zoekresultaten"
+#: ../contents/ui/config/ConfigMenu.qml
+msgid "Search"
+msgstr "Zoeken"
 
-#: ../contents/ui/config/ConfigGeneral.qml
-msgid "Merged (Application Launcher)"
-msgstr "Samengevoegd (programmastarter)"
+#: ../contents/ui/config/ConfigMenu.qml
+msgid "Hide search field"
+msgstr "Zoekvak verbergen"
 
-#: ../contents/ui/config/ConfigGeneral.qml
-msgid "Split into Categories (Application Menu / Dashboard)"
-msgstr "Opgesplitst in categorieën (programmamenu/overzicht)"
+#: ../contents/ui/config/ConfigMenu.qml
+msgid "Search on top"
+msgstr "Zoeken bovenaan"
 
-#: ../contents/ui/config/ConfigGeneral.qml
-msgid "Right Click Menu"
-msgstr "Rechtsklikmenu"
+#: ../contents/ui/config/ConfigMenu.qml
+msgid "Classic layout, left sidebar only"
+msgstr "Alleen klassieke indeling met zijbalk links"
 
-#: ../contents/ui/config/ConfigGeneral.qml ../contents/ui/main.qml
-msgid "Terminal"
-msgstr "Terminalvenster"
+#: ../contents/ui/config/ConfigMenu.qml
+msgid "Search field height:"
+msgstr "Hoogte van zoekvak:"
 
-#: ../contents/ui/config/ConfigGeneral.qml ../contents/ui/main.qml
-msgid "Task Manager"
-msgstr "Systeemmonitor"
+#: ../contents/ui/config/ConfigMenu.qml
+msgid "Search box theme:"
+msgstr "Zoekvakthema:"
 
-#: ../contents/ui/config/ConfigGeneral.qml ../contents/ui/main.qml
-msgid "File Manager"
-msgstr "Bestandsbeheerder"
+#: ../contents/ui/config/ConfigMenu.qml
+msgid "Windows (White)"
+msgstr "Windows (wit)"
 
-#: ../contents/ui/config/ConfigurationShortcuts.qml
+#: ../contents/ui/config/ConfigMenu.qml
+msgid "Group search results"
+msgstr "Group search results"
+
+#: ../contents/ui/config/ConfigMenu.qml
+msgid "Collapse search result groups"
+msgstr "Zoekresultaatgroepen samenvouwen"
+
+#: ../contents/ui/config/ConfigServices.qml
+msgid "OpenAI"
+msgstr "OpenAI"
+
+#: ../contents/ui/config/ConfigServices.qml
+msgid "OpenRouter"
+msgstr "OpenRouter"
+
+#: ../contents/ui/config/ConfigServices.qml
+msgid "Google (Gemini API)"
+msgstr "Google (Gemini API)"
+
+#: ../contents/ui/config/ConfigServices.qml
+msgid "Perplexity"
+msgstr "Perplexity"
+
+#: ../contents/ui/config/ConfigServices.qml
+msgid "Anthropic"
+msgstr "Anthropic"
+
+#: ../contents/ui/config/ConfigServices.qml
+msgid "Open WebUI"
+msgstr "Open WebUI"
+
+#: ../contents/ui/config/ConfigServices.qml
+msgid "Ollama (Local)"
+msgstr "Ollama (Local)"
+
+#: ../contents/ui/config/ConfigServices.qml
+msgid "Add an API key to detect models."
+msgstr "Voeg een API-sleutel toe om modellen te detecteren."
+
+#: ../contents/ui/config/ConfigServices.qml
+msgid "Model detection failed (%1)."
+msgstr "Modeldetectie mislukt (%1)."
+
+#: ../contents/ui/config/ConfigServices.qml
+msgid "No models were detected."
+msgstr "Er zijn geen modellen gedetecteerd."
+
+#: ../contents/ui/config/ConfigServices.qml
+msgid "Detected %1 model(s)."
+msgstr "%1 model(len) gedetecteerd."
+
+#: ../contents/ui/config/ConfigServices.qml
+msgid "Failed to save API key to KWallet."
+msgstr "Failed to save API key to KWallet."
+
+#: ../contents/ui/config/ConfigServices.qml
+msgid "Failed to remove API key from KWallet."
+msgstr "Failed to remove API key from KWallet."
+
+#: ../contents/ui/config/ConfigServices.qml
+msgid "Failed to save the IGDB client secret to KWallet."
+msgstr "Het IGDB-clientgeheim kon niet in KWallet worden opgeslagen."
+
+#: ../contents/ui/config/ConfigServices.qml
+msgid "Failed to remove the IGDB client secret from KWallet."
+msgstr "Het IGDB-clientgeheim kon niet uit KWallet worden verwijderd."
+
+#: ../contents/ui/config/ConfigServices.qml
+msgid "Paste your API key to auto-detect models."
+msgstr "Plak uw API-sleutel om modellen automatisch te detecteren."
+
+#: ../contents/ui/config/ConfigServices.qml
+msgid "AI Chat:"
+msgstr "AI-chat:"
+
+#: ../contents/ui/config/ConfigServices.qml
+msgid "Enabled"
+msgstr "Ingeschakeld"
+
+#: ../contents/ui/config/ConfigServices.qml
+msgid "Disabled"
+msgstr "Uitgeschakeld"
+
+#: ../contents/ui/config/ConfigServices.qml
+msgid "Provider"
+msgstr "Aanbieder"
+
+#: ../contents/ui/config/ConfigServices.qml
+msgid "AI provider:"
+msgstr "AI-aanbieder:"
+
+#: ../contents/ui/config/ConfigServices.qml
+msgid "API key:"
+msgstr "API-sleutel:"
+
+#: ../contents/ui/config/ConfigServices.qml
+msgid "API key (optional):"
+msgstr "API-sleutel (optioneel):"
+
+#: ../contents/ui/config/ConfigServices.qml
+msgid "Required for this provider (stored in KWallet)"
+msgstr "Required for this provider (stored in KWallet)"
+
+#: ../contents/ui/config/ConfigServices.qml
+msgid "Optional bearer token (stored in KWallet)"
+msgstr "Optional bearer token (stored in KWallet)"
+
+#: ../contents/ui/config/ConfigServices.qml
+msgid "Hide API Key"
+msgstr "API-sleutel verbergen"
+
+#: ../contents/ui/config/ConfigServices.qml
+msgid "Show API Key"
+msgstr "Toon API-sleutel"
+
+#: ../contents/ui/config/ConfigServices.qml
 msgid ""
-"When this widget has a global shortcut set, like 'Alt+F1', Plasma will open "
-"this menu with just the ⊞ Windows / Meta key."
-msgstr "Als er voor deze widget een globale sneltoets is ingesteld, bijv. ‘Alt+F1’, dan opent Plasma dit menu alleen met de ⊞ Windows-/Metatoets."
+"An API key is already stored in KWallet. Enter a new key here to replace it."
+msgstr ""
+"An API key is already stored in KWallet. Enter a new key here to replace it."
+
+#: ../contents/ui/config/ConfigServices.qml
+msgid "Ollama server:"
+msgstr "Ollama-server:"
+
+#: ../contents/ui/config/ConfigServices.qml
+msgid "Open WebUI server:"
+msgstr "Open WebUI-server:"
+
+#: ../contents/ui/config/ConfigServices.qml
+msgid "Model:"
+msgstr "Model:"
+
+#: ../contents/ui/config/ConfigServices.qml
+msgid "Reload models"
+msgstr "Modellen opnieuw laden"
+
+#: ../contents/ui/config/ConfigServices.qml
+msgid "No models detected yet. Paste your API key to auto-detect."
+msgstr ""
+"Nog geen modellen gedetecteerd. Plak uw API-sleutel om automatisch te "
+"detecteren."
+
+#: ../contents/ui/config/ConfigServices.qml
+msgid "Chat options"
+msgstr "Chatopties"
+
+#: ../contents/ui/config/ConfigServices.qml
+msgid "Enable streaming responses"
+msgstr "Schakel streamingreacties in"
+
+#: ../contents/ui/config/ConfigServices.qml
+msgid ""
+"<ul><li>OpenAI, OpenRouter, Google, Perplexity and Anthropic require network "
+"access and an API key.</li><li>Open WebUI uses its OpenAI-compatible API at "
+"your configured server URL and can optionally use a bearer token; both the "
+"server root and an /api URL are accepted.</li><li>Ollama connects to a local "
+"server (default: http://127.0.0.1:11434).</li></ul>"
+msgstr ""
+"<ul><li>OpenAI, OpenRouter, Google, Perplexity and Anthropic require network "
+"access and an API key.</li><li>Open WebUI uses its OpenAI-compatible API at "
+"your configured server URL and can optionally use a bearer token; both the "
+"server root and an /api URL are accepted.</li><li>Ollama connects to a local "
+"server (default: http://127.0.0.1:11434).</li></ul>"
+
+#: ../contents/ui/config/ConfigServices.qml
+msgid "Game Metadata"
+msgstr "Spelmetadata"
+
+#: ../contents/ui/config/ConfigServices.qml
+msgid "IGDB client ID:"
+msgstr "IGDB-client-ID:"
+
+#: ../contents/ui/config/ConfigServices.qml
+msgid "Required for hero-page IGDB tags"
+msgstr "Vereist voor IGDB-tags op hero-pagina's"
+
+#: ../contents/ui/config/ConfigServices.qml
+msgid "IGDB client secret:"
+msgstr "IGDB-clientgeheim:"
+
+#: ../contents/ui/config/ConfigServices.qml
+msgid "Stored in KWallet"
+msgstr "Opgeslagen in KWallet"
+
+#: ../contents/ui/config/ConfigServices.qml
+msgid "Hide client secret"
+msgstr "Clientgeheim verbergen"
+
+#: ../contents/ui/config/ConfigServices.qml
+msgid "Show client secret"
+msgstr "Clientgeheim tonen"
+
+#: ../contents/ui/config/ConfigServices.qml
+msgid ""
+"An IGDB client secret is already stored in KWallet. Enter a new value here "
+"to replace it."
+msgstr ""
+"Er is al een IGDB-clientgeheim opgeslagen in KWallet. Voer hier een nieuwe "
+"waarde in om het te vervangen."
+
+#: ../contents/ui/config/ConfigServices.qml
+msgid ""
+"Hero pages can download Steam store descriptions and IGDB tags when you "
+"enable the per-page metadata option in the hero editor."
+msgstr ""
+"Hero-pagina's kunnen beschrijvingen uit de Steam-winkel en IGDB-tags "
+"downloaden wanneer u de metadata-optie per pagina inschakelt in de hero-"
+"editor."
+
+#: ../contents/ui/config/ConfigServices.qml
+msgid "Default Apps"
+msgstr "Standaardprogramma's"
+
+#: ../contents/ui/config/ConfigServices.qml
+msgid "Show a terminal when running as root"
+msgstr "Een terminal tonen bij uitvoeren als root"
+
+#: ../contents/ui/config/ConfigServices.qml
+msgid "Terminal:"
+msgstr "Terminalvenster:"
+
+#: ../contents/ui/config/ConfigServices.qml
+msgid "Task manager:"
+msgstr "Systeemmonitor:"
+
+#: ../contents/ui/config/ConfigServices.qml
+msgid "File manager:"
+msgstr "Bestandsbeheerder:"
+
+#: ../contents/ui/config/ConfigSidebar.qml ../contents/ui/main.qml
+msgid "Choose a custom avatar"
+msgstr "Een eigen avatar kiezen"
+
+#: ../contents/ui/config/ConfigSidebar.qml ../contents/ui/main.qml
+#: ../contents/ui/TileEditorHeroPanel.qml ../contents/ui/TileEditorView.qml
+msgid "Image Files (*.png *.apng *.gif *.webp *.jpg *.jpeg *.bmp *.svg *.svgz)"
+msgstr ""
+"Afbeeldingsbestanden (*.png *.apng *.gif *.webp *.jpg *.jpeg *.bmp *.svg "
+"*.svgz)"
+
+#: ../contents/ui/config/ConfigSidebar.qml
+msgid "Shortcuts"
+msgstr "Snelkoppelingen"
+
+#: ../contents/ui/config/ConfigSidebar.qml
+msgid "Sidebar shortcuts:"
+msgstr "Snelkoppelingen op zijbalk:"
+
+#: ../contents/ui/config/ConfigSidebar.qml
+#: ../contents/ui/libconfig/ListBoxStringList.qml
+msgid "Shortcut cannot be empty."
+msgstr "Shortcut cannot be empty."
+
+#: ../contents/ui/config/ConfigSidebar.qml
+msgid ""
+"Unsupported XDG shortcut. Use DOCUMENTS, DOWNLOAD, MUSIC, PICTURES, or "
+"VIDEOS."
+msgstr ""
+"Unsupported XDG shortcut. Use DOCUMENTS, DOWNLOAD, MUSIC, PICTURES, or "
+"VIDEOS."
+
+#: ../contents/ui/config/ConfigSidebar.qml
+msgid "Desktop launcher not found."
+msgstr "Desktop launcher not found."
+
+#: ../contents/ui/config/ConfigSidebar.qml
+msgid ""
+"Use an installed .desktop launcher, an xdg: shortcut, or a filesystem path."
+msgstr ""
+"Use an installed .desktop launcher, an xdg: shortcut, or a filesystem path."
+
+#: ../contents/ui/config/ConfigSidebar.qml
+msgid "Shortcut presets"
+msgstr "Voorinstellingen voor snelkoppelingen"
+
+#: ../contents/ui/config/ConfigSidebar.qml
+msgid "Add common folders and apps to the sidebar."
+msgstr "Add common folders and apps to the sidebar."
+
+#: ../contents/ui/config/ConfigSidebar.qml
+msgid "Options"
+msgstr "Opties"
+
+#: ../contents/ui/config/ConfigSidebar.qml
+msgid "Sidebar icon size:"
+msgstr "Pictogramgrootte van zijbalk:"
+
+#: ../contents/ui/config/ConfigSidebar.qml
+msgid "Sidebar position:"
+msgstr "Positie van zijbalk:"
+
+#: ../contents/ui/config/ConfigSidebar.qml
+#: ../contents/ui/config/ConfigTiles.qml
+msgid "Left"
+msgstr "Links"
+
+#: ../contents/ui/config/ConfigSidebar.qml
+msgid "Top"
+msgstr "Boven"
+
+#: ../contents/ui/config/ConfigSidebar.qml
+msgid "Bottom"
+msgstr "Onder"
+
+#: ../contents/ui/config/ConfigSidebar.qml
+msgid "Sidebar width:"
+msgstr "Breedte van zijbalk:"
+
+#: ../contents/ui/config/ConfigSidebar.qml
+msgid "Sidebar height:"
+msgstr "Hoogte van zijbalk:"
+
+#: ../contents/ui/config/ConfigSidebar.qml
+msgid "Profile picture:"
+msgstr "Profielfoto:"
+
+#: ../contents/ui/config/ConfigSidebar.qml
+#: ../contents/ui/ProfileContextMenu.qml
+msgid "Use a custom avatar..."
+msgstr "Een eigen avatar gebruiken..."
+
+#: ../contents/ui/config/ConfigSidebar.qml
+#: ../contents/ui/ProfileContextMenu.qml
+msgid "Revert to system avatar"
+msgstr "Terug naar systeemavatar"
+
+#: ../contents/ui/config/ConfigSidebar.qml
+msgid "Power actions:"
+msgstr "Energieacties:"
+
+#: ../contents/ui/config/ConfigSidebar.qml
+msgid "Use the session modal for power actions"
+msgstr "Het sessievenster gebruiken voor energieacties"
+
+#: ../contents/ui/config/ConfigTiles.qml
+msgid "Tabs"
+msgstr "Tabbladen"
+
+#: ../contents/ui/config/ConfigTiles.qml
+msgid "Tab style:"
+msgstr "Tabbladstijl:"
+
+#: ../contents/ui/config/ConfigTiles.qml
+msgid "Disable Tabs"
+msgstr "Tabbladen uitschakelen"
+
+#: ../contents/ui/config/ConfigTiles.qml
+msgid "Accent Tab"
+msgstr "Accenttabblad"
+
+#: ../contents/ui/config/ConfigTiles.qml
+msgid "Underline"
+msgstr "Onderstreept"
+
+#: ../contents/ui/config/ConfigTiles.qml
+msgid "Pills"
+msgstr "Pillen"
+
+#: ../contents/ui/config/ConfigTiles.qml
+msgid "Remember last open tab"
+msgstr "Laatst geopende tabblad onthouden"
+
+#: ../contents/ui/config/ConfigTiles.qml
+msgid "Add a Popular tab"
+msgstr "Een tabblad Populair toevoegen"
+
+#: ../contents/ui/config/ConfigTiles.qml
+msgid "Popular applications to display:"
+msgstr "Aantal populaire programma's:"
+
+#: ../contents/ui/config/ConfigTiles.qml
+msgid ""
+"The Popular tab ranks applications using KDE's application history for the "
+"current Activity. Its Most Recent group shows recently launched applications "
+"that aren't already listed, using the App History count from Menu › App "
+"List. KDE keeps that history; removing the tab doesn't clear it."
+msgstr ""
+"Het tabblad Populair rangschikt programma's op basis van de "
+"programmageschiedenis van KDE voor de huidige activiteit. De groep Meest "
+"recent toont recent gestarte programma's die nog niet in de lijst staan, met "
+"het aantal uit Menu › Programmalijst. KDE bewaart die geschiedenis; het "
+"tabblad verwijderen wist deze niet."
+
+#: ../contents/ui/config/ConfigTiles.qml
+msgid "Size & Spacing"
+msgstr "Size & Spacing"
+
+#: ../contents/ui/config/ConfigTiles.qml
+msgid "Tile size:"
+msgstr "Tegelgrootte:"
+
+#: ../contents/ui/config/ConfigTiles.qml
+msgid "Tile icon size:"
+msgstr "Pictogramgrootte van tegels:"
+
+#: ../contents/ui/config/ConfigTiles.qml
+msgid "Base size for tile icons; small/large variants scale from this"
+msgstr "Base size for tile icons; small/large variants scale from this"
+
+#: ../contents/ui/config/ConfigTiles.qml
+msgid "Tile margin:"
+msgstr "Tegelruimte:"
+
+#: ../contents/ui/config/ConfigTiles.qml
+msgid "Colours & Effects"
+msgstr "Kleuren en effecten"
+
+#: ../contents/ui/config/ConfigTiles.qml
+msgid "Standalone tile background:"
+msgstr "Achtergrond van losse tegels:"
+
+#: ../contents/ui/config/ConfigTiles.qml
+msgid "Transparent"
+msgstr "Doorzichtig"
+
+#: ../contents/ui/config/ConfigTiles.qml
+msgid "Gradient"
+msgstr "Kleurverloop"
+
+#: ../contents/ui/config/ConfigTiles.qml
+msgid "Grouped tile background:"
+msgstr "Achtergrond van gegroepeerde tegels:"
+
+#: ../contents/ui/config/ConfigTiles.qml
+msgid "Group panel"
+msgstr "Groepspaneel"
+
+#: ../contents/ui/config/ConfigTiles.qml
+msgid "Same as standalone tiles"
+msgstr "Zelfde als losse tegels"
+
+#: ../contents/ui/config/ConfigTiles.qml
+msgid "Hover effect:"
+msgstr "Zweefeffect:"
+
+#: ../contents/ui/config/ConfigTiles.qml
+msgid "Classic"
+msgstr "Klassiek"
+
+#: ../contents/ui/config/ConfigTiles.qml
+msgid "Holographic"
+msgstr "Holographic"
+
+#: ../contents/ui/config/ConfigTiles.qml
+msgid "Play animated backgrounds only on hover"
+msgstr "Play animated backgrounds only on hover"
+
+#: ../contents/ui/config/ConfigTiles.qml
+msgid "Show tooltips on hover"
+msgstr "Show tooltips on hover"
+
+#: ../contents/ui/config/ConfigTiles.qml
+msgid "Labels & Groups"
+msgstr "Labels en groepen"
+
+#: ../contents/ui/config/ConfigTiles.qml
+msgid "Tile label alignment:"
+msgstr "Uitlijning van tegellabel:"
+
+#: ../contents/ui/config/ConfigTiles.qml
+msgid "Centre"
+msgstr "Midden"
+
+#: ../contents/ui/config/ConfigTiles.qml
+msgid "Right"
+msgstr "Rechts"
+
+#: ../contents/ui/config/ConfigTiles.qml
+msgid "Group label alignment:"
+msgstr "Uitlijning van groepslabel:"
+
+#: ../contents/ui/config/ConfigTiles.qml
+msgid "Group layout:"
+msgstr "Groepsindeling:"
+
+#: ../contents/ui/config/ConfigTiles.qml
+msgid "Card"
+msgstr "Kaart"
+
+#: ../contents/ui/config/ConfigTiles.qml
+msgid "Lock tiles"
+msgstr "Tegels vergrendelen"
+
+#: ../contents/ui/config/ConfigTiles.qml
+msgid "Preset tiles"
+msgstr "Voorinstellingen"
+
+#: ../contents/ui/config/ConfigTiles.qml
+msgid "Preset tile folder:"
+msgstr "Map voor vooraf ingestelde tegels:"
+
+#: ../contents/ui/config/ConfigTiles.qml
+msgid "Browse..."
+msgstr "Bladeren…"
+
+#: ../contents/ui/config/ConfigTiles.qml
+msgid "Select Preset Tile Folder"
+msgstr "Select Preset Tile Folder"
+
+#: ../contents/ui/HeroPageMetadataFetcher.qml
+msgid "Received malformed JSON."
+msgstr ""
+
+#: ../contents/ui/HeroPageMetadataFetcher.qml
+msgid "Steam did not return store details for app %1."
+msgstr ""
+
+#: ../contents/ui/HeroPageMetadataFetcher.qml
+msgid "Could not determine the Steam app ID."
+msgstr ""
+
+#: ../contents/ui/HeroPageMetadataFetcher.qml
+msgid "Steam did not return artwork for app %1."
+msgstr ""
+
+#: ../contents/ui/HeroPageMetadataFetcher.qml
+msgid "IGDB authentication failed."
+msgstr ""
+
+#: ../contents/ui/HeroPageMetadataFetcher.qml
+msgid "IGDB has no Steam mapping for app %1."
+msgstr ""
+
+#: ../contents/ui/HeroPageMetadataFetcher.qml
+msgid "IGDB has no title match for %1."
+msgstr ""
+
+#: ../contents/ui/HeroPageMetadataFetcher.qml
+msgid "IGDB returned no data for game %1."
+msgstr ""
+
+#: ../contents/ui/HeroPageMetadataFetcher.qml
+msgid "Missing IGDB credentials."
+msgstr ""
+
+#: ../contents/ui/HeroPageMetadataFetcher.qml
+msgid "Could not fetch IGDB details."
+msgstr ""
+
+#: ../contents/ui/HeroPageMetadataFetcher.qml
+msgid "No IGDB match for %1."
+msgstr ""
+
+#: ../contents/ui/HeroPageMetadataFetcher.qml
+msgid ""
+"Set the IGDB Client ID and Client Secret in the Tiles settings to download "
+"metadata for this launcher."
+msgstr ""
+
+#: ../contents/ui/HeroPageMetadataFetcher.qml
+msgid "Downloaded IGDB metadata."
+msgstr ""
+
+#: ../contents/ui/HeroPageMetadataFetcher.qml
+msgid "Could not determine a title for this page."
+msgstr ""
+
+#: ../contents/ui/HeroPageMetadataFetcher.qml
+msgid ""
+"This hero page is not linked to a Steam, Heroic, or Lutris game launcher."
+msgstr ""
+
+#: ../contents/ui/HeroPageMetadataFetcher.qml
+msgid ""
+"Saved the Steam store info, but IGDB credentials are missing so no tags were "
+"downloaded."
+msgstr ""
+
+#: ../contents/ui/HeroPageMetadataFetcher.qml
+msgid "Saved the Steam store info, but IGDB authentication failed."
+msgstr ""
+
+#: ../contents/ui/HeroPageMetadataFetcher.qml
+msgid "Saved the Steam store info, but downloading IGDB tags failed."
+msgstr ""
+
+#: ../contents/ui/HeroPageMetadataFetcher.qml
+msgid "Saved the Steam store info, but no IGDB game match was found."
+msgstr ""
+
+#: ../contents/ui/HeroTileView.qml
+msgid "Launch"
+msgstr ""
+
+#: ../contents/ui/HeroTileView.qml
+msgid "Hero Tile — right-click → Edit, or drop an app here to add a page"
+msgstr ""
+
+#: ../contents/ui/LeftPaneView.qml
+msgid "User"
+msgstr ""
+
+#: ../contents/ui/LeftPaneView.qml ../contents/ui/SidebarShortcutPillRow.qml
+#: ../contents/ui/SidebarView.qml
+msgid "Settings"
+msgstr ""
+
+#: ../contents/ui/LeftPaneView.qml ../contents/ui/SidebarShortcutPillRow.qml
+#: ../contents/ui/SidebarView.qml
+msgid "Tiled Menu Reloaded Settings — Update available"
+msgstr ""
+
+#: ../contents/ui/LeftPaneView.qml ../contents/ui/SidebarShortcutPillRow.qml
+#: ../contents/ui/SidebarView.qml
+msgid "Tiled Menu Reloaded Settings"
+msgstr "Instellingen van Tiled Menu Reloaded"
+
+#: ../contents/ui/LeftPaneView.qml ../contents/ui/SidebarShortcutPillRow.qml
+#: ../contents/ui/SidebarView.qml
+msgid "Power"
+msgstr "Afsluitmenu"
+
+#: ../contents/ui/LeftPaneView.qml ../contents/ui/Popup.qml
+#: ../contents/ui/SidebarView.qml
+msgid "Auto Resize"
+msgstr ""
+
+#: ../contents/ui/libconfig/ListBoxStringList.qml
+msgid "That shortcut already exists."
+msgstr "That shortcut already exists."
+
+#: ../contents/ui/libconfig/ListBoxStringList.qml
+msgid "Enter a desktop file, URL, or path"
+msgstr "Enter a desktop file, URL, or path"
+
+#: ../contents/ui/libconfig/ListBoxStringList.qml
+msgid "Add"
+msgstr "Toevoegen"
+
+#: ../contents/ui/libconfig/ListBoxStringList.qml
+msgid "Save"
+msgstr "Opslaan"
+
+#: ../contents/ui/libconfig/ListBoxStringList.qml
+msgid "Update"
+msgstr "Bijwerken"
+
+#: ../contents/ui/libconfig/ListBoxStringList.qml
+msgid "Remove"
+msgstr "Verwijderen"
+
+#: ../contents/ui/libconfig/ListBoxStringList.qml
+msgid "Up"
+msgstr "Omhoog"
+
+#: ../contents/ui/libconfig/ListBoxStringList.qml
+msgid "Down"
+msgstr "Omlaag"
+
+#: ../contents/ui/lib/KWalletSecret.qml
+msgid ""
+"Secure storage is unavailable because no qdbus binary (qdbus6, qdbus-qt6, or "
+"qdbus) was found."
+msgstr ""
+
+#: ../contents/ui/lib/KWalletSecret.qml
+msgid ""
+"Secure storage is unavailable because no KWallet wallet was found. Create or "
+"enable a wallet in KDE Wallet settings."
+msgstr ""
+
+#: ../contents/ui/lib/KWalletSecret.qml
+msgid "Could not read the secret from KWallet."
+msgstr ""
+
+#: ../contents/ui/lib/KWalletSecret.qml
+msgid "Could not write API key to KWallet."
+msgstr ""
+
+#: ../contents/ui/lib/KWalletSecret.qml
+msgid "Could not remove API key from KWallet."
+msgstr ""
 
 #: ../contents/ui/main.qml
 msgid "System Info"
 msgstr "Systeeminformatie"
+
+#: ../contents/ui/main.qml
+msgid "Terminal"
+msgstr "Terminalvenster"
+
+#: ../contents/ui/main.qml
+msgid "Task Manager"
+msgstr "Systeemmonitor"
+
+#: ../contents/ui/main.qml
+msgid "File Manager"
+msgstr "Bestandsbeheerder"
 
 #: ../contents/ui/main.qml ../contents/ui/SearchFiltersView.qml
 msgid "System Settings"
@@ -302,46 +1220,66 @@ msgid "Edit Applications..."
 msgstr "Programma's bewerken…"
 
 #: ../contents/ui/Popup.qml
-msgid "Resize?"
-msgstr "Grootte aanpassen?"
+msgctxt "Popular tab group for apps without a menu category"
+msgid "Other"
+msgstr ""
 
-#: ../contents/ui/Popup.qml ../contents/ui/TileGridSplash.qml
-msgid "Meta + Right Click to resize the menu."
-msgstr "Gebruik Meta + rechtermuisklik om de menugrootte aan te passen."
+#: ../contents/ui/Popup.qml
+msgctxt "group of recently launched applications in the Popular tab"
+msgid "Most Recent"
+msgstr ""
+
+#: ../contents/ui/Popup.qml ../contents/ui/TileTabBar.qml
+msgid "Delete Tab"
+msgstr ""
+
+#: ../contents/ui/Popup.qml
+msgid "The tab \"%1\" contains %2 tile(s). Delete it anyway?"
+msgstr ""
+
+#: ../contents/ui/Popup.qml
+msgid "Unpin"
+msgstr ""
+
+#: ../contents/ui/Popup.qml
+msgid "Keep Open"
+msgstr ""
+
+#: ../contents/ui/Popup.qml
+msgid "No application history yet"
+msgstr ""
+
+#: ../contents/ui/Popup.qml
+msgid ""
+"This tab shows your most used and most recent applications from KDE's "
+"application history for the current Activity. Launch some applications and "
+"they will appear here."
+msgstr ""
+
+#: ../contents/ui/PowerSessionModal.qml
+msgid "Session"
+msgstr ""
+
+#: ../contents/ui/ProfileContextMenu.qml
+msgid "User Manager"
+msgstr "Gebruikersbeheer"
+
+#: ../contents/ui/RootAppLauncher.qml
+msgid "Could not run the application as root."
+msgstr ""
 
 #: ../contents/ui/SearchField.qml
-msgid "Search"
-msgstr "Zoeken"
+msgid "Search apps, files and settings..."
+msgstr ""
 
 #: ../contents/ui/SearchField.qml
-msgid "Search Apps"
-msgstr "Zoeken naar programma's"
-
-#: ../contents/ui/SearchField.qml
-msgid "Search Files"
-msgstr "Zoeken naar bestanden"
-
-#: ../contents/ui/SearchField.qml
-msgid "Search Bookmarks"
-msgstr "Zoeken naar bladwijzers"
-
-#: ../contents/ui/SearchField.qml
-msgctxt "Search [krunnerName, krunnerName, ...], "
-msgid "Search %1"
-msgstr "%1 doorzoeken"
+msgid "Search..."
+msgstr ""
 
 #: ../contents/ui/SearchFiltersViewItem.qml
 #: ../contents/ui/SearchFiltersView.qml
 msgid "Default"
 msgstr "Standaard"
-
-#: ../contents/ui/SearchFiltersView.qml
-msgid "All"
-msgstr "Alles"
-
-#: ../contents/ui/SearchFiltersView.qml
-msgid "Search with all KRunner plugins"
-msgstr "Zoeken met alle KRunner-plug-ins"
 
 #: ../contents/ui/SearchFiltersView.qml
 msgid "Search with user selected defaults"
@@ -396,16 +1334,194 @@ msgid "Unit Converter"
 msgstr "Eenheden omzetten"
 
 #: ../contents/ui/SearchResultsView.qml
+msgid "All results"
+msgstr ""
+
+#: ../contents/ui/SearchResultsView.qml
+msgid "Applications only"
+msgstr ""
+
+#: ../contents/ui/SearchResultsView.qml
+msgid "Files only"
+msgstr ""
+
+#: ../contents/ui/SearchResultsView.qml
 msgid "Filters"
 msgstr "Filters"
 
-#: ../contents/ui/SidebarView.qml
-msgid "User Manager"
-msgstr "Gebruikersbeheer"
+#: ../contents/ui/TileEditorColorGroup.qml ../contents/ui/TileEditorField.qml
+#: ../contents/ui/TileEditorPresetTiles.qml
+#: ../contents/ui/TileEditorRectField.qml ../contents/ui/TileEditorView.qml
+msgid "Label"
+msgstr "Omschrijving"
 
-#: ../contents/ui/SidebarView.qml
-msgid "Power"
-msgstr "Afsluitmenu"
+#: ../contents/ui/TileEditorHeroPanel.qml
+msgid "Downloading metadata..."
+msgstr ""
+
+#: ../contents/ui/TileEditorHeroPanel.qml
+msgid "Metadata download failed."
+msgstr ""
+
+#: ../contents/ui/TileEditorHeroPanel.qml
+msgid "Downloaded metadata."
+msgstr ""
+
+#: ../contents/ui/TileEditorHeroPanel.qml
+msgid "Hero Carousel"
+msgstr ""
+
+#: ../contents/ui/TileEditorHeroPanel.qml
+msgid "Auto-scroll"
+msgstr ""
+
+#: ../contents/ui/TileEditorHeroPanel.qml
+msgid "Interval (s):"
+msgstr ""
+
+#: ../contents/ui/TileEditorHeroPanel.qml
+msgid "Pages"
+msgstr ""
+
+#: ../contents/ui/TileEditorHeroPanel.qml
+#: ../contents/ui/TileEditorPresetTiles.qml
+msgid "Could not determine a title for this launcher."
+msgstr ""
+
+#: ../contents/ui/TileEditorHeroPanel.qml
+#: ../contents/ui/TileEditorPresetTiles.qml
+msgid "Looking up IGDB artwork..."
+msgstr ""
+
+#: ../contents/ui/TileEditorHeroPanel.qml
+#: ../contents/ui/TileEditorPresetTiles.qml
+msgid "No IGDB artwork found."
+msgstr ""
+
+#: ../contents/ui/TileEditorHeroPanel.qml
+msgid "Downloaded IGDB artwork."
+msgstr ""
+
+#: ../contents/ui/TileEditorHeroPanel.qml
+msgid "Saving selected image..."
+msgstr ""
+
+#: ../contents/ui/TileEditorHeroPanel.qml
+msgid "Could not save the selected image."
+msgstr ""
+
+#: ../contents/ui/TileEditorHeroPanel.qml
+msgid "Page %1"
+msgstr ""
+
+#: ../contents/ui/TileEditorHeroPanel.qml
+msgid "Image:"
+msgstr ""
+
+#: ../contents/ui/TileEditorHeroPanel.qml
+msgid "File path or URL"
+msgstr ""
+
+#: ../contents/ui/TileEditorHeroPanel.qml
+msgid "Choose a background image for this hero page"
+msgstr ""
+
+#: ../contents/ui/TileEditorHeroPanel.qml ../contents/ui/TileEditorView.qml
+msgid "Choose an image"
+msgstr "Kies een afbeelding"
+
+#: ../contents/ui/TileEditorHeroPanel.qml
+msgid "Hide preset images"
+msgstr ""
+
+#: ../contents/ui/TileEditorHeroPanel.qml
+msgid "Choose from preset images"
+msgstr ""
+
+#: ../contents/ui/TileEditorHeroPanel.qml
+msgid "No preset tile images are available for this entry"
+msgstr ""
+
+#: ../contents/ui/TileEditorHeroPanel.qml
+msgid "Use %1"
+msgstr ""
+
+#: ../contents/ui/TileEditorHeroPanel.qml
+msgid "Use this image"
+msgstr ""
+
+#: ../contents/ui/TileEditorHeroPanel.qml
+msgid "No preset images are available."
+msgstr ""
+
+#: ../contents/ui/TileEditorHeroPanel.qml
+msgid "Label:"
+msgstr "Omschrijving:"
+
+#: ../contents/ui/TileEditorHeroPanel.qml
+msgid "Optional overlay text"
+msgstr ""
+
+#: ../contents/ui/TileEditorHeroPanel.qml
+msgid "Launch URL:"
+msgstr ""
+
+#: ../contents/ui/TileEditorHeroPanel.qml
+msgid "Optional .desktop file or http(s):// URL"
+msgstr ""
+
+#: ../contents/ui/TileEditorHeroPanel.qml
+msgid "Show downloaded store info and tags"
+msgstr ""
+
+#: ../contents/ui/TileEditorHeroPanel.qml
+msgid "Download store text and tags for this page when enabled"
+msgstr ""
+
+#: ../contents/ui/TileEditorHeroPanel.qml
+msgid ""
+"Set the IGDB Client ID and Client Secret in the Tiles settings to enable "
+"this option"
+msgstr ""
+
+#: ../contents/ui/TileEditorHeroPanel.qml
+msgid ""
+"This option is only available for Steam, Heroic, or Lutris game launchers"
+msgstr ""
+
+#: ../contents/ui/TileEditorHeroPanel.qml
+msgid "Refresh downloaded metadata"
+msgstr ""
+
+#: ../contents/ui/TileEditorHeroPanel.qml
+msgid "Fill in the IGDB metadata settings first"
+msgstr ""
+
+#: ../contents/ui/TileEditorHeroPanel.qml
+msgid "Add page"
+msgstr ""
+
+#: ../contents/ui/TileEditorPresetTiles.qml
+msgid ""
+"Set the IGDB Client ID and Client Secret in the Tiles settings to download "
+"artwork."
+msgstr ""
+
+#: ../contents/ui/TileEditorRectField.qml
+msgid "x:"
+msgstr "x:"
+
+#: ../contents/ui/TileEditorRectField.qml
+msgid "y:"
+msgstr "y:"
+
+#: ../contents/ui/TileEditorRectField.qml
+msgid "w:"
+msgstr "w:"
+
+#: ../contents/ui/TileEditorRectField.qml
+msgid "h:"
+msgstr "h:"
 
 #: ../contents/ui/TileEditorView.qml ../contents/ui/TileItem.qml
 msgid "Edit Tile"
@@ -424,48 +1540,28 @@ msgid "Url"
 msgstr "URL"
 
 #: ../contents/ui/TileEditorView.qml
-msgid "Label"
-msgstr "Omschrijving"
-
-#: ../contents/ui/TileEditorView.qml
 msgid "Icon"
 msgstr "Pictogram"
+
+#: ../contents/ui/TileEditorView.qml
+msgid "Fill the whole tile"
+msgstr ""
 
 #: ../contents/ui/TileEditorView.qml
 msgid "Background Image"
 msgstr "Achtergrondafbeelding"
 
 #: ../contents/ui/TileEditorView.qml
-msgid "Choose an image"
-msgstr "Kies een afbeelding"
-
-#: ../contents/ui/TileEditorView.qml
-msgid "Image Files (*.png *.apng *.gif *.webp *.jpg *.jpeg *.bmp *.svg *.svgz)"
-msgstr "Afbeeldingsbestanden (*.png *.apng *.gif *.webp *.jpg *.jpeg *.bmp *.svg *.svgz)"
-
-#: ../contents/ui/TileEditorView.qml
 msgid "Preset Tiles"
 msgstr "Voorinstellingen"
 
 #: ../contents/ui/TileEditorView.qml
+msgid "Background Colour"
+msgstr "Achtergrondkleur"
+
+#: ../contents/ui/TileEditorView.qml
 msgid "Position / Size"
 msgstr "Positie/Grootte"
-
-#: ../contents/ui/TileEditorRectField.qml
-msgid "x:"
-msgstr "x:"
-
-#: ../contents/ui/TileEditorRectField.qml
-msgid "y:"
-msgstr "y:"
-
-#: ../contents/ui/TileEditorRectField.qml
-msgid "w:"
-msgstr "w:"
-
-#: ../contents/ui/TileEditorRectField.qml
-msgid "h:"
-msgstr "h:"
 
 #: ../contents/ui/TileGridPresets.qml
 msgid "Add Preset"
@@ -484,12 +1580,16 @@ msgid "Gmail"
 msgstr "Gmail"
 
 #: ../contents/ui/TileGridPresets.qml
-msgid "Software Center"
-msgstr "Softwarecentrum"
+msgid "Software Centre"
+msgstr ""
 
 #: ../contents/ui/TileGrid.qml
 msgid "New Group"
 msgstr "Nieuwe groep"
+
+#: ../contents/ui/TileGrid.qml
+msgid "New Hero Tile"
+msgstr ""
 
 #: ../contents/ui/TileGrid.qml
 msgid "Unlock Tiles"
@@ -498,6 +1598,12 @@ msgstr "Tegels ontgrendelen"
 #: ../contents/ui/TileGrid.qml
 msgid "Lock Tiles"
 msgstr "Tegels vergrendelen"
+
+#: ../contents/ui/TileGrid.qml
+msgid "%1 tile"
+msgid_plural "%1 tiles"
+msgstr[0] ""
+msgstr[1] ""
 
 #: ../contents/ui/TileGrid.qml
 msgctxt "default group label"
@@ -521,579 +1627,301 @@ msgid "Use Default Tile Layout"
 msgstr "Standaard tegelindeling gebruiken"
 
 #: ../contents/ui/TileItem.qml
+msgid "Reset Group Positions"
+msgstr ""
+
+#: ../contents/ui/TileItem.qml
 msgid "Sort Tiles"
 msgstr "Tegels sorteren"
 
-#: ../contents/ui/SidebarView.qml
-msgid "Tiled Menu Reloaded Settings"
-msgstr "Instellingen van Tiled Menu Reloaded"
-
-#: ../contents/ui/config/ConfigMain.qml
-msgid "AI Chat"
-msgstr "AI-chat"
-
-#: ../contents/ui/AiChatView.qml
-msgid "+ Start New Chat"
-msgstr "+ Start een nieuwe chat"
-
-#: ../contents/ui/AiChatView.qml
-msgid "Delete This Conversation"
-msgstr "Verwijder dit gesprek"
-
-#: ../contents/ui/AiChatView.qml
-msgid "You"
-msgstr "Jij"
-
-#: ../contents/ui/AiChatView.qml
-msgid "Assistant"
-msgstr "Assistent"
-
-#: ../contents/ui/AiChatView.qml
-msgid "Start a new conversation"
-msgstr "Begin een nieuw gesprek"
-
-#: ../contents/ui/AiChatView.qml
-msgid "Configure provider, API key and model in settings before sending."
-msgstr "Configureer provider, API-sleutel en model in de instellingen voordat u verzendt."
-
-#: ../contents/ui/AiChatView.qml
-msgid "Ask anything... (Enter to send, Shift+Enter for newline)"
-msgstr "Alles vragen... (Enter om te verzenden, Shift+Enter voor nieuwe regel)"
-
-#: ../contents/ui/AiChatModel.qml
-msgid "New Chat"
-msgstr "Nieuwe chat"
-
-#: ../contents/ui/AiChatModel.qml
-msgid "Please choose a model in settings."
-msgstr "Kies een model in de instellingen."
-
-#: ../contents/ui/AiChatModel.qml
-msgid "Please enter an API key in settings."
-msgstr "Voer een API-sleutel in de instellingen in."
-
-#: ../contents/ui/AiChatModel.qml
-msgid "Waiting for response..."
-msgstr "Wachten op reactie..."
-
-#: ../contents/ui/AiChatModel.qml
-msgid "The provider returned an empty response."
-msgstr "De provider heeft een leeg antwoord geretourneerd."
-
-#: ../contents/ui/AiChatModel.qml
-msgid "Please enter an API key before detecting models."
-msgstr "Voer een API-sleutel in voordat u modellen detecteert."
-
-#: ../contents/ui/AiChatModel.qml ../contents/ui/config/ConfigAiChat.qml
-msgid "Detecting models..."
-msgstr "Modellen detecteren..."
-
-#: ../contents/ui/AiChatModel.qml
-msgid "No models were detected for this provider."
-msgstr "Er zijn geen modellen gevonden voor deze aanbieder."
-
-#: ../contents/ui/AiChatModel.qml
-msgid "Invalid JSON response from provider."
-msgstr "Ongeldig JSON-antwoord van provider."
-
-#: ../contents/ui/AiChatModel.qml
-msgid "Request failed (%1)."
-msgstr "Verzoek mislukt (%1)."
-
-#: ../contents/ui/AiChatModel.qml
-msgid "Request failed (%1): %2"
-msgstr "Verzoek mislukt (%1): %2"
-
-#: ../contents/ui/config/ConfigAiChat.qml
-msgid "Add an API key to detect models."
-msgstr "Voeg een API-sleutel toe om modellen te detecteren."
-
-#: ../contents/ui/config/ConfigAiChat.qml
-msgid "Model detection failed (%1)."
-msgstr "Modeldetectie mislukt (%1)."
-
-#: ../contents/ui/config/ConfigAiChat.qml
-msgid "No models were detected."
-msgstr "Er zijn geen modellen gedetecteerd."
-
-#: ../contents/ui/config/ConfigAiChat.qml
-msgid "Detected %1 model(s)."
-msgstr "%1 model(len) gedetecteerd."
-
-#: ../contents/ui/config/ConfigAiChat.qml
-msgid "Paste your API key to auto-detect models."
-msgstr "Plak uw API-sleutel om modellen automatisch te detecteren."
-
-#: ../contents/ui/config/ConfigAiChat.qml
-msgid "Provider"
-msgstr "Aanbieder"
-
-#: ../contents/ui/config/ConfigAiChat.qml
-msgid "AI Provider"
-msgstr "AI-aanbieder"
-
-#: ../contents/ui/config/ConfigAiChat.qml
-msgid "API Key"
-msgstr "API-sleutel"
-
-#: ../contents/ui/config/ConfigAiChat.qml
-msgid "Required for this provider"
-msgstr "Vereist voor deze aanbieder"
-
-#: ../contents/ui/config/ConfigAiChat.qml
-msgid "Hide API Key"
-msgstr "API-sleutel verbergen"
-
-#: ../contents/ui/config/ConfigAiChat.qml
-msgid "Show API Key"
-msgstr "Toon API-sleutel"
-
-#: ../contents/ui/config/ConfigAiChat.qml
-msgid "Ollama Server"
-msgstr "Ollama-server"
-
-#: ../contents/ui/config/ConfigAiChat.qml
-msgid "Detected Models"
-msgstr "Gedetecteerde modellen"
-
-#: ../contents/ui/config/ConfigAiChat.qml
-msgid "Reload models"
-msgstr "Modellen opnieuw laden"
-
-#: ../contents/ui/config/ConfigAiChat.qml
-msgid "No models detected yet. Paste your API key to auto-detect."
-msgstr "Nog geen modellen gedetecteerd. Plak uw API-sleutel om automatisch te detecteren."
-
-#: ../contents/ui/config/ConfigAiChat.qml
-msgid "Chat Options"
-msgstr "Chatopties"
-
-#: ../contents/ui/config/ConfigAiChat.qml
-msgid "Enable streaming responses"
-msgstr "Schakel streamingreacties in"
-
-#: ../contents/ui/config/ConfigAiChat.qml
-msgid "Notes"
-msgstr "Opmerkingen"
-
-#: ../contents/ui/config/ConfigAiChat.qml
-msgid ""
-"OpenAI, OpenRouter, Google, Perplexity and Anthropic require network access "
-"and an API key. Ollama connects to a local server (default: http://"
-"127.0.0.1:11434)."
-msgstr "OpenAI, OpenRouter, Google, Perplexity en Anthropic vereisen netwerktoegang en een API-sleutel. Ollama maakt verbinding met een lokale server (standaard: http://127.0.0.1:11434)."
-
-#: contents/ui/config/ConfigAppearance.qml:24
-#: contents/ui/config/ConfigSearch.qml:30
-msgid "Follow Current %1 (%2)"
-msgstr "Follow Current %1 (%2)"
-
-#: contents/ui/config/ConfigAppearance.qml:34
-msgid "Shared Surfaces"
-msgstr "Shared Surfaces"
-
-#: contents/ui/config/ConfigAppearance.qml:40
-msgid "Surface Style"
-msgstr "Surface Style"
-
-#: contents/ui/config/ConfigAppearance.qml:51
-#: contents/ui/config/ConfigTiles.qml:135
-msgid "Custom Colour"
-msgstr "Custom Colour"
-
-#: contents/ui/config/ConfigAppearance.qml:65
-msgid "Frosted Glass"
-msgstr "Matglas"
-
-#: contents/ui/config/ConfigAppearance.qml:73
-msgid "Surface Corners"
-msgstr "Surface Corners"
-
-#: contents/ui/config/ConfigAppearance.qml:77
-msgid "Rounded corners"
-msgstr "Afgeronde hoeken"
-
-#: contents/ui/config/ConfigAppearance.qml:90
-msgid "Corner radius"
-msgstr "Hoekradius"
-
-#: contents/ui/config/ConfigAppearance.qml:95
-msgid "Surface Borders"
-msgstr "Surface Borders"
-
-#: contents/ui/config/ConfigAppearance.qml:96
-msgid "Hide surface borders"
-msgstr "Hide surface borders"
-
-#: contents/ui/config/ConfigAppearance.qml:102
-msgid ""
-"Applies to tiles, group panels, sidebar cards, search box, and pill tab bar "
-"surfaces."
-msgstr "Applies to tiles, group panels, sidebar cards, search box, and pill tab bar surfaces."
-
-#: contents/config/config.qml:11 contents/ui/config/ConfigTiles.qml:125
-msgid "Appearance"
-msgstr "Weergave"
-
-#: contents/ui/config/ConfigAiChat.qml:24
-msgid "OpenAI"
-msgstr "OpenAI"
-
-#: contents/ui/config/ConfigAiChat.qml:25
-msgid "OpenRouter"
-msgstr "OpenRouter"
-
-#: contents/ui/config/ConfigAiChat.qml:26
-msgid "Google (Gemini API)"
-msgstr "Google (Gemini API)"
-
-#: contents/ui/config/ConfigAiChat.qml:27
-msgid "Perplexity"
-msgstr "Perplexity"
-
-#: contents/ui/config/ConfigAiChat.qml:28
-msgid "Anthropic"
-msgstr "Anthropic"
-
-#: contents/ui/config/ConfigAiChat.qml:29
-msgid "Open WebUI"
-msgstr "Open WebUI"
-
-#: contents/ui/config/ConfigAiChat.qml:30
-msgid "Ollama (Local)"
-msgstr "Ollama (Local)"
-
-#: contents/ui/config/ConfigAiChat.qml:273
-msgid "Failed to save API key to KWallet."
-msgstr "Failed to save API key to KWallet."
-
-#: contents/ui/config/ConfigAiChat.qml:285
-msgid "Failed to remove API key from KWallet."
-msgstr "Failed to remove API key from KWallet."
-
-#: contents/ui/config/ConfigAiChat.qml:354
-msgid "Enabled"
-msgstr "Ingeschakeld"
-
-#: contents/ui/config/ConfigAiChat.qml:355
-msgid "Disabled"
-msgstr "Uitgeschakeld"
-
-#: contents/ui/config/ConfigAiChat.qml:388
-msgid "API Key (Optional)"
-msgstr "API Key (Optional)"
-
-#: contents/ui/config/ConfigAiChat.qml:391
-msgid "Required for this provider (stored in KWallet)"
-msgstr "Required for this provider (stored in KWallet)"
-
-#: contents/ui/config/ConfigAiChat.qml:392
-msgid "Optional bearer token (stored in KWallet)"
-msgstr "Optional bearer token (stored in KWallet)"
-
-#: contents/ui/config/ConfigAiChat.qml:440
-msgid ""
-"An API key is already stored in KWallet. Enter a new key here to replace it."
-msgstr "An API key is already stored in KWallet. Enter a new key here to replace it."
-
-#: contents/ui/config/ConfigAiChat.qml:463
-msgid "Open WebUI Server"
-msgstr "Open WebUI Server"
-
-#: contents/ui/config/ConfigAiChat.qml:538
-msgid ""
-"<ul><li>OpenAI, OpenRouter, Google, Perplexity and Anthropic require network "
-"access and an API key.</li><li>Open WebUI uses its OpenAI-compatible API at "
-"your configured server URL and can optionally use a bearer token; both the "
-"server root and an /api URL are accepted.</li><li>Ollama connects to a local "
-"server (default: http://127.0.0.1:11434).</li></ul>"
-msgstr "<ul><li>OpenAI, OpenRouter, Google, Perplexity and Anthropic require network access and an API key.</li><li>Open WebUI uses its OpenAI-compatible API at your configured server URL and can optionally use a bearer token; both the server root and an /api URL are accepted.</li><li>Ollama connects to a local server (default: http://127.0.0.1:11434).</li></ul>"
-
-#: contents/ui/config/ConfigExportLayout.qml:652
-msgid "Invalid tile property JSON"
-msgstr "Invalid tile property JSON"
-
-#: contents/ui/config/ConfigExportLayout.qml:1075
-msgid "Applied tile model (%1 tiles)"
-msgstr "Applied tile model (%1 tiles)"
-
-#: contents/ui/config/ConfigExportLayout.qml:1110
-msgid "Failed to save file"
-msgstr "Failed to save file"
-
-#: contents/ui/config/ConfigExportLayout.qml:1128
-msgid "Failed to import file"
-msgstr "Failed to import file"
-
-#: contents/ui/config/ConfigExportLayout.qml:1137
-msgid "Import produced no data"
-msgstr "Import produced no data"
-
-#: contents/ui/config/ConfigExportLayout.qml:1146
-msgid "Failed to decode imported file"
-msgstr "Failed to decode imported file"
-
-#: contents/ui/config/ConfigExportLayout.qml:1160
-msgid "Imported from %1"
-msgstr "Imported from %1"
-
-#: contents/ui/config/ConfigExportLayout.qml:1164
-msgid "Failed to import settings"
-msgstr "Failed to import settings"
-
-#: contents/ui/config/ConfigExportLayout.qml:1172
-msgid "Save Layout"
-msgstr "Save Layout"
-
-#: contents/ui/config/ConfigExportLayout.qml:1175
-#: contents/ui/config/ConfigExportLayout.qml:1194
-msgid "Layout Files (*.xml)"
-msgstr "Layout Files (*.xml)"
-
-#: contents/ui/config/ConfigExportLayout.qml:1176
-#: contents/ui/config/ConfigExportLayout.qml:1195
-msgid "All Files (*)"
-msgstr "Alle bestanden (*)"
-
-#: contents/ui/config/ConfigExportLayout.qml:1191
-msgid "Import Layout"
-msgstr "Import Layout"
-
-#: contents/ui/config/ConfigExportLayout.qml:1214
-msgid "Saved to %1"
-msgstr "Saved to %1"
-
-#: contents/ui/config/ConfigExportLayout.qml:1235
-msgid "Application Launcher XML layout"
-msgstr "Application Launcher XML layout"
-
-#: contents/ui/config/ConfigExportLayout.qml:1241
-msgid ""
-"These are all the settings and variables for this application launcher. Be "
-"careful when changing things by hand, because mistakes here can break the "
-"layout or configuration."
-msgstr "These are all the settings and variables for this application launcher. Be careful when changing things by hand, because mistakes here can break the layout or configuration."
-
-#: contents/ui/config/ConfigExportLayout.qml:1280
-msgid "Import XML"
-msgstr "Import XML"
-
-#: contents/ui/config/ConfigExportLayout.qml:1285
-msgid "Export XML"
-msgstr "Export XML"
-
-#: contents/ui/config/ConfigGeneral.qml:307
-msgid "Application List"
-msgstr "Application List"
-
-#: contents/ui/config/ConfigGeneral.qml:329
-msgid "Docked Sidebar Width"
-msgstr "Docked Sidebar Width"
-
-#: contents/ui/config/ConfigGeneral.qml:342
-msgid "Last Used View"
-msgstr "Last Used View"
-
-#: contents/ui/config/ConfigSearch.qml:52
-msgid "Search On Top"
-msgstr "Search On Top"
-
-#: contents/ui/config/ConfigSearch.qml:105
-msgid "Group search results"
-msgstr "Group search results"
-
-#: contents/ui/config/ConfigSidebar.qml:28
-msgid "Layout"
-msgstr "Indeling"
-
-#: contents/ui/config/ConfigSidebar.qml:34
-msgid "Layout Mode"
-msgstr "Layout Mode"
-
-#: contents/ui/config/ConfigSidebar.qml:36
-msgid "Docked Sidebar Layout"
-msgstr "Docked Sidebar Layout"
-
-#: contents/ui/config/ConfigSidebar.qml:37
-msgid "Classic Layout"
-msgstr "Classic Layout"
-
-#: contents/ui/config/ConfigSidebar.qml:305
-#: contents/ui/libconfig/ListBoxStringList.qml:62
-#: contents/ui/libconfig/ListBoxStringList.qml:100
-#: contents/ui/libconfig/ListBoxStringList.qml:309
-msgid "Shortcut cannot be empty."
-msgstr "Shortcut cannot be empty."
-
-#: contents/ui/config/ConfigSidebar.qml:316
-msgid ""
-"Unsupported XDG shortcut. Use DOCUMENTS, DOWNLOAD, MUSIC, PICTURES, or "
-"VIDEOS."
-msgstr "Unsupported XDG shortcut. Use DOCUMENTS, DOWNLOAD, MUSIC, PICTURES, or VIDEOS."
-
-#: contents/ui/config/ConfigSidebar.qml:329
-msgid "Desktop launcher not found."
-msgstr "Desktop launcher not found."
-
-#: contents/ui/config/ConfigSidebar.qml:334
-msgid ""
-"Use an installed .desktop launcher, an xdg: shortcut, or a filesystem path."
-msgstr "Use an installed .desktop launcher, an xdg: shortcut, or a filesystem path."
-
-#: contents/ui/config/ConfigSidebar.qml:354
-msgid "Shortcut Presets"
-msgstr "Shortcut Presets"
-
-#: contents/ui/config/ConfigSidebar.qml:360
-msgid "Add common folders and apps to the sidebar."
-msgstr "Add common folders and apps to the sidebar."
-
-#: contents/ui/config/ConfigSidebar.qml:426
-msgid "Classic Sidebar"
-msgstr "Classic Sidebar"
-
-#: contents/ui/config/ConfigSidebar.qml:435
-msgid "Position"
-msgstr "Positie"
-
-#: contents/ui/config/ConfigSidebar.qml:438
-msgid "Top"
-msgstr "Boven"
-
-#: contents/ui/config/ConfigSidebar.qml:439
-msgid "Bottom"
-msgstr "Onder"
-
-#: contents/ui/config/ConfigSidebar.qml:446
-msgid "Height"
-msgstr "Hoogte"
-
-#: contents/ui/config/ConfigTiles.qml:61 contents/ui/config/ConfigTiles.qml:67
-#: contents/ui/config/ConfigTiles.qml:76
-msgid "Tabs"
-msgstr "Tabbladen"
-
-#: contents/ui/config/ConfigTiles.qml:66
-msgid "Tab Support"
-msgstr "Tab Support"
-
-#: contents/ui/config/ConfigTiles.qml:72
-msgid "Tab Style"
-msgstr "Tab Style"
-
-#: contents/ui/config/ConfigTiles.qml:77
-msgid "Pills"
-msgstr "Pillen"
-
-#: contents/ui/config/ConfigTiles.qml:83
-msgid "Size & Spacing"
-msgstr "Size & Spacing"
-
-#: contents/ui/config/ConfigTiles.qml:104
-msgid "Tile Icon Size"
-msgstr "Tile Icon Size"
-
-#: contents/ui/config/ConfigTiles.qml:113
-msgid "Base size for tile icons; small/large variants scale from this"
-msgstr "Base size for tile icons; small/large variants scale from this"
-
-#: contents/ui/config/ConfigTiles.qml:130
-msgid "Tile Background Colour"
-msgstr "Tile Background Colour"
-
-#: contents/ui/config/ConfigTiles.qml:167
-msgid "Hover Effect"
-msgstr "Hover Effect"
-
-#: contents/ui/config/ConfigTiles.qml:169
-#: contents/ui/config/ConfigTiles.qml:218
-msgid "Classic"
-msgstr "Klassiek"
-
-#: contents/ui/config/ConfigTiles.qml:170
-msgid "Holographic"
-msgstr "Holographic"
-
-#: contents/ui/config/ConfigTiles.qml:176
-msgid "Play animated backgrounds only on hover"
-msgstr "Play animated backgrounds only on hover"
-
-#: contents/ui/config/ConfigTiles.qml:181
-msgid "Show tooltips on hover"
-msgstr "Show tooltips on hover"
-
-#: contents/ui/config/ConfigTiles.qml:187
-msgid "Labels"
-msgstr "Labels"
-
-#: contents/ui/config/ConfigTiles.qml:195
-msgid "Centre"
-msgstr "Midden"
-
-#: contents/ui/config/ConfigTiles.qml:210
-msgid "Groups"
-msgstr "Groepen"
-
-#: contents/ui/config/ConfigTiles.qml:215
-msgid "Group Tile Layout"
-msgstr "Group Tile Layout"
-
-#: contents/ui/config/ConfigTiles.qml:217
-msgid "Card"
-msgstr "Kaart"
-
-#: contents/ui/config/ConfigTiles.qml:229
-msgid "Preset Tile Folder"
-msgstr "Preset Tile Folder"
-
-#: contents/ui/config/ConfigTiles.qml:371
-msgid "Browse..."
-msgstr "Bladeren…"
-
-#: contents/ui/config/ConfigTiles.qml:382
-msgid "Select Preset Tile Folder"
-msgstr "Select Preset Tile Folder"
-
-#: contents/ui/libconfig/ListBoxStringList.qml:348
-msgid "That shortcut already exists."
-msgstr "That shortcut already exists."
-
-#: contents/ui/libconfig/ListBoxStringList.qml:482
-msgid "Enter a desktop file, URL, or path"
-msgstr "Enter a desktop file, URL, or path"
-
-#: contents/ui/libconfig/ListBoxStringList.qml:598
-msgid "Add"
-msgstr "Toevoegen"
-
-#: contents/ui/libconfig/ListBoxStringList.qml:603
-msgid "Save"
-msgstr "Opslaan"
-
-#: contents/ui/libconfig/ListBoxStringList.qml:603
-msgid "Update"
-msgstr "Bijwerken"
-
-#: contents/ui/libconfig/ListBoxStringList.qml:609
-msgid "Remove"
-msgstr "Verwijderen"
-
-#: contents/ui/libconfig/ListBoxStringList.qml:615
-msgid "Up"
-msgstr "Omhoog"
-
-#: contents/ui/libconfig/ListBoxStringList.qml:621
-msgid "Down"
-msgstr "Omlaag"
+#: ../contents/ui/TileItem.qml
+msgid "Move to"
+msgstr ""
+
+#: ../contents/ui/TileTabBar.qml
+msgid "Rename Tab"
+msgstr ""
+
+#: ../contents/ui/TileTabBar.qml
+msgid "Change Icon…"
+msgstr ""
+
+#: ../contents/ui/TileTabBar.qml
+msgid "Clear Icon"
+msgstr ""
+
+#: ../contents/ui/TileTabBar.qml
+msgid "Add Tab"
+msgstr ""
+
+#~ msgid "Group header style"
+#~ msgstr "Groepskopstijl"
+
+#~ msgid "Plain"
+#~ msgstr "Eenvoudig"
+
+#~ msgid "Section header"
+#~ msgstr "Sectiekop"
+
+#~ msgid "Tiled Menu"
+#~ msgstr "Tegelmenu"
+
+#~ msgid "A menu based on Windows 10's Start Menu."
+#~ msgstr "Een menu a la het Windows 10-startmenu."
+
+#~ msgid "General"
+#~ msgstr "Algemeen"
+
+#~ msgid "Import/Export Layout"
+#~ msgstr "Indeling importeren/exporteren"
+
+#~ msgid "Advanced"
+#~ msgstr "Geavanceerd"
+
+#~ msgid "Pin to Taskbar"
+#~ msgstr "Vastmaken aan taakbalk"
+
+#~ msgid "Most Used"
+#~ msgstr "Meest gebruikt"
+
+#~ msgid "Popup"
+#~ msgstr "Pop-up"
+
+#~ msgid "Fullscreen"
+#~ msgstr "Volledig scherm"
+
+#~ msgid "Grid Columns"
+#~ msgstr "Roosterkolommen"
+
+#~ msgid "Panel Icon"
+#~ msgstr "Paneelpictogram"
+
+#~ msgid "Fixed Size"
+#~ msgstr "Vaste grootte"
+
+#~ msgid "Tile Size"
+#~ msgstr "Tegelgrootte"
+
+#~ msgid "Tile Margin"
+#~ msgstr "Tegelruimte"
+
+#~ msgid "Text Alignment"
+#~ msgstr "Tekstuitlijning"
+
+#~ msgid "Center"
+#~ msgstr "Gecentreerd"
+
+#~ msgid "Group Text Alignment"
+#~ msgstr "Uitlijning van groepstekst"
+
+#~ msgid "Width"
+#~ msgstr "Breedte"
+
+#~ msgid "Icon Size"
+#~ msgstr "Pictogramgrootte"
+
+#~ msgid "Popup Button Height"
+#~ msgstr "Hoogte van pop-upknop"
+
+#~ msgid "Sidebar Shortcuts"
+#~ msgstr "Snelkoppelingen op zijbalk"
+
+#~ msgid "Collapse Search Result Groups"
+#~ msgstr "Zoekresultaatgroepen samenvouwen"
+
+#~ msgid "Add Default"
+#~ msgstr "Standaard toevoegen"
+
+#~ msgid "Search Box"
+#~ msgstr "Zoekvak"
+
+#~ msgid "Hide Search Field"
+#~ msgstr "Zoekvak verbergen"
+
+#~ msgid "Search Field Height"
+#~ msgstr "Hoogte van zoekvak"
+
+#~ msgid "Search Box Theme"
+#~ msgstr "Zoekvakthema"
+
+#~ msgid "App List Area Width"
+#~ msgstr "Breedte van programmalijst"
+
+#~ msgid "Default View"
+#~ msgstr "Standaardweergave"
+
+#~ msgid "App Description"
+#~ msgstr "Beschrijving"
+
+#~ msgid "App History"
+#~ msgstr "Programmageschiedenis"
+
+#~ msgid "Search Results"
+#~ msgstr "Zoekresultaten"
+
+#~ msgid "Merged (Application Launcher)"
+#~ msgstr "Samengevoegd (programmastarter)"
+
+#~ msgid "Split into Categories (Application Menu / Dashboard)"
+#~ msgstr "Opgesplitst in categorieën (programmamenu/overzicht)"
+
+#~ msgid "Right Click Menu"
+#~ msgstr "Rechtsklikmenu"
+
+#~ msgid ""
+#~ "When this widget has a global shortcut set, like 'Alt+F1', Plasma will "
+#~ "open this menu with just the ⊞ Windows / Meta key."
+#~ msgstr ""
+#~ "Als er voor deze widget een globale sneltoets is ingesteld, bijv. "
+#~ "‘Alt+F1’, dan opent Plasma dit menu alleen met de ⊞ Windows-/Metatoets."
+
+#~ msgid "Resize?"
+#~ msgstr "Grootte aanpassen?"
+
+#~ msgid "Meta + Right Click to resize the menu."
+#~ msgstr "Gebruik Meta + rechtermuisklik om de menugrootte aan te passen."
+
+#~ msgid "Search Apps"
+#~ msgstr "Zoeken naar programma's"
+
+#~ msgid "Search Files"
+#~ msgstr "Zoeken naar bestanden"
+
+#~ msgid "Search Bookmarks"
+#~ msgstr "Zoeken naar bladwijzers"
+
+#~ msgctxt "Search [krunnerName, krunnerName, ...], "
+#~ msgid "Search %1"
+#~ msgstr "%1 doorzoeken"
+
+#~ msgid "All"
+#~ msgstr "Alles"
+
+#~ msgid "Search with all KRunner plugins"
+#~ msgstr "Zoeken met alle KRunner-plug-ins"
+
+#~ msgid "Software Center"
+#~ msgstr "Softwarecentrum"
+
+#~ msgid "+ Start New Chat"
+#~ msgstr "+ Start een nieuwe chat"
+
+#~ msgid "AI Provider"
+#~ msgstr "AI-aanbieder"
+
+#~ msgid "API Key"
+#~ msgstr "API-sleutel"
+
+#~ msgid "Required for this provider"
+#~ msgstr "Vereist voor deze aanbieder"
+
+#~ msgid "Ollama Server"
+#~ msgstr "Ollama-server"
+
+#~ msgid "Detected Models"
+#~ msgstr "Gedetecteerde modellen"
+
+#~ msgid "Chat Options"
+#~ msgstr "Chatopties"
+
+#~ msgid "Notes"
+#~ msgstr "Opmerkingen"
+
+#~ msgid ""
+#~ "OpenAI, OpenRouter, Google, Perplexity and Anthropic require network "
+#~ "access and an API key. Ollama connects to a local server (default: http://"
+#~ "127.0.0.1:11434)."
+#~ msgstr ""
+#~ "OpenAI, OpenRouter, Google, Perplexity en Anthropic vereisen "
+#~ "netwerktoegang en een API-sleutel. Ollama maakt verbinding met een lokale "
+#~ "server (standaard: http://127.0.0.1:11434)."
+
+#~ msgid "Follow Current %1 (%2)"
+#~ msgstr "Follow Current %1 (%2)"
+
+#~ msgid "Shared Surfaces"
+#~ msgstr "Shared Surfaces"
+
+#~ msgid "Surface Style"
+#~ msgstr "Surface Style"
+
+#~ msgid "Custom Colour"
+#~ msgstr "Custom Colour"
+
+#~ msgid "Frosted Glass"
+#~ msgstr "Matglas"
+
+#~ msgid "Surface Corners"
+#~ msgstr "Surface Corners"
+
+#~ msgid "Surface Borders"
+#~ msgstr "Surface Borders"
+
+#~ msgid "Appearance"
+#~ msgstr "Weergave"
+
+#~ msgid "API Key (Optional)"
+#~ msgstr "API Key (Optional)"
+
+#~ msgid "Open WebUI Server"
+#~ msgstr "Open WebUI Server"
+
+#~ msgid "Application List"
+#~ msgstr "Application List"
+
+#~ msgid "Docked Sidebar Width"
+#~ msgstr "Docked Sidebar Width"
+
+#~ msgid "Search On Top"
+#~ msgstr "Search On Top"
+
+#~ msgid "Layout Mode"
+#~ msgstr "Layout Mode"
+
+#~ msgid "Shortcut Presets"
+#~ msgstr "Shortcut Presets"
+
+#~ msgid "Classic Sidebar"
+#~ msgstr "Classic Sidebar"
+
+#~ msgid "Position"
+#~ msgstr "Positie"
+
+#~ msgid "Height"
+#~ msgstr "Hoogte"
+
+#~ msgid "Tab Support"
+#~ msgstr "Tab Support"
+
+#~ msgid "Tab Style"
+#~ msgstr "Tab Style"
+
+#~ msgid "Tile Icon Size"
+#~ msgstr "Tile Icon Size"
+
+#~ msgid "Tile Background Colour"
+#~ msgstr "Tile Background Colour"
+
+#~ msgid "Hover Effect"
+#~ msgstr "Hover Effect"
+
+#~ msgid "Labels"
+#~ msgstr "Labels"
+
+#~ msgid "Groups"
+#~ msgstr "Groepen"
+
+#~ msgid "Group Tile Layout"
+#~ msgstr "Group Tile Layout"
+
+#~ msgid "Preset Tile Folder"
+#~ msgstr "Preset Tile Folder"
 
 #~ msgid "<b>Version:</b> %1"
 #~ msgstr "<b>Versie:</b> %1"
 
 #~ msgid "Desktop Theme (%1)"
 #~ msgstr "Bureaubladthema (%1)"
-
-#~ msgid "Menu"
-#~ msgstr "Menu"
 
 #~ msgid "Apps"
 #~ msgstr "Apps"

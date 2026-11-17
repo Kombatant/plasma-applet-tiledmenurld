@@ -8,6 +8,7 @@ QT_QPA_PLATFORM=offscreen /tmp/tiledmenu-qml-tests -input tests/tst_most_used.qm
 QT_QPA_PLATFORM=offscreen /tmp/tiledmenu-qml-tests -input tests/tst_group_reflow.qml
 QT_QPA_PLATFORM=offscreen /tmp/tiledmenu-qml-tests -input tests/tst_tile_grid_group_move.qml
 QT_QPA_PLATFORM=offscreen /tmp/tiledmenu-qml-tests -input tests/tst_tile_grid_drag_events.qml
+QT_QPA_PLATFORM=offscreen /tmp/tiledmenu-qml-tests -input tests/tst_config_tabs.qml
 ```
 
 The QML tests require Qt 6 development libraries and Plasma QML modules. The
@@ -39,3 +40,13 @@ a tile onto another group or tile and watch it step aside before dropping.
 `tst_tile_grid_drag_events.qml` sends real internal drag events from a tile
 delegate into the grid. Those events carry the dragged item's top-left
 (`Drag.hotSpot`), not the pointer, so no grab offset may be applied on top.
+
+`tst_config_tabs.qml` covers the in-page tabs of the settings dialog
+(`LibConfig.FormKCM` `tabs` and `LibConfig.FormTab`): only the current tab
+shows, controls inside a tab stage their value on the page root, and nothing
+in a tab moves after the tab is shown (opening a page or switching tabs must
+not make the form jump). It also checks that controls start at the same
+horizontal position on every tab and that the page title is shown. It also
+loads the Menu, Tiles, Sidebar and Theme pages with a stubbed Plasma context.
+The Services and Backup & Updates pages are not loaded because they talk to
+KWallet and the real configuration; check those in the live settings dialog.

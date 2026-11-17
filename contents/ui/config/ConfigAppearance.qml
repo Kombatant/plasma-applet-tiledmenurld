@@ -21,7 +21,7 @@ LibConfig.FormKCM {
 
 	readonly property string plasmaStyleLabelText: {
 		var plasmaStyleText = i18nd("kcm_desktoptheme", "Plasma Style")
-		return i18n("Follow Current %1 (%2)", plasmaStyleText, KSvg.ImageSet.imageSetName)
+		return i18n("Follow current %1 (%2)", plasmaStyleText, KSvg.ImageSet.imageSetName)
 	}
 
 	function setPendingSurfaceStyle(style) {
@@ -29,107 +29,104 @@ LibConfig.FormKCM {
 		ConfigUtils.setPendingValue(formLayout, "sidebarFollowsTheme", style === "theme" || style === "frosted")
 	}
 
-	//-------------------------------------------------------
-	LibConfig.Heading {
-		text: i18n("Shared Surfaces")
-	}
-
-	LibConfig.RadioButtonGroup {
-		id: surfaceThemeGroup
-		spacing: 0
-		Kirigami.FormData.label: i18n("Surface Style")
-
-		QQC2.RadioButton {
-			text: plasmaStyleLabelText
-			QQC2.ButtonGroup.group: surfaceThemeGroup.group
-			checked: formLayout.pendingSurfaceStyle === "theme"
-			onClicked: formLayout.setPendingSurfaceStyle("theme")
-		}
-
-		RowLayout {
-			QQC2.RadioButton {
-				text: i18n("Custom Colour")
-				QQC2.ButtonGroup.group: surfaceThemeGroup.group
-				checked: formLayout.pendingSurfaceStyle === "custom"
-				onClicked: formLayout.setPendingSurfaceStyle("custom")
+	tabs: [
+		LibConfig.FormTab {
+			LibConfig.Heading {
+				text: i18n("Shared surfaces")
 			}
 
-			LibConfig.ColorField {
-				configKey: 'sidebarBackgroundColor'
-				enabled: formLayout.pendingSurfaceStyle === "custom"
-				opacity: enabled ? 1 : 0.45
+			LibConfig.RadioButtonGroup {
+				id: surfaceThemeGroup
+				spacing: 0
+				Kirigami.FormData.label: i18n("Surface style:")
+
+				QQC2.RadioButton {
+					text: plasmaStyleLabelText
+					QQC2.ButtonGroup.group: surfaceThemeGroup.group
+					checked: formLayout.pendingSurfaceStyle === "theme"
+					onClicked: formLayout.setPendingSurfaceStyle("theme")
+				}
+
+				RowLayout {
+					QQC2.RadioButton {
+						text: i18n("Custom colour")
+						QQC2.ButtonGroup.group: surfaceThemeGroup.group
+						checked: formLayout.pendingSurfaceStyle === "custom"
+						onClicked: formLayout.setPendingSurfaceStyle("custom")
+					}
+
+					LibConfig.ColorField {
+						configKey: 'sidebarBackgroundColor'
+						enabled: formLayout.pendingSurfaceStyle === "custom"
+						opacity: enabled ? 1 : 0.45
+					}
+				}
+
+				QQC2.RadioButton {
+					text: i18n("Frosted glass")
+					QQC2.ButtonGroup.group: surfaceThemeGroup.group
+					checked: formLayout.pendingSurfaceStyle === "frosted"
+					onClicked: formLayout.setPendingSurfaceStyle("frosted")
+				}
+			}
+
+			RowLayout {
+				Kirigami.FormData.label: i18n("Surface corners:")
+
+				LibConfig.CheckBox {
+					id: surfaceRoundedCornersToggle
+					text: i18n("Rounded corners")
+					configKey: 'tileRoundedCorners'
+				}
+
+				LibConfig.SpinBox {
+					configKey: 'tileCornerRadius'
+					suffix: i18n("px")
+					minimumValue: 0
+					maximumValue: 32
+					enabled: surfaceRoundedCornersToggle.checked
+				}
+
+				QQC2.Label {
+					text: i18n("Corner radius")
+				}
+			}
+
+			LibConfig.CheckBox {
+				Kirigami.FormData.label: i18n("Surface borders:")
+				text: i18n("Hide surface borders")
+				configKey: 'sidebarHideBorder'
+			}
+
+			RowLayout {
+				Kirigami.FormData.label: i18n("Surface shadows:")
+
+				LibConfig.ComboBox {
+					configKey: "surfaceShadowDarkness"
+					model: [
+						{ value: "normal", text: i18n("Normal") },
+						{ value: "dark", text: i18n("Dark") },
+						{ value: "darker", text: i18n("Darker") },
+					]
+				}
+
+				LibConfig.ComboBox {
+					configKey: "surfaceShadowSize"
+					model: [
+						{ value: "normal", text: i18n("Normal") },
+						{ value: "large", text: i18n("Large") },
+						{ value: "extraLarge", text: i18n("Extra Large") },
+					]
+				}
+			}
+
+			QQC2.Label {
+				Kirigami.FormData.label: ""
+				text: i18n("Applies to tiles, group panels, sidebar cards, search box, and pill tab bar surfaces.")
+				wrapMode: Text.WordWrap
+				Layout.fillWidth: true
+				opacity: 0.75
 			}
 		}
-
-		QQC2.RadioButton {
-			text: i18n("Frosted Glass")
-			QQC2.ButtonGroup.group: surfaceThemeGroup.group
-			checked: formLayout.pendingSurfaceStyle === "frosted"
-			onClicked: formLayout.setPendingSurfaceStyle("frosted")
-		}
-	}
-
-	RowLayout {
-		Kirigami.FormData.label: i18n("Surface Corners")
-
-		LibConfig.CheckBox {
-			id: surfaceRoundedCornersToggle
-			text: i18n("Rounded corners")
-			configKey: 'tileRoundedCorners'
-		}
-
-		LibConfig.SpinBox {
-			configKey: 'tileCornerRadius'
-			suffix: i18n("px")
-			minimumValue: 0
-			maximumValue: 32
-			enabled: surfaceRoundedCornersToggle.checked
-		}
-
-		QQC2.Label {
-			text: i18n("Corner radius")
-		}
-	}
-
-	LibConfig.CheckBox {
-		Kirigami.FormData.label: i18n("Surface Borders")
-		text: i18n("Hide surface borders")
-		configKey: 'sidebarHideBorder'
-	}
-
-	LibConfig.CheckBox {
-		Kirigami.FormData.label: i18n("Session Modal")
-		text: i18n("Use the session modal for power actions")
-		configKey: 'dockedSidebarCompactPower'
-	}
-
-	RowLayout {
-		Kirigami.FormData.label: i18n("Surface Shadows")
-
-		LibConfig.ComboBox {
-			configKey: "surfaceShadowDarkness"
-			model: [
-				{ value: "normal", text: i18n("Normal") },
-				{ value: "dark", text: i18n("Dark") },
-				{ value: "darker", text: i18n("Darker") },
-			]
-		}
-
-		LibConfig.ComboBox {
-			configKey: "surfaceShadowSize"
-			model: [
-				{ value: "normal", text: i18n("Normal") },
-				{ value: "large", text: i18n("Large") },
-				{ value: "extraLarge", text: i18n("Extra Large") },
-			]
-		}
-	}
-
-	QQC2.Label {
-		Kirigami.FormData.label: ""
-		text: i18n("Applies to tiles, group panels, sidebar cards, search box, and pill tab bar surfaces.")
-		wrapMode: Text.WordWrap
-		Layout.fillWidth: true
-		opacity: 0.75
-	}
+	]
 }

@@ -5,6 +5,7 @@ import org.kde.plasma.plasma5support as Plasma5Support
 import org.kde.kirigami as Kirigami
 import Qt.labs.platform as QtLabsPlatform
 import "../libconfig/ConfigUtils.js" as ConfigUtils
+import "../lib" as Lib
 import "../lib/Base64.js" as Base64
 import "../lib/TileTabs.js" as TileTabs
 import "../Utils.js" as Utils
@@ -1253,69 +1254,181 @@ Item {
 		execRead.connectSource(cmd)
 	}
 
+	readonly property string _localVersion: (typeof plasmoid !== "undefined" && plasmoid.metaData && plasmoid.metaData.version) ? plasmoid.metaData.version : ""
+	readonly property string _projectUrl: "https://github.com/Kombatant/plasma-applet-tiledmenurld"
+
+	Lib.UpdateChecker {
+		id: updatesChecker
+		localVersion: page._localVersion
+	}
+
+	// Same header as LibConfig.FormKCM: page title, tab bar, rule.
 	ColumnLayout {
-		id: contentLayout
-		anchors.fill: parent
-		anchors.margins: Kirigami.Units.gridUnit * 2
-		spacing: Kirigami.Units.smallSpacing
+		id: pageHeader
+		anchors.top: parent.top
+		anchors.left: parent.left
+		anchors.right: parent.right
+		anchors.leftMargin: Kirigami.Units.gridUnit
+		anchors.rightMargin: Kirigami.Units.gridUnit
+		spacing: 0
 
 		Kirigami.Heading {
+			visible: text.length > 0
 			Layout.fillWidth: true
+			Layout.topMargin: Kirigami.Units.largeSpacing
+			Layout.bottomMargin: Kirigami.Units.largeSpacing
+			text: page.title
 			level: 2
-			font.weight: Font.Bold
-			text: i18n("Application Launcher XML layout")
+			font.weight: Font.DemiBold
+			elide: Text.ElideRight
 		}
 
-		Label {
+		TabBar {
+			id: pageTabBar
 			Layout.fillWidth: true
-			wrapMode: Text.WordWrap
-			text: i18n("These are all the settings and variables for this application launcher. Be careful when changing things by hand, because mistakes here can break the layout or configuration.")
-		}
 
-		ScrollView {
-			id: xmlScrollView
-			Layout.fillWidth: true
-			Layout.fillHeight: true
-			clip: true
-
-			TextArea {
-				id: xmlEditor
-				// Avoid anchoring inside ScrollView (can produce anchor-loop warnings).
-				width: xmlScrollView.availableWidth
-				height: Math.max(xmlScrollView.availableHeight, implicitHeight)
-				font.family: "monospace"
-				wrapMode: TextEdit.NoWrap
-				selectByMouse: true
-				onTextChanged: {
-					if (page._updatingTextFromConfig) {
-						return
-					}
-					page._xmlEditedByUser = true
-					applyXmlDebounced.restart()
-				}
-				onActiveFocusChanged: {
-					// When the user clicks OK, focus moves away from the editor.
-					// Flush any pending debounced apply so changes are not lost.
-					if (!activeFocus) {
-						page._flushPendingXmlApply()
-					}
-				}
+			TabButton {
+				text: i18n("Import / Export")
+				width: implicitWidth
+			}
+			TabButton {
+				text: i18n("Updates")
+				width: implicitWidth
 			}
 		}
 
-		RowLayout {
+		Kirigami.Separator {
 			Layout.fillWidth: true
+		}
+	}
+
+	StackLayout {
+		id: contentLayout
+		anchors.top: pageHeader.bottom
+		anchors.left: parent.left
+		anchors.right: parent.right
+		anchors.bottom: parent.bottom
+		anchors.margins: Kirigami.Units.gridUnit
+		anchors.topMargin: Kirigami.Units.largeSpacing
+		currentIndex: pageTabBar.currentIndex
+
+		ColumnLayout {
 			spacing: Kirigami.Units.smallSpacing
-			Item { Layout.fillWidth: true }
-			Button {
-				text: i18n("Import XML")
-				icon.name: "document-open"
-				onClicked: importDialog.open()
+
+			Kirigami.Heading {
+				Layout.fillWidth: true
+				level: 2
+				font.weight: Font.Bold
+				text: i18n("Application Launcher XML layout")
 			}
+
+			Label {
+				Layout.fillWidth: true
+				wrapMode: Text.WordWrap
+				text: i18n("These are all the settings and variables for this application launcher. Be careful when changing things by hand, because mistakes here can break the layout or configuration.")
+			}
+
+			ScrollView {
+				id: xmlScrollView
+				Layout.fillWidth: true
+				Layout.fillHeight: true
+				clip: true
+
+				TextArea {
+					id: xmlEditor
+					// Avoid anchoring inside ScrollView (can produce anchor-loop warnings).
+					width: xmlScrollView.availableWidth
+					height: Math.max(xmlScrollView.availableHeight, implicitHeight)
+					font.family: "monospace"
+					wrapMode: TextEdit.NoWrap
+					selectByMouse: true
+					onTextChanged: {
+						if (page._updatingTextFromConfig) {
+							return
+						}
+						page._xmlEditedByUser = true
+						applyXmlDebounced.restart()
+					}
+					onActiveFocusChanged: {
+						// When the user clicks OK, focus moves away from the editor.
+						// Flush any pending debounced apply so changes are not lost.
+						if (!activeFocus) {
+							page._flushPendingXmlApply()
+						}
+					}
+				}
+			}
+
+			RowLayout {
+				Layout.fillWidth: true
+				spacing: Kirigami.Units.smallSpacing
+				Item { Layout.fillWidth: true }
+				Button {
+					text: i18n("Import XML")
+					icon.name: "document-open"
+					onClicked: importDialog.open()
+				}
+				Button {
+					text: i18n("Export XML")
+					icon.name: "document-save"
+					onClicked: saveDialog.open()
+				}
+			}
+		}
+
+		ColumnLayout {
+			spacing: Kirigami.Units.largeSpacing
+
+			Label {
+				Layout.fillWidth: true
+				text: i18n("Installed version: %1", page._localVersion || i18n("Unknown"))
+				textFormat: Text.PlainText
+			}
+
+			Kirigami.InlineMessage {
+				Layout.fillWidth: true
+				visible: updatesChecker.checking
+				type: Kirigami.MessageType.Information
+				text: i18n("Checking for updates…")
+			}
+
+			Kirigami.InlineMessage {
+				Layout.fillWidth: true
+				visible: !updatesChecker.checking && updatesChecker.checked && updatesChecker.updateAvailable
+				type: Kirigami.MessageType.Positive
+				text: i18n("A new version (%1) is available. Visit the project page on GitHub to upgrade.", updatesChecker.latestVersion)
+				actions: [
+					Kirigami.Action {
+						text: i18n("Open GitHub")
+						icon.name: "internet-services"
+						onTriggered: Qt.openUrlExternally(page._projectUrl)
+					}
+				]
+			}
+
+			Kirigami.InlineMessage {
+				Layout.fillWidth: true
+				visible: !updatesChecker.checking && updatesChecker.checked && !updatesChecker.updateAvailable && !updatesChecker.failed
+				type: Kirigami.MessageType.Information
+				text: i18n("You are running the latest version.")
+			}
+
+			Kirigami.InlineMessage {
+				Layout.fillWidth: true
+				visible: updatesChecker.checked && updatesChecker.failed
+				type: Kirigami.MessageType.Warning
+				text: i18n("Could not check for updates. Check your internet connection.")
+			}
+
 			Button {
-				text: i18n("Export XML")
-				icon.name: "document-save"
-				onClicked: saveDialog.open()
+				text: i18n("Check Again")
+				icon.name: "view-refresh"
+				enabled: !updatesChecker.checking
+				onClicked: updatesChecker.check(true)
+			}
+
+			Item {
+				Layout.fillHeight: true
 			}
 		}
 	}

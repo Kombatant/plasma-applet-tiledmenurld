@@ -2,6 +2,7 @@
 
 import QtQuick
 import QtQuick.Controls as QQC2
+import QtQuick.Layouts
 import org.kde.kirigami as Kirigami
 
 Item {
@@ -9,6 +10,17 @@ Item {
 	default property alias _formChildren: formLayout.data
 	property string title: ""
 	property alias wideMode: formLayout.wideMode
+
+	// Optional in-page tabs. Assign `tabs: [ LibConfig.FormTab { ... }, ... ]`
+	// to split a page into several short forms under a tab bar. Tabs are
+	// parented into the page tree as they are created, so LibConfig controls
+	// inside them still resolve this item as their KCM root.
+	property alias tabs: tabHost.data
+	property alias currentTab: tabBar.currentIndex
+	readonly property bool tabbed: tabHost.children.length > 0
+
+	// Left and right inset shared by the page title, the tab bar and the form.
+	readonly property int pageMargin: Kirigami.Units.gridUnit
 	readonly property int uniformComboBoxWidth: Kirigami.Units.gridUnit * 12
 	readonly property int uniformSpinBoxWidth: Kirigami.Units.gridUnit * 7
 	implicitWidth: formLayout.implicitWidth
@@ -244,23 +256,105 @@ Item {
 	palette.link: Kirigami.Theme.linkColor
 	palette.linkVisited: Kirigami.Theme.visitedLinkColor
 
+	ColumnLayout {
+		id: pageHeader
+		anchors.top: parent.top
+		anchors.left: parent.left
+		anchors.right: parent.right
+		anchors.leftMargin: formPage.pageMargin
+		anchors.rightMargin: formPage.pageMargin
+		spacing: 0
+
+		// Plasma passes the category name as `title`.
+		Kirigami.Heading {
+			id: titleHeading
+			visible: text.length > 0
+			Layout.fillWidth: true
+			Layout.topMargin: Kirigami.Units.largeSpacing
+			Layout.bottomMargin: Kirigami.Units.largeSpacing
+			text: formPage.title
+			level: 2
+			font.weight: Font.DemiBold
+			elide: Text.ElideRight
+		}
+
+		QQC2.TabBar {
+			id: tabBar
+			// A page with a single FormTab is a plain form: no tab bar.
+			visible: tabHost.children.length > 1
+			Layout.fillWidth: true
+
+			Repeater {
+				model: tabHost.children.length
+				delegate: QQC2.TabButton {
+					required property int index
+					text: tabHost.children[index] ? tabHost.children[index].title : ""
+					width: implicitWidth
+				}
+			}
+
+			onCurrentIndexChanged: scrollView.QQC2.ScrollBar.vertical.position = 0
+		}
+
+		Kirigami.Separator {
+			visible: tabBar.visible
+			Layout.fillWidth: true
+		}
+	}
+
 	QQC2.ScrollView {
 		id: scrollView
-		anchors.fill: parent
+		anchors.top: pageHeader.bottom
+		anchors.left: parent.left
+		anchors.right: parent.right
+		anchors.bottom: parent.bottom
 		clip: true
 
 		Item {
-			width: scrollView.availableWidth
-			implicitHeight: formLayout.implicitHeight + formLayout.anchors.topMargin * 2
+			// Tabbed pages always leave room for the vertical scroll bar.
+			// Otherwise switching between a tab that scrolls and one that
+			// does not changes the available width a frame later, and the
+			// whole form visibly reflows.
+			width: formPage.tabbed
+				? scrollView.width - scrollView.leftPadding - scrollView.QQC2.ScrollBar.vertical.width
+				: scrollView.availableWidth
+			implicitHeight: (formPage.tabbed ? tabHost.height : formLayout.implicitHeight) + formLayout.anchors.topMargin * 2
 
 			Kirigami.FormLayout {
 				id: formLayout
+				visible: !formPage.tabbed
 				anchors.left: parent.left
 				anchors.right: parent.right
 				anchors.top: parent.top
-				anchors.leftMargin: Kirigami.Units.gridUnit * 2
+				anchors.leftMargin: formPage.pageMargin
 				anchors.topMargin: Kirigami.Units.largeSpacing
-				anchors.rightMargin: Kirigami.Units.gridUnit
+				anchors.rightMargin: formPage.pageMargin
+			}
+
+			Item {
+				id: tabHost
+				readonly property Item currentItem: (tabBar.currentIndex >= 0 && tabBar.currentIndex < children.length) ? children[tabBar.currentIndex] : null
+				anchors.left: parent.left
+				anchors.right: parent.right
+				anchors.top: parent.top
+				anchors.leftMargin: formLayout.anchors.leftMargin
+				anchors.topMargin: formLayout.anchors.topMargin
+				anchors.rightMargin: formLayout.anchors.rightMargin
+				height: currentItem ? currentItem.implicitHeight : 0
+
+				// Visibility is set here, not bound in FormTab, so the newly
+				// shown tab can be laid out in the same call, after its whole
+				// subtree has become visible.
+				function _showCurrent() {
+					for (let i = 0; i < children.length; i++) {
+						children[i].visible = children[i] === currentItem
+					}
+					if (currentItem) {
+						currentItem._settleLayout()
+					}
+				}
+				onCurrentItemChanged: _showCurrent()
+				Component.onCompleted: _showCurrent()
 			}
 		}
 	}
