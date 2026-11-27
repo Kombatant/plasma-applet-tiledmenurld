@@ -44,6 +44,12 @@ QtObject {
 			return "transparent"
 		}
 		if (!followsStandaloneBackground) {
+			// A background image alone opts the tile out of group panel styling,
+			// but shouldn't paint the theme highlight behind the image (it shows
+			// through transparent PNGs). Let the group card show through instead.
+			if (hasExplicitBackgroundImage && !hasExplicitGradient) {
+				return "transparent"
+			}
 			return config.plasmaStyleTileColor
 		}
 		return config.defaultTileColor

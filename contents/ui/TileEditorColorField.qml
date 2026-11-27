@@ -35,7 +35,8 @@ PlasmaComponents3.TextField {
 		if (configKey) {
 			return plasmoid.configuration[configKey]
 		} else {
-			return "#000"
+			// Tile editor: start empty so the default colour shows as the hint.
+			return ""
 		}
 	}
 
@@ -48,7 +49,6 @@ PlasmaComponents3.TextField {
 		}
 	}
 	readonly property int sideControlMargin: Math.max(2 * Screen.devicePixelRatio, Math.round(Kirigami.Units.smallSpacing / 2))
-	readonly property int sideControlSize: Math.max(0, height - topPadding - bottomPadding)
 
 	onValueChanged: {
 		if (!activeFocus) {
@@ -64,7 +64,6 @@ PlasmaComponents3.TextField {
 	}
 
 	leftPadding: sideControlMargin + mouseArea.width + sideControlMargin
-	rightPadding: clearButton.visible ? (sideControlMargin + clearButton.width + sideControlMargin) : sideControlMargin
 
 	FontMetrics {
 		id: fontMetrics
@@ -92,34 +91,40 @@ PlasmaComponents3.TextField {
 		onClicked: dialogLoader.active = true
 
 		// Color Preview Circle
-		Item {
-			id: previewBgGradient
+		// Checkerboard behind the preview so translucent colours (e.g. #00000000)
+		// read as transparent rather than as solid black. Clipped to a circle so
+		// the square cells don't poke out past the round preview.
+		Canvas {
+			id: previewBgChecker
 			visible: colorField.showPreviewBg
 			anchors.fill: parent
-			clip: true
+			readonly property int checkerCells: 4
 
-			Rectangle {
-				anchors.fill: parent
-				radius: width / 2
-				color: "white"
-			}
-
-			readonly property real checkerCell: Math.max(2 * Screen.devicePixelRatio, Math.round(width / 4))
-			readonly property int checkerRows: Math.max(1, Math.ceil(height / checkerCell))
-			readonly property int checkerCols: Math.max(1, Math.ceil(width / checkerCell))
-
-			Repeater {
-				model: previewBgGradient.checkerRows * previewBgGradient.checkerCols
-				delegate: Rectangle {
-					required property int index
-					readonly property int rowIndex: Math.floor(index / previewBgGradient.checkerCols)
-					readonly property int colIndex: index % previewBgGradient.checkerCols
-					x: colIndex * previewBgGradient.checkerCell
-					y: rowIndex * previewBgGradient.checkerCell
-					width: previewBgGradient.checkerCell
-					height: previewBgGradient.checkerCell
-					color: ((colIndex + rowIndex) % 2 === 0) ? "white" : "#cccccc"
+			onWidthChanged: requestPaint()
+			onHeightChanged: requestPaint()
+			onPaint: {
+				const ctx = getContext("2d")
+				ctx.reset()
+				if (width <= 0 || height <= 0) {
+					return
 				}
+				ctx.save()
+				ctx.beginPath()
+				ctx.arc(width / 2, height / 2, Math.min(width, height) / 2, 0, 2 * Math.PI)
+				ctx.clip()
+				ctx.fillStyle = "white"
+				ctx.fillRect(0, 0, width, height)
+				ctx.fillStyle = "#cccccc"
+				const cellW = width / checkerCells
+				const cellH = height / checkerCells
+				for (let row = 0; row < checkerCells; row++) {
+					for (let col = 0; col < checkerCells; col++) {
+						if ((row + col) % 2 === 1) {
+							ctx.fillRect(col * cellW, row * cellH, cellW, cellH)
+						}
+					}
+				}
+				ctx.restore()
 			}
 		}
 		Rectangle {
@@ -129,39 +134,6 @@ PlasmaComponents3.TextField {
 			border.width: 1
 			border.color: Kirigami.ColorUtils.linearInterpolation(color, Kirigami.Theme.textColor, 0.5)
 			radius: width / 2
-		}
-	}
-
-	Item {
-		id: clearButton
-		anchors.right: parent.right
-		anchors.rightMargin: colorField.sideControlMargin
-		anchors.top: parent.top
-		anchors.topMargin: parent.topPadding
-		anchors.bottom: parent.bottom
-		anchors.bottomMargin: parent.bottomPadding
-		width: colorField.sideControlSize
-		visible: colorField.text.length > 0
-		z: 1
-
-		Kirigami.Icon {
-			anchors.centerIn: parent
-			width: Math.max(0, parent.width - (2 * colorField.sideControlMargin))
-			height: width
-			source: "edit-clear"
-			color: Kirigami.Theme.textColor
-			opacity: clearMouseArea.containsMouse ? 0.9 : 0.65
-		}
-
-		MouseArea {
-			id: clearMouseArea
-			anchors.fill: parent
-			hoverEnabled: true
-			cursorShape: Qt.PointingHandCursor
-			onClicked: {
-				colorField.text = ""
-				colorField.forceActiveFocus()
-			}
 		}
 	}
 

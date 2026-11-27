@@ -9,6 +9,7 @@ QT_QPA_PLATFORM=offscreen /tmp/tiledmenu-qml-tests -input tests/tst_group_reflow
 QT_QPA_PLATFORM=offscreen /tmp/tiledmenu-qml-tests -input tests/tst_tile_grid_group_move.qml
 QT_QPA_PLATFORM=offscreen /tmp/tiledmenu-qml-tests -input tests/tst_tile_grid_drag_events.qml
 QT_QPA_PLATFORM=offscreen /tmp/tiledmenu-qml-tests -input tests/tst_config_tabs.qml
+QT_QPA_PLATFORM=offscreen /tmp/tiledmenu-qml-tests -input tests/tst_tile_background.qml
 ```
 
 The QML tests require Qt 6 development libraries and Plasma QML modules. The
@@ -36,6 +37,11 @@ at cell boundaries, neighbours waiting for the dwell before stepping aside,
 and group cards growing in the preview.
 The drag gesture itself can only be checked in Plasma: drag a group header or
 a tile onto another group or tile and watch it step aside before dropping.
+
+`tst_tile_background.qml` loads a real `TileGrid` and checks the colour each
+launcher body is drawn with at rest: a grouped tile with only a background
+image stays transparent so the group card shows through (issue #41), while an
+explicit colour and loose tiles keep their colours.
 
 `tst_tile_grid_drag_events.qml` sends real internal drag events from a tile
 delegate into the grid. Those events carry the dragged item's top-left

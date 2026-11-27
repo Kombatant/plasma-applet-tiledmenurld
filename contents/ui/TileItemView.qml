@@ -17,6 +17,7 @@ Rectangle {
 		&& hovered
 		&& !appObj.isGroup
 		&& !appObj.usesGroupPanelStyling
+		&& appObj.followsStandaloneBackground
 		&& appObj.backgroundColor.a <= 0.01
 	color: (appObj.isGroup || appObj.usesGroupPanelStyling)
 		? "transparent"
