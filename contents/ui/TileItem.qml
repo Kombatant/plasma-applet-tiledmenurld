@@ -360,7 +360,11 @@ Item {
 		anchors.fill: parent
 		hoverEnabled: true
 		QQC2.ToolTip.delay: Kirigami.Units.toolTipDelay
-		QQC2.ToolTip.visible: !!plasmoid.configuration.showTileTooltips && containsMouse && tileTooltipText.length > 0
+		QQC2.ToolTip.visible: !!plasmoid.configuration.showTileTooltips
+			&& containsMouse
+			&& tileTooltipText.length > 0
+			&& !dragActive
+			&& !(contextMenuLoader.item && contextMenuLoader.item.opened)
 		QQC2.ToolTip.text: tileTooltipText
 		acceptedButtons: Qt.LeftButton | Qt.RightButton
 		cursorShape: (dragActive && dragOutside)
@@ -532,15 +536,6 @@ Item {
 			}
 			// We need to use callLater to call functions after Drag.drop().
 		}
-	}
-
-	QQC2.ToolTip {
-		id: control
-		visible: tileItemView.hovered && !(dragActive || (contextMenuLoader.item && contextMenuLoader.item.opened)) && appObj.tile.w == 1 && appObj.tile.h == 1
-		text: appObj.labelText
-		delay: 0
-		x: parent.width + rightPadding
-		y: (parent.height - height) / 2
 	}
 
 	Loader {
